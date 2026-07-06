@@ -55,7 +55,8 @@ async function ensureSession(force = false) {
 
   // getcrumb datacenter IP'lerinde throttle olabiliyor ("Too Many Requests").
   // Host'ları dönüşümlü deneyip artan beklemeyle birkaç kez tekrar ediyoruz.
-  const backoff = [0, 1500, 4000, 9000, 15000];
+  // (Yenileme süresini makul tutmak için sınırlı tutuldu.)
+  const backoff = [0, 1500, 4000];
   let cookie = '';
   for (let attempt = 0; attempt < backoff.length; attempt++) {
     if (backoff[attempt]) await sleep(backoff[attempt]);
@@ -152,13 +153,12 @@ async function fetchFundamentals(ticker, attempt = 0) {
   }
 
   if (!res.ok) {
-    if (attempt < 3) {
+    if (attempt < 1) { // en fazla 1 tekrar — yenilemeyi hızlı tutmak için
       if (res.status === 401 || res.status === 403) await ensureSession(true); // crumb tazele
-      else await sleep(700 * (attempt + 1) + Math.random() * 400); // 429/5xx: nazikçe bekle
+      else await sleep(600 + Math.random() * 400); // 429/5xx: kısa bekle
       return fetchFundamentals(ticker, attempt + 1);
     }
-    console.warn(`[data] ${symbol} fundamentals atlandı (HTTP ${res.status})`);
-    return null;
+    return null; // sessizce atla
   }
 
   const json = await res.json();

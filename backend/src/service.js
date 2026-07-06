@@ -68,10 +68,12 @@ export async function getRecommendations() {
     }
   }
 
-  // Cold-start / uyanma sonrası bellek boşsa: yenilemeyi bekleyip veriyle dön.
+  // Cold-start / uyanma sonrası bellek boşsa: yenilemeyi tetikle ama GET'i
+  // askıda tutma — en fazla ~8 sn bekle, dolmazsa eldekini döndür (yenileme arkada sürer).
   if (memory.recommendations.length === 0) {
+    const timeout = new Promise((r) => setTimeout(r, 8000));
     try {
-      await refresh();
+      await Promise.race([refresh(), timeout]);
     } catch (err) {
       console.warn(`[service] Tembel yenileme başarısız: ${err.message}`);
     }
