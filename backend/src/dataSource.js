@@ -134,21 +134,31 @@ async function fetchChart(ticker) {
 }
 
 // --- Analist hedefleri + temel veriler (quoteSummary) -----------------------
-async function fetchFundamentals(ticker, retry = true) {
+// Datacenter IP'lerinde quoteSummary istek bazında da throttle olabiliyor.
+// Başarısızlıkta backoff'la tekrar; 401/403'te oturumu (crumb) tazele.
+async function fetchFundamentals(ticker, attempt = 0) {
   const symbol = toSymbol(ticker);
   const { cookie, crumb } = await ensureSession();
   if (!crumb) return null; // oturum kurulamadı; fundamentals'ı sessizce atla
   const modules = 'financialData,defaultKeyStatistics';
   const url = `${SUMMARY_URL}/${symbol}?modules=${modules}&crumb=${encodeURIComponent(crumb)}`;
-  const res = await fetch(url, { headers: { ...BROWSER_HEADERS, Cookie: cookie } });
 
-  if ((res.status === 401 || res.status === 403) && retry) {
-    await ensureSession(true); // crumb/cookie süresi dolmuş olabilir, tazele
-    return fetchFundamentals(ticker, false);
+  let res;
+  try {
+    res = await fetch(url, { headers: { ...BROWSER_HEADERS, Cookie: cookie } });
+  } catch (e) {
+    if (attempt < 3) { await sleep(700 * (attempt + 1)); return fetchFundamentals(ticker, attempt + 1); }
+    return null;
   }
+
   if (!res.ok) {
-    if (retry) console.warn(`[data] ${symbol} fundamentals HTTP ${res.status}`);
-    return null; // temel veri zorunlu değil; yoksa null döneriz
+    if (attempt < 3) {
+      if (res.status === 401 || res.status === 403) await ensureSession(true); // crumb tazele
+      else await sleep(700 * (attempt + 1) + Math.random() * 400); // 429/5xx: nazikçe bekle
+      return fetchFundamentals(ticker, attempt + 1);
+    }
+    console.warn(`[data] ${symbol} fundamentals atlandı (HTTP ${res.status})`);
+    return null;
   }
 
   const json = await res.json();
@@ -187,7 +197,7 @@ export async function fetchQuotes(tickers) {
     } catch (err) {
       console.warn(`[data] ${ticker} atlandı: ${err.message}`);
     }
-    await new Promise((r) => setTimeout(r, 150)); // rate-limit'e takılmamak için
+    await sleep(500); // rate-limit'e takılmamak için hisseler arası bekleme
   }
   return out;
 }
