@@ -4,21 +4,76 @@ import { toSymbol } from './stocks.js';
 // ve crumb/cookie gerektirmez. 1 aylık günlük veriyi çekiyoruz.
 const CHART_URL = 'https://query1.finance.yahoo.com/v8/finance/chart';
 const SUMMARY_URL = 'https://query2.finance.yahoo.com/v10/finance/quoteSummary';
-const UA = 'Mozilla/5.0 (brokerage-app)';
+// Datacenter IP'lerinde Yahoo gerçekçi bir tarayıcı UA bekliyor.
+const UA =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
+  '(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36';
+const BROWSER_HEADERS = {
+  'User-Agent': UA,
+  Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+  'Accept-Language': 'en-US,en;q=0.9',
+};
+
+// undici .get('set-cookie') cookie'leri virgülle birleştirip bozabiliyor;
+// getSetCookie() ile her cookie'yi ayrı alıp name=value kısmını topluyoruz.
+function collectCookies(res) {
+  const list = typeof res.headers.getSetCookie === 'function'
+    ? res.headers.getSetCookie()
+    : [res.headers.get('set-cookie')].filter(Boolean);
+  return list.map((c) => c.split(';')[0]).join('; ');
+}
 
 // --- Analist/temel veri için crumb + cookie yönetimi ------------------------
 let session = { cookie: '', crumb: '' };
 
 async function ensureSession(force = false) {
   if (session.crumb && !force) return session;
-  const c = await fetch('https://fc.yahoo.com', { headers: { 'User-Agent': UA } });
-  const cookie = (c.headers.get('set-cookie') || '').split(';')[0];
+
+  // 1) Cookie: önce ana sayfa, olmazsa fc.yahoo.com
+  let cookie = '';
+  for (const url of ['https://finance.yahoo.com/', 'https://fc.yahoo.com/']) {
+    try {
+      const c = await fetch(url, { headers: BROWSER_HEADERS, redirect: 'follow' });
+      cookie = collectCookies(c);
+      if (cookie) break;
+    } catch { /* sıradaki kaynağı dene */ }
+  }
+
+  // 2) Crumb
   const cr = await fetch('https://query2.finance.yahoo.com/v1/test/getcrumb', {
-    headers: { 'User-Agent': UA, Cookie: cookie },
+    headers: { ...BROWSER_HEADERS, Cookie: cookie },
   });
-  const crumb = await cr.text();
+  const crumb = (await cr.text()).trim();
+
   session = { cookie, crumb };
   return session;
+}
+
+// Canlı ortamda hangi adımda kırıldığını görmek için teşhis.
+export async function diagnose(ticker = 'THYAO') {
+  const symbol = toSymbol(ticker);
+  const steps = {};
+  try {
+    const { cookie, crumb } = await ensureSession(true);
+    steps.cookieVar = cookie ? cookie.slice(0, 60) : '(boş)';
+    steps.cookieLen = cookie.length;
+    steps.crumb = crumb.slice(0, 40);
+    steps.crumbLen = crumb.length;
+
+    const url = `${SUMMARY_URL}/${symbol}?modules=financialData&crumb=${encodeURIComponent(crumb)}`;
+    const res = await fetch(url, { headers: { ...BROWSER_HEADERS, Cookie: cookie } });
+    steps.summaryStatus = res.status;
+    const body = await res.text();
+    steps.summaryBodyHead = body.slice(0, 200);
+    try {
+      const fd = JSON.parse(body)?.quoteSummary?.result?.[0]?.financialData;
+      steps.targetMean = fd?.targetMeanPrice?.raw ?? null;
+      steps.numAnalysts = fd?.numberOfAnalystOpinions?.raw ?? null;
+    } catch { /* JSON değilse yukarıdaki body zaten görünür */ }
+  } catch (e) {
+    steps.error = e.message;
+  }
+  return steps;
 }
 
 // --- Fiyat + geçmiş (chart) -------------------------------------------------
@@ -55,13 +110,16 @@ async function fetchFundamentals(ticker, retry = true) {
   const { cookie, crumb } = await ensureSession();
   const modules = 'financialData,defaultKeyStatistics';
   const url = `${SUMMARY_URL}/${symbol}?modules=${modules}&crumb=${encodeURIComponent(crumb)}`;
-  const res = await fetch(url, { headers: { 'User-Agent': UA, Cookie: cookie } });
+  const res = await fetch(url, { headers: { ...BROWSER_HEADERS, Cookie: cookie } });
 
-  if (res.status === 401 && retry) {
-    await ensureSession(true); // crumb süresi dolmuş olabilir, tazele
+  if ((res.status === 401 || res.status === 403) && retry) {
+    await ensureSession(true); // crumb/cookie süresi dolmuş olabilir, tazele
     return fetchFundamentals(ticker, false);
   }
-  if (!res.ok) return null; // temel veri zorunlu değil; yoksa null döneriz
+  if (!res.ok) {
+    if (retry) console.warn(`[data] ${symbol} fundamentals HTTP ${res.status}`);
+    return null; // temel veri zorunlu değil; yoksa null döneriz
+  }
 
   const json = await res.json();
   const r = json?.quoteSummary?.result?.[0];

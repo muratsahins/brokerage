@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import { initDb } from './db.js';
 import { refresh, getRecommendations } from './service.js';
+import { diagnose } from './dataSource.js';
 
 const app = express();
 app.use(cors());
@@ -10,6 +11,15 @@ app.use(express.json());
 
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, time: new Date().toISOString() });
+});
+
+// Analist verisinin neden gelmediğini canlıda görmek için teşhis ucu.
+app.get('/api/debug/fundamentals', async (req, res) => {
+  try {
+    res.json(await diagnose(req.query.ticker || 'THYAO'));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Öneri listesi
