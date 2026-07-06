@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { initDb } from './db.js';
-import { refresh, getRecommendations } from './service.js';
+import { syncData, getRecommendations } from './service.js';
 import { diagnose } from './dataSource.js';
 
 const app = express();
@@ -32,11 +32,11 @@ app.get('/api/recommendations', async (req, res) => {
   }
 });
 
-// Manuel yenileme tetikle
+// Manuel yenileme: yayınlanan veriyi yeniden çek (yoksa canlı çekim)
 app.post('/api/refresh', async (req, res) => {
   try {
-    const items = await refresh();
-    res.json({ ok: true, count: items.length });
+    const data = await (async () => { await syncData(); return getRecommendations(); })();
+    res.json({ ok: true, count: data.items.length, source: data.source });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -47,15 +47,15 @@ const PORT = process.env.PORT || 4000;
 async function start() {
   await initDb();
 
-  // İlk veriyi çek (arka planda, sunucuyu bloklamadan)
-  refresh().catch((err) => console.warn(`[start] İlk yenileme başarısız: ${err.message}`));
+  // İlk veriyi yükle (yayınlanan JSON → yoksa canlı). Sunucuyu bloklama.
+  syncData().catch((err) => console.warn(`[start] İlk veri yüklemesi başarısız: ${err.message}`));
 
   const minutes = Number(process.env.REFRESH_INTERVAL_MINUTES ?? 30);
   if (minutes > 0) {
     setInterval(() => {
-      refresh().catch((err) => console.warn(`[cron] Yenileme başarısız: ${err.message}`));
+      syncData().catch((err) => console.warn(`[cron] Veri senkronizasyonu başarısız: ${err.message}`));
     }, minutes * 60 * 1000);
-    console.log(`[start] Otomatik yenileme her ${minutes} dakikada bir açık.`);
+    console.log(`[start] Otomatik veri senkronizasyonu her ${minutes} dakikada bir açık.`);
   }
 
   app.listen(PORT, () => console.log(`[start] Backend hazır: http://localhost:${PORT}`));

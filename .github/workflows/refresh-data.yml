@@ -1,0 +1,45 @@
+name: BIST verisini yenile
+
+# Analist verisi Render'ın datacenter IP'sinde throttle olduğu için,
+# veriyi taze bir GitHub runner IP'sinde çekip repoya yayınlıyoruz.
+on:
+  schedule:
+    - cron: '0 */3 * * *'   # her 3 saatte bir (UTC)
+  workflow_dispatch:          # elle tetikleme (Actions sekmesinden "Run workflow")
+
+permissions:
+  contents: write             # data/*.json commit'lemek için
+
+concurrency:
+  group: refresh-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Backend bağımlılıkları
+        working-directory: backend
+        run: npm ci
+
+      - name: Veriyi çek ve JSON'a yaz
+        working-directory: backend
+        run: node src/publish.js ../data/recommendations.json
+
+      - name: Değişikliği commit'le
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/recommendations.json
+          if git diff --staged --quiet; then
+            echo "Değişiklik yok."
+          else
+            git commit -m "chore: BIST verisi güncellendi [skip ci]"
+            git push
+          fi
