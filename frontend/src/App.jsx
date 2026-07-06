@@ -1,5 +1,9 @@
 import { useEffect, useState, useMemo } from 'react';
 
+// Canlıda backend ayrı bir origin'de (Render). VITE_API_URL ile verilir.
+// Dev'de boş kalır → '/api...' Vite proxy üzerinden backend'e gider.
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
 const SIGNAL_STYLES = {
   AL: { label: 'AL', bg: '#0f5132', fg: '#4ade80' },
   TUT: { label: 'TUT', bg: '#665200', fg: '#fbbf24' },
@@ -81,7 +85,7 @@ export default function App() {
   async function load() {
     try {
       setError(null);
-      const res = await fetch('/api/recommendations');
+      const res = await fetch(`${API_BASE}/api/recommendations`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       setData(json);
@@ -95,7 +99,7 @@ export default function App() {
   async function triggerRefresh() {
     setRefreshing(true);
     try {
-      await fetch('/api/refresh', { method: 'POST' });
+      await fetch(`${API_BASE}/api/refresh`, { method: 'POST' });
       await load();
     } catch (err) {
       setError(err.message);

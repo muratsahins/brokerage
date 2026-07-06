@@ -16,8 +16,16 @@ const memory = {
 
 const byTicker = new Map(BIST_STOCKS.map((s) => [s.ticker, s]));
 
+// Aynı anda birden çok yenileme başlamasın; eşzamanlı çağrılar tek işi paylaşır.
+let inflight = null;
+export function refresh() {
+  if (inflight) return inflight;
+  inflight = doRefresh().finally(() => { inflight = null; });
+  return inflight;
+}
+
 // Yahoo'dan çeker, puanlar, DB varsa kaydeder, ayrıca belleğe yazar.
-export async function refresh() {
+async function doRefresh() {
   console.log('[service] Veri yenileniyor...');
   const quotes = await fetchQuotes(BIST_STOCKS.map((s) => s.ticker));
   const recos = buildRecommendations(quotes);
@@ -59,5 +67,15 @@ export async function getRecommendations() {
       console.warn(`[service] DB okuma başarısız, belleğe düşülüyor: ${err.message}`);
     }
   }
+
+  // Cold-start / uyanma sonrası bellek boşsa: yenilemeyi bekleyip veriyle dön.
+  if (memory.recommendations.length === 0) {
+    try {
+      await refresh();
+    } catch (err) {
+      console.warn(`[service] Tembel yenileme başarısız: ${err.message}`);
+    }
+  }
+
   return { source: 'memory', updatedAt: memory.updatedAt, items: memory.recommendations };
 }

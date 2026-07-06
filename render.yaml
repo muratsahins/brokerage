@@ -1,0 +1,17 @@
+# Render Blueprint — backend (Node/Express) ücretsiz web servisi
+# Render panelinde: New + > Blueprint > bu repo'yu seç. Kalan alanlar otomatik dolar.
+services:
+  - type: web
+    name: brokerage-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: REFRESH_INTERVAL_MINUTES
+        value: "30"
+      # PORT'u Render otomatik verir; kod process.env.PORT'u kullanıyor.
+      # PostgreSQL istersen: Render'da ücretsiz bir Postgres oluşturup
+      # buraya DATABASE_URL ekleyebilirsin (yoksa uygulama bellek içi çalışır).
