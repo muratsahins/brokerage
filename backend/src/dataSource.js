@@ -26,26 +26,55 @@ function collectCookies(res) {
 // --- Analist/temel veri için crumb + cookie yönetimi ------------------------
 let session = { cookie: '', crumb: '' };
 
-async function ensureSession(force = false) {
-  if (session.crumb && !force) return session;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-  // 1) Cookie: önce ana sayfa, olmazsa fc.yahoo.com
-  let cookie = '';
+// Geçerli crumb kısa, boşluksuz bir jetondur. "Too Many Requests",
+// boş metin veya HTML hata sayfaları geçersizdir.
+function isValidCrumb(s) {
+  return !!s && s.length > 0 && s.length < 30 && !/\s/.test(s);
+}
+
+async function fetchCookie() {
   for (const url of ['https://finance.yahoo.com/', 'https://fc.yahoo.com/']) {
     try {
       const c = await fetch(url, { headers: BROWSER_HEADERS, redirect: 'follow' });
-      cookie = collectCookies(c);
-      if (cookie) break;
+      const cookie = collectCookies(c);
+      if (cookie) return cookie;
     } catch { /* sıradaki kaynağı dene */ }
   }
+  return '';
+}
 
-  // 2) Crumb
-  const cr = await fetch('https://query2.finance.yahoo.com/v1/test/getcrumb', {
-    headers: { ...BROWSER_HEADERS, Cookie: cookie },
-  });
-  const crumb = (await cr.text()).trim();
+const CRUMB_HOSTS = [
+  'https://query1.finance.yahoo.com/v1/test/getcrumb',
+  'https://query2.finance.yahoo.com/v1/test/getcrumb',
+];
 
-  session = { cookie, crumb };
+async function ensureSession(force = false) {
+  if (isValidCrumb(session.crumb) && !force) return session;
+
+  // getcrumb datacenter IP'lerinde throttle olabiliyor ("Too Many Requests").
+  // Host'ları dönüşümlü deneyip artan beklemeyle birkaç kez tekrar ediyoruz.
+  const backoff = [0, 1500, 4000, 9000, 15000];
+  let cookie = '';
+  for (let attempt = 0; attempt < backoff.length; attempt++) {
+    if (backoff[attempt]) await sleep(backoff[attempt]);
+    cookie = await fetchCookie();
+    const host = CRUMB_HOSTS[attempt % CRUMB_HOSTS.length];
+    try {
+      const cr = await fetch(host, { headers: { ...BROWSER_HEADERS, Cookie: cookie } });
+      const crumb = (await cr.text()).trim();
+      if (isValidCrumb(crumb)) {
+        session = { cookie, crumb };
+        return session;
+      }
+      console.warn(`[data] crumb denemesi ${attempt + 1} geçersiz: "${crumb.slice(0, 24)}"`);
+    } catch (e) {
+      console.warn(`[data] crumb denemesi ${attempt + 1} hata: ${e.message}`);
+    }
+  }
+
+  session = { cookie, crumb: '' }; // başarısız — fundamentals atlanacak
   return session;
 }
 
@@ -108,6 +137,7 @@ async function fetchChart(ticker) {
 async function fetchFundamentals(ticker, retry = true) {
   const symbol = toSymbol(ticker);
   const { cookie, crumb } = await ensureSession();
+  if (!crumb) return null; // oturum kurulamadı; fundamentals'ı sessizce atla
   const modules = 'financialData,defaultKeyStatistics';
   const url = `${SUMMARY_URL}/${symbol}?modules=${modules}&crumb=${encodeURIComponent(crumb)}`;
   const res = await fetch(url, { headers: { ...BROWSER_HEADERS, Cookie: cookie } });
