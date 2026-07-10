@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-10T19:38:20.617Z",
+  "updatedAt": "2026-07-10T22:08:24.053Z",
   "source": "github-actions",
   "count": 29,
   "withAnalyst": 24,
@@ -544,7 +544,7 @@
       "exp3m": 6.12,
       "upside12m": 26.81,
       "targetMean": 114.51,
-      "targetHigh": 132.53,
+      "targetHigh": 132.52,
       "targetLow": 100.25,
       "recommendationKey": "none",
       "numAnalysts": 7,
