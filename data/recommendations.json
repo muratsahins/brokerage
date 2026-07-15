@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-15T08:20:25.302Z",
+  "updatedAt": "2026-07-15T10:54:16.077Z",
   "source": "github-actions",
   "count": 29,
   "withAnalyst": 24,
@@ -565,7 +565,7 @@
       "pos52w": 0.738,
       "exp1m": 1.15,
       "exp3m": 3.49,
-      "upside12m": 14.73,
+      "upside12m": 14.72,
       "targetMean": 46.85,
       "targetHigh": 53.66,
       "targetLow": 36.87,
