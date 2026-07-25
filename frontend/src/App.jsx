@@ -7,32 +7,29 @@ function tvSymbol(s) {
   return `BIST:${s.ticker}`;
 }
 
-// TradingView tv.js scriptini bir kez yükler.
-function loadTradingView() {
-  return new Promise((resolve) => {
-    if (window.TradingView) return resolve();
-    let sc = document.getElementById('tv-js');
-    if (sc) { sc.addEventListener('load', () => resolve()); return; }
-    sc = document.createElement('script');
-    sc.id = 'tv-js';
-    sc.src = 'https://s3.tradingview.com/tv.js';
-    sc.onload = () => resolve();
-    document.head.appendChild(sc);
-  });
-}
-
-// Grafik pop-up'ı: seçilen enstrümanın TradingView grafiğini başlıkla gösterir.
+// Grafik pop-up'ı: TradingView resmi "Advanced Chart" embed'i (sembolü JSON'dan
+// okur; legacy tv.js'in aksine BIST sembolünü doğru uygular).
 function ChartModal({ item, onClose }) {
   const containerRef = useRef(null);
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', onKey);
-    let cancelled = false;
-    loadTradingView().then(() => {
-      if (cancelled || !containerRef.current || !window.TradingView) return;
-      containerRef.current.innerHTML = '';
-      new window.TradingView.widget({
+
+    const el = containerRef.current;
+    if (el) {
+      el.innerHTML = '';
+      const widget = document.createElement('div');
+      widget.className = 'tradingview-widget-container__widget';
+      widget.style.height = '100%';
+      widget.style.width = '100%';
+      el.appendChild(widget);
+
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+      script.async = true;
+      script.innerHTML = JSON.stringify({
         autosize: true,
         symbol: tvSymbol(item),
         interval: 'D',
@@ -42,10 +39,11 @@ function ChartModal({ item, onClose }) {
         locale: 'tr',
         allow_symbol_change: false,
         hide_side_toolbar: false,
-        container_id: containerRef.current.id,
       });
-    });
-    return () => { cancelled = true; document.removeEventListener('keydown', onKey); };
+      el.appendChild(script);
+    }
+
+    return () => { document.removeEventListener('keydown', onKey); };
   }, [item, onClose]);
 
   return (
@@ -59,7 +57,7 @@ function ChartModal({ item, onClose }) {
           <button className="modal-close" onClick={onClose} aria-label="Kapat">✕</button>
         </div>
         <div className="modal-chart">
-          <div id={`tv_${item.ticker}`} ref={containerRef} style={{ height: '100%', width: '100%' }} />
+          <div className="tradingview-widget-container" ref={containerRef} style={{ height: '100%', width: '100%' }} />
         </div>
       </div>
     </div>
