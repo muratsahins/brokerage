@@ -137,11 +137,43 @@ h1 { font-size: 26px; margin: 0 0 6px; }
 }
 .tab.active .tab-count { background: #1f6feb; color: #fff; }
 
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 0;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0 12px;
+}
+.search:focus-within { border-color: #1f6feb; }
+.search-icon { color: var(--muted); font-size: 14px; }
+.search-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 15px;
+  padding: 11px 0;
+}
+.search-input::placeholder { color: var(--muted); }
+.search-clear {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 15px;
+  padding: 4px 6px;
+}
+.search-clear:hover { color: var(--text); }
+
 .filters {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 16px 0 12px;
+  margin: 12px 0 12px;
   flex-wrap: wrap;
 }
 .filter {

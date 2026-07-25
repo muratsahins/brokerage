@@ -18,6 +18,18 @@ function fmtNum(x, digits = 2) {
   });
 }
 
+// Türkçe karakter duyarsız normalleştirme (arama için): "Şişecam" -> "sisecam".
+function norm(s) {
+  return (s || '')
+    .replace(/[İIı]/g, 'i')
+    .replace(/[Şş]/g, 's')
+    .replace(/[Ğğ]/g, 'g')
+    .replace(/[Üü]/g, 'u')
+    .replace(/[Öö]/g, 'o')
+    .replace(/[Çç]/g, 'c')
+    .toLowerCase();
+}
+
 function Pct({ value, strong }) {
   if (value == null) return <span className="muted-dash">—</span>;
   const up = value >= 0;
@@ -98,6 +110,7 @@ export default function App() {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('ALL');
   const [tab, setTab] = useState('bist30');
+  const [query, setQuery] = useState('');
   // Görünüm: 'mobile' (kart, yatay scroll yok) | 'web' (tam tablo).
   const [view, setView] = useState(() => {
     try { return localStorage.getItem('viewMode') || (window.innerWidth <= 640 ? 'mobile' : 'web'); }
@@ -153,7 +166,6 @@ export default function App() {
     { key: 'metal',   label: 'Kıymetli Maden', match: (i) => i.kind === 'metal' },
   ];
   const activeTab = TABS.find((t) => t.key === tab) ?? TABS[0];
-  const isMetalTab = activeTab.key === 'metal'; // Alış/Satış sütunları yalnızca burada
 
   // Önce aktif sekmeye göre, sonra sinyale göre süz.
   const inTab = useMemo(
@@ -161,10 +173,20 @@ export default function App() {
     [data.items, tab],
   );
 
+  // Arama varsa TÜM enstrümanlarda (sekmeden bağımsız), yoksa aktif sekmede süz.
+  const searching = query.trim().length > 0;
   const items = useMemo(() => {
-    if (filter === 'ALL') return inTab;
-    return inTab.filter((i) => i.signal === filter);
-  }, [inTab, filter]);
+    const nq = norm(query.trim());
+    let list = nq
+      ? data.items.filter((i) =>
+          norm(i.ticker).includes(nq) || norm(i.name).includes(nq) || norm(i.sector).includes(nq))
+      : inTab;
+    if (filter !== 'ALL') list = list.filter((i) => i.signal === filter);
+    return list;
+  }, [data.items, inTab, query, filter]);
+
+  // Alış/Satış sütunları: görünen listede kıymetli maden varsa göster.
+  const showBuySell = items.some((s) => s.kind === 'metal');
 
   useEffect(() => { try { localStorage.setItem('viewMode', view); } catch { /* yoksay */ } }, [view]);
 
@@ -174,7 +196,7 @@ export default function App() {
         <div>
           <h1>📈 BIST Hisse Önerileri</h1>
           <p className="subtitle">
-            Analist hedef fiyatı + temel verilere dayalı beklenen getiri · {inTab.length} kayıt
+            Analist hedef fiyatı + temel verilere dayalı beklenen getiri · {searching ? `“${query.trim()}” için ${items.length} sonuç` : `${inTab.length} kayıt`}
             {data.source && <> · kaynak: {data.source === 'postgres' ? 'PostgreSQL' : 'bellek'}</>}
           </p>
         </div>
@@ -215,6 +237,21 @@ export default function App() {
         })}
       </div>
 
+      <div className="search">
+        <span className="search-icon">🔎</span>
+        <input
+          className="search-input"
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Hisse veya kıymetli maden ara… (ör. GARAN, altın, banka)"
+          aria-label="Ara"
+        />
+        {query && (
+          <button className="search-clear" onClick={() => setQuery('')} aria-label="Aramayı temizle">✕</button>
+        )}
+      </div>
+
       <div className="filters">
         {['ALL', 'AL', 'TUT', 'İZLE'].map((f) => (
           <button
@@ -236,9 +273,11 @@ export default function App() {
       {error && <div className="state error">Hata: {error}</div>}
       {!loading && !error && items.length === 0 && (
         <div className="state">
-          {data.items.length > 0
-            ? 'Bu sekme/filtrede gösterilecek hisse yok.'
-            : 'Henüz veri yok. “Yenile”ye basın veya backend’in çalıştığından emin olun.'}
+          {searching
+            ? `“${query.trim()}” ile eşleşen kayıt bulunamadı.`
+            : data.items.length > 0
+              ? 'Bu sekme/filtrede gösterilecek hisse yok.'
+              : 'Henüz veri yok. “Yenile”ye basın veya backend’in çalıştığından emin olun.'}
         </div>
       )}
 
@@ -250,8 +289,8 @@ export default function App() {
                 <th>#</th>
                 <th>Hisse</th>
                 <th className="num">Fiyat</th>
-                {isMetalTab && <th className="num">Alış</th>}
-                {isMetalTab && <th className="num">Satış</th>}
+                {showBuySell && <th className="num">Alış</th>}
+                {showBuySell && <th className="num">Satış</th>}
                 <th className="num">Günlük</th>
                 <th className="num">1 Ay Bek.</th>
                 <th className="num">3 Ay Bek.</th>
@@ -277,14 +316,14 @@ export default function App() {
                       <div className="exp-note">≈ {fmtNum(s.tryPerGram)} ₺/gr</div>
                     )}
                   </td>
-                  {isMetalTab && (
+                  {showBuySell && (
                     <td className="num">
                       {s.buyPrice != null
                         ? <>{fmtNum(s.buyPrice)} <span className="cur">₺</span></>
                         : <span className="muted-dash">—</span>}
                     </td>
                   )}
-                  {isMetalTab && (
+                  {showBuySell && (
                     <td className="num">
                       {s.sellPrice != null
                         ? <>{fmtNum(s.sellPrice)} <span className="cur">₺</span></>
@@ -339,7 +378,7 @@ export default function App() {
                 <div className="exp-note">≈ {fmtNum(s.tryPerGram)} ₺/gr</div>
               )}
 
-              {isMetalTab && (
+              {s.kind === 'metal' && (
                 <div className="card-metrics">
                   <div className="metric">
                     <span className="metric-label">Alış</span>
