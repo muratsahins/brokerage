@@ -122,10 +122,17 @@ async function fetchChart(ticker) {
     throw new Error(`Yahoo ${symbol} -> fiyat verisi yok`);
   }
 
+  // Günlük değişim için ÖNCEKİ SEANS kapanışı gerekir = günlük serideki sondan
+  // bir önceki kapanış. (meta.chartPreviousClose, 1 aylık aralıkta ~1 ay önceki
+  // kapanışı verdiği için günlük değişimi yanlışlıkla aylık değişime eşitliyordu.)
+  const previousClose = closes.length >= 2
+    ? closes[closes.length - 2]
+    : (meta.regularMarketPreviousClose ?? meta.chartPreviousClose ?? closes[0]);
+
   return {
     symbol,
     price: meta.regularMarketPrice,
-    previousClose: meta.chartPreviousClose ?? meta.previousClose ?? closes[0],
+    previousClose,
     currency: meta.currency ?? 'TRY',
     fiftyTwoWeekHigh: meta.fiftyTwoWeekHigh ?? Math.max(...closes),
     fiftyTwoWeekLow: meta.fiftyTwoWeekLow ?? Math.min(...closes),
