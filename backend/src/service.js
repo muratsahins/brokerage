@@ -1,5 +1,5 @@
 import { BIST_STOCKS, INSTRUMENTS, toSymbol } from './stocks.js';
-import { fetchQuotes, fetchUsdTryRate } from './dataSource.js';
+import { fetchQuotes, fetchUsdTryRate, fetchAltinInPrices } from './dataSource.js';
 import { buildRecommendations } from './recommend.js';
 import {
   isDbAvailable,
@@ -41,9 +41,11 @@ export async function computeRecommendations() {
   const quotes = await fetchQuotes(INSTRUMENTS);
   const recos = buildRecommendations(quotes);
 
-  // Kıymetli madenler için TCMB USD/TRY kuru (varsa TRY/gram hesaplanır).
+  // Kıymetli madenler için TCMB USD/TRY kuru + altin.in alış/satış fiyatları.
   const hasMetal = INSTRUMENTS.some((i) => i.kind === 'metal');
-  const usdTry = hasMetal ? await fetchUsdTryRate() : null;
+  const [usdTry, altinIn] = hasMetal
+    ? await Promise.all([fetchUsdTryRate(), fetchAltinInPrices()])
+    : [null, {}];
 
   return recos.map((r) => {
     const meta = byTicker.get(r.ticker) ?? { name: r.ticker, sector: null, bist: null, kind: 'stock' };
@@ -56,10 +58,18 @@ export async function computeRecommendations() {
       bist: meta.bist ?? null,
       kind,
     };
-    // Metal fiyatı USD/ons -> TRY/gram karşılığı.
-    if (kind === 'metal' && item.price != null && usdTry) {
-      item.tryPerGram = Math.round((item.price / TROY_OUNCE_G) * usdTry * 100) / 100;
-      item.usdTry = usdTry;
+    if (kind === 'metal') {
+      // Metal fiyatı USD/ons -> TRY/gram karşılığı.
+      if (item.price != null && usdTry) {
+        item.tryPerGram = Math.round((item.price / TROY_OUNCE_G) * usdTry * 100) / 100;
+        item.usdTry = usdTry;
+      }
+      // altin.in alış/satış (o metal orada varsa).
+      const ai = meta.altinInName ? altinIn[meta.altinInName] : null;
+      if (ai) {
+        item.buyPrice = ai.buy ?? null;
+        item.sellPrice = ai.sell ?? null;
+      }
     }
     return item;
   });

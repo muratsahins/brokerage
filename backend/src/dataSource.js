@@ -126,6 +126,31 @@ export async function fetchUsdTryRate() {
   }
 }
 
+// --- altin.in alış/satış fiyatları ------------------------------------------
+// Sayfa Windows-1254 (Türkçe) kodlu HTML döndürür. Her metal için alış/satış
+// değerlerini { "Gram Altın": {buy, sell}, ... } biçiminde döner.
+export async function fetchAltinInPrices() {
+  try {
+    const res = await fetch('https://altin.in/', { headers: { 'User-Agent': UA } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const html = new TextDecoder('windows-1254').decode(Buffer.from(await res.arrayBuffer()));
+    // <li class='... alis|satis' title='Gram Altın - Alış'>6167.8780</li>
+    const re = /class='[^']*(alis|satis)'[^>]*title='([^']*?)'>\s*([\d.,]+)/g;
+    const out = {};
+    let m;
+    while ((m = re.exec(html))) {
+      const name = m[2].replace(/\s*-\s*(Al[ıi]ş|Sat[ıi]ş)\s*$/i, '').trim();
+      const val = parseFloat(m[3].replace(/,/g, ''));
+      if (!Number.isFinite(val)) continue;
+      (out[name] ??= {})[m[1] === 'alis' ? 'buy' : 'sell'] = Math.round(val * 100) / 100;
+    }
+    return out;
+  } catch (err) {
+    console.warn(`[data] altin.in fiyatları alınamadı: ${err.message}`);
+    return {};
+  }
+}
+
 // --- Fiyat + geçmiş (chart) -------------------------------------------------
 async function fetchChart(symbol) {
   // 6 aylık günlük veri: hem 1 aylık momentum hem de teknik göstergeler

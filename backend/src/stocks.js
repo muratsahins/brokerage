@@ -114,11 +114,12 @@ export const BIST_STOCKS = [
 
 // Kıymetli madenler (Yahoo vadeli sembolleri, USD/ons). Analist hedefi yoktur;
 // yalnızca fiyat, değişim ve teknik göstergeler (WaveTrend/SuperTrend) gösterilir.
+// altinInName: altin.in'deki alış/satış satırının adı (o metal orada yoksa null).
 export const METALS = [
-  { ticker: 'XAU', name: 'Altın',    symbol: 'GC=F', currency: 'USD' },
-  { ticker: 'XAG', name: 'Gümüş',    symbol: 'SI=F', currency: 'USD' },
-  { ticker: 'XPT', name: 'Platin',   symbol: 'PL=F', currency: 'USD' },
-  { ticker: 'XPD', name: 'Paladyum', symbol: 'PA=F', currency: 'USD' },
+  { ticker: 'XAU', name: 'Altın',    symbol: 'GC=F', currency: 'USD', altinInName: 'Gram Altın' },
+  { ticker: 'XAG', name: 'Gümüş',    symbol: 'SI=F', currency: 'USD', altinInName: 'Gümüş' },
+  { ticker: 'XPT', name: 'Platin',   symbol: 'PL=F', currency: 'USD', altinInName: 'Platin' },
+  { ticker: 'XPD', name: 'Paladyum', symbol: 'PA=F', currency: 'USD', altinInName: null },
 ];
 
 // Fiyat/gösterge çekimi için birleşik enstrüman listesi. Her enstrümanın açık

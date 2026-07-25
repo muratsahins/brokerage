@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-25T19:48:40.695Z",
+  "updatedAt": "2026-07-25T19:58:04.206Z",
   "source": "github-actions",
   "count": 104,
   "withAnalyst": 51,
@@ -1572,7 +1572,9 @@
       "bist": null,
       "kind": "metal",
       "tryPerGram": 6184.01,
-      "usdTry": 47.2497
+      "usdTry": 47.2497,
+      "buyPrice": 6115.45,
+      "sellPrice": 6167.88
     },
     {
       "symbol": "TRALT.IS",
@@ -1628,7 +1630,9 @@
       "bist": null,
       "kind": "metal",
       "tryPerGram": 89.49,
-      "usdTry": 47.2497
+      "usdTry": 47.2497,
+      "buyPrice": 88.35,
+      "sellPrice": 88.57
     },
     {
       "symbol": "PL=F",
@@ -1657,7 +1661,9 @@
       "bist": null,
       "kind": "metal",
       "tryPerGram": 2436.81,
-      "usdTry": 47.2497
+      "usdTry": 47.2497,
+      "buyPrice": 2418.98,
+      "sellPrice": 2426.13
     },
     {
       "symbol": "FENER.IS",

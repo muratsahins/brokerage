@@ -226,6 +226,8 @@ export default function App() {
                 <th>#</th>
                 <th>Hisse</th>
                 <th className="num">Fiyat</th>
+                <th className="num">Alış</th>
+                <th className="num">Satış</th>
                 <th className="num">Günlük</th>
                 <th className="num">1 Ay Bek.</th>
                 <th className="num">3 Ay Bek.</th>
@@ -249,6 +251,16 @@ export default function App() {
                     {s.tryPerGram != null && (
                       <div className="exp-note">≈ {fmtNum(s.tryPerGram)} ₺/gr</div>
                     )}
+                  </td>
+                  <td className="num">
+                    {s.buyPrice != null
+                      ? <>{fmtNum(s.buyPrice)} <span className="cur">₺</span></>
+                      : <span className="muted-dash">—</span>}
+                  </td>
+                  <td className="num">
+                    {s.sellPrice != null
+                      ? <>{fmtNum(s.sellPrice)} <span className="cur">₺</span></>
+                      : <span className="muted-dash">—</span>}
                   </td>
                   <td className="num"><Pct value={s.changePct} /></td>
                   <td className="num"><Expected value={s.exp1m} /></td>
@@ -290,6 +302,8 @@ export default function App() {
         <p>
           <strong>Kıymetli madenler</strong> USD/ons cinsinden gösterilir; <strong>₺/gr</strong> karşılığı
           TCMB güncel USD döviz satış kuru ve 1 troy ons = 31,1035 gram üzerinden hesaplanır.
+          <strong>Alış/Satış</strong> (₺) fiyatları <strong>altin.in</strong>'den alınır (paladyum orada
+          bulunmadığından boş görünebilir).
         </p>
         <p>
           ⚠️ Bu tahminler geleceğin garantisi <strong>değildir</strong> ve <strong>yatırım tavsiyesi değildir</strong>.
