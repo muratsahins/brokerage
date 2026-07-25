@@ -244,7 +244,12 @@ export default function App() {
                     <div className="ticker">{s.ticker}</div>
                     <div className="name">{s.name}{s.sector ? ` · ${s.sector}` : ''}</div>
                   </td>
-                  <td className="num">{fmtNum(s.price)} <span className="cur">{s.currency || 'TRY'}</span></td>
+                  <td className="num">
+                    {fmtNum(s.price)} <span className="cur">{s.currency || 'TRY'}</span>
+                    {s.tryPerGram != null && (
+                      <div className="exp-note">≈ {fmtNum(s.tryPerGram)} ₺/gr</div>
+                    )}
+                  </td>
                   <td className="num"><Pct value={s.changePct} /></td>
                   <td className="num"><Expected value={s.exp1m} /></td>
                   <td className="num"><Expected value={s.exp3m} /></td>
@@ -281,6 +286,10 @@ export default function App() {
           <code>SAT</code> (aşırı bölge kesişimi yoksa boş). SuperTrend'de fiyat trend çizgisinin
           üstünde <code>AL</code>, altında <code>SAT</code>. Kısa vadeli, gecikmeli sinyallerdir;
           analist tahminlerinden bağımsızdır.
+        </p>
+        <p>
+          <strong>Kıymetli madenler</strong> USD/ons cinsinden gösterilir; <strong>₺/gr</strong> karşılığı
+          TCMB güncel USD döviz satış kuru ve 1 troy ons = 31,1035 gram üzerinden hesaplanır.
         </p>
         <p>
           ⚠️ Bu tahminler geleceğin garantisi <strong>değildir</strong> ve <strong>yatırım tavsiyesi değildir</strong>.

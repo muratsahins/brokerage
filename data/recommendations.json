@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-25T19:38:35.984Z",
+  "updatedAt": "2026-07-25T19:48:40.695Z",
   "source": "github-actions",
   "count": 104,
   "withAnalyst": 51,
@@ -1136,7 +1136,9 @@
       "name": "Paladyum",
       "sector": "Kıymetli Maden",
       "bist": null,
-      "kind": "metal"
+      "kind": "metal",
+      "tryPerGram": 1904.36,
+      "usdTry": 47.2497
     },
     {
       "symbol": "BIMAS.IS",
@@ -1568,7 +1570,9 @@
       "name": "Altın",
       "sector": "Kıymetli Maden",
       "bist": null,
-      "kind": "metal"
+      "kind": "metal",
+      "tryPerGram": 6184.01,
+      "usdTry": 47.2497
     },
     {
       "symbol": "TRALT.IS",
@@ -1622,7 +1626,9 @@
       "name": "Gümüş",
       "sector": "Kıymetli Maden",
       "bist": null,
-      "kind": "metal"
+      "kind": "metal",
+      "tryPerGram": 89.49,
+      "usdTry": 47.2497
     },
     {
       "symbol": "PL=F",
@@ -1649,7 +1655,9 @@
       "name": "Platin",
       "sector": "Kıymetli Maden",
       "bist": null,
-      "kind": "metal"
+      "kind": "metal",
+      "tryPerGram": 2436.81,
+      "usdTry": 47.2497
     },
     {
       "symbol": "FENER.IS",

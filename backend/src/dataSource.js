@@ -106,6 +106,26 @@ export async function diagnose(ticker = 'THYAO') {
   return steps;
 }
 
+// --- TCMB USD/TRY kuru ------------------------------------------------------
+// Kıymetli madenlerin (USD/ons) TRY/gram karşılığı için güncel döviz satış kuru.
+export async function fetchUsdTryRate() {
+  try {
+    const res = await fetch('https://www.tcmb.gov.tr/kurlar/today.xml', {
+      headers: { 'User-Agent': UA },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const xml = await res.text();
+    const block = xml.match(/<Currency[^>]*CurrencyCode="USD"[\s\S]*?<\/Currency>/);
+    const m = block?.[0].match(/<ForexSelling>([\d.]+)<\/ForexSelling>/);
+    const rate = m ? parseFloat(m[1]) : NaN;
+    if (!Number.isFinite(rate) || rate <= 0) throw new Error('geçersiz kur');
+    return rate;
+  } catch (err) {
+    console.warn(`[data] TCMB USD/TRY alınamadı: ${err.message}`);
+    return null;
+  }
+}
+
 // --- Fiyat + geçmiş (chart) -------------------------------------------------
 async function fetchChart(symbol) {
   // 6 aylık günlük veri: hem 1 aylık momentum hem de teknik göstergeler

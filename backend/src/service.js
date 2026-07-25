@@ -1,5 +1,5 @@
 import { BIST_STOCKS, INSTRUMENTS, toSymbol } from './stocks.js';
-import { fetchQuotes } from './dataSource.js';
+import { fetchQuotes, fetchUsdTryRate } from './dataSource.js';
 import { buildRecommendations } from './recommend.js';
 import {
   isDbAvailable,
@@ -34,20 +34,34 @@ const memory = {
 
 const byTicker = new Map(INSTRUMENTS.map((s) => [s.ticker, s]));
 
+const TROY_OUNCE_G = 31.1034768; // 1 troy ons = gram
+
 // Yahoo'dan çeker, puanlar, isim/sektör/tür ile zenginleştirir. Yan etkisiz.
 export async function computeRecommendations() {
   const quotes = await fetchQuotes(INSTRUMENTS);
   const recos = buildRecommendations(quotes);
+
+  // Kıymetli madenler için TCMB USD/TRY kuru (varsa TRY/gram hesaplanır).
+  const hasMetal = INSTRUMENTS.some((i) => i.kind === 'metal');
+  const usdTry = hasMetal ? await fetchUsdTryRate() : null;
+
   return recos.map((r) => {
     const meta = byTicker.get(r.ticker) ?? { name: r.ticker, sector: null, bist: null, kind: 'stock' };
-    return {
+    const kind = meta.kind ?? 'stock';
+    const item = {
       ...r,
       ticker: r.ticker,
       name: meta.name,
       sector: meta.sector,
       bist: meta.bist ?? null,
-      kind: meta.kind ?? 'stock',
+      kind,
     };
+    // Metal fiyatı USD/ons -> TRY/gram karşılığı.
+    if (kind === 'metal' && item.price != null && usdTry) {
+      item.tryPerGram = Math.round((item.price / TROY_OUNCE_G) * usdTry * 100) / 100;
+      item.usdTry = usdTry;
+    }
+    return item;
   });
 }
 
