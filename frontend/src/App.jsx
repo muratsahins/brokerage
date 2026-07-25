@@ -229,7 +229,7 @@ export default function App() {
                 <th className="num">12 Ay Potansiyel</th>
                 <th style={{ minWidth: 110 }}>Puan</th>
                 <th>Sinyal</th>
-                <th>Elliott Wave</th>
+                <th>WaveTrend</th>
                 <th>SuperTrend</th>
               </tr>
             </thead>
@@ -255,7 +255,7 @@ export default function App() {
                   </td>
                   <td><ScoreBar score={s.score} /></td>
                   <td><SignalBadge signal={s.signal} /></td>
-                  <td><IndicatorBadge signal={s.ewoSignal} /></td>
+                  <td><IndicatorBadge signal={s.wtSignal} /></td>
                   <td><IndicatorBadge signal={s.stSignal} /></td>
                 </tr>
               ))}
@@ -271,10 +271,11 @@ export default function App() {
           bu potansiyelin zamana bölünmüş (bileşik) karşılığıdır. Analist kapsamı olmayan hisselerde tahmin gösterilmez.
         </p>
         <p>
-          <strong>Elliott Wave</strong> (LazyBear ElliotWave Oscillator) ve <strong>SuperTrend</strong>
-          (Kıvanç Özbilgiç), günlük fiyat verisinden hesaplanan teknik göstergelerdir:
-          <code>AL</code> yükseliş, <code>SAT</code> düşüş yönünü belirtir. Kısa vadeli ve gecikmeli
-          sinyallerdir; analist tahminlerinden bağımsızdır.
+          <strong>WaveTrend</strong> (LazyBear WaveTrend Oscillator) ve <strong>SuperTrend</strong>
+          (Kıvanç Özbilgiç), günlük fiyat verisinden hesaplanan teknik göstergelerdir. WaveTrend'de
+          yeşil çizgi (wt1) sinyal çizgisini (wt2) yukarı kestiğinde <code>AL</code>, aşağı kestiğinde
+          <code>SAT</code>; SuperTrend'de fiyat trend çizgisinin üstünde <code>AL</code>, altında
+          <code>SAT</code>. Kısa vadeli, gecikmeli sinyallerdir; analist tahminlerinden bağımsızdır.
         </p>
         <p>
           ⚠️ Bu tahminler geleceğin garantisi <strong>değildir</strong> ve <strong>yatırım tavsiyesi değildir</strong>.

@@ -1,5 +1,5 @@
 // TradingView göstergeleri (belirtilen yazarların scriptlerine göre):
-//  - ElliotWave Oscillator (EWO) — LazyBear
+//  - WaveTrend Oscillator — LazyBear
 //  - SuperTrend — Kıvanç Özbilgiç
 // Günlük OHLC dizilerini (eşit uzunlukta, eskiden yeniye) alır ve son bardaki
 // AL/SAT sinyalini döner. Yeterli bar yoksa null döner.
@@ -8,9 +8,21 @@
 // SuperTrend (Kıvanç Özbilgiç): kaynak hl2, ATR periyodu 10, çarpan 3, ATR=RMA.
 const ST_ATR_PERIOD = 10;
 const ST_MULTIPLIER = 3;
-// ElliotWave Oscillator (LazyBear): SMA(close,5) - SMA(close,35).
-const EWO_FAST = 5;
-const EWO_SLOW = 35;
+// WaveTrend (LazyBear): kanal 10, ortalama 21, sinyal çizgisi SMA(wt1,4).
+const WT_CHANNEL_LEN = 10;
+const WT_AVERAGE_LEN = 21;
+const WT_SIGNAL_LEN = 4;
+
+// Üstel hareketli ortalama (ilk değerle tohumlanır).
+function ema(values, period) {
+  if (values.length === 0) return [];
+  const k = 2 / (period + 1);
+  const out = [values[0]];
+  for (let i = 1; i < values.length; i++) {
+    out.push(values[i] * k + out[i - 1] * (1 - k));
+  }
+  return out;
+}
 
 // Basit hareketli ortalama (tam pencere dolana kadar kısmi ortalama).
 function sma(values, period) {
@@ -84,13 +96,30 @@ export function supertrendSignal(highs, lows, closes, period = ST_ATR_PERIOD, mu
   return trend === 1 ? 'AL' : 'SAT';
 }
 
-// ElliotWave Oscillator (LazyBear): SMA(close,5) - SMA(close,35).
-// Histogram ≥ 0 (yükseliş momentumu) → AL, < 0 → SAT.
-export function elliottWaveSignal(closes, fast = EWO_FAST, slow = EWO_SLOW) {
+// WaveTrend Oscillator (LazyBear): yeşil çizgi wt1, sinyal (kırmızı) çizgi wt2.
+// wt1 wt2'yi YUKARI kestiğinde AL, AŞAĞI kestiğinde SAT. Son kesişimin yönünü döner.
+export function wavetrendSignal(highs, lows, closes, n1 = WT_CHANNEL_LEN, n2 = WT_AVERAGE_LEN) {
   const n = closes?.length ?? 0;
-  if (n < slow + 1) return null;
-  const maFast = sma(closes, fast);
-  const maSlow = sma(closes, slow);
-  const ewo = maFast[n - 1] - maSlow[n - 1];
-  return ewo >= 0 ? 'AL' : 'SAT';
+  if (n < n2 + WT_SIGNAL_LEN + 2) return null;
+  const ap = closes.map((c, i) => (highs[i] + lows[i] + c) / 3); // hlc3
+  const esa = ema(ap, n1);
+  const de = ema(ap.map((v, i) => Math.abs(v - esa[i])), n1);
+  const ci = ap.map((v, i) => {
+    const d = de[i];
+    return d === 0 ? 0 : (v - esa[i]) / (0.015 * d);
+  });
+  const wt1 = ema(ci, n2);           // yeşil çizgi
+  const wt2 = sma(wt1, WT_SIGNAL_LEN); // kırmızı sinyal çizgisi
+
+  // En son kesişimin yönü: yukarı kesişim -> AL, aşağı kesişim -> SAT.
+  let signal = null;
+  for (let i = 1; i < n; i++) {
+    const prevDiff = wt1[i - 1] - wt2[i - 1];
+    const diff = wt1[i] - wt2[i];
+    if (prevDiff <= 0 && diff > 0) signal = 'AL';        // yeşil, kırmızıyı yukarı kesti
+    else if (prevDiff >= 0 && diff < 0) signal = 'SAT';  // yeşil, kırmızıyı aşağı kesti
+  }
+  // Hiç kesişim bulunmadıysa mevcut konuma göre.
+  if (signal == null) signal = wt1[n - 1] >= wt2[n - 1] ? 'AL' : 'SAT';
+  return signal;
 }

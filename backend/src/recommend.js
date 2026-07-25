@@ -6,7 +6,7 @@
 //   exp3m     = (1 + upside12m)^(3/12) - 1
 // Analist kapsamı olmayan hisselerde tahmin üretilmez (null) — uydurmuyoruz.
 
-import { supertrendSignal, elliottWaveSignal } from './indicators.js';
+import { supertrendSignal, wavetrendSignal } from './indicators.js';
 
 function clamp01(x) {
   return Math.max(0, Math.min(1, x));
@@ -72,8 +72,8 @@ export function scoreQuote(q) {
   else if (score >= 45) signal = 'TUT';
 
   // --- TradingView teknik gösterge sinyalleri (AL/SAT) -----------------------
-  // ElliotWave Oscillator (LazyBear) + SuperTrend (Kıvanç Özbilgiç)
-  const ewoSignal = elliottWaveSignal(q.closes);
+  // WaveTrend Oscillator (LazyBear) + SuperTrend (Kıvanç Özbilgiç)
+  const wtSignal = wavetrendSignal(q.highs, q.lows, q.closes);
   const stSignal = supertrendSignal(q.highs, q.lows, q.closes);
 
   return {
@@ -96,7 +96,7 @@ export function scoreQuote(q) {
     revenueGrowth: f.revenueGrowth != null ? round(f.revenueGrowth * 100) : null,
     score,
     signal,
-    ewoSignal,  // ElliotWave Oscillator (LazyBear): 'AL' | 'SAT' | null
+    wtSignal,   // WaveTrend Oscillator (LazyBear): 'AL' | 'SAT' | null
     stSignal,   // SuperTrend (Kıvanç Özbilgiç): 'AL' | 'SAT' | null
   };
 }
