@@ -107,11 +107,11 @@ export async function diagnose(ticker = 'THYAO') {
 }
 
 // --- Fiyat + geçmiş (chart) -------------------------------------------------
-async function fetchChart(ticker) {
-  const symbol = toSymbol(ticker);
+async function fetchChart(symbol) {
   // 6 aylık günlük veri: hem 1 aylık momentum hem de teknik göstergeler
-  // (WaveTrend, Supertrend) için yeterli bar sağlar.
-  const url = `${CHART_URL}/${symbol}?range=6mo&interval=1d`;
+  // (WaveTrend, Supertrend) için yeterli bar sağlar. symbol tam Yahoo sembolüdür
+  // (ör. THYAO.IS veya GC=F) — '=' gibi karakterler için URL-kodlanır.
+  const url = `${CHART_URL}/${encodeURIComponent(symbol)}?range=6mo&interval=1d`;
   const res = await fetch(url, { headers: { 'User-Agent': UA } });
   if (!res.ok) throw new Error(`Yahoo ${symbol} -> HTTP ${res.status}`);
   const json = await res.json();
@@ -145,9 +145,8 @@ async function fetchChart(ticker) {
     symbol,
     price: meta.regularMarketPrice,
     previousClose,
-    // BIST (.IS) hisseleri her zaman Türk Lirası cinsindendir. Yahoo bazı
-    // sembollerde meta.currency'yi hatalı (GBp/GBP) döndürebildiği için sabitliyoruz.
-    currency: 'TRY',
+    // Para birimi enstrümana göre çağıran tarafça (fetchQuotes) atanır — Yahoo'nun
+    // meta.currency'sine güvenmiyoruz (BIST'te bazen hatalı GBp/GBP dönebiliyor).
     fiftyTwoWeekHigh: meta.fiftyTwoWeekHigh ?? Math.max(...closes),
     fiftyTwoWeekLow: meta.fiftyTwoWeekLow ?? Math.min(...closes),
     firstClose: monthAgoClose,
@@ -158,18 +157,17 @@ async function fetchChart(ticker) {
 // --- Analist hedefleri + temel veriler (quoteSummary) -----------------------
 // Datacenter IP'lerinde quoteSummary istek bazında da throttle olabiliyor.
 // Başarısızlıkta backoff'la tekrar; 401/403'te oturumu (crumb) tazele.
-async function fetchFundamentals(ticker, attempt = 0) {
-  const symbol = toSymbol(ticker);
+async function fetchFundamentals(symbol, attempt = 0) {
   const { cookie, crumb } = await ensureSession();
   if (!crumb) return null; // oturum kurulamadı; fundamentals'ı sessizce atla
   const modules = 'financialData,defaultKeyStatistics';
-  const url = `${SUMMARY_URL}/${symbol}?modules=${modules}&crumb=${encodeURIComponent(crumb)}`;
+  const url = `${SUMMARY_URL}/${encodeURIComponent(symbol)}?modules=${modules}&crumb=${encodeURIComponent(crumb)}`;
 
   let res;
   try {
     res = await fetch(url, { headers: { ...BROWSER_HEADERS, Cookie: cookie } });
   } catch (e) {
-    if (attempt < 3) { await sleep(700 * (attempt + 1)); return fetchFundamentals(ticker, attempt + 1); }
+    if (attempt < 3) { await sleep(700 * (attempt + 1)); return fetchFundamentals(symbol, attempt + 1); }
     return null;
   }
 
@@ -177,7 +175,7 @@ async function fetchFundamentals(ticker, attempt = 0) {
     if (attempt < 1) { // en fazla 1 tekrar — yenilemeyi hızlı tutmak için
       if (res.status === 401 || res.status === 403) await ensureSession(true); // crumb tazele
       else await sleep(600 + Math.random() * 400); // 429/5xx: kısa bekle
-      return fetchFundamentals(ticker, attempt + 1);
+      return fetchFundamentals(symbol, attempt + 1);
     }
     return null; // sessizce atla
   }
@@ -202,23 +200,27 @@ async function fetchFundamentals(ticker, attempt = 0) {
   };
 }
 
-// Tüm hisseleri sırayla (nazikçe) çeker; başarısız olanları atlar.
-export async function fetchQuotes(tickers) {
+// Tüm enstrümanları sırayla (nazikçe) çeker; başarısız olanları atlar.
+// instruments: { ticker, symbol, currency, kind } nesneleri.
+export async function fetchQuotes(instruments) {
   const out = [];
-  for (const ticker of tickers) {
+  for (const inst of instruments) {
     try {
-      const chart = await fetchChart(ticker);
+      const chart = await fetchChart(inst.symbol);
       let fundamentals = null;
-      try {
-        fundamentals = await fetchFundamentals(ticker);
-      } catch (e) {
-        console.warn(`[data] ${ticker} temel veri alınamadı: ${e.message}`);
+      // Kıymetli madenlerin analist/temel verisi yok — gereksiz istek atmıyoruz.
+      if (inst.kind !== 'metal') {
+        try {
+          fundamentals = await fetchFundamentals(inst.symbol);
+        } catch (e) {
+          console.warn(`[data] ${inst.ticker} temel veri alınamadı: ${e.message}`);
+        }
       }
-      out.push({ ticker, ...chart, fundamentals });
+      out.push({ ticker: inst.ticker, ...chart, currency: inst.currency, fundamentals });
     } catch (err) {
-      console.warn(`[data] ${ticker} atlandı: ${err.message}`);
+      console.warn(`[data] ${inst.ticker} atlandı: ${err.message}`);
     }
-    await sleep(500); // rate-limit'e takılmamak için hisseler arası bekleme
+    await sleep(500); // rate-limit'e takılmamak için enstrümanlar arası bekleme
   }
   return out;
 }

@@ -112,6 +112,22 @@ export const BIST_STOCKS = [
   { ticker: 'ZOREN', name: 'Zorlu Enerji',           sector: 'Enerji',        bist: 100 },
 ];
 
+// Kıymetli madenler (Yahoo vadeli sembolleri, USD/ons). Analist hedefi yoktur;
+// yalnızca fiyat, değişim ve teknik göstergeler (WaveTrend/SuperTrend) gösterilir.
+export const METALS = [
+  { ticker: 'XAU', name: 'Altın',    symbol: 'GC=F', currency: 'USD' },
+  { ticker: 'XAG', name: 'Gümüş',    symbol: 'SI=F', currency: 'USD' },
+  { ticker: 'XPT', name: 'Platin',   symbol: 'PL=F', currency: 'USD' },
+  { ticker: 'XPD', name: 'Paladyum', symbol: 'PA=F', currency: 'USD' },
+];
+
+// Fiyat/gösterge çekimi için birleşik enstrüman listesi. Her enstrümanın açık
+// Yahoo `symbol`'ü, `currency`'si ve `kind`'i (stock/metal) vardır.
+export const INSTRUMENTS = [
+  ...BIST_STOCKS.map((s) => ({ ...s, symbol: `${s.ticker}.IS`, currency: 'TRY', kind: 'stock' })),
+  ...METALS.map((m) => ({ ...m, sector: 'Kıymetli Maden', bist: null, kind: 'metal' })),
+];
+
 export function toSymbol(ticker) {
   return `${ticker}.IS`;
 }

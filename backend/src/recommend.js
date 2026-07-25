@@ -78,6 +78,7 @@ export function scoreQuote(q) {
 
   return {
     symbol: q.symbol,
+    ticker: q.ticker,
     price: round(price),
     currency: q.currency,
     changePct: round(changePct),

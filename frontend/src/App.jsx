@@ -97,7 +97,7 @@ export default function App() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('ALL');
-  const [indexTab, setIndexTab] = useState(30); // 30 | 50 | 100 (iç içe: 30⊂50⊂100)
+  const [tab, setTab] = useState('bist30');
 
   async function load() {
     try {
@@ -140,22 +140,25 @@ export default function App() {
     };
   }, []);
 
-  // Önce endeks sekmesine göre (BIST 30/50/100 iç içe), sonra sinyale göre süz.
-  const inIndex = useMemo(
-    () => data.items.filter((i) => (i.bist ?? 100) <= indexTab),
-    [data.items, indexTab],
+  // Sekmeler: BIST 30/50/100 iç içe (30⊂50⊂100) + ayrı Kıymetli Maden sekmesi.
+  const TABS = [
+    { key: 'bist30',  label: 'BIST 30',        match: (i) => i.bist != null && i.bist <= 30 },
+    { key: 'bist50',  label: 'BIST 50',        match: (i) => i.bist != null && i.bist <= 50 },
+    { key: 'bist100', label: 'BIST 100',       match: (i) => i.bist != null && i.bist <= 100 },
+    { key: 'metal',   label: 'Kıymetli Maden', match: (i) => i.kind === 'metal' },
+  ];
+  const activeTab = TABS.find((t) => t.key === tab) ?? TABS[0];
+
+  // Önce aktif sekmeye göre, sonra sinyale göre süz.
+  const inTab = useMemo(
+    () => data.items.filter(activeTab.match),
+    [data.items, tab],
   );
 
   const items = useMemo(() => {
-    if (filter === 'ALL') return inIndex;
-    return inIndex.filter((i) => i.signal === filter);
-  }, [inIndex, filter]);
-
-  const TABS = [
-    { tier: 30, label: 'BIST 30' },
-    { tier: 50, label: 'BIST 50' },
-    { tier: 100, label: 'BIST 100' },
-  ];
+    if (filter === 'ALL') return inTab;
+    return inTab.filter((i) => i.signal === filter);
+  }, [inTab, filter]);
 
   return (
     <div className="page">
@@ -163,7 +166,7 @@ export default function App() {
         <div>
           <h1>📈 BIST Hisse Önerileri</h1>
           <p className="subtitle">
-            Analist hedef fiyatı + temel verilere dayalı beklenen getiri · {inIndex.length} hisse
+            Analist hedef fiyatı + temel verilere dayalı beklenen getiri · {inTab.length} kayıt
             {data.source && <> · kaynak: {data.source === 'postgres' ? 'PostgreSQL' : 'bellek'}</>}
           </p>
         </div>
@@ -174,12 +177,12 @@ export default function App() {
 
       <div className="tabs">
         {TABS.map((t) => {
-          const count = data.items.filter((i) => (i.bist ?? 100) <= t.tier).length;
+          const count = data.items.filter(t.match).length;
           return (
             <button
-              key={t.tier}
-              className={`tab ${indexTab === t.tier ? 'active' : ''}`}
-              onClick={() => setIndexTab(t.tier)}
+              key={t.key}
+              className={`tab ${tab === t.key ? 'active' : ''}`}
+              onClick={() => setTab(t.key)}
             >
               {t.label}
               {count > 0 && <span className="tab-count">{count}</span>}
@@ -241,7 +244,7 @@ export default function App() {
                     <div className="ticker">{s.ticker}</div>
                     <div className="name">{s.name}{s.sector ? ` · ${s.sector}` : ''}</div>
                   </td>
-                  <td className="num">{fmtNum(s.price)} <span className="cur">TRY</span></td>
+                  <td className="num">{fmtNum(s.price)} <span className="cur">{s.currency || 'TRY'}</span></td>
                   <td className="num"><Pct value={s.changePct} /></td>
                   <td className="num"><Expected value={s.exp1m} /></td>
                   <td className="num"><Expected value={s.exp3m} /></td>

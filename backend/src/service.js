@@ -1,4 +1,4 @@
-import { BIST_STOCKS, toSymbol } from './stocks.js';
+import { BIST_STOCKS, INSTRUMENTS, toSymbol } from './stocks.js';
 import { fetchQuotes } from './dataSource.js';
 import { buildRecommendations } from './recommend.js';
 import {
@@ -32,16 +32,22 @@ const memory = {
   source: null,
 };
 
-const byTicker = new Map(BIST_STOCKS.map((s) => [s.ticker, s]));
+const byTicker = new Map(INSTRUMENTS.map((s) => [s.ticker, s]));
 
-// Yahoo'dan çeker, puanlar, isim/sektör ile zenginleştirir. Yan etkisiz.
+// Yahoo'dan çeker, puanlar, isim/sektör/tür ile zenginleştirir. Yan etkisiz.
 export async function computeRecommendations() {
-  const quotes = await fetchQuotes(BIST_STOCKS.map((s) => s.ticker));
+  const quotes = await fetchQuotes(INSTRUMENTS);
   const recos = buildRecommendations(quotes);
   return recos.map((r) => {
-    const ticker = r.symbol.replace('.IS', '');
-    const meta = byTicker.get(ticker) ?? { name: ticker, sector: null, bist: 100 };
-    return { ...r, ticker, name: meta.name, sector: meta.sector, bist: meta.bist ?? 100 };
+    const meta = byTicker.get(r.ticker) ?? { name: r.ticker, sector: null, bist: null, kind: 'stock' };
+    return {
+      ...r,
+      ticker: r.ticker,
+      name: meta.name,
+      sector: meta.sector,
+      bist: meta.bist ?? null,
+      kind: meta.kind ?? 'stock',
+    };
   });
 }
 

@@ -1,11 +1,12 @@
 {
-  "updatedAt": "2026-07-25T19:25:49.251Z",
+  "updatedAt": "2026-07-25T19:38:35.984Z",
   "source": "github-actions",
-  "count": 100,
+  "count": 104,
   "withAnalyst": 51,
   "items": [
     {
       "symbol": "ODINE.IS",
+      "ticker": "ODINE",
       "price": 2470,
       "currency": "TRY",
       "changePct": 5.56,
@@ -25,13 +26,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "AL",
-      "ticker": "ODINE",
       "name": "Odine Teknoloji",
       "sector": "Teknoloji",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "RALYH.IS",
+      "ticker": "RALYH",
       "price": 256,
       "currency": "TRY",
       "changePct": 0.59,
@@ -51,13 +53,14 @@
       "signal": "AL",
       "wtSignal": "AL",
       "stSignal": "AL",
-      "ticker": "RALYH",
       "name": "Ral Yatırım Holding",
       "sector": "Holding",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "IEYHO.IS",
+      "ticker": "IEYHO",
       "price": 164.2,
       "currency": "TRY",
       "changePct": 2.31,
@@ -77,13 +80,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "AL",
-      "ticker": "IEYHO",
       "name": "Işıklar Enerji Yapı Hold.",
       "sector": "Holding",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "TRENJ.IS",
+      "ticker": "TRENJ",
       "price": 100.3,
       "currency": "TRY",
       "changePct": -3.65,
@@ -103,13 +107,14 @@
       "signal": "AL",
       "wtSignal": "AL",
       "stSignal": "AL",
-      "ticker": "TRENJ",
       "name": "TR Doğal Enerji",
       "sector": "Enerji",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "EUPWR.IS",
+      "ticker": "EUPWR",
       "price": 100.4,
       "currency": "TRY",
       "changePct": 2.08,
@@ -129,13 +134,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "AL",
-      "ticker": "EUPWR",
       "name": "Europower Enerji",
       "sector": "Enerji",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "OYAKC.IS",
+      "ticker": "OYAKC",
       "price": 21.3,
       "currency": "TRY",
       "changePct": 2.31,
@@ -155,13 +161,14 @@
       "signal": "AL",
       "wtSignal": "AL",
       "stSignal": "AL",
-      "ticker": "OYAKC",
       "name": "Oyak Çimento",
       "sector": "Çimento",
-      "bist": 50
+      "bist": 50,
+      "kind": "stock"
     },
     {
       "symbol": "ANSGR.IS",
+      "ticker": "ANSGR",
       "price": 26.84,
       "currency": "TRY",
       "changePct": -1.11,
@@ -181,13 +188,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "ANSGR",
       "name": "Anadolu Sigorta",
       "sector": "Sigorta",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "SOKM.IS",
+      "ticker": "SOKM",
       "price": 53.1,
       "currency": "TRY",
       "changePct": -3.28,
@@ -207,13 +215,14 @@
       "signal": "AL",
       "wtSignal": "AL",
       "stSignal": "AL",
-      "ticker": "SOKM",
       "name": "Şok Marketler",
       "sector": "Perakende",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "KCHOL.IS",
+      "ticker": "KCHOL",
       "price": 197.6,
       "currency": "TRY",
       "changePct": -0.3,
@@ -233,13 +242,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "AL",
-      "ticker": "KCHOL",
       "name": "Koç Holding",
       "sector": "Holding",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "EKGYO.IS",
+      "ticker": "EKGYO",
       "price": 18.62,
       "currency": "TRY",
       "changePct": -2.87,
@@ -259,13 +269,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "EKGYO",
       "name": "Emlak Konut GYO",
       "sector": "GYO",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "TSKB.IS",
+      "ticker": "TSKB",
       "price": 11.43,
       "currency": "TRY",
       "changePct": 1.33,
@@ -285,13 +296,14 @@
       "signal": "AL",
       "wtSignal": null,
       "stSignal": "SAT",
-      "ticker": "TSKB",
       "name": "T.S.K.B.",
       "sector": "Bankacılık",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "TURSG.IS",
+      "ticker": "TURSG",
       "price": 6.62,
       "currency": "TRY",
       "changePct": -0.75,
@@ -311,13 +323,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "AL",
-      "ticker": "TURSG",
       "name": "Türkiye Sigorta",
       "sector": "Sigorta",
-      "bist": 50
+      "bist": 50,
+      "kind": "stock"
     },
     {
       "symbol": "MAVI.IS",
+      "ticker": "MAVI",
       "price": 38.48,
       "currency": "TRY",
       "changePct": -3.7,
@@ -337,13 +350,14 @@
       "signal": "AL",
       "wtSignal": "AL",
       "stSignal": "AL",
-      "ticker": "MAVI",
       "name": "Mavi Giyim",
       "sector": "Perakende",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "GRSEL.IS",
+      "ticker": "GRSEL",
       "price": 348.75,
       "currency": "TRY",
       "changePct": 9.67,
@@ -363,13 +377,14 @@
       "signal": "AL",
       "wtSignal": null,
       "stSignal": "AL",
-      "ticker": "GRSEL",
       "name": "Gürsel Turizm",
       "sector": "Ulaştırma",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "ISMEN.IS",
+      "ticker": "ISMEN",
       "price": 36.3,
       "currency": "TRY",
       "changePct": 0.78,
@@ -389,13 +404,14 @@
       "signal": "AL",
       "wtSignal": "AL",
       "stSignal": "AL",
-      "ticker": "ISMEN",
       "name": "İş Yatırım Menkul",
       "sector": "Aracı Kurum",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "MAGEN.IS",
+      "ticker": "MAGEN",
       "price": 40.5,
       "currency": "TRY",
       "changePct": -1.36,
@@ -415,13 +431,14 @@
       "signal": "AL",
       "wtSignal": "AL",
       "stSignal": "AL",
-      "ticker": "MAGEN",
       "name": "Margün Enerji",
       "sector": "Enerji",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "SAHOL.IS",
+      "ticker": "SAHOL",
       "price": 87.1,
       "currency": "TRY",
       "changePct": -0.97,
@@ -441,13 +458,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "SAHOL",
       "name": "Sabancı Holding",
       "sector": "Holding",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "GESAN.IS",
+      "ticker": "GESAN",
       "price": 81.3,
       "currency": "TRY",
       "changePct": -1.57,
@@ -467,13 +485,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "AL",
-      "ticker": "GESAN",
       "name": "Girişim Elektrik",
       "sector": "Enerji",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "FROTO.IS",
+      "ticker": "FROTO",
       "price": 79,
       "currency": "TRY",
       "changePct": -0.5,
@@ -493,13 +512,14 @@
       "signal": "AL",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "FROTO",
       "name": "Ford Otosan",
       "sector": "Otomotiv",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "ARCLK.IS",
+      "ticker": "ARCLK",
       "price": 99,
       "currency": "TRY",
       "changePct": 0,
@@ -519,13 +539,14 @@
       "signal": "AL",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "ARCLK",
       "name": "Arçelik",
       "sector": "Dayanıklı Tüketim",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "TCELL.IS",
+      "ticker": "TCELL",
       "price": 103.7,
       "currency": "TRY",
       "changePct": -1.24,
@@ -545,13 +566,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "TCELL",
       "name": "Turkcell",
       "sector": "Telekom",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "ULKER.IS",
+      "ticker": "ULKER",
       "price": 92.05,
       "currency": "TRY",
       "changePct": -2.44,
@@ -571,13 +593,14 @@
       "signal": "AL",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "ULKER",
       "name": "Ülker Bisküvi",
       "sector": "Gıda",
-      "bist": 50
+      "bist": 50,
+      "kind": "stock"
     },
     {
       "symbol": "ALARK.IS",
+      "ticker": "ALARK",
       "price": 105.6,
       "currency": "TRY",
       "changePct": -1.4,
@@ -597,13 +620,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "AL",
-      "ticker": "ALARK",
       "name": "Alarko Holding",
       "sector": "Holding",
-      "bist": 50
+      "bist": 50,
+      "kind": "stock"
     },
     {
       "symbol": "CIMSA.IS",
+      "ticker": "CIMSA",
       "price": 49.64,
       "currency": "TRY",
       "changePct": -1.02,
@@ -623,13 +647,14 @@
       "signal": "AL",
       "wtSignal": "AL",
       "stSignal": "AL",
-      "ticker": "CIMSA",
       "name": "Çimsa",
       "sector": "Çimento",
-      "bist": 50
+      "bist": 50,
+      "kind": "stock"
     },
     {
       "symbol": "PGSUS.IS",
+      "ticker": "PGSUS",
       "price": 161.6,
       "currency": "TRY",
       "changePct": 0.75,
@@ -649,13 +674,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "PGSUS",
       "name": "Pegasus",
       "sector": "Ulaştırma",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "GARAN.IS",
+      "ticker": "GARAN",
       "price": 126,
       "currency": "TRY",
       "changePct": 0.8,
@@ -675,13 +701,14 @@
       "signal": "AL",
       "wtSignal": null,
       "stSignal": "SAT",
-      "ticker": "GARAN",
       "name": "Garanti BBVA",
       "sector": "Bankacılık",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "EFOR.IS",
+      "ticker": "EFOR",
       "price": 18.2,
       "currency": "TRY",
       "changePct": 1.79,
@@ -701,13 +728,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "AL",
-      "ticker": "EFOR",
       "name": "Efor Yatırım",
       "sector": "Holding",
-      "bist": 50
+      "bist": 50,
+      "kind": "stock"
     },
     {
       "symbol": "ISCTR.IS",
+      "ticker": "ISCTR",
       "price": 12.92,
       "currency": "TRY",
       "changePct": -0.62,
@@ -727,13 +755,14 @@
       "signal": "AL",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "ISCTR",
       "name": "İş Bankası (C)",
       "sector": "Bankacılık",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "DOAS.IS",
+      "ticker": "DOAS",
       "price": 186.3,
       "currency": "TRY",
       "changePct": 0.22,
@@ -753,13 +782,14 @@
       "signal": "AL",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "DOAS",
       "name": "Doğuş Otomotiv",
       "sector": "Otomotiv",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "MPARK.IS",
+      "ticker": "MPARK",
       "price": 402.25,
       "currency": "TRY",
       "changePct": -1.89,
@@ -779,13 +809,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "MPARK",
       "name": "MLP Sağlık (Medical Park)",
       "sector": "Sağlık",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "MGROS.IS",
+      "ticker": "MGROS",
       "price": 623,
       "currency": "TRY",
       "changePct": -1.19,
@@ -805,13 +836,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "MGROS",
       "name": "Migros",
       "sector": "Perakende",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "THYAO.IS",
+      "ticker": "THYAO",
       "price": 312,
       "currency": "TRY",
       "changePct": -0.24,
@@ -831,13 +863,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "THYAO",
       "name": "Türk Hava Yolları",
       "sector": "Ulaştırma",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "TTKOM.IS",
+      "ticker": "TTKOM",
       "price": 54,
       "currency": "TRY",
       "changePct": -2.96,
@@ -857,13 +890,14 @@
       "signal": "AL",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "TTKOM",
       "name": "Türk Telekom",
       "sector": "Telekom",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "BALSU.IS",
+      "ticker": "BALSU",
       "price": 16.08,
       "currency": "TRY",
       "changePct": -3.71,
@@ -883,13 +917,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "BALSU",
       "name": "Balsu Gıda",
       "sector": "Gıda",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "DOHOL.IS",
+      "ticker": "DOHOL",
       "price": 21.18,
       "currency": "TRY",
       "changePct": -1.03,
@@ -909,13 +944,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "DOHOL",
       "name": "Doğan Holding",
       "sector": "Holding",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "VESTL.IS",
+      "ticker": "VESTL",
       "price": 24.42,
       "currency": "TRY",
       "changePct": 0.33,
@@ -935,13 +971,14 @@
       "signal": "AL",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "VESTL",
       "name": "Vestel",
       "sector": "Elektronik",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "PSGYO.IS",
+      "ticker": "PSGYO",
       "price": 3.74,
       "currency": "TRY",
       "changePct": -5.56,
@@ -961,13 +998,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "AL",
-      "ticker": "PSGYO",
       "name": "Panora GYO",
       "sector": "GYO",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "ASTOR.IS",
+      "ticker": "ASTOR",
       "price": 297,
       "currency": "TRY",
       "changePct": -3.26,
@@ -987,13 +1025,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "ASTOR",
       "name": "Astor Enerji",
       "sector": "Enerji",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "CCOLA.IS",
+      "ticker": "CCOLA",
       "price": 91.15,
       "currency": "TRY",
       "changePct": 0.05,
@@ -1013,13 +1052,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "AL",
-      "ticker": "CCOLA",
       "name": "Coca-Cola İçecek",
       "sector": "İçecek",
-      "bist": 50
+      "bist": 50,
+      "kind": "stock"
     },
     {
       "symbol": "ALTNY.IS",
+      "ticker": "ALTNY",
       "price": 16.67,
       "currency": "TRY",
       "changePct": -1.94,
@@ -1039,13 +1079,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "ALTNY",
       "name": "Altınay Savunma",
       "sector": "Savunma",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "TAVHL.IS",
+      "ticker": "TAVHL",
       "price": 259.5,
       "currency": "TRY",
       "changePct": 0.1,
@@ -1065,13 +1106,41 @@
       "signal": "AL",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "TAVHL",
       "name": "TAV Havalimanları",
       "sector": "Ulaştırma",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
+    },
+    {
+      "symbol": "PA=F",
+      "ticker": "XPD",
+      "price": 1253.6,
+      "currency": "USD",
+      "changePct": -0.14,
+      "momentum1m": 7.95,
+      "pos52w": 0.158,
+      "exp1m": null,
+      "exp3m": null,
+      "upside12m": null,
+      "targetMean": null,
+      "targetHigh": null,
+      "targetLow": null,
+      "recommendationKey": null,
+      "numAnalysts": null,
+      "forwardPE": null,
+      "revenueGrowth": null,
+      "score": 70,
+      "signal": "AL",
+      "wtSignal": "AL",
+      "stSignal": "AL",
+      "name": "Paladyum",
+      "sector": "Kıymetli Maden",
+      "bist": null,
+      "kind": "metal"
     },
     {
       "symbol": "BIMAS.IS",
+      "ticker": "BIMAS",
       "price": 380.25,
       "currency": "TRY",
       "changePct": -2.62,
@@ -1091,13 +1160,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "AL",
-      "ticker": "BIMAS",
       "name": "BİM Mağazalar",
       "sector": "Perakende",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "SISE.IS",
+      "ticker": "SISE",
       "price": 43.42,
       "currency": "TRY",
       "changePct": -0.6,
@@ -1117,13 +1187,14 @@
       "signal": "AL",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "SISE",
       "name": "Şişecam",
       "sector": "Cam/Sanayi",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "TOASO.IS",
+      "ticker": "TOASO",
       "price": 281,
       "currency": "TRY",
       "changePct": -1.83,
@@ -1143,13 +1214,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "TOASO",
       "name": "Tofaş",
       "sector": "Otomotiv",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "VAKBN.IS",
+      "ticker": "VAKBN",
       "price": 30.24,
       "currency": "TRY",
       "changePct": -0.66,
@@ -1169,13 +1241,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "VAKBN",
       "name": "Vakıfbank",
       "sector": "Bankacılık",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "ENJSA.IS",
+      "ticker": "ENJSA",
       "price": 105.4,
       "currency": "TRY",
       "changePct": -2.77,
@@ -1195,13 +1268,14 @@
       "signal": "AL",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "ENJSA",
       "name": "Enerjisa Enerji",
       "sector": "Enerji",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "AEFES.IS",
+      "ticker": "AEFES",
       "price": 20.96,
       "currency": "TRY",
       "changePct": -2.69,
@@ -1221,13 +1295,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "AL",
-      "ticker": "AEFES",
       "name": "Anadolu Efes",
       "sector": "İçecek",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "TRMET.IS",
+      "ticker": "TRMET",
       "price": 136.1,
       "currency": "TRY",
       "changePct": 1.64,
@@ -1247,13 +1322,14 @@
       "signal": "AL",
       "wtSignal": "AL",
       "stSignal": "AL",
-      "ticker": "TRMET",
       "name": "TR Anadolu Metal Madencilik",
       "sector": "Madencilik",
-      "bist": 50
+      "bist": 50,
+      "kind": "stock"
     },
     {
       "symbol": "ZOREN.IS",
+      "ticker": "ZOREN",
       "price": 2.54,
       "currency": "TRY",
       "changePct": -1.17,
@@ -1273,13 +1349,14 @@
       "signal": "AL",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "ZOREN",
       "name": "Zorlu Enerji",
       "sector": "Enerji",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "SASA.IS",
+      "ticker": "SASA",
       "price": 2.69,
       "currency": "TRY",
       "changePct": 1.51,
@@ -1299,13 +1376,14 @@
       "signal": "AL",
       "wtSignal": "SAT",
       "stSignal": "AL",
-      "ticker": "SASA",
       "name": "Sasa Polyester",
       "sector": "Kimya",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "OTKAR.IS",
+      "ticker": "OTKAR",
       "price": 327,
       "currency": "TRY",
       "changePct": -1.8,
@@ -1325,13 +1403,14 @@
       "signal": "TUT",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "OTKAR",
       "name": "Otokar",
       "sector": "Otomotiv",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "AKSEN.IS",
+      "ticker": "AKSEN",
       "price": 105.8,
       "currency": "TRY",
       "changePct": 1.34,
@@ -1351,13 +1430,14 @@
       "signal": "TUT",
       "wtSignal": "SAT",
       "stSignal": "AL",
-      "ticker": "AKSEN",
       "name": "Aksa Enerji",
       "sector": "Enerji",
-      "bist": 50
+      "bist": 50,
+      "kind": "stock"
     },
     {
       "symbol": "TUPRS.IS",
+      "ticker": "TUPRS",
       "price": 304.25,
       "currency": "TRY",
       "changePct": -3.26,
@@ -1377,13 +1457,14 @@
       "signal": "TUT",
       "wtSignal": "AL",
       "stSignal": "AL",
-      "ticker": "TUPRS",
       "name": "Tüpraş",
       "sector": "Enerji",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "AKSA.IS",
+      "ticker": "AKSA",
       "price": 12.05,
       "currency": "TRY",
       "changePct": 0.33,
@@ -1403,13 +1484,14 @@
       "signal": "TUT",
       "wtSignal": "SAT",
       "stSignal": "AL",
-      "ticker": "AKSA",
       "name": "Aksa Akrilik",
       "sector": "Kimya",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "HEKTS.IS",
+      "ticker": "HEKTS",
       "price": 2.99,
       "currency": "TRY",
       "changePct": -3.86,
@@ -1429,13 +1511,14 @@
       "signal": "TUT",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "HEKTS",
       "name": "Hektaş",
       "sector": "Tarım Kimya",
-      "bist": 50
+      "bist": 50,
+      "kind": "stock"
     },
     {
       "symbol": "QUAGR.IS",
+      "ticker": "QUAGR",
       "price": 3.92,
       "currency": "TRY",
       "changePct": 0.77,
@@ -1455,13 +1538,41 @@
       "signal": "TUT",
       "wtSignal": "AL",
       "stSignal": "AL",
-      "ticker": "QUAGR",
       "name": "Qua Granite",
       "sector": "Yapı/Seramik",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
+    },
+    {
+      "symbol": "GC=F",
+      "ticker": "XAU",
+      "price": 4070.8,
+      "currency": "USD",
+      "changePct": 0.6,
+      "momentum1m": 2.02,
+      "pos52w": 0.347,
+      "exp1m": null,
+      "exp3m": null,
+      "upside12m": null,
+      "targetMean": null,
+      "targetHigh": null,
+      "targetLow": null,
+      "recommendationKey": null,
+      "numAnalysts": null,
+      "forwardPE": null,
+      "revenueGrowth": null,
+      "score": 55,
+      "signal": "TUT",
+      "wtSignal": "AL",
+      "stSignal": "SAT",
+      "name": "Altın",
+      "sector": "Kıymetli Maden",
+      "bist": null,
+      "kind": "metal"
     },
     {
       "symbol": "TRALT.IS",
+      "ticker": "TRALT",
       "price": 49.12,
       "currency": "TRY",
       "changePct": -2.83,
@@ -1481,13 +1592,68 @@
       "signal": "TUT",
       "wtSignal": "AL",
       "stSignal": "AL",
-      "ticker": "TRALT",
       "name": "Türk Altın İşletmeleri",
       "sector": "Madencilik",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
+    },
+    {
+      "symbol": "SI=F",
+      "ticker": "XAG",
+      "price": 58.91,
+      "currency": "USD",
+      "changePct": 1.92,
+      "momentum1m": 1.47,
+      "pos52w": 0.266,
+      "exp1m": null,
+      "exp3m": null,
+      "upside12m": null,
+      "targetMean": null,
+      "targetHigh": null,
+      "targetLow": null,
+      "recommendationKey": null,
+      "numAnalysts": null,
+      "forwardPE": null,
+      "revenueGrowth": null,
+      "score": 54,
+      "signal": "TUT",
+      "wtSignal": "AL",
+      "stSignal": "SAT",
+      "name": "Gümüş",
+      "sector": "Kıymetli Maden",
+      "bist": null,
+      "kind": "metal"
+    },
+    {
+      "symbol": "PL=F",
+      "ticker": "XPT",
+      "price": 1604.1,
+      "currency": "USD",
+      "changePct": 0.31,
+      "momentum1m": 1.49,
+      "pos52w": 0.208,
+      "exp1m": null,
+      "exp3m": null,
+      "upside12m": null,
+      "targetMean": null,
+      "targetHigh": null,
+      "targetLow": null,
+      "recommendationKey": null,
+      "numAnalysts": null,
+      "forwardPE": null,
+      "revenueGrowth": null,
+      "score": 54,
+      "signal": "TUT",
+      "wtSignal": "AL",
+      "stSignal": "SAT",
+      "name": "Platin",
+      "sector": "Kıymetli Maden",
+      "bist": null,
+      "kind": "metal"
     },
     {
       "symbol": "FENER.IS",
+      "ticker": "FENER",
       "price": 3.06,
       "currency": "TRY",
       "changePct": -0.97,
@@ -1507,13 +1673,14 @@
       "signal": "TUT",
       "wtSignal": "SAT",
       "stSignal": "AL",
-      "ticker": "FENER",
       "name": "Fenerbahçe Futbol",
       "sector": "Spor",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "IZENR.IS",
+      "ticker": "IZENR",
       "price": 10,
       "currency": "TRY",
       "changePct": -0.3,
@@ -1533,13 +1700,14 @@
       "signal": "TUT",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "IZENR",
       "name": "İzdemir Enerji",
       "sector": "Enerji",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "ODAS.IS",
+      "ticker": "ODAS",
       "price": 8.52,
       "currency": "TRY",
       "changePct": -6.78,
@@ -1559,13 +1727,14 @@
       "signal": "TUT",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "ODAS",
       "name": "Odaş Elektrik",
       "sector": "Enerji",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "REEDR.IS",
+      "ticker": "REEDR",
       "price": 6.75,
       "currency": "TRY",
       "changePct": 0.3,
@@ -1585,13 +1754,14 @@
       "signal": "TUT",
       "wtSignal": "AL",
       "stSignal": "AL",
-      "ticker": "REEDR",
       "name": "Reeder Teknoloji",
       "sector": "Teknoloji",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "ENKAI.IS",
+      "ticker": "ENKAI",
       "price": 88.8,
       "currency": "TRY",
       "changePct": -1.28,
@@ -1611,13 +1781,14 @@
       "signal": "TUT",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "ENKAI",
       "name": "Enka İnşaat",
       "sector": "İnşaat",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "BRSAN.IS",
+      "ticker": "BRSAN",
       "price": 570.5,
       "currency": "TRY",
       "changePct": 2.33,
@@ -1637,13 +1808,14 @@
       "signal": "TUT",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "BRSAN",
       "name": "Borusan Boru",
       "sector": "Metal/Sanayi",
-      "bist": 50
+      "bist": 50,
+      "kind": "stock"
     },
     {
       "symbol": "ASELS.IS",
+      "ticker": "ASELS",
       "price": 380.25,
       "currency": "TRY",
       "changePct": 1.06,
@@ -1663,13 +1835,14 @@
       "signal": "TUT",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "ASELS",
       "name": "Aselsan",
       "sector": "Savunma",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "KUYAS.IS",
+      "ticker": "KUYAS",
       "price": 70.75,
       "currency": "TRY",
       "changePct": -3.35,
@@ -1689,13 +1862,14 @@
       "signal": "TUT",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "KUYAS",
       "name": "Kuyaş Yatırım",
       "sector": "Holding",
-      "bist": 50
+      "bist": 50,
+      "kind": "stock"
     },
     {
       "symbol": "GRTHO.IS",
+      "ticker": "GRTHO",
       "price": 247,
       "currency": "TRY",
       "changePct": -0.12,
@@ -1715,13 +1889,14 @@
       "signal": "TUT",
       "wtSignal": "AL",
       "stSignal": "AL",
-      "ticker": "GRTHO",
       "name": "Grainturk Holding",
       "sector": "Holding",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "KRDMD.IS",
+      "ticker": "KRDMD",
       "price": 42.2,
       "currency": "TRY",
       "changePct": 0.09,
@@ -1741,13 +1916,14 @@
       "signal": "TUT",
       "wtSignal": "SAT",
       "stSignal": "AL",
-      "ticker": "KRDMD",
       "name": "Kardemir (D)",
       "sector": "Metal",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "GSRAY.IS",
+      "ticker": "GSRAY",
       "price": 1.01,
       "currency": "TRY",
       "changePct": 0,
@@ -1767,13 +1943,14 @@
       "signal": "TUT",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "GSRAY",
       "name": "Galatasaray Sportif",
       "sector": "Spor",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "ENERY.IS",
+      "ticker": "ENERY",
       "price": 9.57,
       "currency": "TRY",
       "changePct": 0.42,
@@ -1793,13 +1970,14 @@
       "signal": "İZLE",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "ENERY",
       "name": "Enerya Enerji",
       "sector": "Enerji",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "EREGL.IS",
+      "ticker": "EREGL",
       "price": 43.28,
       "currency": "TRY",
       "changePct": -2.08,
@@ -1819,13 +1997,14 @@
       "signal": "İZLE",
       "wtSignal": "SAT",
       "stSignal": "AL",
-      "ticker": "EREGL",
       "name": "Ereğli Demir Çelik",
       "sector": "Metal",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "CWENE.IS",
+      "ticker": "CWENE",
       "price": 37.3,
       "currency": "TRY",
       "changePct": -5.43,
@@ -1845,13 +2024,14 @@
       "signal": "İZLE",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "CWENE",
       "name": "CW Enerji",
       "sector": "Enerji",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "BSOKE.IS",
+      "ticker": "BSOKE",
       "price": 34.76,
       "currency": "TRY",
       "changePct": -0.57,
@@ -1871,13 +2051,14 @@
       "signal": "İZLE",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "BSOKE",
       "name": "Batısöke Çimento",
       "sector": "Çimento",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "HALKB.IS",
+      "ticker": "HALKB",
       "price": 35.98,
       "currency": "TRY",
       "changePct": -1.26,
@@ -1897,13 +2078,14 @@
       "signal": "İZLE",
       "wtSignal": null,
       "stSignal": "SAT",
-      "ticker": "HALKB",
       "name": "Halkbank",
       "sector": "Bankacılık",
-      "bist": 50
+      "bist": 50,
+      "kind": "stock"
     },
     {
       "symbol": "BRYAT.IS",
+      "ticker": "BRYAT",
       "price": 1815,
       "currency": "TRY",
       "changePct": 0.5,
@@ -1923,13 +2105,14 @@
       "signal": "İZLE",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "BRYAT",
       "name": "Borusan Yat. Pazarlama",
       "sector": "Holding",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "CVKMD.IS",
+      "ticker": "CVKMD",
       "price": 38.14,
       "currency": "TRY",
       "changePct": -3.39,
@@ -1949,13 +2132,14 @@
       "signal": "İZLE",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "CVKMD",
       "name": "CVK Maden İşletmeleri",
       "sector": "Madencilik",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "GENIL.IS",
+      "ticker": "GENIL",
       "price": 9.21,
       "currency": "TRY",
       "changePct": -0.97,
@@ -1975,13 +2159,14 @@
       "signal": "İZLE",
       "wtSignal": "SAT",
       "stSignal": "AL",
-      "ticker": "GENIL",
       "name": "Gen İlaç",
       "sector": "Sağlık",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "PETKM.IS",
+      "ticker": "PETKM",
       "price": 22.02,
       "currency": "TRY",
       "changePct": -2.39,
@@ -2001,13 +2186,14 @@
       "signal": "İZLE",
       "wtSignal": "SAT",
       "stSignal": "AL",
-      "ticker": "PETKM",
       "name": "Petkim",
       "sector": "Kimya",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "DAPGM.IS",
+      "ticker": "DAPGM",
       "price": 9.52,
       "currency": "TRY",
       "changePct": -3.55,
@@ -2027,13 +2213,14 @@
       "signal": "İZLE",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "DAPGM",
       "name": "DAP Gayrimenkul",
       "sector": "GYO",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "PAHOL.IS",
+      "ticker": "PAHOL",
       "price": 1.42,
       "currency": "TRY",
       "changePct": -2.07,
@@ -2053,13 +2240,14 @@
       "signal": "İZLE",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "PAHOL",
       "name": "Pasifik Holding",
       "sector": "Holding",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "ESEN.IS",
+      "ticker": "ESEN",
       "price": 3.53,
       "currency": "TRY",
       "changePct": 0.28,
@@ -2079,13 +2267,14 @@
       "signal": "İZLE",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "ESEN",
       "name": "Esenboğa Elektrik",
       "sector": "Enerji",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "PATEK.IS",
+      "ticker": "PATEK",
       "price": 20.42,
       "currency": "TRY",
       "changePct": -1.07,
@@ -2105,13 +2294,14 @@
       "signal": "İZLE",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "PATEK",
       "name": "Papilon Savunma",
       "sector": "Savunma",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "CANTE.IS",
+      "ticker": "CANTE",
       "price": 1.28,
       "currency": "TRY",
       "changePct": -2.29,
@@ -2131,13 +2321,14 @@
       "signal": "İZLE",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "CANTE",
       "name": "Çan2 Termik",
       "sector": "Enerji",
-      "bist": 50
+      "bist": 50,
+      "kind": "stock"
     },
     {
       "symbol": "GLRMK.IS",
+      "ticker": "GLRMK",
       "price": 163.3,
       "currency": "TRY",
       "changePct": 0.18,
@@ -2157,13 +2348,14 @@
       "signal": "İZLE",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "GLRMK",
       "name": "Gülermak Ağır Sanayi",
       "sector": "İnşaat",
-      "bist": 50
+      "bist": 50,
+      "kind": "stock"
     },
     {
       "symbol": "PASEU.IS",
+      "ticker": "PASEU",
       "price": 114.7,
       "currency": "TRY",
       "changePct": 0.61,
@@ -2183,13 +2375,14 @@
       "signal": "İZLE",
       "wtSignal": "AL",
       "stSignal": "AL",
-      "ticker": "PASEU",
       "name": "Pasifik Eurasia Lojistik",
       "sector": "Lojistik",
-      "bist": 50
+      "bist": 50,
+      "kind": "stock"
     },
     {
       "symbol": "EUREN.IS",
+      "ticker": "EUREN",
       "price": 4.11,
       "currency": "TRY",
       "changePct": -0.96,
@@ -2209,13 +2402,14 @@
       "signal": "İZLE",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "EUREN",
       "name": "Europen Endüstri",
       "sector": "Sanayi",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "SARKY.IS",
+      "ticker": "SARKY",
       "price": 25.76,
       "currency": "TRY",
       "changePct": -1.3,
@@ -2235,13 +2429,14 @@
       "signal": "İZLE",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "SARKY",
       "name": "Sarkuysan",
       "sector": "Metal",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "GUBRF.IS",
+      "ticker": "GUBRF",
       "price": 422.75,
       "currency": "TRY",
       "changePct": -0.53,
@@ -2261,13 +2456,14 @@
       "signal": "İZLE",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "GUBRF",
       "name": "Gübre Fabrikaları",
       "sector": "Kimya",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "TUKAS.IS",
+      "ticker": "TUKAS",
       "price": 2.1,
       "currency": "TRY",
       "changePct": -0.94,
@@ -2287,13 +2483,14 @@
       "signal": "İZLE",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "TUKAS",
       "name": "Tukaş Gıda",
       "sector": "Gıda",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "TKFEN.IS",
+      "ticker": "TKFEN",
       "price": 150,
       "currency": "TRY",
       "changePct": 2.81,
@@ -2313,13 +2510,14 @@
       "signal": "İZLE",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "TKFEN",
       "name": "Tekfen Holding",
       "sector": "Holding",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "ECILC.IS",
+      "ticker": "ECILC",
       "price": 71.05,
       "currency": "TRY",
       "changePct": -2.13,
@@ -2339,13 +2537,14 @@
       "signal": "İZLE",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "ECILC",
       "name": "Eczacıbaşı İlaç",
       "sector": "Sağlık",
-      "bist": 50
+      "bist": 50,
+      "kind": "stock"
     },
     {
       "symbol": "KTLEV.IS",
+      "ticker": "KTLEV",
       "price": 155,
       "currency": "TRY",
       "changePct": -8.28,
@@ -2365,13 +2564,14 @@
       "signal": "İZLE",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "KTLEV",
       "name": "Katılımevim Tasarruf",
       "sector": "Finans",
-      "bist": 50
+      "bist": 50,
+      "kind": "stock"
     },
     {
       "symbol": "KLRHO.IS",
+      "ticker": "KLRHO",
       "price": 81.15,
       "currency": "TRY",
       "changePct": -2.99,
@@ -2391,13 +2591,14 @@
       "signal": "İZLE",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "KLRHO",
       "name": "Kiler Holding",
       "sector": "Holding",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "BTCIM.IS",
+      "ticker": "BTCIM",
       "price": 5.28,
       "currency": "TRY",
       "changePct": 1.54,
@@ -2417,13 +2618,14 @@
       "signal": "İZLE",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "BTCIM",
       "name": "Batıçim Batı Anadolu",
       "sector": "Çimento",
-      "bist": 50
+      "bist": 50,
+      "kind": "stock"
     },
     {
       "symbol": "BERA.IS",
+      "ticker": "BERA",
       "price": 13.57,
       "currency": "TRY",
       "changePct": -1.67,
@@ -2443,13 +2645,14 @@
       "signal": "İZLE",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "BERA",
       "name": "Bera Holding",
       "sector": "Holding",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "AKBNK.IS",
+      "ticker": "AKBNK",
       "price": 67.6,
       "currency": "TRY",
       "changePct": 0.82,
@@ -2469,13 +2672,14 @@
       "signal": "İZLE",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "AKBNK",
       "name": "Akbank",
       "sector": "Bankacılık",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "MIATK.IS",
+      "ticker": "MIATK",
       "price": 33.64,
       "currency": "TRY",
       "changePct": 1.45,
@@ -2495,13 +2699,14 @@
       "signal": "İZLE",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "MIATK",
       "name": "Mia Teknoloji",
       "sector": "Teknoloji",
-      "bist": 50
+      "bist": 50,
+      "kind": "stock"
     },
     {
       "symbol": "DSTKF.IS",
+      "ticker": "DSTKF",
       "price": 2048,
       "currency": "TRY",
       "changePct": -2.48,
@@ -2521,13 +2726,14 @@
       "signal": "İZLE",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "DSTKF",
       "name": "Destek Finans Faktoring",
       "sector": "Finans",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "YKBNK.IS",
+      "ticker": "YKBNK",
       "price": 33.36,
       "currency": "TRY",
       "changePct": 0.3,
@@ -2547,13 +2753,14 @@
       "signal": "İZLE",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "YKBNK",
       "name": "Yapı Kredi",
       "sector": "Bankacılık",
-      "bist": 30
+      "bist": 30,
+      "kind": "stock"
     },
     {
       "symbol": "OBAMS.IS",
+      "ticker": "OBAMS",
       "price": 5.21,
       "currency": "TRY",
       "changePct": -2.62,
@@ -2573,13 +2780,14 @@
       "signal": "İZLE",
       "wtSignal": "AL",
       "stSignal": "SAT",
-      "ticker": "OBAMS",
       "name": "Oba Makarnacılık",
       "sector": "Gıda",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     },
     {
       "symbol": "SKBNK.IS",
+      "ticker": "SKBNK",
       "price": 11.76,
       "currency": "TRY",
       "changePct": -9.95,
@@ -2599,10 +2807,10 @@
       "signal": "İZLE",
       "wtSignal": "SAT",
       "stSignal": "SAT",
-      "ticker": "SKBNK",
       "name": "Şekerbank",
       "sector": "Bankacılık",
-      "bist": 100
+      "bist": 100,
+      "kind": "stock"
     }
   ]
 }
