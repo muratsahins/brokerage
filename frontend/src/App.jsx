@@ -164,7 +164,6 @@ export default function App() {
     { key: 'bist30',  label: 'BIST 30',        match: (i) => i.bist != null && i.bist <= 30 },
     { key: 'bist50',  label: 'BIST 50',        match: (i) => i.bist != null && i.bist <= 50 },
     { key: 'bist100', label: 'BIST 100',       match: (i) => i.bist != null && i.bist <= 100 },
-    { key: 'other',   label: 'Diğer',          match: (i) => i.kind === 'stock' && i.bist == null },
     { key: 'metal',   label: 'Kıymetli Maden', match: (i) => i.kind === 'metal' },
   ];
   const activeTab = TABS.find((t) => t.key === tab) ?? TABS[0];
