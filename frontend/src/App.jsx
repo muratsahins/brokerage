@@ -1,4 +1,70 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
+
+// TradingView sembolü: BIST hisseleri "BIST:TICKER", kıymetli madenler TVC spot.
+const METAL_TV = { XAU: 'TVC:GOLD', XAG: 'TVC:SILVER', XPT: 'TVC:PLATINUM', XPD: 'TVC:PALLADIUM' };
+function tvSymbol(s) {
+  if (s.kind === 'metal') return METAL_TV[s.ticker] || `BIST:${s.ticker}`;
+  return `BIST:${s.ticker}`;
+}
+
+// TradingView tv.js scriptini bir kez yükler.
+function loadTradingView() {
+  return new Promise((resolve) => {
+    if (window.TradingView) return resolve();
+    let sc = document.getElementById('tv-js');
+    if (sc) { sc.addEventListener('load', () => resolve()); return; }
+    sc = document.createElement('script');
+    sc.id = 'tv-js';
+    sc.src = 'https://s3.tradingview.com/tv.js';
+    sc.onload = () => resolve();
+    document.head.appendChild(sc);
+  });
+}
+
+// Grafik pop-up'ı: seçilen enstrümanın TradingView grafiğini başlıkla gösterir.
+function ChartModal({ item, onClose }) {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    let cancelled = false;
+    loadTradingView().then(() => {
+      if (cancelled || !containerRef.current || !window.TradingView) return;
+      containerRef.current.innerHTML = '';
+      new window.TradingView.widget({
+        autosize: true,
+        symbol: tvSymbol(item),
+        interval: 'D',
+        timezone: 'Europe/Istanbul',
+        theme: 'dark',
+        style: '1',
+        locale: 'tr',
+        allow_symbol_change: false,
+        hide_side_toolbar: false,
+        container_id: containerRef.current.id,
+      });
+    });
+    return () => { cancelled = true; document.removeEventListener('keydown', onKey); };
+  }, [item, onClose]);
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-head">
+          <div className="modal-title">
+            <span className="modal-ticker">{item.ticker}</span>
+            <span className="modal-name">{item.name}{item.sector ? ` · ${item.sector}` : ''}</span>
+          </div>
+          <button className="modal-close" onClick={onClose} aria-label="Kapat">✕</button>
+        </div>
+        <div className="modal-chart">
+          <div id={`tv_${item.ticker}`} ref={containerRef} style={{ height: '100%', width: '100%' }} />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // Canlıda backend ayrı bir origin'de (Render). VITE_API_URL ile verilir.
 // Dev'de boş kalır → '/api...' Vite proxy üzerinden backend'e gider.
@@ -111,6 +177,7 @@ export default function App() {
   const [filter, setFilter] = useState('ALL');
   const [tab, setTab] = useState('bist30');
   const [query, setQuery] = useState('');
+  const [chartItem, setChartItem] = useState(null); // grafik pop-up'ı için seçili enstrüman
   // Görünüm: 'mobile' (kart, yatay scroll yok) | 'web' (tam tablo).
   const [view, setView] = useState(() => {
     try { return localStorage.getItem('viewMode') || (window.innerWidth <= 640 ? 'mobile' : 'web'); }
@@ -304,7 +371,9 @@ export default function App() {
                 <tr key={s.ticker}>
                   <td className="rank">{i + 1}</td>
                   <td>
-                    <div className="ticker">{s.ticker}</div>
+                    <button className="ticker ticker-link" onClick={() => setChartItem(s)} title="Grafiği aç">
+                      {s.ticker} <span className="chart-ico">📈</span>
+                    </button>
                     <div className="name">{s.name}{s.sector ? ` · ${s.sector}` : ''}</div>
                   </td>
                   <td className="num">
@@ -358,7 +427,9 @@ export default function App() {
                 <div className="card-id">
                   <span className="rank">{i + 1}</span>
                   <div>
-                    <div className="ticker">{s.ticker}</div>
+                    <button className="ticker ticker-link" onClick={() => setChartItem(s)} title="Grafiği aç">
+                      {s.ticker} <span className="chart-ico">📈</span>
+                    </button>
                     <div className="name">{s.name}{s.sector ? ` · ${s.sector}` : ''}</div>
                   </div>
                 </div>
@@ -449,6 +520,8 @@ export default function App() {
           Veriler Yahoo Finance / analist konsensüsü kaynaklıdır, gecikmeli olabilir.
         </p>
       </footer>
+
+      {chartItem && <ChartModal item={chartItem} onClose={() => setChartItem(null)} />}
     </div>
   );
 }
