@@ -145,7 +145,9 @@ async function fetchChart(ticker) {
     symbol,
     price: meta.regularMarketPrice,
     previousClose,
-    currency: meta.currency ?? 'TRY',
+    // BIST (.IS) hisseleri her zaman Türk Lirası cinsindendir. Yahoo bazı
+    // sembollerde meta.currency'yi hatalı (GBp/GBP) döndürebildiği için sabitliyoruz.
+    currency: 'TRY',
     fiftyTwoWeekHigh: meta.fiftyTwoWeekHigh ?? Math.max(...closes),
     fiftyTwoWeekLow: meta.fiftyTwoWeekLow ?? Math.min(...closes),
     firstClose: monthAgoClose,

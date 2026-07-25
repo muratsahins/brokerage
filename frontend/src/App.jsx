@@ -241,7 +241,7 @@ export default function App() {
                     <div className="ticker">{s.ticker}</div>
                     <div className="name">{s.name}{s.sector ? ` · ${s.sector}` : ''}</div>
                   </td>
-                  <td className="num">{fmtNum(s.price)} <span className="cur">{s.currency || 'TRY'}</span></td>
+                  <td className="num">{fmtNum(s.price)} <span className="cur">TRY</span></td>
                   <td className="num"><Pct value={s.changePct} /></td>
                   <td className="num"><Expected value={s.exp1m} /></td>
                   <td className="num"><Expected value={s.exp3m} /></td>
