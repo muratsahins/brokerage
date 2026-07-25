@@ -234,7 +234,7 @@ export default function App() {
 
   // Sekmeler: BIST 30/50/100 iç içe (30⊂50⊂100) + ayrı Kıymetli Maden sekmesi.
   const TABS = [
-    { key: 'all',     label: 'Tümü',           match: (i) => i.kind === 'stock' },
+    { key: 'all',     label: 'BIST',           match: (i) => i.kind === 'stock' },
     { key: 'bist30',  label: 'BIST 30',        match: (i) => i.bist != null && i.bist <= 30 },
     { key: 'bist50',  label: 'BIST 50',        match: (i) => i.bist != null && i.bist <= 50 },
     { key: 'bist100', label: 'BIST 100',       match: (i) => i.bist != null && i.bist <= 100 },
@@ -363,9 +363,7 @@ export default function App() {
                 {showBuySell && <th className="num">Alış</th>}
                 {showBuySell && <th className="num">Satış</th>}
                 <th className="num">Günlük</th>
-                <th className="num">1 Ay Bek.</th>
-                <th className="num">3 Ay Bek.</th>
-                <th className="num">12 Ay Potansiyel</th>
+                <th className="num">Hedef</th>
                 <th style={{ minWidth: 110 }}>Puan</th>
                 <th>Sinyal</th>
                 <th>53-60 WaveTrend</th>
@@ -404,8 +402,6 @@ export default function App() {
                     </td>
                   )}
                   <td className="num"><Pct value={s.changePct} /></td>
-                  <td className="num"><Expected value={s.exp1m} /></td>
-                  <td className="num"><Expected value={s.exp3m} /></td>
                   <td className="num">
                     <Expected
                       value={s.upside12m}
@@ -468,15 +464,7 @@ export default function App() {
 
               <div className="card-metrics">
                 <div className="metric">
-                  <span className="metric-label">1 Ay Bek.</span>
-                  <Expected value={s.exp1m} />
-                </div>
-                <div className="metric">
-                  <span className="metric-label">3 Ay Bek.</span>
-                  <Expected value={s.exp3m} />
-                </div>
-                <div className="metric">
-                  <span className="metric-label">12 Ay Potansiyel</span>
+                  <span className="metric-label">Hedef</span>
                   <Expected
                     value={s.upside12m}
                     note={s.upside12m != null
