@@ -109,7 +109,9 @@ export async function diagnose(ticker = 'THYAO') {
 // --- Fiyat + geçmiş (chart) -------------------------------------------------
 async function fetchChart(ticker) {
   const symbol = toSymbol(ticker);
-  const url = `${CHART_URL}/${symbol}?range=1mo&interval=1d`;
+  // 6 aylık günlük veri: hem 1 aylık momentum hem de teknik göstergeler
+  // (WaveTrend, Supertrend) için yeterli bar sağlar.
+  const url = `${CHART_URL}/${symbol}?range=6mo&interval=1d`;
   const res = await fetch(url, { headers: { 'User-Agent': UA } });
   if (!res.ok) throw new Error(`Yahoo ${symbol} -> HTTP ${res.status}`);
   const json = await res.json();
@@ -117,17 +119,27 @@ async function fetchChart(ticker) {
   if (!result) throw new Error(`Yahoo ${symbol} -> boş sonuç`);
 
   const meta = result.meta;
-  const closes = (result.indicators?.quote?.[0]?.close ?? []).filter((v) => v != null);
+  const q = result.indicators?.quote?.[0] ?? {};
+  const rawC = q.close ?? [], rawH = q.high ?? [], rawL = q.low ?? [];
+  // OHLC'yi hizalı tut: yalnızca kapanış/yüksek/düşük değerlerinin üçü de dolu
+  // olan barları al (göstergeler eşit uzunlukta diziler bekliyor).
+  const highs = [], lows = [], closes = [];
+  for (let i = 0; i < rawC.length; i++) {
+    if (rawC[i] == null || rawH[i] == null || rawL[i] == null) continue;
+    closes.push(rawC[i]); highs.push(rawH[i]); lows.push(rawL[i]);
+  }
   if (closes.length === 0 || meta?.regularMarketPrice == null) {
     throw new Error(`Yahoo ${symbol} -> fiyat verisi yok`);
   }
 
-  // Günlük değişim için ÖNCEKİ SEANS kapanışı gerekir = günlük serideki sondan
-  // bir önceki kapanış. (meta.chartPreviousClose, 1 aylık aralıkta ~1 ay önceki
-  // kapanışı verdiği için günlük değişimi yanlışlıkla aylık değişime eşitliyordu.)
-  const previousClose = closes.length >= 2
-    ? closes[closes.length - 2]
+  const n = closes.length;
+  // Günlük değişim için ÖNCEKİ SEANS kapanışı = serideki sondan bir önceki kapanış.
+  const previousClose = n >= 2
+    ? closes[n - 2]
     : (meta.regularMarketPreviousClose ?? meta.chartPreviousClose ?? closes[0]);
+  // 1 aylık momentum için ~21 işlem günü önceki kapanış (6 aylık aralıkta bile
+  // "1 ay" anlamını korur).
+  const monthAgoClose = closes[Math.max(0, n - 1 - 21)];
 
   return {
     symbol,
@@ -136,8 +148,8 @@ async function fetchChart(ticker) {
     currency: meta.currency ?? 'TRY',
     fiftyTwoWeekHigh: meta.fiftyTwoWeekHigh ?? Math.max(...closes),
     fiftyTwoWeekLow: meta.fiftyTwoWeekLow ?? Math.min(...closes),
-    firstClose: closes[0],
-    closes,
+    firstClose: monthAgoClose,
+    highs, lows, closes,
   };
 }
 

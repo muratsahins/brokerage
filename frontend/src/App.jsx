@@ -50,6 +50,22 @@ function Expected({ value, note }) {
   );
 }
 
+// WaveTrend / Supertrend gibi teknik göstergelerin AL/SAT sinyali
+function IndicatorBadge({ signal }) {
+  if (!signal) return <span className="muted-dash">—</span>;
+  const buy = signal === 'AL';
+  return (
+    <span style={{
+      background: buy ? '#0f5132' : '#5b1a1a',
+      color: buy ? '#4ade80' : '#f87171',
+      padding: '3px 10px', borderRadius: 999,
+      fontSize: 12, fontWeight: 700, letterSpacing: 0.5,
+    }}>
+      {signal}
+    </span>
+  );
+}
+
 function SignalBadge({ signal }) {
   const s = SIGNAL_STYLES[signal] ?? SIGNAL_STYLES['İZLE'];
   return (
@@ -213,6 +229,8 @@ export default function App() {
                 <th className="num">12 Ay Potansiyel</th>
                 <th style={{ minWidth: 110 }}>Puan</th>
                 <th>Sinyal</th>
+                <th>WaveTrend</th>
+                <th>Supertrend</th>
               </tr>
             </thead>
             <tbody>
@@ -237,6 +255,8 @@ export default function App() {
                   </td>
                   <td><ScoreBar score={s.score} /></td>
                   <td><SignalBadge signal={s.signal} /></td>
+                  <td><IndicatorBadge signal={s.wtSignal} /></td>
+                  <td><IndicatorBadge signal={s.stSignal} /></td>
                 </tr>
               ))}
             </tbody>
@@ -249,6 +269,11 @@ export default function App() {
           <strong>Beklenen getiri</strong> tahminleri, hisseyi izleyen analistlerin <strong>ortalama 12 aylık hedef
           fiyatından</strong> hesaplanır: <code>12 ay potansiyel = (hedef − fiyat) / fiyat</code>; 1 ay ve 3 ay değerleri
           bu potansiyelin zamana bölünmüş (bileşik) karşılığıdır. Analist kapsamı olmayan hisselerde tahmin gösterilmez.
+        </p>
+        <p>
+          <strong>WaveTrend</strong> (LazyBear) ve <strong>Supertrend</strong>, günlük fiyat verisinden
+          hesaplanan teknik göstergelerdir: <code>AL</code> yükseliş, <code>SAT</code> düşüş yönünü belirtir.
+          Kısa vadeli ve gecikmeli sinyallerdir; analist tahminlerinden bağımsızdır.
         </p>
         <p>
           ⚠️ Bu tahminler geleceğin garantisi <strong>değildir</strong> ve <strong>yatırım tavsiyesi değildir</strong>.
