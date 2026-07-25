@@ -302,7 +302,7 @@ export default function App() {
           (Kıvanç Özbilgiç), günlük fiyat verisinden hesaplanan teknik göstergelerdir.
           <strong>53-60 WaveTrend</strong>: yeşil çizgi kırmızı sinyal çizgisini aşırı satım bölgesinde
           (−53/−60) yukarı kestiğinde <code>AL</code>, aşırı alım bölgesinde (+53/+60) aşağı kestiğinde
-          <code>SAT</code> (aşırı bölge kesişimi yoksa boş). <strong>WaveTrend</strong>: yeşil çizgi
+          <code>SAT</code>; ters kesişim olunca boşalır. <strong>WaveTrend</strong>: yeşil çizgi
           kırmızıyı (herhangi bölgede) yukarı kestiğinde <code>AL</code>, aşağı kestiğinde <code>SAT</code>.
           SuperTrend'de fiyat trend çizgisinin üstünde <code>AL</code>, altında <code>SAT</code>.
           Kısa vadeli, gecikmeli sinyallerdir; analist tahminlerinden bağımsızdır.

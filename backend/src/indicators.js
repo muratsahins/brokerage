@@ -134,10 +134,11 @@ export function wavetrendCrossSignal(highs, lows, closes) {
   return signal;
 }
 
-// 53-60 WaveTrend: yalnızca AŞIRI bölgelerdeki kesişimlerde sinyal üretir:
-//   AL  = aşırı satımda (wt2 <= -53) wt1'in wt2'yi YUKARI kesmesi
-//   SAT = aşırı alımda  (wt2 >= +53) wt1'in wt2'yi AŞAĞI kesmesi
-// En son geçerli sinyali döner; aşırı-bölge kesişimi yoksa null (—).
+// 53-60 WaveTrend: sinyal TERS kesişime kadar kalıcıdır, sonra boşalır (null).
+//   AL  : aşırı satımda (wt2 <= -53) YUKARI kesişimle kurulur;
+//         sonraki AŞAĞI kesişim (tersi) olunca boşalır.
+//   SAT : aşırı alımda  (wt2 >= +53) AŞAĞI kesişimle kurulur;
+//         sonraki YUKARI kesişim (tersi) olunca boşalır.
 export function wavetrendSignal(highs, lows, closes) {
   const w = computeWaveTrend(highs, lows, closes);
   if (!w) return null;
@@ -146,9 +147,16 @@ export function wavetrendSignal(highs, lows, closes) {
   for (let i = 1; i < n; i++) {
     const prevDiff = wt1[i - 1] - wt2[i - 1];
     const diff = wt1[i] - wt2[i];
+    const upCross = prevDiff <= 0 && diff > 0;
+    const downCross = prevDiff >= 0 && diff < 0;
     const level = wt2[i]; // kesişimin gerçekleştiği bölge (kırmızı çizgi değeri)
-    if (prevDiff <= 0 && diff > 0 && level <= WT_OS_LEVEL) signal = 'AL';
-    else if (prevDiff >= 0 && diff < 0 && level >= WT_OB_LEVEL) signal = 'SAT';
+    if (upCross) {
+      if (level <= WT_OS_LEVEL) signal = 'AL';   // aşırı satımda yukarı kesişim -> AL
+      else if (signal === 'SAT') signal = null;  // SAT'ın tersi -> boşalt
+    } else if (downCross) {
+      if (level >= WT_OB_LEVEL) signal = 'SAT';  // aşırı alımda aşağı kesişim -> SAT
+      else if (signal === 'AL') signal = null;   // AL'ın tersi -> boşalt
+    }
   }
   return signal;
 }
