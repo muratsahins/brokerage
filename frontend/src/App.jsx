@@ -108,7 +108,20 @@ export default function App() {
     }
   }
 
-  useEffect(() => { load(); }, []);
+  // İlk yükleme + kendini yenileme: her 5 dakikada bir ve sekmeye geri dönünce
+  // arka planda sessizce yeniden çeker (spinner göstermeden).
+  useEffect(() => {
+    load();
+    const id = setInterval(load, 5 * 60 * 1000);
+    const onFocus = () => { if (document.visibilityState === 'visible') load(); };
+    document.addEventListener('visibilitychange', onFocus);
+    window.addEventListener('focus', onFocus);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener('visibilitychange', onFocus);
+      window.removeEventListener('focus', onFocus);
+    };
+  }, []);
 
   const items = useMemo(() => {
     if (filter === 'ALL') return data.items;

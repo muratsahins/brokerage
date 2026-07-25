@@ -11,9 +11,19 @@ import {
 // Analist verisi Render'ın datacenter IP'sinde throttle olduğu için,
 // asıl veri GitHub Actions'ta (taze runner IP) çekilip repoya yayınlanır.
 // Backend bu yayınlanan JSON'u runtime'da okur; yoksa canlı çekime düşer.
+const GITHUB_REPO = process.env.GITHUB_REPO || 'muratsahins/brokerage';
+const GITHUB_BRANCH = process.env.GITHUB_BRANCH || 'main';
+const DATA_PATH = process.env.PUBLISHED_DATA_PATH || 'data/recommendations.json';
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+
+// Repo PUBLIC ise raw.githubusercontent yeterli. Repo PRIVATE ise raw 404 döner;
+// bu durumda GITHUB_TOKEN tanımlıysa GitHub Contents API'si üzerinden okunur.
 const PUBLISHED_DATA_URL =
   process.env.PUBLISHED_DATA_URL ||
-  'https://raw.githubusercontent.com/muratsahins/brokerage/main/data/recommendations.json';
+  `https://raw.githubusercontent.com/${GITHUB_REPO}/${GITHUB_BRANCH}/${DATA_PATH}`;
+
+const GITHUB_API_URL =
+  `https://api.github.com/repos/${GITHUB_REPO}/contents/${DATA_PATH}?ref=${GITHUB_BRANCH}`;
 
 // Bellek içi önbellek (yayınlanan veri veya canlı çekim buraya yazılır)
 const memory = {
@@ -38,9 +48,17 @@ export async function computeRecommendations() {
 // GitHub'da yayınlanan JSON'u çekip belleğe alır. Başarılıysa true.
 export async function loadPublished() {
   try {
-    const res = await fetch(`${PUBLISHED_DATA_URL}?t=${Date.now()}`, {
-      headers: { 'Cache-Control': 'no-cache' },
-    });
+    // Token varsa (private repo) Contents API; yoksa (public repo) raw URL.
+    const url = GITHUB_TOKEN
+      ? `${GITHUB_API_URL}&t=${Date.now()}`
+      : `${PUBLISHED_DATA_URL}?t=${Date.now()}`;
+    const headers = { 'Cache-Control': 'no-cache' };
+    if (GITHUB_TOKEN) {
+      headers.Authorization = `Bearer ${GITHUB_TOKEN}`;
+      // Contents API'sinden base64 sarmalı yerine ham içeriği iste.
+      headers.Accept = 'application/vnd.github.raw';
+    }
+    const res = await fetch(url, { headers });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     if (!Array.isArray(data.items) || data.items.length === 0) throw new Error('boş veri');
