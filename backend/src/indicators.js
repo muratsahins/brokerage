@@ -2,6 +2,13 @@
 // Günlük OHLC dizilerini (eşit uzunlukta, eskiden yeniye sıralı) alır ve son
 // bardaki AL/SAT sinyalini döner. Yeterli bar yoksa null döner.
 
+// --- Gösterge parametreleri (TradingView varsayılanları) ---------------------
+const ST_ATR_PERIOD = 10;   // Supertrend ATR periyodu
+const ST_MULTIPLIER = 3;    // Supertrend ATR çarpanı
+const WT_CHANNEL_LEN = 10;  // WaveTrend n1 — kanal uzunluğu
+const WT_AVERAGE_LEN = 21;  // WaveTrend n2 — ortalama uzunluğu
+const WT_SIGNAL_LEN = 4;    // WaveTrend sinyal çizgisi (wt2) SMA uzunluğu
+
 // Üstel hareketli ortalama (ilk değerle tohumlanır).
 function ema(values, period) {
   if (values.length === 0) return [];
@@ -51,7 +58,7 @@ function atr(highs, lows, closes, period) {
 }
 
 // Supertrend: fiyat trend çizgisinin üstündeyse AL (yükseliş), altındaysa SAT.
-export function supertrendSignal(highs, lows, closes, period = 10, mult = 3) {
+export function supertrendSignal(highs, lows, closes, period = ST_ATR_PERIOD, mult = ST_MULTIPLIER) {
   const n = closes?.length ?? 0;
   if (n < period + 2) return null;
   const atrArr = atr(highs, lows, closes, period);
@@ -92,7 +99,7 @@ export function supertrendSignal(highs, lows, closes, period = 10, mult = 3) {
 }
 
 // WaveTrend (LazyBear): wt1, wt2 sinyal çizgisinin üstündeyse AL, altındaysa SAT.
-export function wavetrendSignal(highs, lows, closes, n1 = 10, n2 = 21) {
+export function wavetrendSignal(highs, lows, closes, n1 = WT_CHANNEL_LEN, n2 = WT_AVERAGE_LEN) {
   const n = closes?.length ?? 0;
   if (n < n2 + 5) return null;
   const ap = closes.map((c, i) => (highs[i] + lows[i] + c) / 3); // hlc3
@@ -103,7 +110,7 @@ export function wavetrendSignal(highs, lows, closes, n1 = 10, n2 = 21) {
     return d === 0 ? 0 : (v - esa[i]) / (0.015 * d);
   });
   const wt1 = ema(ci, n2);
-  const wt2 = sma(wt1, 4);
+  const wt2 = sma(wt1, WT_SIGNAL_LEN);
   const last = n - 1;
   return wt1[last] >= wt2[last] ? 'AL' : 'SAT';
 }
