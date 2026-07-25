@@ -148,6 +148,7 @@ export default function App() {
     { key: 'metal',   label: 'Kıymetli Maden', match: (i) => i.kind === 'metal' },
   ];
   const activeTab = TABS.find((t) => t.key === tab) ?? TABS[0];
+  const isMetalTab = activeTab.key === 'metal'; // Alış/Satış sütunları yalnızca burada
 
   // Önce aktif sekmeye göre, sonra sinyale göre süz.
   const inTab = useMemo(
@@ -226,8 +227,8 @@ export default function App() {
                 <th>#</th>
                 <th>Hisse</th>
                 <th className="num">Fiyat</th>
-                <th className="num">Alış</th>
-                <th className="num">Satış</th>
+                {isMetalTab && <th className="num">Alış</th>}
+                {isMetalTab && <th className="num">Satış</th>}
                 <th className="num">Günlük</th>
                 <th className="num">1 Ay Bek.</th>
                 <th className="num">3 Ay Bek.</th>
@@ -252,16 +253,20 @@ export default function App() {
                       <div className="exp-note">≈ {fmtNum(s.tryPerGram)} ₺/gr</div>
                     )}
                   </td>
-                  <td className="num">
-                    {s.buyPrice != null
-                      ? <>{fmtNum(s.buyPrice)} <span className="cur">₺</span></>
-                      : <span className="muted-dash">—</span>}
-                  </td>
-                  <td className="num">
-                    {s.sellPrice != null
-                      ? <>{fmtNum(s.sellPrice)} <span className="cur">₺</span></>
-                      : <span className="muted-dash">—</span>}
-                  </td>
+                  {isMetalTab && (
+                    <td className="num">
+                      {s.buyPrice != null
+                        ? <>{fmtNum(s.buyPrice)} <span className="cur">₺</span></>
+                        : <span className="muted-dash">—</span>}
+                    </td>
+                  )}
+                  {isMetalTab && (
+                    <td className="num">
+                      {s.sellPrice != null
+                        ? <>{fmtNum(s.sellPrice)} <span className="cur">₺</span></>
+                        : <span className="muted-dash">—</span>}
+                    </td>
+                  )}
                   <td className="num"><Pct value={s.changePct} /></td>
                   <td className="num"><Expected value={s.exp1m} /></td>
                   <td className="num"><Expected value={s.exp3m} /></td>
