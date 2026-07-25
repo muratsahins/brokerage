@@ -366,7 +366,7 @@ export default function App() {
                 <th className="num">Hedef</th>
                 <th style={{ minWidth: 110 }}>Puan</th>
                 <th>Sinyal</th>
-                <th>53-60 WaveTrend</th>
+                <th>overzone</th>
                 <th>WaveTrend</th>
                 <th>SuperTrend</th>
               </tr>
@@ -479,7 +479,7 @@ export default function App() {
               </div>
 
               <div className="card-signals">
-                <div className="sig"><span className="metric-label">53-60 WaveTrend</span><IndicatorBadge signal={s.wtSignal} /></div>
+                <div className="sig"><span className="metric-label">overzone</span><IndicatorBadge signal={s.wtSignal} /></div>
                 <div className="sig"><span className="metric-label">WaveTrend</span><IndicatorBadge signal={s.wtCrossSignal} /></div>
                 <div className="sig"><span className="metric-label">SuperTrend</span><IndicatorBadge signal={s.stSignal} /></div>
               </div>
@@ -497,7 +497,7 @@ export default function App() {
         <p>
           <strong>WaveTrend</strong> (LazyBear WaveTrend Oscillator) ve <strong>SuperTrend</strong>
           (Kıvanç Özbilgiç), günlük fiyat verisinden hesaplanan teknik göstergelerdir.
-          <strong>53-60 WaveTrend</strong>: yeşil çizgi kırmızı sinyal çizgisini aşırı satım bölgesinde
+          <strong>overzone</strong>: yeşil çizgi kırmızı sinyal çizgisini aşırı satım bölgesinde
           (−53/−60) yukarı kestiğinde <code>AL</code>, aşırı alım bölgesinde (+53/+60) aşağı kestiğinde
           <code>SAT</code>; ters kesişim olunca boşalır. <strong>WaveTrend</strong>: yeşil çizgi
           kırmızıyı (herhangi bölgede) yukarı kestiğinde <code>AL</code>, aşağı kestiğinde <code>SAT</code>.
