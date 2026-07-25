@@ -1,59 +1,72 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
+import { createChart } from 'lightweight-charts';
 
-// TradingView sembolü: BIST hisseleri "BIST:TICKER", kıymetli madenler TVC spot.
-const METAL_TV = { XAU: 'TVC:GOLD', XAG: 'TVC:SILVER', XPT: 'TVC:PLATINUM', XPD: 'TVC:PALLADIUM' };
-function tvSymbol(s) {
-  if (s.kind === 'metal') return METAL_TV[s.ticker] || `BIST:${s.ticker}`;
-  return `BIST:${s.ticker}`;
-}
-
-// TradingView "Advanced Chart" iframe URL'i — sembol doğrudan URL'ye gömülür.
-// (Script enjekte edip config'i document.currentScript'ten okuma yöntemi, sayfa
-// yüklendikten sonra async eklenen script'lerde -özellikle mobilde- currentScript
-// null olduğu için config'i bulamayıp varsayılan AAPL'ı gösteriyordu.)
-function tvChartUrl(item) {
-  const cfg = {
-    autosize: true,
-    symbol: tvSymbol(item),
-    interval: 'D',
-    timezone: 'Europe/Istanbul',
-    theme: 'dark',
-    style: '1',
-    locale: 'tr',
-    withdateranges: true,
-    hide_side_toolbar: false,
-    allow_symbol_change: false,
-    width: '100%',
-    height: '100%',
-  };
-  return `https://www.tradingview-widget.com/embed-widget/advanced-chart/?locale=tr#${encodeURIComponent(JSON.stringify(cfg))}`;
-}
-
-// Grafik pop-up'ı: seçilen enstrümanın TradingView grafiğini başlıkla gösterir.
+// Grafik pop-up'ı: kendi Yahoo OHLC verimizi (backend /api/chart) Lightweight
+// Charts (açık kaynak, ücretsiz) ile mum grafiği olarak çizer. TradingView embed'i
+// BIST verisini göstermediği ("Sembol sadece TradingView'de bulunabilir") için
+// harici widget yerine kendi grafiğimizi çiziyoruz — lisans gerekmez.
 function ChartModal({ item, onClose }) {
+  const wrapRef = useRef(null);
+  const [status, setStatus] = useState('loading'); // loading | ok | error
+
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
+    let chart = null;
+    let cancelled = false;
 
+    (async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/chart?ticker=${encodeURIComponent(item.ticker)}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (cancelled || !wrapRef.current) return;
+        if (!data.candles || data.candles.length === 0) throw new Error('boş veri');
+        setStatus('ok');
+        chart = createChart(wrapRef.current, {
+          autoSize: true,
+          layout: { background: { color: '#171a21' }, textColor: '#e6e8eb' },
+          grid: { vertLines: { color: '#20242d' }, horzLines: { color: '#20242d' } },
+          rightPriceScale: { borderColor: '#262a33' },
+          timeScale: { borderColor: '#262a33' },
+        });
+        const series = chart.addCandlestickSeries({
+          upColor: '#4ade80', downColor: '#f87171',
+          wickUpColor: '#4ade80', wickDownColor: '#f87171',
+          borderVisible: false,
+        });
+        series.setData(data.candles);
+        chart.timeScale().fitContent();
+      } catch {
+        if (!cancelled) setStatus('error');
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      document.removeEventListener('keydown', onKey);
+      if (chart) chart.remove();
+    };
+  }, [item, onClose]);
+
+  const cur = item.currency || (item.kind === 'metal' ? 'USD' : 'TRY');
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-head">
           <div className="modal-title">
-            <span className="modal-ticker">{item.ticker}</span>
-            <span className="modal-name">{item.name}{item.sector ? ` · ${item.sector}` : ''}</span>
+            <span className="modal-ticker">{item.ticker} · {fmtNum(item.price)} {cur}</span>
+            <span className="modal-name">{item.name}{item.sector ? ` · ${item.sector}` : ''} · son 1 yıl (günlük)</span>
           </div>
           <button className="modal-close" onClick={onClose} aria-label="Kapat">✕</button>
         </div>
         <div className="modal-chart">
-          <iframe
-            title={`${item.ticker} grafiği`}
-            src={tvChartUrl(item)}
-            style={{ width: '100%', height: '100%', border: 0 }}
-            allowFullScreen
-          />
+          <div ref={wrapRef} style={{ width: '100%', height: '100%' }} />
+          {status !== 'ok' && (
+            <div className="chart-state">
+              {status === 'loading' ? 'Grafik yükleniyor…' : 'Grafik verisi alınamadı.'}
+            </div>
+          )}
         </div>
       </div>
     </div>

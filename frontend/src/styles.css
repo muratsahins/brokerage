@@ -281,7 +281,17 @@ th.num { text-align: right; }
   cursor: pointer;
 }
 .modal-close:hover { color: var(--text); border-color: var(--muted); }
-.modal-chart { flex: 1; min-height: 0; }
+.modal-chart { flex: 1; min-height: 0; position: relative; }
+.chart-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 14px;
+  pointer-events: none;
+}
 .name { color: var(--muted); font-size: 12px; margin-top: 2px; }
 .cur { color: var(--muted); font-size: 11px; }
 

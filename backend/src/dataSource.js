@@ -151,6 +151,27 @@ export async function fetchAltinInPrices() {
   }
 }
 
+// --- Grafik için tam OHLC serisi (mum grafiği) ------------------------------
+// Frontend'de Lightweight Charts ile çizmek üzere günlük mum verisini döner.
+export async function fetchOhlc(symbol, range = '1y') {
+  const url = `${CHART_URL}/${encodeURIComponent(symbol)}?range=${range}&interval=1d`;
+  const res = await fetch(url, { headers: { 'User-Agent': UA } });
+  if (!res.ok) throw new Error(`Yahoo ${symbol} -> HTTP ${res.status}`);
+  const json = await res.json();
+  const r = json?.chart?.result?.[0];
+  if (!r) throw new Error(`Yahoo ${symbol} -> boş sonuç`);
+  const ts = r.timestamp ?? [];
+  const q = r.indicators?.quote?.[0] ?? {};
+  const candles = [];
+  for (let i = 0; i < ts.length; i++) {
+    const o = q.open?.[i], h = q.high?.[i], l = q.low?.[i], c = q.close?.[i];
+    if (o == null || h == null || l == null || c == null) continue;
+    // Lightweight Charts günlük seri için 'yyyy-mm-dd' bekliyor.
+    candles.push({ time: new Date(ts[i] * 1000).toISOString().slice(0, 10), open: o, high: h, low: l, close: c });
+  }
+  return { symbol, currency: r.meta?.currency ?? null, candles };
+}
+
 // --- Fiyat + geçmiş (chart) -------------------------------------------------
 async function fetchChart(symbol) {
   // 6 aylık günlük veri: hem 1 aylık momentum hem de teknik göstergeler

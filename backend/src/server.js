@@ -3,7 +3,11 @@ import express from 'express';
 import cors from 'cors';
 import { initDb } from './db.js';
 import { syncData, getRecommendations } from './service.js';
-import { diagnose } from './dataSource.js';
+import { diagnose, fetchOhlc } from './dataSource.js';
+import { INSTRUMENTS } from './stocks.js';
+
+const symbolByTicker = new Map(INSTRUMENTS.map((i) => [i.ticker, i.symbol]));
+const VALID_RANGE = /^(1mo|3mo|6mo|1y|2y|5y)$/;
 
 const app = express();
 app.use(cors());
@@ -11,6 +15,19 @@ app.use(express.json());
 
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, time: new Date().toISOString() });
+});
+
+// Grafik için günlük OHLC mum verisi (frontend Lightweight Charts ile çizer).
+app.get('/api/chart', async (req, res) => {
+  try {
+    const ticker = String(req.query.ticker || '').toUpperCase();
+    if (!ticker) return res.status(400).json({ error: 'ticker gerekli' });
+    const symbol = symbolByTicker.get(ticker) || `${ticker}.IS`;
+    const range = VALID_RANGE.test(String(req.query.range)) ? String(req.query.range) : '1y';
+    res.json(await fetchOhlc(symbol, range));
+  } catch (err) {
+    res.status(502).json({ error: err.message });
+  }
 });
 
 // Analist verisinin neden gelmediğini canlıda görmek için teşhis ucu.
