@@ -101,11 +101,8 @@ export function supertrendSignal(highs, lows, closes, period = ST_ATR_PERIOD, mu
 }
 
 // WaveTrend Oscillator (LazyBear): yeşil çizgi wt1, sinyal (kırmızı) çizgi wt2.
-// Yalnızca AŞIRI bölgelerdeki kesişimlerde sinyal üretir:
-//   AL  = aşırı satımda (wt2 <= -53) wt1'in wt2'yi YUKARI kesmesi
-//   SAT = aşırı alımda  (wt2 >= +53) wt1'in wt2'yi AŞAĞI kesmesi
-// En son geçerli sinyali döner; aşırı-bölge kesişimi yoksa null (—).
-export function wavetrendSignal(highs, lows, closes, n1 = WT_CHANNEL_LEN, n2 = WT_AVERAGE_LEN) {
+// wt1 (yeşil çizgi) ve wt2 (kırmızı sinyal çizgisi) dizilerini hesaplar.
+function computeWaveTrend(highs, lows, closes, n1 = WT_CHANNEL_LEN, n2 = WT_AVERAGE_LEN) {
   const n = closes?.length ?? 0;
   if (n < n2 + WT_SIGNAL_LEN + 2) return null;
   const ap = closes.map((c, i) => (highs[i] + lows[i] + c) / 3); // hlc3
@@ -117,7 +114,34 @@ export function wavetrendSignal(highs, lows, closes, n1 = WT_CHANNEL_LEN, n2 = W
   });
   const wt1 = ema(ci, n2);             // yeşil çizgi
   const wt2 = sma(wt1, WT_SIGNAL_LEN); // kırmızı sinyal çizgisi
+  return { wt1, wt2, n };
+}
 
+// Standart WaveTrend kesişimi (herhangi bölge): yeşil çizgi (wt1) kırmızıyı (wt2)
+// YUKARI kestiğinde AL, AŞAĞI kestiğinde SAT. Son kesişimin yönünü döner.
+export function wavetrendCrossSignal(highs, lows, closes) {
+  const w = computeWaveTrend(highs, lows, closes);
+  if (!w) return null;
+  const { wt1, wt2, n } = w;
+  let signal = null;
+  for (let i = 1; i < n; i++) {
+    const prevDiff = wt1[i - 1] - wt2[i - 1];
+    const diff = wt1[i] - wt2[i];
+    if (prevDiff <= 0 && diff > 0) signal = 'AL';        // yukarı kesişim
+    else if (prevDiff >= 0 && diff < 0) signal = 'SAT';  // aşağı kesişim
+  }
+  if (signal == null) signal = wt1[n - 1] >= wt2[n - 1] ? 'AL' : 'SAT';
+  return signal;
+}
+
+// 53-60 WaveTrend: yalnızca AŞIRI bölgelerdeki kesişimlerde sinyal üretir:
+//   AL  = aşırı satımda (wt2 <= -53) wt1'in wt2'yi YUKARI kesmesi
+//   SAT = aşırı alımda  (wt2 >= +53) wt1'in wt2'yi AŞAĞI kesmesi
+// En son geçerli sinyali döner; aşırı-bölge kesişimi yoksa null (—).
+export function wavetrendSignal(highs, lows, closes) {
+  const w = computeWaveTrend(highs, lows, closes);
+  if (!w) return null;
+  const { wt1, wt2, n } = w;
   let signal = null;
   for (let i = 1; i < n; i++) {
     const prevDiff = wt1[i - 1] - wt2[i - 1];
