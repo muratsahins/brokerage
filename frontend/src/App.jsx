@@ -109,7 +109,7 @@ export default function App() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('ALL');
-  const [tab, setTab] = useState('bist30');
+  const [tab, setTab] = useState('all');
   const [query, setQuery] = useState('');
   // Görünüm: 'mobile' (kart, yatay scroll yok) | 'web' (tam tablo).
   const [view, setView] = useState(() => {
@@ -160,9 +160,11 @@ export default function App() {
 
   // Sekmeler: BIST 30/50/100 iç içe (30⊂50⊂100) + ayrı Kıymetli Maden sekmesi.
   const TABS = [
+    { key: 'all',     label: 'Tümü',           match: (i) => i.kind === 'stock' },
     { key: 'bist30',  label: 'BIST 30',        match: (i) => i.bist != null && i.bist <= 30 },
     { key: 'bist50',  label: 'BIST 50',        match: (i) => i.bist != null && i.bist <= 50 },
     { key: 'bist100', label: 'BIST 100',       match: (i) => i.bist != null && i.bist <= 100 },
+    { key: 'other',   label: 'Diğer',          match: (i) => i.kind === 'stock' && i.bist == null },
     { key: 'metal',   label: 'Kıymetli Maden', match: (i) => i.kind === 'metal' },
   ];
   const activeTab = TABS.find((t) => t.key === tab) ?? TABS[0];
