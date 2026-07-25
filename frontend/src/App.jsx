@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 
 // TradingView sembolü: BIST hisseleri "BIST:TICKER", kıymetli madenler TVC spot.
 const METAL_TV = { XAU: 'TVC:GOLD', XAG: 'TVC:SILVER', XPT: 'TVC:PLATINUM', XPD: 'TVC:PALLADIUM' };
@@ -7,44 +7,35 @@ function tvSymbol(s) {
   return `BIST:${s.ticker}`;
 }
 
-// Grafik pop-up'ı: TradingView resmi "Advanced Chart" embed'i (sembolü JSON'dan
-// okur; legacy tv.js'in aksine BIST sembolünü doğru uygular).
-function ChartModal({ item, onClose }) {
-  const containerRef = useRef(null);
+// TradingView "Advanced Chart" iframe URL'i — sembol doğrudan URL'ye gömülür.
+// (Script enjekte edip config'i document.currentScript'ten okuma yöntemi, sayfa
+// yüklendikten sonra async eklenen script'lerde -özellikle mobilde- currentScript
+// null olduğu için config'i bulamayıp varsayılan AAPL'ı gösteriyordu.)
+function tvChartUrl(item) {
+  const cfg = {
+    autosize: true,
+    symbol: tvSymbol(item),
+    interval: 'D',
+    timezone: 'Europe/Istanbul',
+    theme: 'dark',
+    style: '1',
+    locale: 'tr',
+    withdateranges: true,
+    hide_side_toolbar: false,
+    allow_symbol_change: false,
+    width: '100%',
+    height: '100%',
+  };
+  return `https://www.tradingview-widget.com/embed-widget/advanced-chart/?locale=tr#${encodeURIComponent(JSON.stringify(cfg))}`;
+}
 
+// Grafik pop-up'ı: seçilen enstrümanın TradingView grafiğini başlıkla gösterir.
+function ChartModal({ item, onClose }) {
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', onKey);
-
-    const el = containerRef.current;
-    if (el) {
-      el.innerHTML = '';
-      const widget = document.createElement('div');
-      widget.className = 'tradingview-widget-container__widget';
-      widget.style.height = '100%';
-      widget.style.width = '100%';
-      el.appendChild(widget);
-
-      const script = document.createElement('script');
-      script.type = 'text/javascript';
-      script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
-      script.async = true;
-      script.innerHTML = JSON.stringify({
-        autosize: true,
-        symbol: tvSymbol(item),
-        interval: 'D',
-        timezone: 'Europe/Istanbul',
-        theme: 'dark',
-        style: '1',
-        locale: 'tr',
-        allow_symbol_change: false,
-        hide_side_toolbar: false,
-      });
-      el.appendChild(script);
-    }
-
-    return () => { document.removeEventListener('keydown', onKey); };
-  }, [item, onClose]);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -57,7 +48,12 @@ function ChartModal({ item, onClose }) {
           <button className="modal-close" onClick={onClose} aria-label="Kapat">✕</button>
         </div>
         <div className="modal-chart">
-          <div className="tradingview-widget-container" ref={containerRef} style={{ height: '100%', width: '100%' }} />
+          <iframe
+            title={`${item.ticker} grafiği`}
+            src={tvChartUrl(item)}
+            style={{ width: '100%', height: '100%', border: 0 }}
+            allowFullScreen
+          />
         </div>
       </div>
     </div>
