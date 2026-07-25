@@ -253,8 +253,9 @@ export async function fetchQuotes(instruments) {
     try {
       const chart = await fetchChart(inst.symbol);
       let fundamentals = null;
-      // Kıymetli madenlerin analist/temel verisi yok — gereksiz istek atmıyoruz.
-      if (inst.kind !== 'metal') {
+      // Analist/temel veriyi yalnızca endeks hisselerinde (BIST 30/50/100) çek;
+      // geniş evren (bist=null) ve kıymetli madenlerde atla — yenilemeyi hızlı tutmak için.
+      if (inst.kind === 'stock' && inst.bist != null) {
         try {
           fundamentals = await fetchFundamentals(inst.symbol);
         } catch (e) {
@@ -265,7 +266,7 @@ export async function fetchQuotes(instruments) {
     } catch (err) {
       console.warn(`[data] ${inst.ticker} atlandı: ${err.message}`);
     }
-    await sleep(500); // rate-limit'e takılmamak için enstrümanlar arası bekleme
+    await sleep(350); // rate-limit'e takılmamak için enstrümanlar arası bekleme
   }
   return out;
 }

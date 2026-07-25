@@ -109,7 +109,7 @@ export default function App() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('ALL');
-  const [tab, setTab] = useState('all');
+  const [tab, setTab] = useState('bist30');
   const [query, setQuery] = useState('');
   // Görünüm: 'mobile' (kart, yatay scroll yok) | 'web' (tam tablo).
   const [view, setView] = useState(() => {
@@ -224,19 +224,15 @@ export default function App() {
       </header>
 
       <div className="tabs">
-        {TABS.map((t) => {
-          const count = data.items.filter(t.match).length;
-          return (
-            <button
-              key={t.key}
-              className={`tab ${tab === t.key ? 'active' : ''}`}
-              onClick={() => setTab(t.key)}
-            >
-              {t.label}
-              {count > 0 && <span className="tab-count">{count}</span>}
-            </button>
-          );
-        })}
+        {TABS.map((t) => (
+          <button
+            key={t.key}
+            className={`tab ${tab === t.key ? 'active' : ''}`}
+            onClick={() => setTab(t.key)}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
 
       <div className="search">
