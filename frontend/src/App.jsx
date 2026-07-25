@@ -81,6 +81,7 @@ export default function App() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('ALL');
+  const [indexTab, setIndexTab] = useState(30); // 30 | 50 | 100 (iç içe: 30⊂50⊂100)
 
   async function load() {
     try {
@@ -123,10 +124,22 @@ export default function App() {
     };
   }, []);
 
+  // Önce endeks sekmesine göre (BIST 30/50/100 iç içe), sonra sinyale göre süz.
+  const inIndex = useMemo(
+    () => data.items.filter((i) => (i.bist ?? 100) <= indexTab),
+    [data.items, indexTab],
+  );
+
   const items = useMemo(() => {
-    if (filter === 'ALL') return data.items;
-    return data.items.filter((i) => i.signal === filter);
-  }, [data.items, filter]);
+    if (filter === 'ALL') return inIndex;
+    return inIndex.filter((i) => i.signal === filter);
+  }, [inIndex, filter]);
+
+  const TABS = [
+    { tier: 30, label: 'BIST 30' },
+    { tier: 50, label: 'BIST 50' },
+    { tier: 100, label: 'BIST 100' },
+  ];
 
   return (
     <div className="page">
@@ -134,7 +147,7 @@ export default function App() {
         <div>
           <h1>📈 BIST Hisse Önerileri</h1>
           <p className="subtitle">
-            Analist hedef fiyatı + temel verilere dayalı beklenen getiri · {data.items.length} hisse
+            Analist hedef fiyatı + temel verilere dayalı beklenen getiri · {inIndex.length} hisse
             {data.source && <> · kaynak: {data.source === 'postgres' ? 'PostgreSQL' : 'bellek'}</>}
           </p>
         </div>
@@ -142,6 +155,22 @@ export default function App() {
           {refreshing ? 'Yenileniyor…' : '↻ Yenile'}
         </button>
       </header>
+
+      <div className="tabs">
+        {TABS.map((t) => {
+          const count = data.items.filter((i) => (i.bist ?? 100) <= t.tier).length;
+          return (
+            <button
+              key={t.tier}
+              className={`tab ${indexTab === t.tier ? 'active' : ''}`}
+              onClick={() => setIndexTab(t.tier)}
+            >
+              {t.label}
+              {count > 0 && <span className="tab-count">{count}</span>}
+            </button>
+          );
+        })}
+      </div>
 
       <div className="filters">
         {['ALL', 'AL', 'TUT', 'İZLE'].map((f) => (
@@ -163,7 +192,11 @@ export default function App() {
       {loading && <div className="state">Yükleniyor…</div>}
       {error && <div className="state error">Hata: {error}</div>}
       {!loading && !error && items.length === 0 && (
-        <div className="state">Henüz veri yok. “Yenile”ye basın veya backend’in çalıştığından emin olun.</div>
+        <div className="state">
+          {data.items.length > 0
+            ? 'Bu sekme/filtrede gösterilecek hisse yok.'
+            : 'Henüz veri yok. “Yenile”ye basın veya backend’in çalıştığından emin olun.'}
+        </div>
       )}
 
       {items.length > 0 && (

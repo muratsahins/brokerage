@@ -40,8 +40,8 @@ export async function computeRecommendations() {
   const recos = buildRecommendations(quotes);
   return recos.map((r) => {
     const ticker = r.symbol.replace('.IS', '');
-    const meta = byTicker.get(ticker) ?? { name: ticker, sector: null };
-    return { ...r, ticker, name: meta.name, sector: meta.sector };
+    const meta = byTicker.get(ticker) ?? { name: ticker, sector: null, bist: 100 };
+    return { ...r, ticker, name: meta.name, sector: meta.sector, bist: meta.bist ?? 100 };
   });
 }
 
