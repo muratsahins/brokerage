@@ -98,6 +98,11 @@ export default function App() {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('ALL');
   const [tab, setTab] = useState('bist30');
+  // Görünüm: 'mobile' (kart, yatay scroll yok) | 'web' (tam tablo).
+  const [view, setView] = useState(() => {
+    try { return localStorage.getItem('viewMode') || (window.innerWidth <= 640 ? 'mobile' : 'web'); }
+    catch { return 'web'; }
+  });
 
   async function load() {
     try {
@@ -161,6 +166,8 @@ export default function App() {
     return inTab.filter((i) => i.signal === filter);
   }, [inTab, filter]);
 
+  useEffect(() => { try { localStorage.setItem('viewMode', view); } catch { /* yoksay */ } }, [view]);
+
   return (
     <div className="page">
       <header className="header">
@@ -171,9 +178,25 @@ export default function App() {
             {data.source && <> · kaynak: {data.source === 'postgres' ? 'PostgreSQL' : 'bellek'}</>}
           </p>
         </div>
-        <button className="refresh-btn" onClick={triggerRefresh} disabled={refreshing}>
-          {refreshing ? 'Yenileniyor…' : '↻ Yenile'}
-        </button>
+        <div className="header-actions">
+          <div className="view-toggle" role="group" aria-label="Görünüm">
+            <button
+              className={view === 'mobile' ? 'active' : ''}
+              onClick={() => setView('mobile')}
+            >
+              📱 Mobil
+            </button>
+            <button
+              className={view === 'web' ? 'active' : ''}
+              onClick={() => setView('web')}
+            >
+              🖥 Web
+            </button>
+          </div>
+          <button className="refresh-btn" onClick={triggerRefresh} disabled={refreshing}>
+            {refreshing ? 'Yenileniyor…' : '↻ Yenile'}
+          </button>
+        </div>
       </header>
 
       <div className="tabs">
@@ -219,7 +242,7 @@ export default function App() {
         </div>
       )}
 
-      {items.length > 0 && (
+      {items.length > 0 && view === 'web' && (
         <div className="table-wrap">
           <table>
             <thead>
@@ -288,6 +311,78 @@ export default function App() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {items.length > 0 && view === 'mobile' && (
+        <div className="cards">
+          {items.map((s, i) => (
+            <div className="card" key={s.ticker}>
+              <div className="card-top">
+                <div className="card-id">
+                  <span className="rank">{i + 1}</span>
+                  <div>
+                    <div className="ticker">{s.ticker}</div>
+                    <div className="name">{s.name}{s.sector ? ` · ${s.sector}` : ''}</div>
+                  </div>
+                </div>
+                <SignalBadge signal={s.signal} />
+              </div>
+
+              <div className="card-price">
+                <span className="card-price-val">
+                  {fmtNum(s.price)} <span className="cur">{s.currency || 'TRY'}</span>
+                </span>
+                <Pct value={s.changePct} />
+              </div>
+              {s.tryPerGram != null && (
+                <div className="exp-note">≈ {fmtNum(s.tryPerGram)} ₺/gr</div>
+              )}
+
+              {isMetalTab && (
+                <div className="card-metrics">
+                  <div className="metric">
+                    <span className="metric-label">Alış</span>
+                    <span>{s.buyPrice != null ? <>{fmtNum(s.buyPrice)} ₺</> : <span className="muted-dash">—</span>}</span>
+                  </div>
+                  <div className="metric">
+                    <span className="metric-label">Satış</span>
+                    <span>{s.sellPrice != null ? <>{fmtNum(s.sellPrice)} ₺</> : <span className="muted-dash">—</span>}</span>
+                  </div>
+                </div>
+              )}
+
+              <div className="card-metrics">
+                <div className="metric">
+                  <span className="metric-label">1 Ay Bek.</span>
+                  <Expected value={s.exp1m} />
+                </div>
+                <div className="metric">
+                  <span className="metric-label">3 Ay Bek.</span>
+                  <Expected value={s.exp3m} />
+                </div>
+                <div className="metric">
+                  <span className="metric-label">12 Ay Potansiyel</span>
+                  <Expected
+                    value={s.upside12m}
+                    note={s.upside12m != null
+                      ? `${s.numAnalysts ?? '?'} analist · hedef ${fmtNum(s.targetMean)}₺`
+                      : null}
+                  />
+                </div>
+                <div className="metric">
+                  <span className="metric-label">Puan</span>
+                  <ScoreBar score={s.score} />
+                </div>
+              </div>
+
+              <div className="card-signals">
+                <div className="sig"><span className="metric-label">53-60 WaveTrend</span><IndicatorBadge signal={s.wtSignal} /></div>
+                <div className="sig"><span className="metric-label">WaveTrend</span><IndicatorBadge signal={s.wtCrossSignal} /></div>
+                <div className="sig"><span className="metric-label">SuperTrend</span><IndicatorBadge signal={s.stSignal} /></div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 

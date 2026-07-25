@@ -32,6 +32,25 @@ body {
 h1 { font-size: 26px; margin: 0 0 6px; }
 .subtitle { color: var(--muted); margin: 0; font-size: 14px; }
 
+.header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+.view-toggle {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.view-toggle button {
+  background: var(--panel);
+  color: var(--muted);
+  border: none;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.view-toggle button.active { background: #1f6feb; color: #fff; }
+
 .refresh-btn {
   background: #1f6feb;
   color: #fff;
@@ -43,6 +62,48 @@ h1 { font-size: 26px; margin: 0 0 6px; }
   cursor: pointer;
 }
 .refresh-btn:disabled { opacity: 0.6; cursor: default; }
+
+/* --- Mobil kart düzeni (yatay scroll yok) --- */
+.cards { display: flex; flex-direction: column; gap: 12px; }
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+}
+.card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.card-id { display: flex; gap: 10px; align-items: baseline; }
+.card-price {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 10px;
+}
+.card-price-val { font-size: 18px; font-weight: 700; }
+.card-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 14px;
+  margin-top: 12px;
+}
+.metric { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+.metric-label {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.card-signals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.sig { display: flex; flex-direction: column; gap: 5px; align-items: flex-start; }
+.card .exp { align-items: flex-start; }
 
 .tabs {
   display: flex;
