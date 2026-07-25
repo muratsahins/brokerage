@@ -229,8 +229,8 @@ export default function App() {
                 <th className="num">12 Ay Potansiyel</th>
                 <th style={{ minWidth: 110 }}>Puan</th>
                 <th>Sinyal</th>
-                <th>WaveTrend</th>
-                <th>Supertrend</th>
+                <th>Elliott Wave</th>
+                <th>SuperTrend</th>
               </tr>
             </thead>
             <tbody>
@@ -255,7 +255,7 @@ export default function App() {
                   </td>
                   <td><ScoreBar score={s.score} /></td>
                   <td><SignalBadge signal={s.signal} /></td>
-                  <td><IndicatorBadge signal={s.wtSignal} /></td>
+                  <td><IndicatorBadge signal={s.ewoSignal} /></td>
                   <td><IndicatorBadge signal={s.stSignal} /></td>
                 </tr>
               ))}
@@ -271,9 +271,10 @@ export default function App() {
           bu potansiyelin zamana bölünmüş (bileşik) karşılığıdır. Analist kapsamı olmayan hisselerde tahmin gösterilmez.
         </p>
         <p>
-          <strong>WaveTrend</strong> (LazyBear) ve <strong>Supertrend</strong>, günlük fiyat verisinden
-          hesaplanan teknik göstergelerdir: <code>AL</code> yükseliş, <code>SAT</code> düşüş yönünü belirtir.
-          Kısa vadeli ve gecikmeli sinyallerdir; analist tahminlerinden bağımsızdır.
+          <strong>Elliott Wave</strong> (LazyBear ElliotWave Oscillator) ve <strong>SuperTrend</strong>
+          (Kıvanç Özbilgiç), günlük fiyat verisinden hesaplanan teknik göstergelerdir:
+          <code>AL</code> yükseliş, <code>SAT</code> düşüş yönünü belirtir. Kısa vadeli ve gecikmeli
+          sinyallerdir; analist tahminlerinden bağımsızdır.
         </p>
         <p>
           ⚠️ Bu tahminler geleceğin garantisi <strong>değildir</strong> ve <strong>yatırım tavsiyesi değildir</strong>.
