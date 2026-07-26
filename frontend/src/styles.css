@@ -188,6 +188,24 @@ h1 { font-size: 26px; margin: 0 0 6px; }
 .filter.active { background: #1f6feb; color: #fff; border-color: #1f6feb; }
 .updated { margin-left: auto; color: var(--muted); font-size: 12px; }
 
+.news-list { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+.news-item {
+  display: block;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  text-decoration: none;
+  color: inherit;
+}
+.news-item:hover { border-color: #3a4150; background: #1c2029; }
+.news-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+.news-cat { font-size: 11px; font-weight: 700; color: #60a5fa; text-transform: uppercase; letter-spacing: 0.3px; }
+.news-time { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.news-title { font-weight: 600; font-size: 15px; line-height: 1.4; }
+.news-summary { color: var(--muted); font-size: 13px; margin-top: 6px; line-height: 1.5; }
+.news-src { color: var(--muted); font-size: 11px; margin-top: 8px; }
+
 .state {
   padding: 40px;
   text-align: center;

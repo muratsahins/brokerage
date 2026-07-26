@@ -257,6 +257,68 @@ function ScoreBar({ score }) {
   );
 }
 
+function fmtNewsTime(ts) {
+  if (!ts) return '';
+  const diff = Date.now() - ts;
+  if (diff < 3600000) return `${Math.max(1, Math.floor(diff / 60000))} dk önce`;
+  if (diff < 86400000) return `${Math.floor(diff / 3600000)} saat önce`;
+  return new Date(ts).toLocaleDateString('tr-TR');
+}
+
+// Haberler / KAP sekmesi içeriği: backend'den çeker, liste olarak gösterir.
+function NewsList({ kind }) {
+  const [state, setState] = useState({ loading: true, items: [], ok: true });
+  const [cat, setCat] = useState('ALL');
+
+  useEffect(() => {
+    let cancelled = false;
+    setState({ loading: true, items: [], ok: true });
+    setCat('ALL');
+    fetch(`${API_BASE}/api/${kind}`)
+      .then((r) => r.json())
+      .then((d) => { if (!cancelled) setState({ loading: false, items: d.items || [], ok: d.ok !== false }); })
+      .catch(() => { if (!cancelled) setState({ loading: false, items: [], ok: false }); });
+    return () => { cancelled = true; };
+  }, [kind]);
+
+  if (state.loading) return <div className="state">Yükleniyor… (ilk açılışta backend uyanması birkaç saniye sürebilir)</div>;
+  if (kind === 'kap' && !state.ok && state.items.length === 0)
+    return <div className="state">KAP bildirimleri şu an alınamadı. Birazdan tekrar deneyin.</div>;
+  if (state.items.length === 0) return <div className="state">İçerik bulunamadı.</div>;
+
+  const cats = ['ALL', 'Hisse', 'Kıymetli Maden', 'Öneri', 'Ekonomi'];
+  const items = (kind === 'news' && cat !== 'ALL') ? state.items.filter((i) => i.category === cat) : state.items;
+
+  return (
+    <>
+      {kind === 'news' && (
+        <div className="filters">
+          {cats.map((c) => (
+            <button key={c} className={`filter ${cat === c ? 'active' : ''}`} onClick={() => setCat(c)}>
+              {c === 'ALL' ? 'Tümü' : c}
+            </button>
+          ))}
+        </div>
+      )}
+      <div className="news-list">
+        {items.map((n, i) => (
+          <a key={i} className="news-item" href={n.link} target="_blank" rel="noopener noreferrer">
+            <div className="news-top">
+              <span className="news-cat">{kind === 'kap' ? (n.ticker || n.company || 'KAP') : n.category}</span>
+              <span className="news-time">{fmtNewsTime(n.ts)}</span>
+            </div>
+            <div className="news-title">
+              {kind === 'kap' ? `${n.company || ''}${n.title ? ` — ${n.title}` : ''}` : n.title}
+            </div>
+            {n.summary && <div className="news-summary">{n.summary}</div>}
+            <div className="news-src">{kind === 'kap' ? (n.category || 'KAP bildirimi') : n.source}</div>
+          </a>
+        ))}
+      </div>
+    </>
+  );
+}
+
 export default function App() {
   const [data, setData] = useState({ items: [], updatedAt: null, source: null });
   const [loading, setLoading] = useState(true);
@@ -320,12 +382,15 @@ export default function App() {
     { key: 'bist50',  label: 'BIST 50',        match: (i) => i.bist != null && i.bist <= 50 },
     { key: 'bist100', label: 'BIST 100',       match: (i) => i.bist != null && i.bist <= 100 },
     { key: 'metal',   label: 'Kıymetli Maden', match: (i) => i.kind === 'metal' },
+    { key: 'news',    label: 'Haberler',       news: 'news' },
+    { key: 'kap',     label: 'KAP',            news: 'kap' },
   ];
   const activeTab = TABS.find((t) => t.key === tab) ?? TABS[0];
+  const isNews = !!activeTab.news;
 
   // Önce aktif sekmeye göre, sonra sinyale göre süz.
   const inTab = useMemo(
-    () => data.items.filter(activeTab.match),
+    () => (activeTab.match ? data.items.filter(activeTab.match) : []),
     [data.items, tab],
   );
 
@@ -352,8 +417,10 @@ export default function App() {
         <div>
           <h1>📈 BIST Hisse Önerileri</h1>
           <p className="subtitle">
-            Analist hedef fiyatı + temel verilere dayalı beklenen getiri · {searching ? `“${query.trim()}” için ${items.length} sonuç` : `${inTab.length} kayıt`}
-            {data.source && <> · kaynak: {data.source === 'postgres' ? 'PostgreSQL' : 'bellek'}</>}
+            {isNews
+              ? (activeTab.news === 'kap' ? 'KAP bildirimleri · yatırımcı diline özet' : 'Piyasa, kıymetli maden ve analist önerisi haberleri')
+              : <>Analist hedef fiyatı + temel verilere dayalı beklenen getiri · {searching ? `“${query.trim()}” için ${items.length} sonuç` : `${inTab.length} kayıt`}
+                {data.source && <> · kaynak: {data.source === 'postgres' ? 'PostgreSQL' : 'bellek'}</>}</>}
           </p>
         </div>
         <div className="header-actions">
@@ -389,6 +456,10 @@ export default function App() {
         ))}
       </div>
 
+      {isNews ? (
+        <NewsList kind={activeTab.news} />
+      ) : (
+      <>
       <div className="search">
         <span className="search-icon">🔎</span>
         <input
@@ -567,6 +638,8 @@ export default function App() {
             </div>
           ))}
         </div>
+      )}
+      </>
       )}
 
       <footer className="disclaimer">

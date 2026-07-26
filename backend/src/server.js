@@ -4,6 +4,7 @@ import cors from 'cors';
 import { initDb } from './db.js';
 import { syncData, getRecommendations } from './service.js';
 import { diagnose, fetchOhlc } from './dataSource.js';
+import { fetchNews, fetchKap } from './newsSource.js';
 import { INSTRUMENTS } from './stocks.js';
 
 const symbolByTicker = new Map(INSTRUMENTS.map((i) => [i.ticker, i.symbol]));
@@ -27,6 +28,25 @@ app.get('/api/chart', async (req, res) => {
     res.json(await fetchOhlc(symbol, range));
   } catch (err) {
     res.status(502).json({ error: err.message });
+  }
+});
+
+// Haberler (BIST/hisse, kıymetli maden, ekonomi, analist önerileri).
+app.get('/api/news', async (req, res) => {
+  try {
+    res.json({ items: await fetchNews() });
+  } catch (err) {
+    res.status(502).json({ error: err.message, items: [] });
+  }
+});
+
+// KAP bildirimleri (yatırımcı diline özetlenmiş).
+app.get('/api/kap', async (req, res) => {
+  try {
+    const r = await fetchKap();
+    res.json({ items: r.items, ok: r.ok });
+  } catch (err) {
+    res.status(502).json({ error: err.message, items: [], ok: false });
   }
 });
 
