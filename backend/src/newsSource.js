@@ -41,6 +41,30 @@ function parseRss(xml, source, category) {
   return out;
 }
 
+// Google News RSS parser (başlık "Başlık - Kaynak" biçiminde; <source> etiketi var).
+function parseGoogleNews(xml, category) {
+  const out = [];
+  const blocks = xml.match(/<item[\s\S]*?<\/item>/gi) || [];
+  for (const block of blocks) {
+    const pick = (tag) => {
+      const r = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, 'i').exec(block);
+      return r ? decodeEntities(r[1]) : '';
+    };
+    let title = pick('title');
+    if (!title) continue;
+    const src = pick('source');
+    if (src && title.endsWith(` - ${src}`)) title = title.slice(0, -(src.length + 3)).trim();
+    out.push({
+      title, link: pick('link'), summary: '',
+      pubDate: pick('pubDate'), ts: Date.parse(pick('pubDate')) || 0,
+      source: src || 'Google Haberler', category,
+    });
+  }
+  return out;
+}
+
+const gnews = (q) => `https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=tr-TR&gl=TR&ceid=TR:tr`;
+
 // Analist/hedef fiyat haberlerini yakala.
 const ANALYST_RE = /(hedef fiyat|fiyat hedef|tavsiye|"?al"? önerisi|yükseltti|düşürdü|not(unu)? (yükseltti|düşürdü)|araştırma|öneri|potansiyel getiri)/i;
 
@@ -49,6 +73,10 @@ const FEEDS = [
   { url: 'https://tr.investing.com/rss/news_11.rss', source: 'Investing', category: 'Kıymetli Maden' },
   { url: 'https://tr.investing.com/rss/news_14.rss', source: 'Investing', category: 'Ekonomi' },
   { url: 'https://www.bloomberght.com/rss', source: 'BloombergHT', category: 'Ekonomi' },
+  // BIST şirket ve kıymetli maden haberleri için Google News (Türkçe kaynaklar).
+  { url: gnews('BIST hisse şirket haber when:2d'), category: 'Hisse', google: true },
+  { url: gnews('(gram altın OR ons altın OR gümüş OR platin) fiyat when:2d'), category: 'Kıymetli Maden', google: true },
+  { url: gnews('(hedef fiyat OR "AL önerisi" OR tavsiye) hisse aracı kurum when:3d'), category: 'Öneri', google: true },
 ];
 
 async function fetchText(url, ms = 15000) {
@@ -60,7 +88,7 @@ async function fetchText(url, ms = 15000) {
 let newsCache = { at: 0, items: [] };
 export async function fetchNews() {
   if (Date.now() - newsCache.at < 10 * 60 * 1000 && newsCache.items.length) return newsCache.items;
-  const results = await Promise.allSettled(FEEDS.map((f) => fetchText(f.url).then((xml) => parseRss(xml, f.source, f.category))));
+  const results = await Promise.allSettled(FEEDS.map((f) => fetchText(f.url).then((xml) => (f.google ? parseGoogleNews(xml, f.category) : parseRss(xml, f.source, f.category)))));
   let items = results.flatMap((r) => (r.status === 'fulfilled' ? r.value : []));
   // Analist haberlerini "Öneri" kategorisine taşı.
   for (const it of items) {
@@ -76,56 +104,56 @@ export async function fetchNews() {
 }
 
 // --- KAP bildirimleri --------------------------------------------------------
-// Bildirim kategorisini yatırımcı diline çevirir.
-function kapSummary(title = '', category = '') {
-  const t = `${category} ${title}`.toLowerCase();
-  if (/finansal rapor|bilanço|faaliyet raporu/.test(t)) return 'Şirket dönemsel finansal sonuçlarını açıkladı.';
-  if (/kar payı|temettü/.test(t)) return 'Kâr payı (temettü) dağıtımına ilişkin bildirim.';
-  if (/sermaye artırım|bedelli|bedelsiz/.test(t)) return 'Sermaye artırımı / pay dağıtımına ilişkin bildirim.';
-  if (/pay geri alım|geri alım/.test(t)) return 'Şirket kendi paylarını geri alımına ilişkin bildirim.';
-  if (/pay alım|pay satım|ortaklık yapı/.test(t)) return 'Ortaklık/pay alım-satımına ilişkin bildirim.';
-  if (/ihale|sözleşme|yatırım|anlaşma|sipariş/.test(t)) return 'Yeni iş/sözleşme veya yatırım açıklaması.';
-  if (/genel kurul/.test(t)) return 'Genel kurul toplantısına ilişkin bildirim.';
-  return 'Şirketten özel durum açıklaması.';
+// kap.org.tr datacenter IP'lerini bloklıyor; KAP odaklı haberleri Google News
+// üzerinden (her yerden erişilebilir) çekip yatırımcı diline sınıflandırıyoruz.
+function kapClassify(text) {
+  const t = (text || '').toLowerCase();
+  if (/finansal|bilanço|net kâr|net kar|faaliyet raporu|çeyrek|dönem kâr|zarar açıkla/.test(t))
+    return { label: 'Finansal Sonuç', summary: 'Şirket dönemsel finansal sonuçlarını açıkladı.' };
+  if (/temett|kar payı|kâr payı/.test(t))
+    return { label: 'Temettü', summary: 'Kâr payı (temettü) dağıtımına ilişkin gelişme.' };
+  if (/sermaye art|bedelli|bedelsiz/.test(t))
+    return { label: 'Sermaye Artırımı', summary: 'Sermaye artırımı / pay dağıtımına ilişkin gelişme.' };
+  if (/geri alım/.test(t))
+    return { label: 'Pay Geri Alım', summary: 'Şirketin kendi paylarını geri alımına ilişkin gelişme.' };
+  if (/genel kurul/.test(t))
+    return { label: 'Genel Kurul', summary: 'Genel kurul toplantısına ilişkin gelişme.' };
+  if (/ihale|sözleşme|sipariş|anlaşma|yeni iş|proje|satın al|devral|birleşme|iş birliği|imzala/.test(t))
+    return { label: 'İş / Yatırım', summary: 'Yeni iş, sözleşme veya yatırım gelişmesi.' };
+  if (/halka arz/.test(t))
+    return { label: 'Halka Arz', summary: 'Halka arza ilişkin gelişme.' };
+  if (/pay|ortaklık|hisse devri|iştirak/.test(t))
+    return { label: 'Ortaklık / Pay', summary: 'Ortaklık yapısı / pay hareketine ilişkin gelişme.' };
+  return { label: 'Bildirim', summary: 'Şirkete ilişkin önemli gelişme / KAP bildirimi.' };
 }
+
+const KAP_QUERIES = [
+  'KAP bildirim hisse when:2d',
+  '(bedelsiz OR bedelli OR "sermaye artırımı" OR temettü OR "kar payı") borsa şirket when:3d',
+  '(bilanço OR "finansal sonuç" OR "net kâr") BIST şirket when:3d',
+  '(ihale OR sözleşme OR "satın alma" OR yatırım OR "geri alım") halka açık şirket when:3d',
+];
 
 let kapCache = { at: 0, items: [], ok: false };
 export async function fetchKap() {
   if (Date.now() - kapCache.at < 10 * 60 * 1000 && kapCache.items.length) return kapCache;
   try {
-    const today = new Date();
-    const from = new Date(today.getTime() - 3 * 864e5);
-    const fmt = (d) => d.toISOString().slice(0, 10);
-    const res = await fetch('https://www.kap.org.tr/tr/api/memberDisclosureQuery', {
-      method: 'POST',
-      headers: { 'User-Agent': UA, 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({
-        fromDate: fmt(from), toDate: fmt(today), year: '', prd: '', term: '', ruleType: '',
-        bdkReview: '', disclosureClass: '', index: '', market: '', isLate: '', subjectList: [],
-        mkkMemberOidList: [], inactiveMkkMemberOidList: [], bdkMemberOidList: [], mainSector: '',
-        sector: '', subSector: '', memberType: 'IGS', fromSrc: 'N', srcCategory: '', discloseIndex: '',
-      }),
-      signal: AbortSignal.timeout(25000),
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    const arr = Array.isArray(data) ? data : (data.disclosures || data.result || []);
-    const items = arr.slice(0, 60).map((d) => {
-      const b = d.basic || d;
-      const company = b.companyName || b.stockCodes || d.companyName || '';
-      const ticker = (b.stockCodes || d.stockCodes || '').split(',')[0]?.trim() || '';
-      const title = b.title || d.title || b.kapTitle || d.disclosureCategory || '';
-      const category = b.disclosureCategory || d.disclosureCategory || '';
-      const oid = d.disclosureIndex || b.disclosureIndex || d.publishDate || '';
-      return {
-        company, ticker, title, category,
-        summary: kapSummary(title, category),
-        time: b.publishDate || d.publishDate || '',
-        ts: Date.parse(b.publishDate || d.publishDate || '') || 0,
-        link: oid ? `https://www.kap.org.tr/tr/Bildirim/${oid}` : 'https://www.kap.org.tr/tr/',
-      };
+    const results = await Promise.allSettled(KAP_QUERIES.map((q) => fetchText(gnews(q)).then((xml) => parseGoogleNews(xml))));
+    let items = results.flatMap((r) => (r.status === 'fulfilled' ? r.value : []));
+    // "Google Haberler" gibi başlıksız/menü ögelerini ve tekrarları ayıkla.
+    const seen = new Set();
+    items = items.filter((it) => {
+      if (!it.title || it.title.length < 12 || /^google haberler/i.test(it.title)) return false;
+      const k = it.title.toLowerCase();
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    }).map((it) => {
+      const c = kapClassify(it.title);
+      return { title: it.title, category: c.label, summary: c.summary, source: it.source, time: it.pubDate, ts: it.ts, link: it.link };
     });
     items.sort((a, b) => b.ts - a.ts);
+    items = items.slice(0, 60);
     kapCache = { at: Date.now(), items, ok: true };
   } catch (err) {
     console.warn(`[news] KAP alınamadı: ${err.message}`);
