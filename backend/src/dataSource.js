@@ -277,9 +277,8 @@ export async function fetchQuotes(instruments) {
     try {
       const chart = await fetchChart(inst.symbol);
       let fundamentals = null;
-      // Analist/temel veriyi yalnızca endeks hisselerinde (BIST 30/50/100) çek;
-      // geniş evren (bist=null) ve kıymetli madenlerde atla — yenilemeyi hızlı tutmak için.
-      if (inst.kind === 'stock' && inst.bist != null) {
+      // Analist/temel veriyi tüm BIST hisselerinde çek; yalnızca kıymetli madenlerde atla.
+      if (inst.kind === 'stock') {
         try {
           fundamentals = await fetchFundamentals(inst.symbol);
         } catch (e) {
