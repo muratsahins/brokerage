@@ -200,6 +200,16 @@ h1 { font-size: 26px; margin: 0 0 6px; }
 }
 .news-item:hover { border-color: #3a4150; background: #1c2029; }
 .news-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+.news-catwrap { display: inline-flex; align-items: baseline; gap: 6px; min-width: 0; }
+.news-ticker {
+  background: #1f2937;
+  color: #93c5fd;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+}
 .news-cat { font-size: 11px; font-weight: 700; color: #60a5fa; text-transform: uppercase; letter-spacing: 0.3px; }
 .news-time { font-size: 11px; color: var(--muted); white-space: nowrap; }
 .news-title { font-weight: 600; font-size: 15px; line-height: 1.4; }

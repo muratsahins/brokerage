@@ -304,7 +304,10 @@ function NewsList({ kind }) {
         {items.map((n, i) => (
           <a key={i} className="news-item" href={n.link} target="_blank" rel="noopener noreferrer">
             <div className="news-top">
-              <span className="news-cat">{n.category}</span>
+              <span className="news-catwrap">
+                {n.ticker && <span className="news-ticker">{n.ticker}</span>}
+                <span className="news-cat">{n.category}</span>
+              </span>
               <span className="news-time">{fmtNewsTime(n.ts)}</span>
             </div>
             <div className="news-title">{n.title}</div>

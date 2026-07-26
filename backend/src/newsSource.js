@@ -1,5 +1,6 @@
 // Haber ve KAP kaynakları. RSS akışları (Investing, BloombergHT) ile KAP bildirimleri.
 // Bellek içi kısa önbellek ile kaynakları yormadan servis eder.
+import { INSTRUMENTS } from './stocks.js';
 
 const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
@@ -127,6 +128,31 @@ function kapClassify(text) {
   return { label: 'Bildirim', summary: 'Şirkete ilişkin önemli gelişme / KAP bildirimi.' };
 }
 
+// --- Başlıktan ilgili BIST hisse kodunu tespit --------------------------------
+function normTr(s) {
+  return (s || '')
+    .replace(/[İIı]/g, 'i').replace(/[Şş]/g, 's').replace(/[Ğğ]/g, 'g')
+    .replace(/[Üü]/g, 'u').replace(/[Öö]/g, 'o').replace(/[Çç]/g, 'c').toLowerCase();
+}
+const STOCK_INSTR = INSTRUMENTS.filter((i) => i.kind === 'stock');
+// Ticker kodu (büyük harf) başlıkta aynen geçiyorsa yakala.
+const TICKER_RE = new RegExp(`(?<![A-Z0-9])(${STOCK_INSTR.map((i) => i.ticker).join('|')})(?![A-Z0-9])`);
+// Şirket adı eşleşmesi (Türkçe duyarsız); uzun adlar önce (daha spesifik).
+const NAME_INDEX = STOCK_INSTR
+  .map((i) => [normTr(i.name), i.ticker])
+  .filter(([n]) => n.length >= 6)
+  .sort((a, b) => b[0].length - a[0].length);
+
+function detectTicker(title) {
+  const m = TICKER_RE.exec(title || '');
+  if (m) return m[1];
+  const nt = normTr(title);
+  for (const [name, ticker] of NAME_INDEX) {
+    if (nt.includes(name)) return ticker;
+  }
+  return null;
+}
+
 const KAP_QUERIES = [
   'KAP bildirim hisse when:2d',
   '(bedelsiz OR bedelli OR "sermaye artırımı" OR temettü OR "kar payı") borsa şirket when:3d',
@@ -150,7 +176,7 @@ export async function fetchKap() {
       return true;
     }).map((it) => {
       const c = kapClassify(it.title);
-      return { title: it.title, category: c.label, summary: c.summary, source: it.source, time: it.pubDate, ts: it.ts, link: it.link };
+      return { ticker: detectTicker(it.title), title: it.title, category: c.label, summary: c.summary, source: it.source, time: it.pubDate, ts: it.ts, link: it.link };
     });
     items.sort((a, b) => b.ts - a.ts);
     items = items.slice(0, 60);
