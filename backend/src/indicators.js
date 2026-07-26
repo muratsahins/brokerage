@@ -40,28 +40,49 @@ function sma(values, period) {
   return out;
 }
 
-// RSI (Wilder, 14) — son değeri döner (null yeterli bar yoksa).
-export function rsiValue(closes, period = 14) {
+// RSI (Wilder) tam serisi.
+function rsiSeries(closes, period = 14) {
   const n = closes?.length ?? 0;
-  if (n <= period) return null;
+  const out = new Array(n).fill(null);
+  if (n <= period) return out;
   let gain = 0, loss = 0;
   for (let i = 1; i <= period; i++) {
     const ch = closes[i] - closes[i - 1];
     if (ch >= 0) gain += ch; else loss -= ch;
   }
   let ag = gain / period, al = loss / period;
-  let rsi = al === 0 ? 100 : 100 - 100 / (1 + ag / al);
+  out[period] = al === 0 ? 100 : 100 - 100 / (1 + ag / al);
   for (let i = period + 1; i < n; i++) {
     const ch = closes[i] - closes[i - 1];
     ag = (ag * (period - 1) + (ch > 0 ? ch : 0)) / period;
     al = (al * (period - 1) + (ch < 0 ? -ch : 0)) / period;
-    rsi = al === 0 ? 100 : 100 - 100 / (1 + ag / al);
+    out[i] = al === 0 ? 100 : 100 - 100 / (1 + ag / al);
   }
-  return rsi;
+  return out;
+}
+export function rsiValue(closes, period = 14) {
+  const s = rsiSeries(closes, period);
+  return s.length ? s[s.length - 1] : null;
+}
+
+// RSI aşırı satım DÖNÜŞÜ: son `lookback` barda 30'un altına inip yukarı dönmüş
+// (aşırı satımdan çıkıp 30 üstüne yükselen, yukarı yönlü) hisseler.
+export function rsiBullishReversal(closes, period = 14, lookback = 14) {
+  const rsi = rsiSeries(closes, period);
+  const n = rsi.length;
+  if (n < period + 3) return false;
+  const start = Math.max(period, n - lookback);
+  let minR = Infinity;
+  for (let i = start; i < n; i++) if (rsi[i] != null && rsi[i] < minR) minR = rsi[i];
+  const last = rsi[n - 1], prev = rsi[n - 2];
+  if (last == null || prev == null || minR === Infinity) return false;
+  const oversoldRecently = minR < 30;             // 30 altını gördü
+  const turningUp = last > prev;                  // yukarı dönüyor
+  const recovered = last > 30 && last > minR + 2; // aşırı satımdan çıktı
+  return oversoldRecently && turningUp && recovered;
 }
 
 // MACD (12/26/9): mavi (MACD) çizgisi sarı (sinyal) çizgisinin ÜSTÜNDE mi?
-// (mavi çizgi sarıyı yukarı kesip üstünde kaldığında true olur.)
 export function macdBullish(closes, fast = 12, slow = 26, sig = 9) {
   const n = closes?.length ?? 0;
   if (n < slow + sig + 2) return false;
@@ -70,6 +91,21 @@ export function macdBullish(closes, fast = 12, slow = 26, sig = 9) {
   const macd = closes.map((_, i) => ef[i] - es[i]);
   const signal = ema(macd, sig);
   return macd[n - 1] > signal[n - 1];
+}
+
+// MACD SIFIR ÇİZGİSİNİN ÜZERİNDE pozitif kesişim: son `lookback` barda MACD çizgisi
+// sinyali yukarı kesmiş VE kesişim MACD > 0 (sıfır çizgisi üstünde) gerçekleşmiş.
+export function macdBullCrossAboveZero(closes, fast = 12, slow = 26, sig = 9, lookback = 5) {
+  const n = closes?.length ?? 0;
+  if (n < slow + sig + 2) return false;
+  const ef = ema(closes, fast);
+  const es = ema(closes, slow);
+  const macd = closes.map((_, i) => ef[i] - es[i]);
+  const signal = ema(macd, sig);
+  for (let i = Math.max(1, n - lookback); i < n; i++) {
+    if (macd[i - 1] <= signal[i - 1] && macd[i] > signal[i] && macd[i] > 0) return true;
+  }
+  return false;
 }
 
 // Wilder ATR (RMA yumuşatması) — Pine'daki ta.atr ile aynı.

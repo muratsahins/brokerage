@@ -6,7 +6,10 @@
 //   exp3m     = (1 + upside12m)^(3/12) - 1
 // Analist kapsamı olmayan hisselerde tahmin üretilmez (null) — uydurmuyoruz.
 
-import { supertrendSignal, wavetrendSignal, wavetrendCrossSignal, rsiValue, macdBullish } from './indicators.js';
+import {
+  supertrendSignal, wavetrendSignal, wavetrendCrossSignal,
+  rsiValue, macdBullish, rsiBullishReversal, macdBullCrossAboveZero,
+} from './indicators.js';
 
 function clamp01(x) {
   return Math.max(0, Math.min(1, x));
@@ -78,6 +81,8 @@ export function scoreQuote(q) {
   const stSignal = supertrendSignal(q.highs, q.lows, q.closes);
   const rsi = rsiValue(q.closes);
   const macdBull = macdBullish(q.closes);
+  const rsiReversal = rsiBullishReversal(q.closes);        // aşırı satımdan yukarı dönüş
+  const macdBullCrossZero = macdBullCrossAboveZero(q.closes); // sıfır üstü pozitif kesişim
 
   return {
     symbol: q.symbol,
@@ -104,7 +109,9 @@ export function scoreQuote(q) {
     wtCrossSignal, // WaveTrend standart kesişim (LazyBear): 'AL' | 'SAT' | null
     stSignal,      // SuperTrend (Kıvanç Özbilgiç): 'AL' | 'SAT' | null
     rsi: rsi != null ? round(rsi, 1) : null, // RSI 14 (son)
-    macdBull,      // MACD mavi çizgi sinyal çizgisinin üstünde mi (boolean)
+    macdBull,           // MACD mavi çizgi sinyal çizgisinin üstünde mi
+    rsiReversal,        // RSI aşırı satımdan (30 altı) yukarı dönüş
+    macdBullCrossZero,  // MACD sıfır çizgisi üstünde pozitif kesişim
   };
 }
 
