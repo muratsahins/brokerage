@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-26T01:06:12.394Z",
+  "updatedAt": "2026-07-26T01:24:57.661Z",
   "source": "github-actions",
   "count": 623,
   "withAnalyst": 51,
@@ -29,6 +29,8 @@
       "stSignal": "AL",
       "rsi": 86.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Odine Teknoloji",
       "sector": "Teknoloji",
       "bist": 100,
@@ -59,6 +61,8 @@
       "stSignal": "AL",
       "rsi": 63.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ral Yatırım Holding",
       "sector": "Holding",
       "bist": 100,
@@ -89,6 +93,8 @@
       "stSignal": "AL",
       "rsi": 57.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Akcansa",
       "bist": null,
       "kind": "stock"
@@ -118,6 +124,8 @@
       "stSignal": "AL",
       "rsi": 63.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Akfen Insaat",
       "bist": null,
       "kind": "stock"
@@ -147,6 +155,8 @@
       "stSignal": "AL",
       "rsi": 63.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Aksu Enerji",
       "bist": null,
       "kind": "stock"
@@ -176,6 +186,8 @@
       "stSignal": "AL",
       "rsi": 58.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ard Bilisim Teknolojileri",
       "bist": null,
       "kind": "stock"
@@ -205,6 +217,8 @@
       "stSignal": "AL",
       "rsi": 70.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Atp Yazilim",
       "bist": null,
       "kind": "stock"
@@ -234,6 +248,8 @@
       "stSignal": "AL",
       "rsi": 64.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Aygaz",
       "bist": null,
       "kind": "stock"
@@ -263,6 +279,8 @@
       "stSignal": "AL",
       "rsi": 76.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Beta Enerji Ve Teknoloji",
       "bist": null,
       "kind": "stock"
@@ -292,6 +310,8 @@
       "stSignal": "AL",
       "rsi": 75.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Birlesim Grup Enerji",
       "bist": null,
       "kind": "stock"
@@ -321,6 +341,8 @@
       "stSignal": "SAT",
       "rsi": 53.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Big Medya Teknoloji",
       "bist": null,
       "kind": "stock"
@@ -350,6 +372,8 @@
       "stSignal": "AL",
       "rsi": 68.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Besiktas Futbol Yat",
       "bist": null,
       "kind": "stock"
@@ -379,6 +403,8 @@
       "stSignal": "AL",
       "rsi": 62.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Celik Halat",
       "bist": null,
       "kind": "stock"
@@ -408,6 +434,8 @@
       "stSignal": "AL",
       "rsi": 100,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Dunya Holding",
       "bist": null,
       "kind": "stock"
@@ -437,6 +465,8 @@
       "stSignal": "AL",
       "rsi": 60.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Forte Bilgi Iletisim",
       "bist": null,
       "kind": "stock"
@@ -466,6 +496,8 @@
       "stSignal": "AL",
       "rsi": null,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Golda Gida",
       "bist": null,
       "kind": "stock"
@@ -495,6 +527,8 @@
       "stSignal": "AL",
       "rsi": 91.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Gundogdu Gida",
       "bist": null,
       "kind": "stock"
@@ -524,6 +558,8 @@
       "stSignal": "AL",
       "rsi": 88.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Hedef Holding",
       "bist": null,
       "kind": "stock"
@@ -553,6 +589,8 @@
       "stSignal": "AL",
       "rsi": 64.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Icbc Turkey Bank",
       "bist": null,
       "kind": "stock"
@@ -582,6 +620,8 @@
       "stSignal": "AL",
       "rsi": 77.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Innosa Teknoloji",
       "bist": null,
       "kind": "stock"
@@ -611,6 +651,8 @@
       "stSignal": "AL",
       "rsi": 58.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Isik Plastik",
       "bist": null,
       "kind": "stock"
@@ -640,6 +682,8 @@
       "stSignal": "AL",
       "rsi": 75,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Is Bankasi Kur",
       "bist": null,
       "kind": "stock"
@@ -669,6 +713,8 @@
       "stSignal": null,
       "rsi": null,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Isvea Seramik Ve Banyo",
       "bist": null,
       "kind": "stock"
@@ -698,6 +744,8 @@
       "stSignal": "AL",
       "rsi": 67.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Izmir Demir Celik",
       "bist": null,
       "kind": "stock"
@@ -727,6 +775,8 @@
       "stSignal": "AL",
       "rsi": 70.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Kartonsan",
       "bist": null,
       "kind": "stock"
@@ -756,6 +806,8 @@
       "stSignal": "SAT",
       "rsi": 71.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Koc Metalurji",
       "bist": null,
       "kind": "stock"
@@ -785,6 +837,8 @@
       "stSignal": "SAT",
       "rsi": 47.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Kontrolmatik Teknoloji",
       "bist": null,
       "kind": "stock"
@@ -814,6 +868,8 @@
       "stSignal": "AL",
       "rsi": 61.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Mogan Enerji",
       "bist": null,
       "kind": "stock"
@@ -843,6 +899,8 @@
       "stSignal": "AL",
       "rsi": null,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Orzaks Ilac",
       "bist": null,
       "kind": "stock"
@@ -872,6 +930,8 @@
       "stSignal": "AL",
       "rsi": 88.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ozata Denizcilik",
       "bist": null,
       "kind": "stock"
@@ -901,6 +961,8 @@
       "stSignal": "AL",
       "rsi": 66.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Panora GMYO",
       "bist": null,
       "kind": "stock"
@@ -930,6 +992,8 @@
       "stSignal": "AL",
       "rsi": 62.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Prizma Press Matbaacilik",
       "bist": null,
       "kind": "stock"
@@ -959,6 +1023,8 @@
       "stSignal": "SAT",
       "rsi": 49.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Qnb Finansal Kiralama",
       "bist": null,
       "kind": "stock"
@@ -988,6 +1054,8 @@
       "stSignal": null,
       "rsi": null,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Sa Ra Enerji",
       "bist": null,
       "kind": "stock"
@@ -1017,6 +1085,8 @@
       "stSignal": "AL",
       "rsi": 64.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Sun Tekstil",
       "bist": null,
       "kind": "stock"
@@ -1046,6 +1116,8 @@
       "stSignal": "AL",
       "rsi": 72,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Vbt Yazilim",
       "bist": null,
       "kind": "stock"
@@ -1075,6 +1147,8 @@
       "stSignal": "AL",
       "rsi": 69.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Armada Gida",
       "bist": null,
       "kind": "stock"
@@ -1104,6 +1178,8 @@
       "stSignal": "AL",
       "rsi": 91.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Tera Yatirim Tek Hol",
       "bist": null,
       "kind": "stock"
@@ -1133,6 +1209,8 @@
       "stSignal": "AL",
       "rsi": 55.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Dmr Unlu Mamuller",
       "bist": null,
       "kind": "stock"
@@ -1162,6 +1240,8 @@
       "stSignal": "AL",
       "rsi": 51.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Is Bankasi B",
       "bist": null,
       "kind": "stock"
@@ -1191,6 +1271,8 @@
       "stSignal": "AL",
       "rsi": 81.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Işıklar Enerji Yapı Hold.",
       "sector": "Holding",
       "bist": 100,
@@ -1221,6 +1303,8 @@
       "stSignal": "AL",
       "rsi": 58.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Akfen Yen Enerji",
       "bist": null,
       "kind": "stock"
@@ -1250,6 +1334,8 @@
       "stSignal": "AL",
       "rsi": 60,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Akhan Un",
       "bist": null,
       "kind": "stock"
@@ -1279,6 +1365,8 @@
       "stSignal": "AL",
       "rsi": 59.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "TR Doğal Enerji",
       "sector": "Enerji",
       "bist": 100,
@@ -1309,6 +1397,8 @@
       "stSignal": "AL",
       "rsi": 64.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Kuvva Gida",
       "bist": null,
       "kind": "stock"
@@ -1338,6 +1428,8 @@
       "stSignal": "AL",
       "rsi": 61.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Europower Enerji",
       "sector": "Enerji",
       "bist": 100,
@@ -1368,6 +1460,8 @@
       "stSignal": "AL",
       "rsi": 70,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Altinkilic Gida Ve Sut",
       "bist": null,
       "kind": "stock"
@@ -1397,6 +1491,8 @@
       "stSignal": "AL",
       "rsi": 68.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Anel Elektrik",
       "bist": null,
       "kind": "stock"
@@ -1426,6 +1522,8 @@
       "stSignal": "AL",
       "rsi": 52.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Alarko Carrier",
       "bist": null,
       "kind": "stock"
@@ -1455,6 +1553,8 @@
       "stSignal": "AL",
       "rsi": 57,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Obase Bilgisayar",
       "bist": null,
       "kind": "stock"
@@ -1484,6 +1584,8 @@
       "stSignal": "AL",
       "rsi": 69.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Kimteks Poliuretan",
       "bist": null,
       "kind": "stock"
@@ -1513,6 +1615,8 @@
       "stSignal": "AL",
       "rsi": 56.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Oyak Çimento",
       "sector": "Çimento",
       "bist": 50,
@@ -1543,6 +1647,8 @@
       "stSignal": "SAT",
       "rsi": 37.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Anadolu Sigorta",
       "sector": "Sigorta",
       "bist": 100,
@@ -1573,6 +1679,8 @@
       "stSignal": "AL",
       "rsi": 60.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Şok Marketler",
       "sector": "Perakende",
       "bist": 100,
@@ -1603,6 +1711,8 @@
       "stSignal": "AL",
       "rsi": 53.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Koç Holding",
       "sector": "Holding",
       "bist": 30,
@@ -1633,6 +1743,8 @@
       "stSignal": "SAT",
       "rsi": 49.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Balatacilar Balatacilik",
       "bist": null,
       "kind": "stock"
@@ -1662,6 +1774,8 @@
       "stSignal": "AL",
       "rsi": 63.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Euro Kapital Yat Ort",
       "bist": null,
       "kind": "stock"
@@ -1691,6 +1805,8 @@
       "stSignal": "SAT",
       "rsi": 32.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Emlak Konut GYO",
       "sector": "GYO",
       "bist": 30,
@@ -1721,6 +1837,8 @@
       "stSignal": "SAT",
       "rsi": 44.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "T.S.K.B.",
       "sector": "Bankacılık",
       "bist": 100,
@@ -1751,6 +1869,8 @@
       "stSignal": "AL",
       "rsi": 52.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Frigo Pak Gida",
       "bist": null,
       "kind": "stock"
@@ -1780,6 +1900,8 @@
       "stSignal": "AL",
       "rsi": 56.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Türkiye Sigorta",
       "sector": "Sigorta",
       "bist": 50,
@@ -1810,6 +1932,8 @@
       "stSignal": "AL",
       "rsi": 39.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Mavi Giyim",
       "sector": "Perakende",
       "bist": 100,
@@ -1840,6 +1964,8 @@
       "stSignal": "AL",
       "rsi": 56.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Etiler Gida",
       "bist": null,
       "kind": "stock"
@@ -1869,6 +1995,8 @@
       "stSignal": "AL",
       "rsi": 71.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Gürsel Turizm",
       "sector": "Ulaştırma",
       "bist": 100,
@@ -1899,6 +2027,8 @@
       "stSignal": "AL",
       "rsi": 48.6,
       "macdBull": true,
+      "rsiReversal": true,
+      "macdCross": false,
       "name": "İş Yatırım Menkul",
       "sector": "Aracı Kurum",
       "bist": 100,
@@ -1929,6 +2059,8 @@
       "stSignal": "AL",
       "rsi": 56.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Margün Enerji",
       "sector": "Enerji",
       "bist": 100,
@@ -1959,6 +2091,8 @@
       "stSignal": "AL",
       "rsi": 69.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Creditwest Faktoring",
       "bist": null,
       "kind": "stock"
@@ -1988,6 +2122,8 @@
       "stSignal": "AL",
       "rsi": 65.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ebebek Magazacilik",
       "bist": null,
       "kind": "stock"
@@ -2017,6 +2153,8 @@
       "stSignal": "SAT",
       "rsi": 34.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Sabancı Holding",
       "sector": "Holding",
       "bist": 30,
@@ -2047,6 +2185,8 @@
       "stSignal": "AL",
       "rsi": 53.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Girişim Elektrik",
       "sector": "Enerji",
       "bist": 100,
@@ -2077,6 +2217,8 @@
       "stSignal": "AL",
       "rsi": 68.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Egeyapi Avrupa GMYO",
       "bist": null,
       "kind": "stock"
@@ -2106,6 +2248,8 @@
       "stSignal": "SAT",
       "rsi": 34.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ford Otosan",
       "sector": "Otomotiv",
       "bist": 30,
@@ -2136,6 +2280,8 @@
       "stSignal": "SAT",
       "rsi": 45.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Arçelik",
       "sector": "Dayanıklı Tüketim",
       "bist": 100,
@@ -2166,6 +2312,8 @@
       "stSignal": "SAT",
       "rsi": 40,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Turkcell",
       "sector": "Telekom",
       "bist": 30,
@@ -2196,6 +2344,8 @@
       "stSignal": "SAT",
       "rsi": 24.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ülker Bisküvi",
       "sector": "Gıda",
       "bist": 50,
@@ -2226,6 +2376,8 @@
       "stSignal": "AL",
       "rsi": 63.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Tera Finansal Yat Hol",
       "bist": null,
       "kind": "stock"
@@ -2255,6 +2407,8 @@
       "stSignal": "AL",
       "rsi": 53.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Alarko Holding",
       "sector": "Holding",
       "bist": 50,
@@ -2285,6 +2439,8 @@
       "stSignal": "AL",
       "rsi": 52.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Çimsa",
       "sector": "Çimento",
       "bist": 50,
@@ -2315,6 +2471,8 @@
       "stSignal": "SAT",
       "rsi": 55.8,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Cimbeton",
       "bist": null,
       "kind": "stock"
@@ -2344,6 +2502,8 @@
       "stSignal": "SAT",
       "rsi": 36,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Pegasus",
       "sector": "Ulaştırma",
       "bist": 30,
@@ -2374,6 +2534,8 @@
       "stSignal": "AL",
       "rsi": 65.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Cuhadaroglu Metal",
       "bist": null,
       "kind": "stock"
@@ -2403,6 +2565,8 @@
       "stSignal": "AL",
       "rsi": 62.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Mmc San Ve Tic Yat",
       "bist": null,
       "kind": "stock"
@@ -2432,6 +2596,8 @@
       "stSignal": "SAT",
       "rsi": 39.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Garanti BBVA",
       "sector": "Bankacılık",
       "bist": 30,
@@ -2462,6 +2628,8 @@
       "stSignal": "AL",
       "rsi": 64.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Efor Yatırım",
       "sector": "Holding",
       "bist": 50,
@@ -2492,6 +2660,8 @@
       "stSignal": "SAT",
       "rsi": 44.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Turk Ilac Serum",
       "bist": null,
       "kind": "stock"
@@ -2521,6 +2691,8 @@
       "stSignal": "SAT",
       "rsi": 32.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "İş Bankası (C)",
       "sector": "Bankacılık",
       "bist": 30,
@@ -2551,6 +2723,8 @@
       "stSignal": "SAT",
       "rsi": 49.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Doğuş Otomotiv",
       "sector": "Otomotiv",
       "bist": 100,
@@ -2581,6 +2755,8 @@
       "stSignal": "SAT",
       "rsi": 39.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "MLP Sağlık (Medical Park)",
       "sector": "Sağlık",
       "bist": 100,
@@ -2611,6 +2787,8 @@
       "stSignal": "AL",
       "rsi": 52.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Dagi Giyim",
       "bist": null,
       "kind": "stock"
@@ -2640,6 +2818,8 @@
       "stSignal": "SAT",
       "rsi": 40.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Migros",
       "sector": "Perakende",
       "bist": 30,
@@ -2670,6 +2850,8 @@
       "stSignal": "AL",
       "rsi": 62.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Cates Elektrik",
       "bist": null,
       "kind": "stock"
@@ -2699,6 +2881,8 @@
       "stSignal": "AL",
       "rsi": 54.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Kardemir A",
       "bist": null,
       "kind": "stock"
@@ -2728,6 +2912,8 @@
       "stSignal": "SAT",
       "rsi": 49,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Kron Teknoloji",
       "bist": null,
       "kind": "stock"
@@ -2757,6 +2943,8 @@
       "stSignal": "AL",
       "rsi": 56.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ozyasar Tel",
       "bist": null,
       "kind": "stock"
@@ -2786,6 +2974,8 @@
       "stSignal": "SAT",
       "rsi": 40.8,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Türk Hava Yolları",
       "sector": "Ulaştırma",
       "bist": 30,
@@ -2816,6 +3006,8 @@
       "stSignal": "SAT",
       "rsi": 30.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Türk Telekom",
       "sector": "Telekom",
       "bist": 30,
@@ -2846,6 +3038,8 @@
       "stSignal": "SAT",
       "rsi": 50.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Balsu Gıda",
       "sector": "Gıda",
       "bist": 100,
@@ -2876,6 +3070,8 @@
       "stSignal": "SAT",
       "rsi": 48.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Doğan Holding",
       "sector": "Holding",
       "bist": 100,
@@ -2906,6 +3102,8 @@
       "stSignal": "SAT",
       "rsi": 45.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Vestel",
       "sector": "Elektronik",
       "bist": 100,
@@ -2936,6 +3134,8 @@
       "stSignal": "AL",
       "rsi": 70.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Peker GMYO",
       "bist": null,
       "kind": "stock"
@@ -2965,6 +3165,8 @@
       "stSignal": "AL",
       "rsi": 59.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Panora GYO",
       "sector": "GYO",
       "bist": 100,
@@ -2995,6 +3197,8 @@
       "stSignal": "AL",
       "rsi": 53.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Despec Bilgisayar",
       "bist": null,
       "kind": "stock"
@@ -3024,6 +3228,8 @@
       "stSignal": "AL",
       "rsi": 60.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Turcas Holding",
       "bist": null,
       "kind": "stock"
@@ -3053,6 +3259,8 @@
       "stSignal": "SAT",
       "rsi": 47.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Astor Enerji",
       "sector": "Enerji",
       "bist": 30,
@@ -3083,6 +3291,8 @@
       "stSignal": "AL",
       "rsi": 62.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Coca-Cola İçecek",
       "sector": "İçecek",
       "bist": 50,
@@ -3113,6 +3323,8 @@
       "stSignal": "SAT",
       "rsi": 52.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Altınay Savunma",
       "sector": "Savunma",
       "bist": 100,
@@ -3143,6 +3355,8 @@
       "stSignal": "AL",
       "rsi": 56.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Kardemir B",
       "bist": null,
       "kind": "stock"
@@ -3172,6 +3386,8 @@
       "stSignal": "SAT",
       "rsi": 41.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "TAV Havalimanları",
       "sector": "Ulaştırma",
       "bist": 30,
@@ -3202,6 +3418,8 @@
       "stSignal": "AL",
       "rsi": 49.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Gsd Denizcilik",
       "bist": null,
       "kind": "stock"
@@ -3231,6 +3449,8 @@
       "stSignal": "AL",
       "rsi": 46.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Paladyum",
       "sector": "Kıymetli Maden",
       "bist": null,
@@ -3263,6 +3483,8 @@
       "stSignal": "AL",
       "rsi": 49.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "BİM Mağazalar",
       "sector": "Perakende",
       "bist": 30,
@@ -3293,6 +3515,8 @@
       "stSignal": "AL",
       "rsi": 56.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "T Kalkinma Bank",
       "bist": null,
       "kind": "stock"
@@ -3322,6 +3546,8 @@
       "stSignal": "SAT",
       "rsi": 45.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Şişecam",
       "sector": "Cam/Sanayi",
       "bist": 30,
@@ -3352,6 +3578,8 @@
       "stSignal": "AL",
       "rsi": 61.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Selcuk Ecza Deposu",
       "bist": null,
       "kind": "stock"
@@ -3381,6 +3609,8 @@
       "stSignal": "SAT",
       "rsi": 34.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Tofaş",
       "sector": "Otomotiv",
       "bist": 30,
@@ -3411,6 +3641,8 @@
       "stSignal": "SAT",
       "rsi": 37.8,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Vakıfbank",
       "sector": "Bankacılık",
       "bist": 30,
@@ -3441,6 +3673,8 @@
       "stSignal": "SAT",
       "rsi": 49.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Enerjisa Enerji",
       "sector": "Enerji",
       "bist": 100,
@@ -3471,6 +3705,8 @@
       "stSignal": "AL",
       "rsi": 55.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Arsan Holding",
       "bist": null,
       "kind": "stock"
@@ -3500,6 +3736,8 @@
       "stSignal": "AL",
       "rsi": 64.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Gate Group Teknoloji",
       "bist": null,
       "kind": "stock"
@@ -3529,6 +3767,8 @@
       "stSignal": "AL",
       "rsi": 51.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Anadolu Efes",
       "sector": "İçecek",
       "bist": 30,
@@ -3559,6 +3799,8 @@
       "stSignal": "AL",
       "rsi": 66.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "TR Anadolu Metal Madencilik",
       "sector": "Madencilik",
       "bist": 50,
@@ -3589,6 +3831,8 @@
       "stSignal": "SAT",
       "rsi": 35.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Zorlu Enerji",
       "sector": "Enerji",
       "bist": 100,
@@ -3619,6 +3863,8 @@
       "stSignal": "AL",
       "rsi": 47.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Ahes GMYO",
       "bist": null,
       "kind": "stock"
@@ -3648,6 +3894,8 @@
       "stSignal": "AL",
       "rsi": 55.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Bossa",
       "bist": null,
       "kind": "stock"
@@ -3677,6 +3925,8 @@
       "stSignal": "AL",
       "rsi": 47.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Emek Elektrik",
       "bist": null,
       "kind": "stock"
@@ -3706,6 +3956,8 @@
       "stSignal": "AL",
       "rsi": 59.2,
       "macdBull": true,
+      "rsiReversal": true,
+      "macdCross": false,
       "name": "Sasa Polyester",
       "sector": "Kimya",
       "bist": 30,
@@ -3736,6 +3988,8 @@
       "stSignal": "AL",
       "rsi": 51.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Bahadir Kimya",
       "bist": null,
       "kind": "stock"
@@ -3765,6 +4019,8 @@
       "stSignal": "AL",
       "rsi": 55.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Icu Girisim",
       "bist": null,
       "kind": "stock"
@@ -3794,6 +4050,8 @@
       "stSignal": "AL",
       "rsi": 51.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Manas Enerji Yonetimi",
       "bist": null,
       "kind": "stock"
@@ -3823,6 +4081,8 @@
       "stSignal": "SAT",
       "rsi": 38.8,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Otokar",
       "sector": "Otomotiv",
       "bist": 100,
@@ -3853,6 +4113,8 @@
       "stSignal": "AL",
       "rsi": 53.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Panelsan Cati Cephe",
       "bist": null,
       "kind": "stock"
@@ -3882,6 +4144,8 @@
       "stSignal": "AL",
       "rsi": 62.9,
       "macdBull": true,
+      "rsiReversal": true,
+      "macdCross": true,
       "name": "Pardus Girisim",
       "bist": null,
       "kind": "stock"
@@ -3911,6 +4175,8 @@
       "stSignal": "AL",
       "rsi": 59.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Trabzonspor Sportif",
       "bist": null,
       "kind": "stock"
@@ -3940,6 +4206,8 @@
       "stSignal": "AL",
       "rsi": 64.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Aksa Enerji",
       "sector": "Enerji",
       "bist": 50,
@@ -3970,6 +4238,8 @@
       "stSignal": "AL",
       "rsi": 59.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Gezinomi Seyahat",
       "bist": null,
       "kind": "stock"
@@ -3999,6 +4269,8 @@
       "stSignal": "AL",
       "rsi": 47.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ldr Turizm",
       "bist": null,
       "kind": "stock"
@@ -4028,6 +4300,8 @@
       "stSignal": "SAT",
       "rsi": 51.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Mobiltel Iletisim",
       "bist": null,
       "kind": "stock"
@@ -4057,6 +4331,8 @@
       "stSignal": "AL",
       "rsi": 59.1,
       "macdBull": true,
+      "rsiReversal": true,
+      "macdCross": false,
       "name": "Skyalp Finansal Teknolojiler",
       "bist": null,
       "kind": "stock"
@@ -4086,6 +4362,8 @@
       "stSignal": "SAT",
       "rsi": 51.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Tgs Dis Ticaret",
       "bist": null,
       "kind": "stock"
@@ -4115,6 +4393,8 @@
       "stSignal": "SAT",
       "rsi": 51.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Hub Girisim",
       "bist": null,
       "kind": "stock"
@@ -4144,6 +4424,8 @@
       "stSignal": "AL",
       "rsi": 50.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Seker Yatirim",
       "bist": null,
       "kind": "stock"
@@ -4173,6 +4455,8 @@
       "stSignal": "AL",
       "rsi": 74.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Tüpraş",
       "sector": "Enerji",
       "bist": 30,
@@ -4203,6 +4487,8 @@
       "stSignal": "AL",
       "rsi": 53.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Aksa Akrilik",
       "sector": "Kimya",
       "bist": 100,
@@ -4233,6 +4519,8 @@
       "stSignal": "SAT",
       "rsi": 45.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Atlantis Yatirim Holding",
       "bist": null,
       "kind": "stock"
@@ -4262,6 +4550,8 @@
       "stSignal": "AL",
       "rsi": 60,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Carrefoursa",
       "bist": null,
       "kind": "stock"
@@ -4291,6 +4581,8 @@
       "stSignal": "AL",
       "rsi": 63.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Ecogreen Enerji",
       "bist": null,
       "kind": "stock"
@@ -4320,6 +4612,8 @@
       "stSignal": "AL",
       "rsi": 59.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Eminis Ambalaj",
       "bist": null,
       "kind": "stock"
@@ -4349,6 +4643,8 @@
       "stSignal": "AL",
       "rsi": 50.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Hedef Girisim",
       "bist": null,
       "kind": "stock"
@@ -4378,6 +4674,8 @@
       "stSignal": "SAT",
       "rsi": 49.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Konya Cimento",
       "bist": null,
       "kind": "stock"
@@ -4407,6 +4705,8 @@
       "stSignal": "AL",
       "rsi": 52.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Polisan Holding",
       "bist": null,
       "kind": "stock"
@@ -4436,6 +4736,8 @@
       "stSignal": "SAT",
       "rsi": 52.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Reysas GMYO",
       "bist": null,
       "kind": "stock"
@@ -4465,6 +4767,8 @@
       "stSignal": "SAT",
       "rsi": 51.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Anadolu Grubu Holding",
       "bist": null,
       "kind": "stock"
@@ -4494,6 +4798,8 @@
       "stSignal": "AL",
       "rsi": 60.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Anadolu Hayat Emek",
       "bist": null,
       "kind": "stock"
@@ -4523,6 +4829,8 @@
       "stSignal": "AL",
       "rsi": 57.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Bor Seker",
       "bist": null,
       "kind": "stock"
@@ -4552,6 +4860,8 @@
       "stSignal": "AL",
       "rsi": 48.8,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Cimentas",
       "bist": null,
       "kind": "stock"
@@ -4581,6 +4891,8 @@
       "stSignal": "AL",
       "rsi": 61.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Deva Holding",
       "bist": null,
       "kind": "stock"
@@ -4610,6 +4922,8 @@
       "stSignal": "SAT",
       "rsi": 41.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Marshall",
       "bist": null,
       "kind": "stock"
@@ -4639,6 +4953,8 @@
       "stSignal": "AL",
       "rsi": 60.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Osmanli Menkul",
       "bist": null,
       "kind": "stock"
@@ -4668,6 +4984,8 @@
       "stSignal": "AL",
       "rsi": 46.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Seyitler Kimya",
       "bist": null,
       "kind": "stock"
@@ -4697,6 +5015,8 @@
       "stSignal": "AL",
       "rsi": 55,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Trend GMYO",
       "bist": null,
       "kind": "stock"
@@ -4726,6 +5046,8 @@
       "stSignal": "AL",
       "rsi": 69,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Alcatel Lucent Teletas",
       "bist": null,
       "kind": "stock"
@@ -4755,6 +5077,8 @@
       "stSignal": "AL",
       "rsi": 48.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Dogu Aras Enerji",
       "bist": null,
       "kind": "stock"
@@ -4784,6 +5108,8 @@
       "stSignal": "SAT",
       "rsi": 41,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Blume Metal Kimya",
       "bist": null,
       "kind": "stock"
@@ -4813,6 +5139,8 @@
       "stSignal": "SAT",
       "rsi": 46.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Tera Yatirim Menkul Degerler",
       "bist": null,
       "kind": "stock"
@@ -4842,6 +5170,8 @@
       "stSignal": "SAT",
       "rsi": 36.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Hektaş",
       "sector": "Tarım Kimya",
       "bist": 50,
@@ -4872,6 +5202,8 @@
       "stSignal": "AL",
       "rsi": 55.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Qua Granite",
       "sector": "Yapı/Seramik",
       "bist": 100,
@@ -4902,6 +5234,8 @@
       "stSignal": "AL",
       "rsi": 54.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ronesans Gayrimenkul Yat",
       "bist": null,
       "kind": "stock"
@@ -4931,6 +5265,8 @@
       "stSignal": "AL",
       "rsi": 50.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Sanel Muhendislik",
       "bist": null,
       "kind": "stock"
@@ -4960,6 +5296,8 @@
       "stSignal": "SAT",
       "rsi": 52.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Arf Bio Yenilenebilir Enerji",
       "bist": null,
       "kind": "stock"
@@ -4989,6 +5327,8 @@
       "stSignal": "SAT",
       "rsi": 49.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Atakey Patates",
       "bist": null,
       "kind": "stock"
@@ -5018,6 +5358,8 @@
       "stSignal": "AL",
       "rsi": 46,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Durukan Sekerleme",
       "bist": null,
       "kind": "stock"
@@ -5047,6 +5389,8 @@
       "stSignal": "AL",
       "rsi": 48.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Is GMYO",
       "bist": null,
       "kind": "stock"
@@ -5076,6 +5420,8 @@
       "stSignal": "AL",
       "rsi": 48.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ozerden Ambalaj",
       "bist": null,
       "kind": "stock"
@@ -5105,6 +5451,8 @@
       "stSignal": "AL",
       "rsi": 60,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Ozsu Balik",
       "bist": null,
       "kind": "stock"
@@ -5134,6 +5482,8 @@
       "stSignal": "SAT",
       "rsi": 51.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Baydoner Restoranlari",
       "bist": null,
       "kind": "stock"
@@ -5163,6 +5513,8 @@
       "stSignal": "AL",
       "rsi": 56.4,
       "macdBull": true,
+      "rsiReversal": true,
+      "macdCross": false,
       "name": "Casa Emtia Petrol",
       "bist": null,
       "kind": "stock"
@@ -5192,6 +5544,8 @@
       "stSignal": "SAT",
       "rsi": 41.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Naturelgaz",
       "bist": null,
       "kind": "stock"
@@ -5221,6 +5575,8 @@
       "stSignal": "AL",
       "rsi": 47.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Soke Degirmencilik",
       "bist": null,
       "kind": "stock"
@@ -5250,6 +5606,8 @@
       "stSignal": "AL",
       "rsi": 64.2,
       "macdBull": true,
+      "rsiReversal": true,
+      "macdCross": true,
       "name": "Tureks Turizm Tasimacilik",
       "bist": null,
       "kind": "stock"
@@ -5279,6 +5637,8 @@
       "stSignal": "SAT",
       "rsi": 45.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Altın",
       "sector": "Kıymetli Maden",
       "bist": null,
@@ -5313,6 +5673,8 @@
       "stSignal": "AL",
       "rsi": 48.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Türk Altın İşletmeleri",
       "sector": "Madencilik",
       "bist": 30,
@@ -5343,6 +5705,8 @@
       "stSignal": "AL",
       "rsi": 57.8,
       "macdBull": true,
+      "rsiReversal": true,
+      "macdCross": true,
       "name": "Beyaz Filo",
       "bist": null,
       "kind": "stock"
@@ -5372,6 +5736,8 @@
       "stSignal": "SAT",
       "rsi": 57.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Hatsan Gemi",
       "bist": null,
       "kind": "stock"
@@ -5401,6 +5767,8 @@
       "stSignal": "AL",
       "rsi": 53.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Kuzey Boru",
       "bist": null,
       "kind": "stock"
@@ -5430,6 +5798,8 @@
       "stSignal": "SAT",
       "rsi": 44,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Gümüş",
       "sector": "Kıymetli Maden",
       "bist": null,
@@ -5464,6 +5834,8 @@
       "stSignal": "SAT",
       "rsi": 41.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Platin",
       "sector": "Kıymetli Maden",
       "bist": null,
@@ -5498,6 +5870,8 @@
       "stSignal": "AL",
       "rsi": 60.7,
       "macdBull": true,
+      "rsiReversal": true,
+      "macdCross": true,
       "name": "Agrotech Teknoloji",
       "bist": null,
       "kind": "stock"
@@ -5527,6 +5901,8 @@
       "stSignal": "AL",
       "rsi": 50.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Bin Ulasim Teknolojileri",
       "bist": null,
       "kind": "stock"
@@ -5556,6 +5932,8 @@
       "stSignal": "AL",
       "rsi": 49.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Eczacibasi Yatirim",
       "bist": null,
       "kind": "stock"
@@ -5585,6 +5963,8 @@
       "stSignal": "AL",
       "rsi": 58.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Hurriyet Gzt",
       "bist": null,
       "kind": "stock"
@@ -5614,6 +5994,8 @@
       "stSignal": "AL",
       "rsi": 55.6,
       "macdBull": true,
+      "rsiReversal": true,
+      "macdCross": true,
       "name": "Isbir Holding",
       "bist": null,
       "kind": "stock"
@@ -5643,6 +6025,8 @@
       "stSignal": "SAT",
       "rsi": 58.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Koroplast Temizlik Ambalaj",
       "bist": null,
       "kind": "stock"
@@ -5672,6 +6056,8 @@
       "stSignal": "AL",
       "rsi": 45.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Sdt Uzay Ve Savunma",
       "bist": null,
       "kind": "stock"
@@ -5701,6 +6087,8 @@
       "stSignal": "AL",
       "rsi": 54.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ziraat GMYO",
       "bist": null,
       "kind": "stock"
@@ -5730,6 +6118,8 @@
       "stSignal": "AL",
       "rsi": 41.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Fenerbahçe Futbol",
       "sector": "Spor",
       "bist": 100,
@@ -5760,6 +6150,8 @@
       "stSignal": "AL",
       "rsi": 52.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "E Data Teknoloji",
       "bist": null,
       "kind": "stock"
@@ -5789,6 +6181,8 @@
       "stSignal": "SAT",
       "rsi": 45.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Lydia Holding",
       "bist": null,
       "kind": "stock"
@@ -5818,6 +6212,8 @@
       "stSignal": "AL",
       "rsi": 51.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Sanifoam Endustri",
       "bist": null,
       "kind": "stock"
@@ -5847,6 +6243,8 @@
       "stSignal": "SAT",
       "rsi": 53.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Cem Zeytin",
       "bist": null,
       "kind": "stock"
@@ -5876,6 +6274,8 @@
       "stSignal": "SAT",
       "rsi": 43.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Intema",
       "bist": null,
       "kind": "stock"
@@ -5905,6 +6305,8 @@
       "stSignal": "AL",
       "rsi": 61.3,
       "macdBull": true,
+      "rsiReversal": true,
+      "macdCross": true,
       "name": "Mega Metal",
       "bist": null,
       "kind": "stock"
@@ -5934,6 +6336,8 @@
       "stSignal": "SAT",
       "rsi": 46.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ozderici GMYO",
       "bist": null,
       "kind": "stock"
@@ -5963,6 +6367,8 @@
       "stSignal": "AL",
       "rsi": 45.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Rainbow Polikarbonat",
       "bist": null,
       "kind": "stock"
@@ -5992,6 +6398,8 @@
       "stSignal": "AL",
       "rsi": 47,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "1000 Yatirimlar Hol",
       "bist": null,
       "kind": "stock"
@@ -6021,6 +6429,8 @@
       "stSignal": "SAT",
       "rsi": 42.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ege Endustri",
       "bist": null,
       "kind": "stock"
@@ -6050,6 +6460,8 @@
       "stSignal": "AL",
       "rsi": 100,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Is Bankasi A",
       "bist": null,
       "kind": "stock"
@@ -6079,6 +6491,8 @@
       "stSignal": "SAT",
       "rsi": 42.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Lydia Yesil Enerji",
       "bist": null,
       "kind": "stock"
@@ -6108,6 +6522,8 @@
       "stSignal": "AL",
       "rsi": 100,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Umpas Holding",
       "bist": null,
       "kind": "stock"
@@ -6137,6 +6553,8 @@
       "stSignal": "SAT",
       "rsi": 55.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "İzdemir Enerji",
       "sector": "Enerji",
       "bist": 100,
@@ -6167,6 +6585,8 @@
       "stSignal": "SAT",
       "rsi": 52.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Odaş Elektrik",
       "sector": "Enerji",
       "bist": 100,
@@ -6197,6 +6617,8 @@
       "stSignal": "AL",
       "rsi": 47.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Reeder Teknoloji",
       "sector": "Teknoloji",
       "bist": 100,
@@ -6227,6 +6649,8 @@
       "stSignal": "SAT",
       "rsi": 48.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Akdeniz Yatirim Holding",
       "bist": null,
       "kind": "stock"
@@ -6256,6 +6680,8 @@
       "stSignal": "AL",
       "rsi": 45.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Bogazici Beton Sanayi",
       "bist": null,
       "kind": "stock"
@@ -6285,6 +6711,8 @@
       "stSignal": "SAT",
       "rsi": 48.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Nasmed Egepol",
       "bist": null,
       "kind": "stock"
@@ -6314,6 +6742,8 @@
       "stSignal": "SAT",
       "rsi": 40.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Karel Elektronik",
       "bist": null,
       "kind": "stock"
@@ -6343,6 +6773,8 @@
       "stSignal": "SAT",
       "rsi": 45.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Rodrigo Tekstil",
       "bist": null,
       "kind": "stock"
@@ -6372,6 +6804,8 @@
       "stSignal": "AL",
       "rsi": 52.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Tat Gida",
       "bist": null,
       "kind": "stock"
@@ -6401,6 +6835,8 @@
       "stSignal": "SAT",
       "rsi": 47.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Akfen GMYO",
       "bist": null,
       "kind": "stock"
@@ -6430,6 +6866,8 @@
       "stSignal": "SAT",
       "rsi": 45,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Aksigorta",
       "bist": null,
       "kind": "stock"
@@ -6459,6 +6897,8 @@
       "stSignal": "AL",
       "rsi": 51,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Avrasya GMYO",
       "bist": null,
       "kind": "stock"
@@ -6488,6 +6928,8 @@
       "stSignal": "SAT",
       "rsi": 43.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "F M Izmit Piston",
       "bist": null,
       "kind": "stock"
@@ -6517,6 +6959,8 @@
       "stSignal": "AL",
       "rsi": 52.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Metro Holding",
       "bist": null,
       "kind": "stock"
@@ -6546,6 +6990,8 @@
       "stSignal": "SAT",
       "rsi": 43.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Nuh Cimento",
       "bist": null,
       "kind": "stock"
@@ -6575,6 +7021,8 @@
       "stSignal": "SAT",
       "rsi": 54.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Tarkim Bitki Koruma",
       "bist": null,
       "kind": "stock"
@@ -6604,6 +7052,8 @@
       "stSignal": "SAT",
       "rsi": 44.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Yukselen Celik",
       "bist": null,
       "kind": "stock"
@@ -6633,6 +7083,8 @@
       "stSignal": "SAT",
       "rsi": 41.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Enka İnşaat",
       "sector": "İnşaat",
       "bist": 30,
@@ -6663,6 +7115,8 @@
       "stSignal": "SAT",
       "rsi": 53,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Borusan Boru",
       "sector": "Metal/Sanayi",
       "bist": 50,
@@ -6693,6 +7147,8 @@
       "stSignal": "SAT",
       "rsi": 42.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Artemis Hali",
       "bist": null,
       "kind": "stock"
@@ -6722,6 +7178,8 @@
       "stSignal": "AL",
       "rsi": 43.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Aydem Enerji",
       "bist": null,
       "kind": "stock"
@@ -6751,6 +7209,8 @@
       "stSignal": "SAT",
       "rsi": 45.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Eksun Gida",
       "bist": null,
       "kind": "stock"
@@ -6780,6 +7240,8 @@
       "stSignal": "AL",
       "rsi": 53.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Euro Trend Yat Ort",
       "bist": null,
       "kind": "stock"
@@ -6809,6 +7271,8 @@
       "stSignal": "SAT",
       "rsi": 53.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Izmir Firca",
       "bist": null,
       "kind": "stock"
@@ -6838,6 +7302,8 @@
       "stSignal": "SAT",
       "rsi": 47.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Kalyon Gunes Teknolojileri",
       "bist": null,
       "kind": "stock"
@@ -6867,6 +7333,8 @@
       "stSignal": "AL",
       "rsi": 44.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Oncosem Onkolojik Sistemler",
       "bist": null,
       "kind": "stock"
@@ -6896,6 +7364,8 @@
       "stSignal": "SAT",
       "rsi": 42.8,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Orcay Ortakoy Cay Sanayi",
       "bist": null,
       "kind": "stock"
@@ -6925,6 +7395,8 @@
       "stSignal": "SAT",
       "rsi": 49.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Pc Iletisim Medya",
       "bist": null,
       "kind": "stock"
@@ -6954,6 +7426,8 @@
       "stSignal": "AL",
       "rsi": 52.8,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ufuk Yatirim",
       "bist": null,
       "kind": "stock"
@@ -6983,6 +7457,8 @@
       "stSignal": "SAT",
       "rsi": 53.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Aselsan",
       "sector": "Savunma",
       "bist": 30,
@@ -7013,6 +7489,8 @@
       "stSignal": "SAT",
       "rsi": 49.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Kuyaş Yatırım",
       "sector": "Holding",
       "bist": 50,
@@ -7043,6 +7521,8 @@
       "stSignal": "AL",
       "rsi": 54,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Grainturk Holding",
       "sector": "Holding",
       "bist": 100,
@@ -7073,6 +7553,8 @@
       "stSignal": "SAT",
       "rsi": 56.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Datagate Bilgisayar",
       "bist": null,
       "kind": "stock"
@@ -7102,6 +7584,8 @@
       "stSignal": "SAT",
       "rsi": 52.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Indeks Bilgisayar",
       "bist": null,
       "kind": "stock"
@@ -7131,6 +7615,8 @@
       "stSignal": "SAT",
       "rsi": 43.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Marmara Holding",
       "bist": null,
       "kind": "stock"
@@ -7160,6 +7646,8 @@
       "stSignal": "SAT",
       "rsi": 43.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Platform Turizm",
       "bist": null,
       "kind": "stock"
@@ -7189,6 +7677,8 @@
       "stSignal": "SAT",
       "rsi": 53.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Selva Gida",
       "bist": null,
       "kind": "stock"
@@ -7218,6 +7708,8 @@
       "stSignal": "AL",
       "rsi": 49.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Suwen Tekstil",
       "bist": null,
       "kind": "stock"
@@ -7247,6 +7739,8 @@
       "stSignal": "SAT",
       "rsi": 45.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Tab Gida",
       "bist": null,
       "kind": "stock"
@@ -7276,6 +7770,8 @@
       "stSignal": "AL",
       "rsi": 42.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Torunlar GMYO",
       "bist": null,
       "kind": "stock"
@@ -7305,6 +7801,8 @@
       "stSignal": "SAT",
       "rsi": 43.8,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Vestel Beyaz Esya",
       "bist": null,
       "kind": "stock"
@@ -7334,6 +7832,8 @@
       "stSignal": "AL",
       "rsi": 56.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Kardemir (D)",
       "sector": "Metal",
       "bist": 30,
@@ -7364,6 +7864,8 @@
       "stSignal": "SAT",
       "rsi": 45.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Galatasaray Sportif",
       "sector": "Spor",
       "bist": 100,
@@ -7394,6 +7896,8 @@
       "stSignal": "SAT",
       "rsi": 43.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ayes Celik Hasir Ve Cit",
       "bist": null,
       "kind": "stock"
@@ -7423,6 +7927,8 @@
       "stSignal": "AL",
       "rsi": 51.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Bien Yapi Urunleri",
       "bist": null,
       "kind": "stock"
@@ -7452,6 +7958,8 @@
       "stSignal": "AL",
       "rsi": 41.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Global Men Deg",
       "bist": null,
       "kind": "stock"
@@ -7481,6 +7989,8 @@
       "stSignal": "AL",
       "rsi": 61,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Kocaer Celik",
       "bist": null,
       "kind": "stock"
@@ -7510,6 +8020,8 @@
       "stSignal": "SAT",
       "rsi": 36.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Oylum Sinai Yatirimlar",
       "bist": null,
       "kind": "stock"
@@ -7539,6 +8051,8 @@
       "stSignal": "SAT",
       "rsi": 46.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Plastikkart",
       "bist": null,
       "kind": "stock"
@@ -7568,6 +8082,8 @@
       "stSignal": "SAT",
       "rsi": 55.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Smart Gunes Enerjisi Tek",
       "bist": null,
       "kind": "stock"
@@ -7597,6 +8113,8 @@
       "stSignal": "SAT",
       "rsi": 47.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Ttuborg",
       "bist": null,
       "kind": "stock"
@@ -7626,6 +8144,8 @@
       "stSignal": "AL",
       "rsi": 44.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Yesil Yapi",
       "bist": null,
       "kind": "stock"
@@ -7655,6 +8175,8 @@
       "stSignal": "SAT",
       "rsi": 50.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Enerya Enerji",
       "sector": "Enerji",
       "bist": 100,
@@ -7685,6 +8207,8 @@
       "stSignal": "AL",
       "rsi": 44.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Akmerkez GMYO",
       "bist": null,
       "kind": "stock"
@@ -7714,6 +8238,8 @@
       "stSignal": "SAT",
       "rsi": 44.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Berkosan Yalitim",
       "bist": null,
       "kind": "stock"
@@ -7743,6 +8269,8 @@
       "stSignal": "SAT",
       "rsi": 43.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Burcelik",
       "bist": null,
       "kind": "stock"
@@ -7772,6 +8300,8 @@
       "stSignal": "SAT",
       "rsi": 44.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Sonmez Filament",
       "bist": null,
       "kind": "stock"
@@ -7801,6 +8331,8 @@
       "stSignal": "SAT",
       "rsi": 42.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Vakif GMYO",
       "bist": null,
       "kind": "stock"
@@ -7830,6 +8362,8 @@
       "stSignal": "AL",
       "rsi": 58.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ereğli Demir Çelik",
       "sector": "Metal",
       "bist": 30,
@@ -7860,6 +8394,8 @@
       "stSignal": "SAT",
       "rsi": 44,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ege Gubre",
       "bist": null,
       "kind": "stock"
@@ -7889,6 +8425,8 @@
       "stSignal": "SAT",
       "rsi": 48.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Fade Gida",
       "bist": null,
       "kind": "stock"
@@ -7918,6 +8456,8 @@
       "stSignal": "SAT",
       "rsi": 53.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Fonet Bilgi Teknolojileri",
       "bist": null,
       "kind": "stock"
@@ -7947,6 +8487,8 @@
       "stSignal": "AL",
       "rsi": 51,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ulusoy Un Sanayi",
       "bist": null,
       "kind": "stock"
@@ -7976,6 +8518,8 @@
       "stSignal": "SAT",
       "rsi": 41.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "CW Enerji",
       "sector": "Enerji",
       "bist": 100,
@@ -8006,6 +8550,8 @@
       "stSignal": "SAT",
       "rsi": 43.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Afyon Cimento",
       "bist": null,
       "kind": "stock"
@@ -8035,6 +8581,8 @@
       "stSignal": "AL",
       "rsi": 44.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Duran Dogan Basim",
       "bist": null,
       "kind": "stock"
@@ -8064,6 +8612,8 @@
       "stSignal": "AL",
       "rsi": 58.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Erciyas Celik Boru",
       "bist": null,
       "kind": "stock"
@@ -8093,6 +8643,8 @@
       "stSignal": "SAT",
       "rsi": 51.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Info Yatirim",
       "bist": null,
       "kind": "stock"
@@ -8122,6 +8674,8 @@
       "stSignal": "SAT",
       "rsi": 39,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Is Yat Ort",
       "bist": null,
       "kind": "stock"
@@ -8151,6 +8705,8 @@
       "stSignal": "SAT",
       "rsi": 59.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Kervansaray Yat Holding",
       "bist": null,
       "kind": "stock"
@@ -8180,6 +8736,8 @@
       "stSignal": "SAT",
       "rsi": 40.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Lokman Hekim Saglik",
       "bist": null,
       "kind": "stock"
@@ -8209,6 +8767,8 @@
       "stSignal": "SAT",
       "rsi": 38.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Logo Yazilim",
       "bist": null,
       "kind": "stock"
@@ -8238,6 +8798,8 @@
       "stSignal": "SAT",
       "rsi": 49.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Mhr GMYO",
       "bist": null,
       "kind": "stock"
@@ -8267,6 +8829,8 @@
       "stSignal": "SAT",
       "rsi": 50.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Netas Telekom",
       "bist": null,
       "kind": "stock"
@@ -8296,6 +8860,8 @@
       "stSignal": "AL",
       "rsi": 48.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Pinar Su",
       "bist": null,
       "kind": "stock"
@@ -8325,6 +8891,8 @@
       "stSignal": "AL",
       "rsi": 37,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Politeknik Metal",
       "bist": null,
       "kind": "stock"
@@ -8354,6 +8922,8 @@
       "stSignal": "SAT",
       "rsi": 45.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Sur Tatil Evleri GMYO",
       "bist": null,
       "kind": "stock"
@@ -8383,6 +8953,8 @@
       "stSignal": "AL",
       "rsi": 50.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Vanet Gida",
       "bist": null,
       "kind": "stock"
@@ -8412,6 +8984,8 @@
       "stSignal": "AL",
       "rsi": 44.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Viking Kagit",
       "bist": null,
       "kind": "stock"
@@ -8441,6 +9015,8 @@
       "stSignal": "SAT",
       "rsi": 55.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Buyuk Sefler Bigchefs",
       "bist": null,
       "kind": "stock"
@@ -8470,6 +9046,8 @@
       "stSignal": "SAT",
       "rsi": 45.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Escar Filo",
       "bist": null,
       "kind": "stock"
@@ -8499,6 +9077,8 @@
       "stSignal": "SAT",
       "rsi": 48,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Goknur Gida",
       "bist": null,
       "kind": "stock"
@@ -8528,6 +9108,8 @@
       "stSignal": "SAT",
       "rsi": 50.8,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Gozde Girisim",
       "bist": null,
       "kind": "stock"
@@ -8557,6 +9139,8 @@
       "stSignal": "SAT",
       "rsi": 41.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Is Finkir",
       "bist": null,
       "kind": "stock"
@@ -8586,6 +9170,8 @@
       "stSignal": "AL",
       "rsi": 43.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Koleksiyon Mobilya",
       "bist": null,
       "kind": "stock"
@@ -8615,6 +9201,8 @@
       "stSignal": "AL",
       "rsi": 40.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Kordsa Teknik Tekstil",
       "bist": null,
       "kind": "stock"
@@ -8644,6 +9232,8 @@
       "stSignal": "AL",
       "rsi": 46.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Kutahya Seker Fabrikasi",
       "bist": null,
       "kind": "stock"
@@ -8673,6 +9263,8 @@
       "stSignal": "SAT",
       "rsi": 48.7,
       "macdBull": true,
+      "rsiReversal": true,
+      "macdCross": false,
       "name": "Meysu Gida",
       "bist": null,
       "kind": "stock"
@@ -8702,6 +9294,8 @@
       "stSignal": "SAT",
       "rsi": 39.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Nigbas Nigde Beton",
       "bist": null,
       "kind": "stock"
@@ -8731,6 +9325,8 @@
       "stSignal": "SAT",
       "rsi": 45.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Penta Teknoloji Urunleri Dagitim",
       "bist": null,
       "kind": "stock"
@@ -8760,6 +9356,8 @@
       "stSignal": "AL",
       "rsi": 52.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Kirac Galvaniz",
       "bist": null,
       "kind": "stock"
@@ -8789,6 +9387,8 @@
       "stSignal": "SAT",
       "rsi": 42.8,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Batısöke Çimento",
       "sector": "Çimento",
       "bist": 100,
@@ -8819,6 +9419,8 @@
       "stSignal": "AL",
       "rsi": 44.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Atakule GMYO",
       "bist": null,
       "kind": "stock"
@@ -8848,6 +9450,8 @@
       "stSignal": "AL",
       "rsi": 43.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Akis GMYO",
       "bist": null,
       "kind": "stock"
@@ -8877,6 +9481,8 @@
       "stSignal": "SAT",
       "rsi": 44.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Avrupa Yatirim Holding",
       "bist": null,
       "kind": "stock"
@@ -8906,6 +9512,8 @@
       "stSignal": "SAT",
       "rsi": 42.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Bulbuloglu Vinc",
       "bist": null,
       "kind": "stock"
@@ -8935,6 +9543,8 @@
       "stSignal": "AL",
       "rsi": 40.8,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Cagdas Cam",
       "bist": null,
       "kind": "stock"
@@ -8964,6 +9574,8 @@
       "stSignal": "SAT",
       "rsi": 51.6,
       "macdBull": true,
+      "rsiReversal": true,
+      "macdCross": false,
       "name": "Consus Enerji",
       "bist": null,
       "kind": "stock"
@@ -8993,6 +9605,8 @@
       "stSignal": "SAT",
       "rsi": 44.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Egeplast",
       "bist": null,
       "kind": "stock"
@@ -9022,6 +9636,8 @@
       "stSignal": "SAT",
       "rsi": 48.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Ersu Gida",
       "bist": null,
       "kind": "stock"
@@ -9051,6 +9667,8 @@
       "stSignal": "SAT",
       "rsi": 36.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Goltas Cimento",
       "bist": null,
       "kind": "stock"
@@ -9080,6 +9698,8 @@
       "stSignal": "SAT",
       "rsi": 43.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Hatay Tekstil",
       "bist": null,
       "kind": "stock"
@@ -9109,6 +9729,8 @@
       "stSignal": "AL",
       "rsi": 48.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Hun Yenilenebilir Enerji",
       "bist": null,
       "kind": "stock"
@@ -9138,6 +9760,8 @@
       "stSignal": "SAT",
       "rsi": 46.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Kristal Kola",
       "bist": null,
       "kind": "stock"
@@ -9167,6 +9791,8 @@
       "stSignal": "SAT",
       "rsi": 40.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Mopas Marketcilik",
       "bist": null,
       "kind": "stock"
@@ -9196,6 +9822,8 @@
       "stSignal": "SAT",
       "rsi": 40.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Netcad Yazilim",
       "bist": null,
       "kind": "stock"
@@ -9225,6 +9853,8 @@
       "stSignal": "SAT",
       "rsi": 53.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Nurol GMYO",
       "bist": null,
       "kind": "stock"
@@ -9254,6 +9884,8 @@
       "stSignal": "SAT",
       "rsi": 41.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Park Elekmadencilik",
       "bist": null,
       "kind": "stock"
@@ -9283,6 +9915,8 @@
       "stSignal": "SAT",
       "rsi": 39.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Qnb Bank",
       "bist": null,
       "kind": "stock"
@@ -9312,6 +9946,8 @@
       "stSignal": "AL",
       "rsi": 39.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Sodas Sodyum Sanayii",
       "bist": null,
       "kind": "stock"
@@ -9341,6 +9977,8 @@
       "stSignal": "SAT",
       "rsi": 41.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Vakif Faktoring",
       "bist": null,
       "kind": "stock"
@@ -9370,6 +10008,8 @@
       "stSignal": "SAT",
       "rsi": 31.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Yibitas Insaat Malzeme",
       "bist": null,
       "kind": "stock"
@@ -9399,6 +10039,8 @@
       "stSignal": "SAT",
       "rsi": 25.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Halkbank",
       "sector": "Bankacılık",
       "bist": 50,
@@ -9429,6 +10071,8 @@
       "stSignal": "SAT",
       "rsi": 41,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Borusan Yat. Pazarlama",
       "sector": "Holding",
       "bist": 100,
@@ -9459,6 +10103,8 @@
       "stSignal": "SAT",
       "rsi": 45,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "CVK Maden İşletmeleri",
       "sector": "Madencilik",
       "bist": 100,
@@ -9489,6 +10135,8 @@
       "stSignal": "AL",
       "rsi": 52.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Gen İlaç",
       "sector": "Sağlık",
       "bist": 100,
@@ -9519,6 +10167,8 @@
       "stSignal": "SAT",
       "rsi": 46.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Agesa Hayat Emeklilik",
       "bist": null,
       "kind": "stock"
@@ -9548,6 +10198,8 @@
       "stSignal": "SAT",
       "rsi": 49.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ahlatci Dogalgaz",
       "bist": null,
       "kind": "stock"
@@ -9577,6 +10229,8 @@
       "stSignal": "SAT",
       "rsi": 43.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Alkim Kagit",
       "bist": null,
       "kind": "stock"
@@ -9606,6 +10260,8 @@
       "stSignal": "SAT",
       "rsi": 47.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Ayen Enerji",
       "bist": null,
       "kind": "stock"
@@ -9635,6 +10291,8 @@
       "stSignal": "AL",
       "rsi": 44,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Eyg GMYO",
       "bist": null,
       "kind": "stock"
@@ -9664,6 +10322,8 @@
       "stSignal": "SAT",
       "rsi": 50.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Gimat Magazacilik",
       "bist": null,
       "kind": "stock"
@@ -9693,6 +10353,8 @@
       "stSignal": "AL",
       "rsi": 50.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Galata Wind Enerji",
       "bist": null,
       "kind": "stock"
@@ -9722,6 +10384,8 @@
       "stSignal": "SAT",
       "rsi": 41,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Menderes Tekstil",
       "bist": null,
       "kind": "stock"
@@ -9751,6 +10415,8 @@
       "stSignal": "SAT",
       "rsi": 45.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Otto Holding",
       "bist": null,
       "kind": "stock"
@@ -9780,6 +10446,8 @@
       "stSignal": "AL",
       "rsi": 41.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Pinar Sut",
       "bist": null,
       "kind": "stock"
@@ -9809,6 +10477,8 @@
       "stSignal": "SAT",
       "rsi": 40.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Pergamon Dis Ticaret",
       "bist": null,
       "kind": "stock"
@@ -9838,6 +10508,8 @@
       "stSignal": "SAT",
       "rsi": 42.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Vakif Yat Ort",
       "bist": null,
       "kind": "stock"
@@ -9867,6 +10539,8 @@
       "stSignal": "AL",
       "rsi": 45.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Atlas Yat Ort",
       "bist": null,
       "kind": "stock"
@@ -9896,6 +10570,8 @@
       "stSignal": "SAT",
       "rsi": 39.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ceo Event Medya",
       "bist": null,
       "kind": "stock"
@@ -9925,6 +10601,8 @@
       "stSignal": "AL",
       "rsi": 41.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ihlas Haber Ajansi",
       "bist": null,
       "kind": "stock"
@@ -9954,6 +10632,8 @@
       "stSignal": "AL",
       "rsi": 41.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Jantsa Jant Sanayi",
       "bist": null,
       "kind": "stock"
@@ -9983,6 +10663,8 @@
       "stSignal": "SAT",
       "rsi": 36.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Kustur Kusadasi Turizm",
       "bist": null,
       "kind": "stock"
@@ -10012,6 +10694,8 @@
       "stSignal": "AL",
       "rsi": 51.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Marti Otel",
       "bist": null,
       "kind": "stock"
@@ -10041,6 +10725,8 @@
       "stSignal": "SAT",
       "rsi": 46.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Say Yenilenebilir Enerji",
       "bist": null,
       "kind": "stock"
@@ -10070,6 +10756,8 @@
       "stSignal": "AL",
       "rsi": 59.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Petkim",
       "sector": "Kimya",
       "bist": 30,
@@ -10100,6 +10788,8 @@
       "stSignal": "SAT",
       "rsi": 45.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "DAP Gayrimenkul",
       "sector": "GYO",
       "bist": 100,
@@ -10130,6 +10820,8 @@
       "stSignal": "SAT",
       "rsi": 37.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Pasifik Holding",
       "sector": "Holding",
       "bist": 100,
@@ -10160,6 +10852,8 @@
       "stSignal": "SAT",
       "rsi": 46.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Albaraka Turk",
       "bist": null,
       "kind": "stock"
@@ -10189,6 +10883,8 @@
       "stSignal": "SAT",
       "rsi": 41,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Bizim Magazalari",
       "bist": null,
       "kind": "stock"
@@ -10218,6 +10914,8 @@
       "stSignal": "AL",
       "rsi": 42.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Edip Gayrimenkul",
       "bist": null,
       "kind": "stock"
@@ -10247,6 +10945,8 @@
       "stSignal": "SAT",
       "rsi": 40.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ihlas Ev Aletleri",
       "bist": null,
       "kind": "stock"
@@ -10276,6 +10976,8 @@
       "stSignal": "SAT",
       "rsi": 43,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Kutahya Porselen",
       "bist": null,
       "kind": "stock"
@@ -10305,6 +11007,8 @@
       "stSignal": "SAT",
       "rsi": 39,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Kuzugrup GMYO",
       "bist": null,
       "kind": "stock"
@@ -10334,6 +11038,8 @@
       "stSignal": "SAT",
       "rsi": 44.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Naturel Enerji",
       "bist": null,
       "kind": "stock"
@@ -10363,6 +11069,8 @@
       "stSignal": "AL",
       "rsi": 43.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Net Holding",
       "bist": null,
       "kind": "stock"
@@ -10392,6 +11100,8 @@
       "stSignal": "SAT",
       "rsi": 38.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Onur Teknoloji",
       "bist": null,
       "kind": "stock"
@@ -10421,6 +11131,8 @@
       "stSignal": "AL",
       "rsi": 42.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Turker Proje Gayrimenkul",
       "bist": null,
       "kind": "stock"
@@ -10450,6 +11162,8 @@
       "stSignal": "SAT",
       "rsi": 41.6,
       "macdBull": true,
+      "rsiReversal": true,
+      "macdCross": true,
       "name": "Yesil Yatirim Holding",
       "bist": null,
       "kind": "stock"
@@ -10479,6 +11193,8 @@
       "stSignal": "SAT",
       "rsi": 49.8,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Z GMYO",
       "bist": null,
       "kind": "stock"
@@ -10508,6 +11224,8 @@
       "stSignal": "SAT",
       "rsi": 43,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "A1 Yenilenebilir Enerji",
       "bist": null,
       "kind": "stock"
@@ -10537,6 +11255,8 @@
       "stSignal": "SAT",
       "rsi": 38.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Adel Kalemcilik",
       "bist": null,
       "kind": "stock"
@@ -10566,6 +11286,8 @@
       "stSignal": "SAT",
       "rsi": 34.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Avod Gida Ve Tarim",
       "bist": null,
       "kind": "stock"
@@ -10595,6 +11317,8 @@
       "stSignal": "AL",
       "rsi": 33.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Banvit",
       "bist": null,
       "kind": "stock"
@@ -10624,6 +11348,8 @@
       "stSignal": "SAT",
       "rsi": 32.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Bastas Baskent Cimento",
       "bist": null,
       "kind": "stock"
@@ -10653,6 +11379,8 @@
       "stSignal": "SAT",
       "rsi": 41.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Biotrend Cevre Ve Enerji",
       "bist": null,
       "kind": "stock"
@@ -10682,6 +11410,8 @@
       "stSignal": "SAT",
       "rsi": 37.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Dct Trading Dis Ticaret",
       "bist": null,
       "kind": "stock"
@@ -10711,6 +11441,8 @@
       "stSignal": "AL",
       "rsi": 55.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Diriteks Dirilis Tekstil",
       "bist": null,
       "kind": "stock"
@@ -10740,6 +11472,8 @@
       "stSignal": "SAT",
       "rsi": 42.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Gsd Holding",
       "bist": null,
       "kind": "stock"
@@ -10769,6 +11503,8 @@
       "stSignal": "SAT",
       "rsi": 53,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Investco Holding",
       "bist": null,
       "kind": "stock"
@@ -10798,6 +11534,8 @@
       "stSignal": "SAT",
       "rsi": 40.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Koton Magazacilik",
       "bist": null,
       "kind": "stock"
@@ -10827,6 +11565,8 @@
       "stSignal": "SAT",
       "rsi": 39.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Tureks Turunc Madencilik",
       "bist": null,
       "kind": "stock"
@@ -10856,6 +11596,8 @@
       "stSignal": "AL",
       "rsi": 44.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Mercan Kimya",
       "bist": null,
       "kind": "stock"
@@ -10885,6 +11627,8 @@
       "stSignal": "SAT",
       "rsi": 41.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Pinar Et Ve Un",
       "bist": null,
       "kind": "stock"
@@ -10914,6 +11658,8 @@
       "stSignal": "AL",
       "rsi": 43.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ruzy Madencilik Ve Enerji",
       "bist": null,
       "kind": "stock"
@@ -10943,6 +11689,8 @@
       "stSignal": "SAT",
       "rsi": 32.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Turk Traktor",
       "bist": null,
       "kind": "stock"
@@ -10972,6 +11720,8 @@
       "stSignal": "SAT",
       "rsi": 35.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Tugcelik",
       "bist": null,
       "kind": "stock"
@@ -11001,6 +11751,8 @@
       "stSignal": "SAT",
       "rsi": 38.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Vakif Fin Kir",
       "bist": null,
       "kind": "stock"
@@ -11030,6 +11782,8 @@
       "stSignal": "AL",
       "rsi": 42.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Yayla En Ur Tur Ve Ins",
       "bist": null,
       "kind": "stock"
@@ -11059,6 +11813,8 @@
       "stSignal": "SAT",
       "rsi": 41.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Esenboğa Elektrik",
       "sector": "Enerji",
       "bist": 100,
@@ -11089,6 +11845,8 @@
       "stSignal": "SAT",
       "rsi": 49.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Adra GMYO",
       "bist": null,
       "kind": "stock"
@@ -11118,6 +11876,8 @@
       "stSignal": "AL",
       "rsi": 47.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Akin Tekstil",
       "bist": null,
       "kind": "stock"
@@ -11147,6 +11907,8 @@
       "stSignal": "SAT",
       "rsi": 45.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Bulls Gsyo",
       "bist": null,
       "kind": "stock"
@@ -11176,6 +11938,8 @@
       "stSignal": "SAT",
       "rsi": 44.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Enda Enerji Holding",
       "bist": null,
       "kind": "stock"
@@ -11205,6 +11969,8 @@
       "stSignal": "SAT",
       "rsi": 49.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Idealist GMYO",
       "bist": null,
       "kind": "stock"
@@ -11234,6 +12000,8 @@
       "stSignal": "SAT",
       "rsi": 37.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ihlas Gazetecilik",
       "bist": null,
       "kind": "stock"
@@ -11263,6 +12031,8 @@
       "stSignal": "SAT",
       "rsi": 40.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Korfez GMYO",
       "bist": null,
       "kind": "stock"
@@ -11292,6 +12062,8 @@
       "stSignal": "SAT",
       "rsi": 52,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Lider Faktoring",
       "bist": null,
       "kind": "stock"
@@ -11321,6 +12093,8 @@
       "stSignal": "AL",
       "rsi": 52.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Matriks Finansal Teknolojiler",
       "bist": null,
       "kind": "stock"
@@ -11350,6 +12124,8 @@
       "stSignal": "SAT",
       "rsi": 33.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Mazhar Zorlu Holding",
       "bist": null,
       "kind": "stock"
@@ -11379,6 +12155,8 @@
       "stSignal": "SAT",
       "rsi": 40.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Oyak Yat Ort",
       "bist": null,
       "kind": "stock"
@@ -11408,6 +12186,8 @@
       "stSignal": "SAT",
       "rsi": 44.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Turk Prysmian Kablo",
       "bist": null,
       "kind": "stock"
@@ -11437,6 +12217,8 @@
       "stSignal": "SAT",
       "rsi": 40.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Dardanel",
       "bist": null,
       "kind": "stock"
@@ -11466,6 +12248,8 @@
       "stSignal": "SAT",
       "rsi": 37.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Derimod",
       "bist": null,
       "kind": "stock"
@@ -11495,6 +12279,8 @@
       "stSignal": "AL",
       "rsi": 40.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Erbosan",
       "bist": null,
       "kind": "stock"
@@ -11524,6 +12310,8 @@
       "stSignal": "AL",
       "rsi": 44.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Global Yat Holding",
       "bist": null,
       "kind": "stock"
@@ -11553,6 +12341,8 @@
       "stSignal": "SAT",
       "rsi": 40.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Kaleseramik",
       "bist": null,
       "kind": "stock"
@@ -11582,6 +12372,8 @@
       "stSignal": "SAT",
       "rsi": 46.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Sumas Suni Tahta",
       "bist": null,
       "kind": "stock"
@@ -11611,6 +12403,8 @@
       "stSignal": "SAT",
       "rsi": 54.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Tapdi Tinaztepe",
       "bist": null,
       "kind": "stock"
@@ -11640,6 +12434,8 @@
       "stSignal": "SAT",
       "rsi": 38.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Yayla Gida",
       "bist": null,
       "kind": "stock"
@@ -11669,6 +12465,8 @@
       "stSignal": "SAT",
       "rsi": 30.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Bosch Fren Sistemleri",
       "bist": null,
       "kind": "stock"
@@ -11698,6 +12496,8 @@
       "stSignal": "SAT",
       "rsi": 34.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Celebi",
       "bist": null,
       "kind": "stock"
@@ -11727,6 +12527,8 @@
       "stSignal": "AL",
       "rsi": 45.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Do Co",
       "bist": null,
       "kind": "stock"
@@ -11756,6 +12558,8 @@
       "stSignal": "SAT",
       "rsi": 32,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Kayseri Seker Fabrikasi",
       "bist": null,
       "kind": "stock"
@@ -11785,6 +12589,8 @@
       "stSignal": "SAT",
       "rsi": 37.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Klimasan Klima",
       "bist": null,
       "kind": "stock"
@@ -11814,6 +12620,8 @@
       "stSignal": "SAT",
       "rsi": 33.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Karsu Tekstil",
       "bist": null,
       "kind": "stock"
@@ -11843,6 +12651,8 @@
       "stSignal": "SAT",
       "rsi": 45.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ata Turizm",
       "bist": null,
       "kind": "stock"
@@ -11872,6 +12682,8 @@
       "stSignal": "SAT",
       "rsi": 38.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Brisa",
       "bist": null,
       "kind": "stock"
@@ -11901,6 +12713,8 @@
       "stSignal": "SAT",
       "rsi": 41.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ekinciler Demir Celik",
       "bist": null,
       "kind": "stock"
@@ -11930,6 +12744,8 @@
       "stSignal": "SAT",
       "rsi": 37.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Gediz Ambalaj",
       "bist": null,
       "kind": "stock"
@@ -11959,6 +12775,8 @@
       "stSignal": "SAT",
       "rsi": 45.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Iskenderun Demir Celik",
       "bist": null,
       "kind": "stock"
@@ -11988,6 +12806,8 @@
       "stSignal": "SAT",
       "rsi": 39.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Konya Kagit",
       "bist": null,
       "kind": "stock"
@@ -12017,6 +12837,8 @@
       "stSignal": "AL",
       "rsi": 42,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Mistral GMYO",
       "bist": null,
       "kind": "stock"
@@ -12046,6 +12868,8 @@
       "stSignal": "SAT",
       "rsi": 43.8,
       "macdBull": true,
+      "rsiReversal": true,
+      "macdCross": false,
       "name": "Rubenis Tekstil",
       "bist": null,
       "kind": "stock"
@@ -12075,6 +12899,8 @@
       "stSignal": "SAT",
       "rsi": 37.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Papilon Savunma",
       "sector": "Savunma",
       "bist": 100,
@@ -12105,6 +12931,8 @@
       "stSignal": "SAT",
       "rsi": 47.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Bms Birlesik Metal",
       "bist": null,
       "kind": "stock"
@@ -12134,6 +12962,8 @@
       "stSignal": "SAT",
       "rsi": 43.5,
       "macdBull": true,
+      "rsiReversal": true,
+      "macdCross": true,
       "name": "Dyo Boya",
       "bist": null,
       "kind": "stock"
@@ -12163,6 +12993,8 @@
       "stSignal": "SAT",
       "rsi": 41.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Ic Enterra Yen Enerji",
       "bist": null,
       "kind": "stock"
@@ -12192,6 +13024,8 @@
       "stSignal": "SAT",
       "rsi": 39.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Euro Yatirim Holding",
       "bist": null,
       "kind": "stock"
@@ -12221,6 +13055,8 @@
       "stSignal": "AL",
       "rsi": 43.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Garanti Faktoring",
       "bist": null,
       "kind": "stock"
@@ -12250,6 +13086,8 @@
       "stSignal": "SAT",
       "rsi": 38.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Isbir Sentetik Dokuma",
       "bist": null,
       "kind": "stock"
@@ -12279,6 +13117,8 @@
       "stSignal": "SAT",
       "rsi": 44.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Segmen Kardesler Gida",
       "bist": null,
       "kind": "stock"
@@ -12308,6 +13148,8 @@
       "stSignal": "SAT",
       "rsi": 38.8,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Sanica Isi Sanayi",
       "bist": null,
       "kind": "stock"
@@ -12337,6 +13179,8 @@
       "stSignal": "AL",
       "rsi": 46.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Temapol Polimer Plastik",
       "bist": null,
       "kind": "stock"
@@ -12366,6 +13210,8 @@
       "stSignal": "SAT",
       "rsi": 51.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Yeo Teknoloji Enerji",
       "bist": null,
       "kind": "stock"
@@ -12395,6 +13241,8 @@
       "stSignal": "SAT",
       "rsi": 39.8,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Alkim Kimya",
       "bist": null,
       "kind": "stock"
@@ -12424,6 +13272,8 @@
       "stSignal": "SAT",
       "rsi": 37.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Baskent Dogalgaz GMYO",
       "bist": null,
       "kind": "stock"
@@ -12453,6 +13303,8 @@
       "stSignal": "SAT",
       "rsi": 39.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Bantas Ambalaj",
       "bist": null,
       "kind": "stock"
@@ -12482,6 +13334,8 @@
       "stSignal": "SAT",
       "rsi": 53.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Demisas Dokum",
       "bist": null,
       "kind": "stock"
@@ -12511,6 +13365,8 @@
       "stSignal": "SAT",
       "rsi": 37.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Dofer Yapi Malzemeleri",
       "bist": null,
       "kind": "stock"
@@ -12540,6 +13396,8 @@
       "stSignal": "SAT",
       "rsi": 41.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Imas Makina",
       "bist": null,
       "kind": "stock"
@@ -12569,6 +13427,8 @@
       "stSignal": "SAT",
       "rsi": 31,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Kiler GMYO",
       "bist": null,
       "kind": "stock"
@@ -12598,6 +13458,8 @@
       "stSignal": "SAT",
       "rsi": 39.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Mondi Turkey",
       "bist": null,
       "kind": "stock"
@@ -12627,6 +13489,8 @@
       "stSignal": "SAT",
       "rsi": 40.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Tumosan Motor Ve Traktor",
       "bist": null,
       "kind": "stock"
@@ -12656,6 +13520,8 @@
       "stSignal": "SAT",
       "rsi": 37.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Çan2 Termik",
       "sector": "Enerji",
       "bist": 50,
@@ -12686,6 +13552,8 @@
       "stSignal": "SAT",
       "rsi": 44.7,
       "macdBull": true,
+      "rsiReversal": true,
+      "macdCross": true,
       "name": "Gülermak Ağır Sanayi",
       "sector": "İnşaat",
       "bist": 50,
@@ -12716,6 +13584,8 @@
       "stSignal": "AL",
       "rsi": 58.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Pasifik Eurasia Lojistik",
       "sector": "Lojistik",
       "bist": 50,
@@ -12746,6 +13616,8 @@
       "stSignal": "SAT",
       "rsi": 34.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Europen Endüstri",
       "sector": "Sanayi",
       "bist": 100,
@@ -12776,6 +13648,8 @@
       "stSignal": "SAT",
       "rsi": 42.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Sarkuysan",
       "sector": "Metal",
       "bist": 100,
@@ -12806,6 +13680,8 @@
       "stSignal": "SAT",
       "rsi": 45.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Best Brands Enerji",
       "bist": null,
       "kind": "stock"
@@ -12835,6 +13711,8 @@
       "stSignal": "SAT",
       "rsi": 40.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Gentas",
       "bist": null,
       "kind": "stock"
@@ -12864,6 +13742,8 @@
       "stSignal": "SAT",
       "rsi": 38.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Guler Yat Holding",
       "bist": null,
       "kind": "stock"
@@ -12893,6 +13773,8 @@
       "stSignal": "SAT",
       "rsi": 38.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Hitit Bilgisayar",
       "bist": null,
       "kind": "stock"
@@ -12922,6 +13804,8 @@
       "stSignal": "SAT",
       "rsi": 30.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Meka Global Makine",
       "bist": null,
       "kind": "stock"
@@ -12951,6 +13835,8 @@
       "stSignal": "SAT",
       "rsi": 38.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Merit Turizm",
       "bist": null,
       "kind": "stock"
@@ -12980,6 +13866,8 @@
       "stSignal": "SAT",
       "rsi": 42.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Soktas",
       "bist": null,
       "kind": "stock"
@@ -13009,6 +13897,8 @@
       "stSignal": null,
       "rsi": null,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Saat Ve Saat Sanayi",
       "bist": null,
       "kind": "stock"
@@ -13038,6 +13928,8 @@
       "stSignal": "SAT",
       "rsi": 39.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Ulaslar Turizm Yat",
       "bist": null,
       "kind": "stock"
@@ -13067,6 +13959,8 @@
       "stSignal": "SAT",
       "rsi": 40.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Vakko Tekstil",
       "bist": null,
       "kind": "stock"
@@ -13096,6 +13990,8 @@
       "stSignal": "SAT",
       "rsi": 38.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Adese Gayrimenkul",
       "bist": null,
       "kind": "stock"
@@ -13125,6 +14021,8 @@
       "stSignal": "SAT",
       "rsi": 30.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ata GMYO",
       "bist": null,
       "kind": "stock"
@@ -13154,6 +14052,8 @@
       "stSignal": "SAT",
       "rsi": 44.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Bayrak Taban Sanayi",
       "bist": null,
       "kind": "stock"
@@ -13183,6 +14083,8 @@
       "stSignal": "SAT",
       "rsi": 47,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Besler Gida",
       "bist": null,
       "kind": "stock"
@@ -13212,6 +14114,8 @@
       "stSignal": "SAT",
       "rsi": 41.1,
       "macdBull": true,
+      "rsiReversal": true,
+      "macdCross": false,
       "name": "Ensari Sinai Yatirimlar",
       "bist": null,
       "kind": "stock"
@@ -13241,6 +14145,8 @@
       "stSignal": "AL",
       "rsi": 44.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Koza Polyester",
       "bist": null,
       "kind": "stock"
@@ -13270,6 +14176,8 @@
       "stSignal": "SAT",
       "rsi": 40.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Marmaris Altinyunus",
       "bist": null,
       "kind": "stock"
@@ -13299,6 +14207,8 @@
       "stSignal": "SAT",
       "rsi": 34,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Mackolik Internet Hizmetleri",
       "bist": null,
       "kind": "stock"
@@ -13328,6 +14238,8 @@
       "stSignal": "SAT",
       "rsi": 33.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ray Sigorta",
       "bist": null,
       "kind": "stock"
@@ -13357,6 +14269,8 @@
       "stSignal": "SAT",
       "rsi": 34.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Vera Konsept GMYO",
       "bist": null,
       "kind": "stock"
@@ -13386,6 +14300,8 @@
       "stSignal": "SAT",
       "rsi": 36.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Avrupakent GMYO",
       "bist": null,
       "kind": "stock"
@@ -13415,6 +14331,8 @@
       "stSignal": "SAT",
       "rsi": 30.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Cemtas",
       "bist": null,
       "kind": "stock"
@@ -13444,6 +14362,8 @@
       "stSignal": "SAT",
       "rsi": 39,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Dof Robotik",
       "bist": null,
       "kind": "stock"
@@ -13473,6 +14393,8 @@
       "stSignal": "SAT",
       "rsi": 31,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Deniz GMYO",
       "bist": null,
       "kind": "stock"
@@ -13502,6 +14424,8 @@
       "stSignal": "SAT",
       "rsi": 39.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ingram Bilisim",
       "bist": null,
       "kind": "stock"
@@ -13531,6 +14455,8 @@
       "stSignal": "SAT",
       "rsi": 31.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Kervan Gida",
       "bist": null,
       "kind": "stock"
@@ -13560,6 +14486,8 @@
       "stSignal": "SAT",
       "rsi": 24.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Makina Takim",
       "bist": null,
       "kind": "stock"
@@ -13589,6 +14517,8 @@
       "stSignal": "SAT",
       "rsi": 34.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Penguen Gida",
       "bist": null,
       "kind": "stock"
@@ -13618,6 +14548,8 @@
       "stSignal": "SAT",
       "rsi": 35.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Petrokent Turizm",
       "bist": null,
       "kind": "stock"
@@ -13647,6 +14579,8 @@
       "stSignal": "SAT",
       "rsi": 45.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ulusoy Elektrik",
       "bist": null,
       "kind": "stock"
@@ -13676,6 +14610,8 @@
       "stSignal": "SAT",
       "rsi": 39.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Gübre Fabrikaları",
       "sector": "Kimya",
       "bist": 30,
@@ -13706,6 +14642,8 @@
       "stSignal": "SAT",
       "rsi": 32.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Tukaş Gıda",
       "sector": "Gıda",
       "bist": 100,
@@ -13736,6 +14674,8 @@
       "stSignal": "SAT",
       "rsi": 42.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Alfa Solar Enerji",
       "bist": null,
       "kind": "stock"
@@ -13765,6 +14705,8 @@
       "stSignal": "SAT",
       "rsi": 34.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Aztek Teknoloji",
       "bist": null,
       "kind": "stock"
@@ -13794,6 +14736,8 @@
       "stSignal": "SAT",
       "rsi": 42.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Ege Seramik",
       "bist": null,
       "kind": "stock"
@@ -13823,6 +14767,8 @@
       "stSignal": "SAT",
       "rsi": 34.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Enpara Bank",
       "bist": null,
       "kind": "stock"
@@ -13852,6 +14798,8 @@
       "stSignal": "AL",
       "rsi": 39.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Iz Yatirim Holding",
       "bist": null,
       "kind": "stock"
@@ -13881,6 +14829,8 @@
       "stSignal": "AL",
       "rsi": 39.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Metro Yat Ort",
       "bist": null,
       "kind": "stock"
@@ -13910,6 +14860,8 @@
       "stSignal": "SAT",
       "rsi": 43.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Rta Laboratuvarlari",
       "bist": null,
       "kind": "stock"
@@ -13939,6 +14891,8 @@
       "stSignal": "SAT",
       "rsi": 36,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Seker GMYO",
       "bist": null,
       "kind": "stock"
@@ -13968,6 +14922,8 @@
       "stSignal": "SAT",
       "rsi": 41.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Sonmez Pamuklu",
       "bist": null,
       "kind": "stock"
@@ -13997,6 +14953,8 @@
       "stSignal": "SAT",
       "rsi": 48.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Tatlipinar Enerji Uretim",
       "bist": null,
       "kind": "stock"
@@ -14026,6 +14984,8 @@
       "stSignal": "SAT",
       "rsi": 40.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Acipayam Seluloz",
       "bist": null,
       "kind": "stock"
@@ -14055,6 +15015,8 @@
       "stSignal": "SAT",
       "rsi": 39.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Alves Kablo",
       "bist": null,
       "kind": "stock"
@@ -14084,6 +15046,8 @@
       "stSignal": "SAT",
       "rsi": 37.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Arena Bilgisayar",
       "bist": null,
       "kind": "stock"
@@ -14113,6 +15077,8 @@
       "stSignal": "SAT",
       "rsi": 35.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Anadolu Isuzu",
       "bist": null,
       "kind": "stock"
@@ -14142,6 +15108,8 @@
       "stSignal": "AL",
       "rsi": 41.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Bak Ambalaj",
       "bist": null,
       "kind": "stock"
@@ -14171,6 +15139,8 @@
       "stSignal": "SAT",
       "rsi": 31.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Bursa Cimento",
       "bist": null,
       "kind": "stock"
@@ -14200,6 +15170,8 @@
       "stSignal": "AL",
       "rsi": 45.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Gedik Y Men Deg",
       "bist": null,
       "kind": "stock"
@@ -14229,6 +15201,8 @@
       "stSignal": "SAT",
       "rsi": 26,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Kent Gida",
       "bist": null,
       "kind": "stock"
@@ -14258,6 +15232,8 @@
       "stSignal": "SAT",
       "rsi": 43.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Metro Petrol Ve Tesisleri",
       "bist": null,
       "kind": "stock"
@@ -14287,6 +15263,8 @@
       "stSignal": "SAT",
       "rsi": 43.9,
       "macdBull": true,
+      "rsiReversal": true,
+      "macdCross": true,
       "name": "Marti GMYO",
       "bist": null,
       "kind": "stock"
@@ -14316,6 +15294,8 @@
       "stSignal": "SAT",
       "rsi": 34,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Reysas Lojistik",
       "bist": null,
       "kind": "stock"
@@ -14345,6 +15325,8 @@
       "stSignal": "SAT",
       "rsi": 63.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Tekfen Holding",
       "sector": "Holding",
       "bist": 100,
@@ -14375,6 +15357,8 @@
       "stSignal": "SAT",
       "rsi": 37.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Bagfas",
       "bist": null,
       "kind": "stock"
@@ -14404,6 +15388,8 @@
       "stSignal": "SAT",
       "rsi": 30,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Cosmos Yat Holding",
       "bist": null,
       "kind": "stock"
@@ -14433,6 +15419,8 @@
       "stSignal": "SAT",
       "rsi": 43.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Formul Plastik Ve Metal",
       "bist": null,
       "kind": "stock"
@@ -14462,6 +15450,8 @@
       "stSignal": "AL",
       "rsi": 40.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Inveo Yatirim Holding",
       "bist": null,
       "kind": "stock"
@@ -14491,6 +15481,8 @@
       "stSignal": "AL",
       "rsi": 37.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Luks Kadife",
       "bist": null,
       "kind": "stock"
@@ -14520,6 +15512,8 @@
       "stSignal": "SAT",
       "rsi": 25.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Teknosa Ic Ve Dis Ticaret",
       "bist": null,
       "kind": "stock"
@@ -14549,6 +15543,8 @@
       "stSignal": "SAT",
       "rsi": 28.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Agaoglu GMYO",
       "bist": null,
       "kind": "stock"
@@ -14578,6 +15574,8 @@
       "stSignal": "SAT",
       "rsi": 36,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Doktas Dokumculuk",
       "bist": null,
       "kind": "stock"
@@ -14607,6 +15605,8 @@
       "stSignal": "SAT",
       "rsi": 45.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Gipta Ofis Kirtasiye",
       "bist": null,
       "kind": "stock"
@@ -14636,6 +15636,8 @@
       "stSignal": "SAT",
       "rsi": 30.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Kim Market Ersan Alisveris",
       "bist": null,
       "kind": "stock"
@@ -14665,6 +15667,8 @@
       "stSignal": "SAT",
       "rsi": 38.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Link Bilgisayar",
       "bist": null,
       "kind": "stock"
@@ -14694,6 +15698,8 @@
       "stSignal": "SAT",
       "rsi": 32.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Sanko Pazarlama",
       "bist": null,
       "kind": "stock"
@@ -14723,6 +15729,8 @@
       "stSignal": "SAT",
       "rsi": 33.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Tskb GMYO",
       "bist": null,
       "kind": "stock"
@@ -14752,6 +15760,8 @@
       "stSignal": "SAT",
       "rsi": 37.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ulusal Faktoring",
       "bist": null,
       "kind": "stock"
@@ -14781,6 +15791,8 @@
       "stSignal": "SAT",
       "rsi": 41.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Verusaturk Girisim",
       "bist": null,
       "kind": "stock"
@@ -14810,6 +15822,8 @@
       "stSignal": "SAT",
       "rsi": 41.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Visne Madencilik",
       "bist": null,
       "kind": "stock"
@@ -14839,6 +15853,8 @@
       "stSignal": "SAT",
       "rsi": 36.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Eczacıbaşı İlaç",
       "sector": "Sağlık",
       "bist": 50,
@@ -14869,6 +15885,8 @@
       "stSignal": "SAT",
       "rsi": 33.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Arzum Ev Aletleri",
       "bist": null,
       "kind": "stock"
@@ -14898,6 +15916,8 @@
       "stSignal": "SAT",
       "rsi": 36.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Elite Naturel Organik Gida",
       "bist": null,
       "kind": "stock"
@@ -14927,6 +15947,8 @@
       "stSignal": "SAT",
       "rsi": 39.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Fuzul GMYO",
       "bist": null,
       "kind": "stock"
@@ -14956,6 +15978,8 @@
       "stSignal": "SAT",
       "rsi": 35.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Katmerciler Ekipman",
       "bist": null,
       "kind": "stock"
@@ -14985,6 +16009,8 @@
       "stSignal": "SAT",
       "rsi": 42.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Kafein Yazilim",
       "bist": null,
       "kind": "stock"
@@ -15014,6 +16040,8 @@
       "stSignal": "SAT",
       "rsi": 31.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Meditera Tibbi Malzeme",
       "bist": null,
       "kind": "stock"
@@ -15043,6 +16071,8 @@
       "stSignal": "SAT",
       "rsi": 37.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Papilon Savunma",
       "bist": null,
       "kind": "stock"
@@ -15072,6 +16102,8 @@
       "stSignal": "SAT",
       "rsi": 34.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Birikim Varlik Yonetim",
       "bist": null,
       "kind": "stock"
@@ -15101,6 +16133,8 @@
       "stSignal": "AL",
       "rsi": 41,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Denge Holding",
       "bist": null,
       "kind": "stock"
@@ -15130,6 +16164,8 @@
       "stSignal": "SAT",
       "rsi": 35.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Gelecek Varlik Yonetimi",
       "bist": null,
       "kind": "stock"
@@ -15159,6 +16195,8 @@
       "stSignal": "SAT",
       "rsi": 35.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Ihlas Gayrimenkul",
       "bist": null,
       "kind": "stock"
@@ -15188,6 +16226,8 @@
       "stSignal": "SAT",
       "rsi": 30.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Servet GMYO",
       "bist": null,
       "kind": "stock"
@@ -15217,6 +16257,8 @@
       "stSignal": "SAT",
       "rsi": 28.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Yaprak Sut Ve Besi Cift",
       "bist": null,
       "kind": "stock"
@@ -15246,6 +16288,8 @@
       "stSignal": "SAT",
       "rsi": 30.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Alarko GMYO",
       "bist": null,
       "kind": "stock"
@@ -15275,6 +16319,8 @@
       "stSignal": "SAT",
       "rsi": 41.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Anatolia Tani Ve Biyoteknoloji",
       "bist": null,
       "kind": "stock"
@@ -15304,6 +16350,8 @@
       "stSignal": "AL",
       "rsi": 41.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Asce GMYO",
       "bist": null,
       "kind": "stock"
@@ -15333,6 +16381,8 @@
       "stSignal": "SAT",
       "rsi": 33.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Bati Ege GMYO",
       "bist": null,
       "kind": "stock"
@@ -15362,6 +16412,8 @@
       "stSignal": "SAT",
       "rsi": 29.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Yatas",
       "bist": null,
       "kind": "stock"
@@ -15391,6 +16443,8 @@
       "stSignal": "SAT",
       "rsi": 31.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Yigit Aku",
       "bist": null,
       "kind": "stock"
@@ -15420,6 +16474,8 @@
       "stSignal": "SAT",
       "rsi": 36.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Cemas Dokum",
       "bist": null,
       "kind": "stock"
@@ -15449,6 +16505,8 @@
       "stSignal": "SAT",
       "rsi": 39.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Dinamik Isi Makina Yalitim",
       "bist": null,
       "kind": "stock"
@@ -15478,6 +16536,8 @@
       "stSignal": "SAT",
       "rsi": 26.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Formet Metal Ve Cam",
       "bist": null,
       "kind": "stock"
@@ -15507,6 +16567,8 @@
       "stSignal": "SAT",
       "rsi": 35.6,
       "macdBull": false,
+      "rsiReversal": true,
+      "macdCross": false,
       "name": "Kalekim Kimyevi Maddeler",
       "bist": null,
       "kind": "stock"
@@ -15536,6 +16598,8 @@
       "stSignal": "SAT",
       "rsi": 34.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Unlu Yatirim Holding",
       "bist": null,
       "kind": "stock"
@@ -15565,6 +16629,8 @@
       "stSignal": "SAT",
       "rsi": 31.7,
       "macdBull": true,
+      "rsiReversal": true,
+      "macdCross": false,
       "name": "Mega Polietilen",
       "bist": null,
       "kind": "stock"
@@ -15594,6 +16660,8 @@
       "stSignal": "SAT",
       "rsi": 30,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ofis Yem Gida",
       "bist": null,
       "kind": "stock"
@@ -15623,6 +16691,8 @@
       "stSignal": "SAT",
       "rsi": 43.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Pamel Elektrik",
       "bist": null,
       "kind": "stock"
@@ -15652,6 +16722,8 @@
       "stSignal": "SAT",
       "rsi": 35.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Katılımevim Tasarruf",
       "sector": "Finans",
       "bist": 50,
@@ -15682,6 +16754,8 @@
       "stSignal": "SAT",
       "rsi": 39.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Kiler Holding",
       "sector": "Holding",
       "bist": 100,
@@ -15712,6 +16786,8 @@
       "stSignal": "SAT",
       "rsi": 57.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Birlik Mensucat",
       "bist": null,
       "kind": "stock"
@@ -15741,6 +16817,8 @@
       "stSignal": "SAT",
       "rsi": 27.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ihlas Holding",
       "bist": null,
       "kind": "stock"
@@ -15770,6 +16848,8 @@
       "stSignal": "SAT",
       "rsi": 37.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Loras Holding",
       "bist": null,
       "kind": "stock"
@@ -15799,6 +16879,8 @@
       "stSignal": "SAT",
       "rsi": 32,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Sinpas GMYO",
       "bist": null,
       "kind": "stock"
@@ -15828,6 +16910,8 @@
       "stSignal": "SAT",
       "rsi": 36.9,
       "macdBull": false,
+      "rsiReversal": true,
+      "macdCross": false,
       "name": "Batıçim Batı Anadolu",
       "sector": "Çimento",
       "bist": 50,
@@ -15858,6 +16942,8 @@
       "stSignal": "SAT",
       "rsi": 37.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Avrasya Petrol Ve Tur",
       "bist": null,
       "kind": "stock"
@@ -15887,6 +16973,8 @@
       "stSignal": "SAT",
       "rsi": 42.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Dogusan",
       "bist": null,
       "kind": "stock"
@@ -15916,6 +17004,8 @@
       "stSignal": "AL",
       "rsi": 40.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Makim Makine",
       "bist": null,
       "kind": "stock"
@@ -15945,6 +17035,8 @@
       "stSignal": "SAT",
       "rsi": 25.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Merko Gida",
       "bist": null,
       "kind": "stock"
@@ -15974,6 +17066,8 @@
       "stSignal": "SAT",
       "rsi": 38.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Parsan",
       "bist": null,
       "kind": "stock"
@@ -16003,6 +17097,8 @@
       "stSignal": "SAT",
       "rsi": 31.1,
       "macdBull": false,
+      "rsiReversal": true,
+      "macdCross": false,
       "name": "Trabzon Liman",
       "bist": null,
       "kind": "stock"
@@ -16032,6 +17128,8 @@
       "stSignal": "SAT",
       "rsi": 28.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Yonga Mobilya",
       "bist": null,
       "kind": "stock"
@@ -16061,6 +17159,8 @@
       "stSignal": "SAT",
       "rsi": 35.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Zedur Enerji",
       "bist": null,
       "kind": "stock"
@@ -16090,6 +17190,8 @@
       "stSignal": "SAT",
       "rsi": 42.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ege Profil",
       "bist": null,
       "kind": "stock"
@@ -16119,6 +17221,8 @@
       "stSignal": "SAT",
       "rsi": 33.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Oyak Yatirim Menkul",
       "bist": null,
       "kind": "stock"
@@ -16148,6 +17252,8 @@
       "stSignal": "SAT",
       "rsi": 38.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Yunsa",
       "bist": null,
       "kind": "stock"
@@ -16177,6 +17283,8 @@
       "stSignal": "SAT",
       "rsi": 35.6,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Bilici Yatirim",
       "bist": null,
       "kind": "stock"
@@ -16206,6 +17314,8 @@
       "stSignal": "AL",
       "rsi": 40.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Escort Teknoloji",
       "bist": null,
       "kind": "stock"
@@ -16235,6 +17345,8 @@
       "stSignal": "SAT",
       "rsi": 34.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Orma Orman Mahsulleri",
       "bist": null,
       "kind": "stock"
@@ -16264,6 +17376,8 @@
       "stSignal": "SAT",
       "rsi": 44.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Usak Seramik",
       "bist": null,
       "kind": "stock"
@@ -16293,6 +17407,8 @@
       "stSignal": "SAT",
       "rsi": 42.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Yeni Gimat GMYO",
       "bist": null,
       "kind": "stock"
@@ -16322,6 +17438,8 @@
       "stSignal": "SAT",
       "rsi": 38.9,
       "macdBull": true,
+      "rsiReversal": true,
+      "macdCross": true,
       "name": "Flap Kongre Toplanti Hiz",
       "bist": null,
       "kind": "stock"
@@ -16351,6 +17469,8 @@
       "stSignal": "SAT",
       "rsi": 34.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Limak Dogu Anadolu",
       "bist": null,
       "kind": "stock"
@@ -16380,6 +17500,8 @@
       "stSignal": "SAT",
       "rsi": 41.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Birlesim Muhendislik",
       "bist": null,
       "kind": "stock"
@@ -16409,6 +17531,8 @@
       "stSignal": "SAT",
       "rsi": 34.4,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Derluks Yatirim Holding",
       "bist": null,
       "kind": "stock"
@@ -16438,6 +17562,8 @@
       "stSignal": "SAT",
       "rsi": 47.8,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Marka Yatirim Holding",
       "bist": null,
       "kind": "stock"
@@ -16467,6 +17593,8 @@
       "stSignal": "SAT",
       "rsi": 30.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ozak GMYO",
       "bist": null,
       "kind": "stock"
@@ -16496,6 +17624,8 @@
       "stSignal": "SAT",
       "rsi": 29.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Bera Holding",
       "sector": "Holding",
       "bist": 100,
@@ -16526,6 +17656,8 @@
       "stSignal": "SAT",
       "rsi": 47.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Sekuro Plastik",
       "bist": null,
       "kind": "stock"
@@ -16555,6 +17687,8 @@
       "stSignal": "SAT",
       "rsi": 31.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Silverline Endustri",
       "bist": null,
       "kind": "stock"
@@ -16584,6 +17718,8 @@
       "stSignal": "SAT",
       "rsi": 35.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ucay Muhendislik",
       "bist": null,
       "kind": "stock"
@@ -16613,6 +17749,8 @@
       "stSignal": "SAT",
       "rsi": 38.8,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Akbank",
       "sector": "Bankacılık",
       "bist": 30,
@@ -16643,6 +17781,8 @@
       "stSignal": "SAT",
       "rsi": 37.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Konfrut Tarim",
       "bist": null,
       "kind": "stock"
@@ -16672,6 +17812,8 @@
       "stSignal": "SAT",
       "rsi": 30.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Lila Kagit",
       "bist": null,
       "kind": "stock"
@@ -16701,6 +17843,8 @@
       "stSignal": "SAT",
       "rsi": 42.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Birko Mensucat",
       "bist": null,
       "kind": "stock"
@@ -16730,6 +17874,8 @@
       "stSignal": "SAT",
       "rsi": 44,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Seranit Granit Seramik",
       "bist": null,
       "kind": "stock"
@@ -16759,6 +17905,8 @@
       "stSignal": "SAT",
       "rsi": 33.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Bms Celik Hasir",
       "bist": null,
       "kind": "stock"
@@ -16788,6 +17936,8 @@
       "stSignal": "SAT",
       "rsi": 31.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Burcelik Vana",
       "bist": null,
       "kind": "stock"
@@ -16817,6 +17967,8 @@
       "stSignal": "SAT",
       "rsi": 26.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Desa Deri",
       "bist": null,
       "kind": "stock"
@@ -16846,6 +17998,8 @@
       "stSignal": "SAT",
       "rsi": 28.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Doganlar Mobilya",
       "bist": null,
       "kind": "stock"
@@ -16875,6 +18029,8 @@
       "stSignal": "SAT",
       "rsi": 36.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Horoz Lojistik",
       "bist": null,
       "kind": "stock"
@@ -16904,6 +18060,8 @@
       "stSignal": "SAT",
       "rsi": 35.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Karsan Otomotiv",
       "bist": null,
       "kind": "stock"
@@ -16933,6 +18091,8 @@
       "stSignal": "AL",
       "rsi": 49.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Koray GMYO",
       "bist": null,
       "kind": "stock"
@@ -16962,6 +18122,8 @@
       "stSignal": "SAT",
       "rsi": 47.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Orge Enerji Elektrik",
       "bist": null,
       "kind": "stock"
@@ -16991,6 +18153,8 @@
       "stSignal": "SAT",
       "rsi": 37.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ekos Teknoloji",
       "bist": null,
       "kind": "stock"
@@ -17020,6 +18184,8 @@
       "stSignal": "SAT",
       "rsi": 45.1,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Gersan Elektrik",
       "bist": null,
       "kind": "stock"
@@ -17049,6 +18215,8 @@
       "stSignal": "SAT",
       "rsi": 23.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Garanti Yat Ort",
       "bist": null,
       "kind": "stock"
@@ -17078,6 +18246,8 @@
       "stSignal": "SAT",
       "rsi": 35.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Is Girisim",
       "bist": null,
       "kind": "stock"
@@ -17107,6 +18277,8 @@
       "stSignal": "SAT",
       "rsi": 42.2,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Smartiks Yazilim",
       "bist": null,
       "kind": "stock"
@@ -17136,6 +18308,8 @@
       "stSignal": "SAT",
       "rsi": 33,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Tek Art Turizm",
       "bist": null,
       "kind": "stock"
@@ -17165,6 +18339,8 @@
       "stSignal": null,
       "rsi": null,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ekim Turizm",
       "bist": null,
       "kind": "stock"
@@ -17194,6 +18370,8 @@
       "stSignal": "SAT",
       "rsi": 35.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "A1 Capital Yatirim",
       "bist": null,
       "kind": "stock"
@@ -17223,6 +18401,8 @@
       "stSignal": "SAT",
       "rsi": 33.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Euro Yat Ort",
       "bist": null,
       "kind": "stock"
@@ -17252,6 +18432,8 @@
       "stSignal": "SAT",
       "rsi": 33.8,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Gentas Kimya",
       "bist": null,
       "kind": "stock"
@@ -17281,6 +18463,8 @@
       "stSignal": "SAT",
       "rsi": 44.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Hareket Proje Tasimaciligi",
       "bist": null,
       "kind": "stock"
@@ -17310,6 +18494,8 @@
       "stSignal": "SAT",
       "rsi": 38.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Akenerji",
       "bist": null,
       "kind": "stock"
@@ -17339,6 +18525,8 @@
       "stSignal": "SAT",
       "rsi": 33.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Altinyunus Cesme",
       "bist": null,
       "kind": "stock"
@@ -17368,6 +18556,8 @@
       "stSignal": "AL",
       "rsi": 49.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Dogus GMYO",
       "bist": null,
       "kind": "stock"
@@ -17397,6 +18587,8 @@
       "stSignal": "SAT",
       "rsi": 35.9,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Metropal Kurumsal Hizmetler",
       "bist": null,
       "kind": "stock"
@@ -17426,6 +18618,8 @@
       "stSignal": "SAT",
       "rsi": 38.6,
       "macdBull": true,
+      "rsiReversal": true,
+      "macdCross": true,
       "name": "Mia Teknoloji",
       "sector": "Teknoloji",
       "bist": 50,
@@ -17456,6 +18650,8 @@
       "stSignal": "SAT",
       "rsi": 32.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Sumer Varlik Yonetim",
       "bist": null,
       "kind": "stock"
@@ -17485,6 +18681,8 @@
       "stSignal": "SAT",
       "rsi": 27,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Destek Finans Faktoring",
       "sector": "Finans",
       "bist": 30,
@@ -17515,6 +18713,8 @@
       "stSignal": "SAT",
       "rsi": 32.4,
       "macdBull": false,
+      "rsiReversal": true,
+      "macdCross": false,
       "name": "Yapı Kredi",
       "sector": "Bankacılık",
       "bist": 30,
@@ -17545,6 +18745,8 @@
       "stSignal": "SAT",
       "rsi": 31.3,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Oba Makarnacılık",
       "sector": "Gıda",
       "bist": 100,
@@ -17575,6 +18777,8 @@
       "stSignal": "SAT",
       "rsi": 30.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Şekerbank",
       "sector": "Bankacılık",
       "bist": 100,
@@ -17605,6 +18809,8 @@
       "stSignal": "SAT",
       "rsi": 14.6,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Barem Ambalaj",
       "bist": null,
       "kind": "stock"
@@ -17634,6 +18840,8 @@
       "stSignal": "SAT",
       "rsi": 41.7,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Borlease Otomotiv",
       "bist": null,
       "kind": "stock"
@@ -17663,6 +18871,8 @@
       "stSignal": "SAT",
       "rsi": 37.7,
       "macdBull": false,
+      "rsiReversal": true,
+      "macdCross": false,
       "name": "Ditas Bdy",
       "bist": null,
       "kind": "stock"
@@ -17692,6 +18902,8 @@
       "stSignal": "SAT",
       "rsi": 33,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ekiz Kimya",
       "bist": null,
       "kind": "stock"
@@ -17721,6 +18933,8 @@
       "stSignal": "SAT",
       "rsi": 39.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Empa Elektronik",
       "bist": null,
       "kind": "stock"
@@ -17750,6 +18964,8 @@
       "stSignal": "SAT",
       "rsi": 35.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Good Year",
       "bist": null,
       "kind": "stock"
@@ -17779,6 +18995,8 @@
       "stSignal": "SAT",
       "rsi": 35.5,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Hidropar Hareket Kontrol",
       "bist": null,
       "kind": "stock"
@@ -17808,6 +19026,8 @@
       "stSignal": "SAT",
       "rsi": 24.9,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Halk GMYO",
       "bist": null,
       "kind": "stock"
@@ -17837,6 +19057,8 @@
       "stSignal": "SAT",
       "rsi": 28.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Ihlas Yayin Holding",
       "bist": null,
       "kind": "stock"
@@ -17866,6 +19088,8 @@
       "stSignal": "SAT",
       "rsi": 32.3,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Kaplamin",
       "bist": null,
       "kind": "stock"
@@ -17895,6 +19119,8 @@
       "stSignal": "SAT",
       "rsi": 28.8,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Kizilbuk GYO",
       "bist": null,
       "kind": "stock"
@@ -17924,6 +19150,8 @@
       "stSignal": "SAT",
       "rsi": 34.7,
       "macdBull": true,
+      "rsiReversal": false,
+      "macdCross": true,
       "name": "Luxera GMYO",
       "bist": null,
       "kind": "stock"
@@ -17953,6 +19181,8 @@
       "stSignal": "SAT",
       "rsi": 33.5,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Ostim Endustriyel Yat",
       "bist": null,
       "kind": "stock"
@@ -17982,6 +19212,8 @@
       "stSignal": "SAT",
       "rsi": 32.7,
       "macdBull": false,
+      "rsiReversal": true,
+      "macdCross": false,
       "name": "Safkar Ege Sogutmacilik",
       "bist": null,
       "kind": "stock"
@@ -18011,6 +19243,8 @@
       "stSignal": "SAT",
       "rsi": 38.4,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Saray Matbaacilik",
       "bist": null,
       "kind": "stock"
@@ -18040,6 +19274,8 @@
       "stSignal": "SAT",
       "rsi": 10.1,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Seker Fin Kir",
       "bist": null,
       "kind": "stock"
@@ -18069,6 +19305,8 @@
       "stSignal": "AL",
       "rsi": null,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Soho Giyim Ve Enerji",
       "bist": null,
       "kind": "stock"
@@ -18098,6 +19336,8 @@
       "stSignal": "SAT",
       "rsi": 33.1,
       "macdBull": false,
+      "rsiReversal": true,
+      "macdCross": false,
       "name": "Savur GMYO",
       "bist": null,
       "kind": "stock"
@@ -18127,6 +19367,8 @@
       "stSignal": "SAT",
       "rsi": 21.2,
       "macdBull": false,
+      "rsiReversal": false,
+      "macdCross": false,
       "name": "Europap Tezol Kagit",
       "bist": null,
       "kind": "stock"
@@ -18156,6 +19398,8 @@
       "stSignal": "SAT",
       "rsi": 43.8,
       "macdBull": true,
+      "rsiReversal": true,
+      "macdCross": true,
       "name": "Verusa Holding",
       "bist": null,
       "kind": "stock"
@@ -18185,6 +19429,8 @@
       "stSignal": "SAT",
       "rsi": 36,
       "macdBull": true,
+      "rsiReversal": true,
+      "macdCross": false,
       "name": "Zeray GMYO",
       "bist": null,
       "kind": "stock"

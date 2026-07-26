@@ -392,7 +392,7 @@ export default function App() {
   const FAV_TAB = {
     key: 'fav',
     label: '⭐ Favori Listesi',
-    match: (i) => i.kind === 'stock' && i.rsiReversal === true && i.macdCross === true,
+    match: (i) => i.kind === 'stock' && i.wtSignal === 'AL' && i.wtCrossSignal === 'AL' && i.stSignal === 'AL',
   };
   const activeTab = [...TABS, FAV_TAB, ...NEWS_TABS].find((t) => t.key === tab) ?? TABS[0];
   const isNews = !!activeTab.news;
@@ -526,8 +526,8 @@ export default function App() {
       {error && <div className="state error">Hata: {error}</div>}
       {tab === 'fav' && (
         <div className="fav-note">
-          <strong>Favori kriterleri:</strong> RSI aşırı satımdan (<code>&lt; 30</code>) yukarı dönen (pozitif dönüş)
-          <strong> ve</strong> MACD pozitif kesişim (mavi çizgi sinyali yukarı kesen) üreten hisseler.
+          <strong>Favori kriterleri (hepsi birden):</strong> overzone <code>AL</code> · WaveTrend <code>AL</code> ·
+          SuperTrend <code>AL</code>.
         </div>
       )}
 
@@ -536,7 +536,7 @@ export default function App() {
           {searching
             ? `“${query.trim()}” ile eşleşen kayıt bulunamadı.`
             : tab === 'fav'
-              ? 'Şu an bu kriterlere uyan hisse yok. (RSI aşırı satımdan dönüş + MACD sıfır üstü pozitif kesişim aynı anda nadir oluşur.)'
+              ? 'Şu an overzone + WaveTrend + SuperTrend’in üçü birden AL olan hisse yok.'
               : data.items.length > 0
                 ? 'Bu sekme/filtrede gösterilecek hisse yok.'
                 : 'Henüz veri yok. “Yenile”ye basın veya backend’in çalıştığından emin olun.'}
