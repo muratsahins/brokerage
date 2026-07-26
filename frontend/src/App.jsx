@@ -388,7 +388,15 @@ export default function App() {
     { key: 'news', label: '📰 Haberler', news: 'news' },
     { key: 'kap',  label: '📋 KAP',      news: 'kap' },
   ];
-  const activeTab = [...TABS, ...NEWS_TABS].find((t) => t.key === tab) ?? TABS[0];
+  // Favori listesi: 5 teknik koşulu birden sağlayan hisseler.
+  const FAV_TAB = {
+    key: 'fav',
+    label: '⭐ Favori Listesi',
+    match: (i) => i.kind === 'stock'
+      && i.wtSignal === 'AL' && i.wtCrossSignal === 'AL' && i.stSignal === 'AL'
+      && i.rsi != null && i.rsi < 30 && i.macdBull === true,
+  };
+  const activeTab = [...TABS, FAV_TAB, ...NEWS_TABS].find((t) => t.key === tab) ?? TABS[0];
   const isNews = !!activeTab.news;
 
   // Önce aktif sekmeye göre, sonra sinyale göre süz.
@@ -459,6 +467,15 @@ export default function App() {
         ))}
       </div>
 
+      <div className="news-nav">
+        <button
+          className={`news-tab fav-tab ${tab === 'fav' ? 'active' : ''}`}
+          onClick={() => setTab('fav')}
+        >
+          {FAV_TAB.label}
+        </button>
+      </div>
+
       <div className="tabs">
         {TABS.map((t) => (
           <button
@@ -509,13 +526,22 @@ export default function App() {
 
       {loading && <div className="state">Yükleniyor…</div>}
       {error && <div className="state error">Hata: {error}</div>}
+      {tab === 'fav' && (
+        <div className="fav-note">
+          <strong>Favori kriterleri (hepsi birden):</strong> overzone <code>AL</code> · WaveTrend <code>AL</code> ·
+          SuperTrend <code>AL</code> · RSI <code>&lt; 30</code> · MACD mavi çizgi sinyalin üstünde
+        </div>
+      )}
+
       {!loading && !error && items.length === 0 && (
         <div className="state">
           {searching
             ? `“${query.trim()}” ile eşleşen kayıt bulunamadı.`
-            : data.items.length > 0
-              ? 'Bu sekme/filtrede gösterilecek hisse yok.'
-              : 'Henüz veri yok. “Yenile”ye basın veya backend’in çalıştığından emin olun.'}
+            : tab === 'fav'
+              ? 'Şu an 5 kriteri birden sağlayan hisse yok. (Bu kombinasyon çok seçici — RSI<30 genelde SuperTrend AL ile birlikte oluşmaz.)'
+              : data.items.length > 0
+                ? 'Bu sekme/filtrede gösterilecek hisse yok.'
+                : 'Henüz veri yok. “Yenile”ye basın veya backend’in çalıştığından emin olun.'}
         </div>
       )}
 

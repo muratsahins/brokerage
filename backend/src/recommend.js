@@ -6,7 +6,7 @@
 //   exp3m     = (1 + upside12m)^(3/12) - 1
 // Analist kapsamı olmayan hisselerde tahmin üretilmez (null) — uydurmuyoruz.
 
-import { supertrendSignal, wavetrendSignal, wavetrendCrossSignal } from './indicators.js';
+import { supertrendSignal, wavetrendSignal, wavetrendCrossSignal, rsiValue, macdBullish } from './indicators.js';
 
 function clamp01(x) {
   return Math.max(0, Math.min(1, x));
@@ -76,6 +76,8 @@ export function scoreQuote(q) {
   const wtCrossSignal = wavetrendCrossSignal(q.highs, q.lows, q.closes);
   const wtSignal = wavetrendSignal(q.highs, q.lows, q.closes);
   const stSignal = supertrendSignal(q.highs, q.lows, q.closes);
+  const rsi = rsiValue(q.closes);
+  const macdBull = macdBullish(q.closes);
 
   return {
     symbol: q.symbol,
@@ -101,6 +103,8 @@ export function scoreQuote(q) {
     wtSignal,      // 53-60 WaveTrend (aşırı bölge kesişimi): 'AL' | 'SAT' | null
     wtCrossSignal, // WaveTrend standart kesişim (LazyBear): 'AL' | 'SAT' | null
     stSignal,      // SuperTrend (Kıvanç Özbilgiç): 'AL' | 'SAT' | null
+    rsi: rsi != null ? round(rsi, 1) : null, // RSI 14 (son)
+    macdBull,      // MACD mavi çizgi sinyal çizgisinin üstünde mi (boolean)
   };
 }
 

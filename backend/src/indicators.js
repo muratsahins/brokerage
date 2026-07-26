@@ -40,6 +40,38 @@ function sma(values, period) {
   return out;
 }
 
+// RSI (Wilder, 14) — son değeri döner (null yeterli bar yoksa).
+export function rsiValue(closes, period = 14) {
+  const n = closes?.length ?? 0;
+  if (n <= period) return null;
+  let gain = 0, loss = 0;
+  for (let i = 1; i <= period; i++) {
+    const ch = closes[i] - closes[i - 1];
+    if (ch >= 0) gain += ch; else loss -= ch;
+  }
+  let ag = gain / period, al = loss / period;
+  let rsi = al === 0 ? 100 : 100 - 100 / (1 + ag / al);
+  for (let i = period + 1; i < n; i++) {
+    const ch = closes[i] - closes[i - 1];
+    ag = (ag * (period - 1) + (ch > 0 ? ch : 0)) / period;
+    al = (al * (period - 1) + (ch < 0 ? -ch : 0)) / period;
+    rsi = al === 0 ? 100 : 100 - 100 / (1 + ag / al);
+  }
+  return rsi;
+}
+
+// MACD (12/26/9): mavi (MACD) çizgisi sarı (sinyal) çizgisinin ÜSTÜNDE mi?
+// (mavi çizgi sarıyı yukarı kesip üstünde kaldığında true olur.)
+export function macdBullish(closes, fast = 12, slow = 26, sig = 9) {
+  const n = closes?.length ?? 0;
+  if (n < slow + sig + 2) return false;
+  const ef = ema(closes, fast);
+  const es = ema(closes, slow);
+  const macd = closes.map((_, i) => ef[i] - es[i]);
+  const signal = ema(macd, sig);
+  return macd[n - 1] > signal[n - 1];
+}
+
 // Wilder ATR (RMA yumuşatması) — Pine'daki ta.atr ile aynı.
 function atr(highs, lows, closes, period) {
   const n = closes.length;

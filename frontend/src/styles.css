@@ -123,6 +123,21 @@ h1 { font-size: 26px; margin: 0 0 6px; }
 }
 .news-tab:hover { border-color: var(--muted); }
 .news-tab.active { background: #1f6feb; color: #fff; border-color: #1f6feb; }
+.fav-tab { border-color: #4a3d00; color: #fbbf24; }
+.fav-tab.active { background: #b45309; color: #fff; border-color: #b45309; }
+
+.fav-note {
+  margin: 14px 0 0;
+  padding: 10px 14px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 3px solid #fbbf24;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.fav-note code { background: #2a2a2a; padding: 1px 6px; border-radius: 4px; font-size: 11px; color: var(--text); }
 
 .tabs {
   display: flex;
