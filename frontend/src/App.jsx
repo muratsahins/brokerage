@@ -383,10 +383,12 @@ export default function App() {
     { key: 'bist50',  label: 'BIST 50',        match: (i) => i.bist != null && i.bist <= 50 },
     { key: 'bist100', label: 'BIST 100',       match: (i) => i.bist != null && i.bist <= 100 },
     { key: 'metal',   label: 'Kıymetli Maden', match: (i) => i.kind === 'metal' },
-    { key: 'news',    label: 'Haberler',       news: 'news' },
-    { key: 'kap',     label: 'KAP',            news: 'kap' },
   ];
-  const activeTab = TABS.find((t) => t.key === tab) ?? TABS[0];
+  const NEWS_TABS = [
+    { key: 'news', label: '📰 Haberler', news: 'news' },
+    { key: 'kap',  label: '📋 KAP',      news: 'kap' },
+  ];
+  const activeTab = [...TABS, ...NEWS_TABS].find((t) => t.key === tab) ?? TABS[0];
   const isNews = !!activeTab.news;
 
   // Önce aktif sekmeye göre, sonra sinyale göre süz.
@@ -444,6 +446,18 @@ export default function App() {
           </button>
         </div>
       </header>
+
+      <div className="news-nav">
+        {NEWS_TABS.map((t) => (
+          <button
+            key={t.key}
+            className={`news-tab ${tab === t.key ? 'active' : ''}`}
+            onClick={() => setTab(t.key)}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
 
       <div className="tabs">
         {TABS.map((t) => (
