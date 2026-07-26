@@ -108,6 +108,40 @@ export function macdBullCross(closes, fast = 12, slow = 26, sig = 9, lookback = 
   return false;
 }
 
+// --- Smart Money Concept (SMC) yükseliş sinyali -----------------------------
+// Fractal swing high/low (pivot) tespiti (k bar sol+sağ).
+function findPivots(highs, lows, k = 2) {
+  const n = highs.length;
+  const sh = [], sl = [];
+  for (let i = k; i < n - k; i++) {
+    let isH = true, isL = true;
+    for (let j = 1; j <= k; j++) {
+      if (highs[i] <= highs[i - j] || highs[i] <= highs[i + j]) isH = false;
+      if (lows[i] >= lows[i - j] || lows[i] >= lows[i + j]) isL = false;
+    }
+    if (isH) sh.push({ i, p: highs[i] });
+    if (isL) sl.push({ i, p: lows[i] });
+  }
+  return { sh, sl };
+}
+
+// SMC yükseliş: likidite süpürme (son dip önceki dibin altına inip döndü) + yapı
+// kırılımı (kapanış son swing high'ı yukarı kesip üstünde tutuyor = BOS/CHoCH).
+export function smcBullish(highs, lows, closes, recent = 5) {
+  const n = closes?.length ?? 0;
+  if (n < 30) return false;
+  const { sh, sl } = findPivots(highs, lows, 2);
+  if (sh.length < 2 || sl.length < 2) return false;
+  const lastSH = sh[sh.length - 1];
+  let brokeUp = false;
+  for (let i = Math.max(1, n - recent); i < n; i++) {
+    if (closes[i - 1] <= lastSH.p && closes[i] > lastSH.p) brokeUp = true;
+  }
+  const holding = closes[n - 1] > lastSH.p;           // kırılım geçerli (üstünde)
+  const sweep = sl[sl.length - 1].p < sl[sl.length - 2].p; // son dip önceki dibin altına indi
+  return brokeUp && holding && sweep;
+}
+
 // Wilder ATR (RMA yumuşatması) — Pine'daki ta.atr ile aynı.
 function atr(highs, lows, closes, period) {
   const n = closes.length;

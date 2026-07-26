@@ -8,7 +8,7 @@
 
 import {
   supertrendSignal, wavetrendSignal, wavetrendCrossSignal,
-  rsiValue, macdBullish, rsiBullishReversal, macdBullCross,
+  rsiValue, macdBullish, rsiBullishReversal, macdBullCross, smcBullish,
 } from './indicators.js';
 
 function clamp01(x) {
@@ -83,6 +83,7 @@ export function scoreQuote(q) {
   const macdBull = macdBullish(q.closes);
   const rsiReversal = rsiBullishReversal(q.closes);   // aşırı satımdan yukarı dönüş
   const macdCross = macdBullCross(q.closes);          // MACD pozitif kesişim
+  const smc = smcBullish(q.highs, q.lows, q.closes);  // SMC yükseliş yapı kırılımı
 
   return {
     symbol: q.symbol,
@@ -112,6 +113,7 @@ export function scoreQuote(q) {
     macdBull,           // MACD mavi çizgi sinyal çizgisinin üstünde mi
     rsiReversal,   // RSI aşırı satımdan (30 altı) yukarı dönüş
     macdCross,     // MACD pozitif kesişim (sıfır çizgisi şartsız)
+    smc,           // SMC yükseliş (likidite süpürme + yapı kırılımı)
   };
 }
 

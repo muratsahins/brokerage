@@ -396,7 +396,13 @@ export default function App() {
       && i.wtSignal === 'AL' && i.wtCrossSignal === 'AL' && i.stSignal === 'AL'
       && (i.recommendationKey === 'buy' || i.recommendationKey === 'strong_buy'),
   };
-  const activeTab = [...TABS, FAV_TAB, ...NEWS_TABS].find((t) => t.key === tab) ?? TABS[0];
+  // SMC (Smart Money Concept) yükseliş: likidite süpürme + yapı kırılımı.
+  const SMC_TAB = {
+    key: 'smc',
+    label: '🎯 SMC',
+    match: (i) => i.kind === 'stock' && i.smc === true,
+  };
+  const activeTab = [...TABS, FAV_TAB, SMC_TAB, ...NEWS_TABS].find((t) => t.key === tab) ?? TABS[0];
   const isNews = !!activeTab.news;
 
   // Önce aktif sekmeye göre, sonra sinyale göre süz.
@@ -474,6 +480,12 @@ export default function App() {
         >
           {FAV_TAB.label}
         </button>
+        <button
+          className={`news-tab smc-tab ${tab === 'smc' ? 'active' : ''}`}
+          onClick={() => setTab('smc')}
+        >
+          {SMC_TAB.label}
+        </button>
       </div>
 
       <div className="tabs">
@@ -534,12 +546,22 @@ export default function App() {
         </div>
       )}
 
+      {tab === 'smc' && (
+        <div className="fav-note">
+          <strong>SMC (Smart Money Concept) — günlük AL:</strong> önce likidite süpürme (fiyat önceki dibin
+          altına inip döndü), ardından yükseliş yapı kırılımı (kapanış son swing high’ı yukarı kesip üstünde
+          tutuyor = BOS/CHoCH). Günlük grafikte akıllı para birikimi → yükseliş sinyali.
+        </div>
+      )}
+
       {!loading && !error && items.length === 0 && (
         <div className="state">
           {searching
             ? `“${query.trim()}” ile eşleşen kayıt bulunamadı.`
             : tab === 'fav'
               ? 'Şu an üç sinyali (overzone + WaveTrend + SuperTrend) birden AL olan ve analist AL tavsiyesi bulunan hisse yok.'
+            : tab === 'smc'
+              ? 'Şu an SMC yükseliş sinyali (likidite süpürme + yapı kırılımı) veren hisse yok.'
               : data.items.length > 0
                 ? 'Bu sekme/filtrede gösterilecek hisse yok.'
                 : 'Henüz veri yok. “Yenile”ye basın veya backend’in çalıştığından emin olun.'}

@@ -125,6 +125,8 @@ h1 { font-size: 26px; margin: 0 0 6px; }
 .news-tab.active { background: #1f6feb; color: #fff; border-color: #1f6feb; }
 .fav-tab { border-color: #4a3d00; color: #fbbf24; }
 .fav-tab.active { background: #b45309; color: #fff; border-color: #b45309; }
+.smc-tab { border-color: #0e3a34; color: #2dd4bf; }
+.smc-tab.active { background: #0d9488; color: #fff; border-color: #0d9488; }
 
 .fav-note {
   margin: 14px 0 0;
