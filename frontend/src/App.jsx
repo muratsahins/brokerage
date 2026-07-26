@@ -392,7 +392,9 @@ export default function App() {
   const FAV_TAB = {
     key: 'fav',
     label: '⭐ Favori Listesi',
-    match: (i) => i.kind === 'stock' && i.wtSignal === 'AL' && i.wtCrossSignal === 'AL' && i.stSignal === 'AL',
+    match: (i) => i.kind === 'stock'
+      && i.wtSignal === 'AL' && i.wtCrossSignal === 'AL' && i.stSignal === 'AL'
+      && (i.recommendationKey === 'buy' || i.recommendationKey === 'strong_buy'),
   };
   const activeTab = [...TABS, FAV_TAB, ...NEWS_TABS].find((t) => t.key === tab) ?? TABS[0];
   const isNews = !!activeTab.news;
@@ -527,7 +529,8 @@ export default function App() {
       {tab === 'fav' && (
         <div className="fav-note">
           <strong>Favori kriterleri (hepsi birden):</strong> overzone <code>AL</code> · WaveTrend <code>AL</code> ·
-          SuperTrend <code>AL</code>.
+          SuperTrend <code>AL</code> · analist tavsiyesi <code>AL / Güçlü AL</code>.
+          <span className="muted-dash"> (Analist verisi BIST 30/50/100 hisselerinde bulunur.)</span>
         </div>
       )}
 
@@ -536,7 +539,7 @@ export default function App() {
           {searching
             ? `“${query.trim()}” ile eşleşen kayıt bulunamadı.`
             : tab === 'fav'
-              ? 'Şu an overzone + WaveTrend + SuperTrend’in üçü birden AL olan hisse yok.'
+              ? 'Şu an üç sinyali (overzone + WaveTrend + SuperTrend) birden AL olan ve analist AL tavsiyesi bulunan hisse yok.'
               : data.items.length > 0
                 ? 'Bu sekme/filtrede gösterilecek hisse yok.'
                 : 'Henüz veri yok. “Yenile”ye basın veya backend’in çalıştığından emin olun.'}
