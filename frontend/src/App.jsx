@@ -1,42 +1,119 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { createChart } from 'lightweight-charts';
 
+// --- Gösterge hesaplayıcıları (kapanışlardan) --------------------------------
+function emaArr(vals, period) {
+  const k = 2 / (period + 1);
+  const out = new Array(vals.length).fill(null);
+  let prev = null;
+  for (let i = 0; i < vals.length; i++) {
+    if (vals[i] == null) continue;
+    prev = prev == null ? vals[i] : vals[i] * k + prev * (1 - k);
+    out[i] = prev;
+  }
+  return out;
+}
+function computeRSI(closes, period = 14) {
+  const out = new Array(closes.length).fill(null);
+  if (closes.length <= period) return out;
+  let gain = 0, loss = 0;
+  for (let i = 1; i <= period; i++) {
+    const ch = closes[i] - closes[i - 1];
+    if (ch >= 0) gain += ch; else loss -= ch;
+  }
+  let ag = gain / period, al = loss / period;
+  out[period] = al === 0 ? 100 : 100 - 100 / (1 + ag / al);
+  for (let i = period + 1; i < closes.length; i++) {
+    const ch = closes[i] - closes[i - 1];
+    ag = (ag * (period - 1) + (ch > 0 ? ch : 0)) / period;
+    al = (al * (period - 1) + (ch < 0 ? -ch : 0)) / period;
+    out[i] = al === 0 ? 100 : 100 - 100 / (1 + ag / al);
+  }
+  return out;
+}
+function computeMACD(closes, fast = 12, slow = 26, sig = 9) {
+  const ef = emaArr(closes, fast);
+  const es = emaArr(closes, slow);
+  const macd = closes.map((_, i) => (ef[i] != null && es[i] != null && i >= slow - 1) ? ef[i] - es[i] : null);
+  const signal = emaArr(macd, sig);
+  const hist = macd.map((v, i) => (v != null && signal[i] != null) ? v - signal[i] : null);
+  return { macd, signal, hist };
+}
+
 // Grafik pop-up'ı: kendi Yahoo OHLC verimizi (backend /api/chart) Lightweight
-// Charts (açık kaynak, ücretsiz) ile mum grafiği olarak çizer. TradingView embed'i
-// BIST verisini göstermediği ("Sembol sadece TradingView'de bulunabilir") için
-// harici widget yerine kendi grafiğimizi çiziyoruz — lisans gerekmez.
+// Charts (açık kaynak, ücretsiz) ile çizer — mum + hacim, altında RSI ve MACD
+// panelleri (zaman eksenleri senkron). TradingView embed'i BIST verisini
+// göstermediği için harici widget yerine kendi grafiğimizi çiziyoruz.
 function ChartModal({ item, onClose }) {
-  const wrapRef = useRef(null);
+  const priceRef = useRef(null);
+  const rsiRef = useRef(null);
+  const macdRef = useRef(null);
   const [status, setStatus] = useState('loading'); // loading | ok | error
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', onKey);
-    let chart = null;
+    let charts = [];
     let cancelled = false;
+
+    const G = '#20242d', BORDER = '#262a33', UP = '#4ade80', DOWN = '#f87171';
+    const base = {
+      autoSize: true,
+      layout: { background: { color: '#171a21' }, textColor: '#8b93a1' },
+      grid: { vertLines: { color: G }, horzLines: { color: G } },
+      rightPriceScale: { borderColor: BORDER, minimumWidth: 60 },
+      crosshair: { horzLine: { labelVisible: false } },
+    };
 
     (async () => {
       try {
         const res = await fetch(`${API_BASE}/api/chart?ticker=${encodeURIComponent(item.ticker)}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        if (cancelled || !wrapRef.current) return;
-        if (!data.candles || data.candles.length === 0) throw new Error('boş veri');
+        if (cancelled || !priceRef.current) return;
+        const candles = data.candles || [];
+        if (candles.length === 0) throw new Error('boş veri');
         setStatus('ok');
-        chart = createChart(wrapRef.current, {
-          autoSize: true,
-          layout: { background: { color: '#171a21' }, textColor: '#e6e8eb' },
-          grid: { vertLines: { color: '#20242d' }, horzLines: { color: '#20242d' } },
-          rightPriceScale: { borderColor: '#262a33' },
-          timeScale: { borderColor: '#262a33' },
+        const closes = candles.map((c) => c.close);
+
+        // --- Fiyat + hacim ---
+        const priceChart = createChart(priceRef.current, { ...base, timeScale: { visible: false, borderColor: BORDER } });
+        const candleSeries = priceChart.addCandlestickSeries({ upColor: UP, downColor: DOWN, wickUpColor: UP, wickDownColor: DOWN, borderVisible: false });
+        candleSeries.setData(candles);
+        const volSeries = priceChart.addHistogramSeries({ priceFormat: { type: 'volume' }, priceScaleId: '' });
+        volSeries.priceScale().applyOptions({ scaleMargins: { top: 0.82, bottom: 0 } });
+        volSeries.setData(candles.map((c) => ({ time: c.time, value: c.volume, color: c.close >= c.open ? 'rgba(74,222,128,0.4)' : 'rgba(248,113,113,0.4)' })));
+
+        // --- RSI 14 (0..100, 30/70 çizgileri) ---
+        const rsi = computeRSI(closes);
+        const rsiChart = createChart(rsiRef.current, { ...base, timeScale: { visible: false, borderColor: BORDER } });
+        const rsiSeries = rsiChart.addLineSeries({ color: '#c084fc', lineWidth: 2, priceLineVisible: false, autoscaleInfoProvider: () => ({ priceRange: { minValue: 0, maxValue: 100 } }) });
+        rsiSeries.setData(candles.map((c, i) => ({ time: c.time, value: rsi[i] })).filter((d) => d.value != null));
+        rsiSeries.createPriceLine({ price: 70, color: 'rgba(248,113,113,0.6)', lineWidth: 1, lineStyle: 2 });
+        rsiSeries.createPriceLine({ price: 30, color: 'rgba(74,222,128,0.6)', lineWidth: 1, lineStyle: 2 });
+
+        // --- MACD 12/26/9 ---
+        const { macd, signal, hist } = computeMACD(closes);
+        const macdChart = createChart(macdRef.current, { ...base, timeScale: { visible: true, borderColor: BORDER } });
+        const histSeries = macdChart.addHistogramSeries({ priceLineVisible: false });
+        histSeries.setData(candles.map((c, i) => ({ time: c.time, value: hist[i], color: hist[i] >= 0 ? 'rgba(74,222,128,0.55)' : 'rgba(248,113,113,0.55)' })).filter((d) => d.value != null));
+        const macdLine = macdChart.addLineSeries({ color: '#60a5fa', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
+        macdLine.setData(candles.map((c, i) => ({ time: c.time, value: macd[i] })).filter((d) => d.value != null));
+        const sigLine = macdChart.addLineSeries({ color: '#fbbf24', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
+        sigLine.setData(candles.map((c, i) => ({ time: c.time, value: signal[i] })).filter((d) => d.value != null));
+
+        // --- Zaman eksenlerini senkronla ---
+        charts = [priceChart, rsiChart, macdChart];
+        let syncing = false;
+        charts.forEach((src) => {
+          src.timeScale().subscribeVisibleLogicalRangeChange((range) => {
+            if (!range || syncing) return;
+            syncing = true;
+            charts.forEach((c) => { if (c !== src) c.timeScale().setVisibleLogicalRange(range); });
+            syncing = false;
+          });
         });
-        const series = chart.addCandlestickSeries({
-          upColor: '#4ade80', downColor: '#f87171',
-          wickUpColor: '#4ade80', wickDownColor: '#f87171',
-          borderVisible: false,
-        });
-        series.setData(data.candles);
-        chart.timeScale().fitContent();
+        priceChart.timeScale().fitContent();
       } catch {
         if (!cancelled) setStatus('error');
       }
@@ -45,7 +122,7 @@ function ChartModal({ item, onClose }) {
     return () => {
       cancelled = true;
       document.removeEventListener('keydown', onKey);
-      if (chart) chart.remove();
+      charts.forEach((c) => { try { c.remove(); } catch { /* yoksay */ } });
     };
   }, [item, onClose]);
 
@@ -61,7 +138,11 @@ function ChartModal({ item, onClose }) {
           <button className="modal-close" onClick={onClose} aria-label="Kapat">✕</button>
         </div>
         <div className="modal-chart">
-          <div ref={wrapRef} style={{ width: '100%', height: '100%' }} />
+          <div className="chart-panes">
+            <div className="pane" style={{ flex: 3 }} ref={priceRef}><span className="pane-label">Fiyat · Hacim</span></div>
+            <div className="pane" style={{ flex: 1.4 }} ref={rsiRef}><span className="pane-label">RSI 14</span></div>
+            <div className="pane" style={{ flex: 1.7 }} ref={macdRef}><span className="pane-label">MACD 12/26/9</span></div>
+          </div>
           {status !== 'ok' && (
             <div className="chart-state">
               {status === 'loading' ? 'Grafik yükleniyor…' : 'Grafik verisi alınamadı.'}

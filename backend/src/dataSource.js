@@ -167,7 +167,10 @@ export async function fetchOhlc(symbol, range = '1y') {
     const o = q.open?.[i], h = q.high?.[i], l = q.low?.[i], c = q.close?.[i];
     if (o == null || h == null || l == null || c == null) continue;
     // Lightweight Charts günlük seri için 'yyyy-mm-dd' bekliyor.
-    candles.push({ time: new Date(ts[i] * 1000).toISOString().slice(0, 10), open: o, high: h, low: l, close: c });
+    candles.push({
+      time: new Date(ts[i] * 1000).toISOString().slice(0, 10),
+      open: o, high: h, low: l, close: c, volume: q.volume?.[i] ?? 0,
+    });
   }
   return { symbol, currency: r.meta?.currency ?? null, candles };
 }
