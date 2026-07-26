@@ -73,6 +73,8 @@ export function scoreQuote(q) {
   let signal = 'İZLE';
   if (score >= 65) signal = 'AL';
   else if (score >= 45) signal = 'TUT';
+  // AL için analist "Güçlü AL" (strong_buy) teyidi şart: yoksa AL -> TUT'a indir.
+  if (signal === 'AL' && f.recommendationKey !== 'strong_buy') signal = 'TUT';
 
   // --- TradingView teknik gösterge sinyalleri (AL/SAT) -----------------------
   // WaveTrend Oscillator (LazyBear): standart kesişim + 53-60 aşırı bölge sürümü.
