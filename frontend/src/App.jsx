@@ -392,7 +392,7 @@ export default function App() {
   const FAV_TAB = {
     key: 'fav',
     label: '⭐ Favori Listesi',
-    match: (i) => i.kind === 'stock' && i.rsiReversal === true && i.macdBullCrossZero === true,
+    match: (i) => i.kind === 'stock' && i.rsiReversal === true && i.macdCross === true,
   };
   const activeTab = [...TABS, FAV_TAB, ...NEWS_TABS].find((t) => t.key === tab) ?? TABS[0];
   const isNews = !!activeTab.news;
@@ -527,7 +527,7 @@ export default function App() {
       {tab === 'fav' && (
         <div className="fav-note">
           <strong>Favori kriterleri:</strong> RSI aşırı satımdan (<code>&lt; 30</code>) yukarı dönen (pozitif dönüş)
-          <strong> ve</strong> MACD sıfır çizgisinin üzerinde pozitif kesişim üreten hisseler.
+          <strong> ve</strong> MACD pozitif kesişim (mavi çizgi sinyali yukarı kesen) üreten hisseler.
         </div>
       )}
 

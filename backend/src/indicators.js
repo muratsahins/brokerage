@@ -93,9 +93,9 @@ export function macdBullish(closes, fast = 12, slow = 26, sig = 9) {
   return macd[n - 1] > signal[n - 1];
 }
 
-// MACD SIFIR ÇİZGİSİNİN ÜZERİNDE pozitif kesişim: son `lookback` barda MACD çizgisi
-// sinyali yukarı kesmiş VE kesişim MACD > 0 (sıfır çizgisi üstünde) gerçekleşmiş.
-export function macdBullCrossAboveZero(closes, fast = 12, slow = 26, sig = 9, lookback = 5) {
+// MACD pozitif kesişim: son `lookback` barda MACD çizgisi sinyali yukarı kesmiş
+// (sıfır çizgisi şartı yok — mavi çizgi sarıyı nerede olursa olsun yukarı kessin).
+export function macdBullCross(closes, fast = 12, slow = 26, sig = 9, lookback = 5) {
   const n = closes?.length ?? 0;
   if (n < slow + sig + 2) return false;
   const ef = ema(closes, fast);
@@ -103,7 +103,7 @@ export function macdBullCrossAboveZero(closes, fast = 12, slow = 26, sig = 9, lo
   const macd = closes.map((_, i) => ef[i] - es[i]);
   const signal = ema(macd, sig);
   for (let i = Math.max(1, n - lookback); i < n; i++) {
-    if (macd[i - 1] <= signal[i - 1] && macd[i] > signal[i] && macd[i] > 0) return true;
+    if (macd[i - 1] <= signal[i - 1] && macd[i] > signal[i]) return true;
   }
   return false;
 }
