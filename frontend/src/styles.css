@@ -391,6 +391,21 @@ th.num { text-align: right; }
   cursor: pointer;
 }
 .modal-close:hover { color: var(--text); border-color: var(--muted); }
+.modal-trade {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.modal-trade-price { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.modal-trade .search-input {
+  flex: 1; min-width: 90px;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
+}
+.modal-trade .vb-buy, .modal-trade .vb-sell { padding: 8px 16px; }
+
 .modal-chart { flex: 1; min-height: 0; position: relative; }
 .chart-panes { display: flex; flex-direction: column; width: 100%; height: 100%; }
 .pane { position: relative; min-height: 0; width: 100%; }

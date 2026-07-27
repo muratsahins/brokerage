@@ -49,6 +49,14 @@ function ChartModal({ item, onClose }) {
   const rsiRef = useRef(null);
   const macdRef = useRef(null);
   const [status, setStatus] = useState('loading'); // loading | ok | error
+  const [tqty, setTqty] = useState('');
+  const [tmsg, setTmsg] = useState(null);
+  const vbe = vbEmail();
+  const doTrade = (side) => {
+    const res = vbTrade(vbe, item, side, tqty);
+    setTmsg({ ok: res.ok, m: res.msg });
+    if (res.ok) setTqty('');
+  };
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };
@@ -137,6 +145,23 @@ function ChartModal({ item, onClose }) {
           </div>
           <button className="modal-close" onClick={onClose} aria-label="Kapat">✕</button>
         </div>
+        <div className="modal-trade">
+          {vbe ? (
+            <>
+              <span className="modal-trade-price">{fmtNum(vbUnitPrice(item))} ₺/{vbUnitLabel(item)}</span>
+              <input
+                className="search-input" type="number" min="0" step="any"
+                placeholder={`miktar (${vbUnitLabel(item)})`}
+                value={tqty} onChange={(e) => setTqty(e.target.value)}
+              />
+              <button className="vb-buy" onClick={() => doTrade('buy')}>AL</button>
+              <button className="vb-sell" onClick={() => doTrade('sell')}>SAT</button>
+            </>
+          ) : (
+            <span className="muted-dash">Alım-satım için Sanal Borsa sekmesinden e-posta ile giriş yap.</span>
+          )}
+        </div>
+        {tmsg && <div className={`vb-msg ${tmsg.ok ? 'ok' : 'err'}`} style={{ margin: '0 14px' }}>{tmsg.m}</div>}
         <div className="modal-chart">
           <div className="chart-panes">
             <div className="pane" style={{ flex: 3 }} ref={priceRef}><span className="pane-label">Fiyat · Hacim</span></div>
@@ -340,6 +365,45 @@ function NewsList({ kind }) {
 // Sanal borsa (paper trading): e-posta ile giriş, localStorage'da portföy.
 // Gerçek para/işlem yok; fiyatlar sitedeki verilerden. Cihaza özeldir.
 const VB_START = 100000; // başlangıç sanal bakiye (₺)
+const VB_OZ = 31.1034768;
+
+// --- Sanal borsa paylaşımlı yardımcıları (localStorage) ----------------------
+// Hem Sanal Borsa sekmesi hem grafik pop-up'ındaki AL/SAT aynı portföyü kullanır.
+function vbEmail() { try { return localStorage.getItem('vb_email') || ''; } catch { return ''; } }
+function vbLoad(email) {
+  if (!email) return null;
+  try { const raw = localStorage.getItem('vb_pf_' + email); return raw ? JSON.parse(raw) : { cash: VB_START, positions: {}, history: [] }; }
+  catch { return { cash: VB_START, positions: {}, history: [] }; }
+}
+function vbSave(email, pf) { try { localStorage.setItem('vb_pf_' + email, JSON.stringify(pf)); } catch { /* yoksay */ } }
+function vbUnitPrice(it) { return it ? (it.kind === 'metal' ? it.tryPerGram : it.price) : null; }
+function vbUnitLabel(it) { return it && it.kind === 'metal' ? 'gr' : 'adet'; }
+function vbTrade(email, item, side, qtyRaw) {
+  const pf = vbLoad(email);
+  if (!pf) return { ok: false, msg: 'Önce Sanal Borsa sekmesinden e-posta ile giriş yap.' };
+  const price = vbUnitPrice(item);
+  const n = Number(qtyRaw);
+  if (!item || price == null) return { ok: false, msg: 'Fiyat bulunamadı.' };
+  if (!(n > 0)) return { ok: false, msg: 'Geçerli miktar gir.' };
+  const cost = n * price;
+  const t = item.ticker;
+  const pos = pf.positions[t] || { qty: 0, avgCost: 0 };
+  let next;
+  if (side === 'buy') {
+    if (cost > pf.cash + 1e-6) return { ok: false, msg: 'Yetersiz bakiye.' };
+    const nq = pos.qty + n;
+    next = { ...pf, cash: pf.cash - cost, positions: { ...pf.positions, [t]: { qty: nq, avgCost: (pos.qty * pos.avgCost + cost) / nq } }, history: [{ time: new Date().toISOString(), ticker: t, side: 'AL', qty: n, price }, ...pf.history].slice(0, 100) };
+  } else {
+    if (n > pos.qty + 1e-6) return { ok: false, msg: 'Elinde yeterli miktar yok.' };
+    const nq = pos.qty - n;
+    const positions = { ...pf.positions };
+    if (nq <= 1e-6) delete positions[t]; else positions[t] = { qty: nq, avgCost: pos.avgCost };
+    next = { ...pf, cash: pf.cash + cost, positions, history: [{ time: new Date().toISOString(), ticker: t, side: 'SAT', qty: n, price }, ...pf.history].slice(0, 100) };
+  }
+  vbSave(email, next);
+  return { ok: true, msg: `${fmtNum(n)} ${vbUnitLabel(item)} ${t} ${side === 'buy' ? 'alındı' : 'satıldı'}.`, pf: next };
+}
+
 function VirtualTrade({ items }) {
   const [email, setEmail] = useState(() => { try { return localStorage.getItem('vb_email') || ''; } catch { return ''; } });
   const [emailInput, setEmailInput] = useState('');
@@ -375,26 +439,9 @@ function VirtualTrade({ items }) {
     setMsg({ t: 'ok', m: 'Portföy sıfırlandı.' });
   }
   function trade(side) {
-    const it = byTicker.get(sel); const price = unitPrice(it); const n = Number(qty);
-    if (!it || price == null) { setMsg({ t: 'err', m: 'Önce bir enstrüman seç.' }); return; }
-    if (!(n > 0)) { setMsg({ t: 'err', m: 'Geçerli miktar gir.' }); return; }
-    const cost = n * price;
-    const pos = pf.positions[sel] || { qty: 0, avgCost: 0 };
-    if (side === 'buy') {
-      if (cost > pf.cash + 1e-6) { setMsg({ t: 'err', m: 'Yetersiz bakiye.' }); return; }
-      const nqp = pos.qty + n;
-      const positions = { ...pf.positions, [sel]: { qty: nqp, avgCost: (pos.qty * pos.avgCost + cost) / nqp } };
-      persist({ cash: pf.cash - cost, positions, history: [{ time: new Date().toISOString(), ticker: sel, side: 'AL', qty: n, price }, ...pf.history].slice(0, 100) });
-      setMsg({ t: 'ok', m: `${fmtNum(n)} ${unitLabel(it)} ${sel} alındı.` });
-    } else {
-      if (n > pos.qty + 1e-6) { setMsg({ t: 'err', m: 'Elinde yeterli miktar yok.' }); return; }
-      const nqp = pos.qty - n;
-      const positions = { ...pf.positions };
-      if (nqp <= 1e-6) delete positions[sel]; else positions[sel] = { qty: nqp, avgCost: pos.avgCost };
-      persist({ cash: pf.cash + cost, positions, history: [{ time: new Date().toISOString(), ticker: sel, side: 'SAT', qty: n, price }, ...pf.history].slice(0, 100) });
-      setMsg({ t: 'ok', m: `${fmtNum(n)} ${unitLabel(it)} ${sel} satıldı.` });
-    }
-    setQty('');
+    const res = vbTrade(email, byTicker.get(sel), side, qty);
+    setMsg({ t: res.ok ? 'ok' : 'err', m: res.msg });
+    if (res.ok) { setPf(res.pf); setQty(''); }
   }
 
   if (!email) {
