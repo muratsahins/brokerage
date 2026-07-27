@@ -39,6 +39,41 @@ function computeMACD(closes, fast = 12, slow = 26, sig = 9) {
   const hist = macd.map((v, i) => (v != null && signal[i] != null) ? v - signal[i] : null);
   return { macd, signal, hist };
 }
+// Basit hareketli ortalama (pencere içinde null varsa null).
+function smaArr(vals, period) {
+  const out = new Array(vals.length).fill(null);
+  for (let i = period - 1; i < vals.length; i++) {
+    let sum = 0, ok = true;
+    for (let j = i - period + 1; j <= i; j++) { if (vals[j] == null) { ok = false; break; } sum += vals[j]; }
+    if (ok) out[i] = sum / period;
+  }
+  return out;
+}
+// WaveTrend (LazyBear) — tablo sinyaliyle aynı: wt1 (yeşil), wt2 (kırmızı sinyal).
+function computeWaveTrend(highs, lows, closes, n1 = 10, n2 = 21) {
+  const ap = closes.map((c, i) => (highs[i] + lows[i] + c) / 3);
+  const esa = emaArr(ap, n1);
+  const de = emaArr(ap.map((v, i) => Math.abs(v - esa[i])), n1);
+  const ci = ap.map((v, i) => { const d = de[i]; return d === 0 ? 0 : (v - esa[i]) / (0.015 * d); });
+  const wt1 = emaArr(ci, n2);
+  const wt2 = smaArr(wt1, 4);
+  return { wt1, wt2 };
+}
+// Stochastic RSI (14,14,3,3): %K ve %D (0..100).
+function computeStochRSI(closes, rsiLen = 14, stochLen = 14, kS = 3, dS = 3) {
+  const rsi = computeRSI(closes, rsiLen);
+  const n = closes.length;
+  const stoch = new Array(n).fill(null);
+  for (let i = 0; i < n; i++) {
+    if (rsi[i] == null || i < rsiLen + stochLen - 1) continue;
+    let mn = Infinity, mx = -Infinity, ok = true;
+    for (let j = i - stochLen + 1; j <= i; j++) { const r = rsi[j]; if (r == null) { ok = false; break; } if (r < mn) mn = r; if (r > mx) mx = r; }
+    if (ok) stoch[i] = mx === mn ? 0 : ((rsi[i] - mn) / (mx - mn)) * 100;
+  }
+  const k = smaArr(stoch, kS);
+  const d = smaArr(k, dS);
+  return { k, d };
+}
 
 // Grafik pop-up'ı: kendi Yahoo OHLC verimizi (backend /api/chart) Lightweight
 // Charts (açık kaynak, ücretsiz) ile çizer — mum + hacim, altında RSI ve MACD
@@ -46,7 +81,8 @@ function computeMACD(closes, fast = 12, slow = 26, sig = 9) {
 // göstermediği için harici widget yerine kendi grafiğimizi çiziyoruz.
 function ChartModal({ item, onClose }) {
   const priceRef = useRef(null);
-  const rsiRef = useRef(null);
+  const wtRef = useRef(null);
+  const stochRef = useRef(null);
   const macdRef = useRef(null);
   const [status, setStatus] = useState('loading'); // loading | ok | error
   const [tqty, setTqty] = useState('');
@@ -92,13 +128,27 @@ function ChartModal({ item, onClose }) {
         volSeries.priceScale().applyOptions({ scaleMargins: { top: 0.82, bottom: 0 } });
         volSeries.setData(candles.map((c) => ({ time: c.time, value: c.volume, color: c.close >= c.open ? 'rgba(74,222,128,0.4)' : 'rgba(248,113,113,0.4)' })));
 
-        // --- RSI 14 (0..100, 30/70 çizgileri) ---
-        const rsi = computeRSI(closes);
-        const rsiChart = createChart(rsiRef.current, { ...base, timeScale: { visible: false, borderColor: BORDER } });
-        const rsiSeries = rsiChart.addLineSeries({ color: '#c084fc', lineWidth: 2, priceLineVisible: false, autoscaleInfoProvider: () => ({ priceRange: { minValue: 0, maxValue: 100 } }) });
-        rsiSeries.setData(candles.map((c, i) => ({ time: c.time, value: rsi[i] })).filter((d) => d.value != null));
-        rsiSeries.createPriceLine({ price: 70, color: 'rgba(248,113,113,0.6)', lineWidth: 1, lineStyle: 2 });
-        rsiSeries.createPriceLine({ price: 30, color: 'rgba(74,222,128,0.6)', lineWidth: 1, lineStyle: 2 });
+        const highs = candles.map((c) => c.high);
+        const lows = candles.map((c) => c.low);
+
+        // --- WaveTrend (LazyBear) — tablo sinyaliyle uyumlu: wt1 yeşil, wt2 kırmızı ---
+        const { wt1, wt2 } = computeWaveTrend(highs, lows, closes);
+        const wtChart = createChart(wtRef.current, { ...base, timeScale: { visible: false, borderColor: BORDER } });
+        const wt1s = wtChart.addLineSeries({ color: '#4ade80', lineWidth: 2, priceLineVisible: false, lastValueVisible: false });
+        wt1s.setData(candles.map((c, i) => ({ time: c.time, value: wt1[i] })).filter((d) => d.value != null));
+        const wt2s = wtChart.addLineSeries({ color: '#f87171', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
+        wt2s.setData(candles.map((c, i) => ({ time: c.time, value: wt2[i] })).filter((d) => d.value != null));
+        [60, 53, 0, -53, -60].forEach((lvl) => wt1s.createPriceLine({ price: lvl, color: lvl === 0 ? 'rgba(139,147,161,0.45)' : 'rgba(139,147,161,0.25)', lineWidth: 1, lineStyle: 2 }));
+
+        // --- Stochastic RSI (14,14,3,3): %K mavi, %D turuncu, 20/80 ---
+        const { k: srK, d: srD } = computeStochRSI(closes);
+        const stochChart = createChart(stochRef.current, { ...base, timeScale: { visible: false, borderColor: BORDER } });
+        const kSeries = stochChart.addLineSeries({ color: '#60a5fa', lineWidth: 2, priceLineVisible: false, lastValueVisible: false, autoscaleInfoProvider: () => ({ priceRange: { minValue: 0, maxValue: 100 } }) });
+        kSeries.setData(candles.map((c, i) => ({ time: c.time, value: srK[i] })).filter((d) => d.value != null));
+        const dSeries = stochChart.addLineSeries({ color: '#fbbf24', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
+        dSeries.setData(candles.map((c, i) => ({ time: c.time, value: srD[i] })).filter((d) => d.value != null));
+        kSeries.createPriceLine({ price: 80, color: 'rgba(248,113,113,0.6)', lineWidth: 1, lineStyle: 2 });
+        kSeries.createPriceLine({ price: 20, color: 'rgba(74,222,128,0.6)', lineWidth: 1, lineStyle: 2 });
 
         // --- MACD 12/26/9 ---
         const { macd, signal, hist } = computeMACD(closes);
@@ -111,7 +161,7 @@ function ChartModal({ item, onClose }) {
         sigLine.setData(candles.map((c, i) => ({ time: c.time, value: signal[i] })).filter((d) => d.value != null));
 
         // --- Zaman eksenlerini senkronla ---
-        charts = [priceChart, rsiChart, macdChart];
+        charts = [priceChart, wtChart, stochChart, macdChart];
         let syncing = false;
         charts.forEach((src) => {
           src.timeScale().subscribeVisibleLogicalRangeChange((range) => {
@@ -165,8 +215,9 @@ function ChartModal({ item, onClose }) {
         <div className="modal-chart">
           <div className="chart-panes">
             <div className="pane" style={{ flex: 3 }} ref={priceRef}><span className="pane-label">Fiyat · Hacim</span></div>
-            <div className="pane" style={{ flex: 1.4 }} ref={rsiRef}><span className="pane-label">RSI 14</span></div>
-            <div className="pane" style={{ flex: 1.7 }} ref={macdRef}><span className="pane-label">MACD 12/26/9</span></div>
+            <div className="pane" style={{ flex: 1.5 }} ref={wtRef}><span className="pane-label">WaveTrend (LazyBear)</span></div>
+            <div className="pane" style={{ flex: 1.5 }} ref={stochRef}><span className="pane-label">Stoch RSI 14</span></div>
+            <div className="pane" style={{ flex: 1.5 }} ref={macdRef}><span className="pane-label">MACD 12/26/9</span></div>
           </div>
           {status !== 'ok' && (
             <div className="chart-state">
