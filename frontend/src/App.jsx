@@ -158,6 +158,23 @@ function ChartModal({ item, onClose }) {
 // Dev'de boş kalır → '/api...' Vite proxy üzerinden backend'e gider.
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
+// Dakikalık güncel fiyatları (/api/prices) mevcut veriye işler: yalnızca fiyat +
+// günlük değişim (+ metal ₺/gram) güncellenir; göstergeler/analist değişmez.
+function mergeLivePrices(data, live) {
+  if (!live || !live.prices || !data || !data.items) return data;
+  let changed = false;
+  const items = data.items.map((it) => {
+    const p = live.prices[it.ticker];
+    if (!p || p.price == null) return it;
+    changed = true;
+    const next = { ...it, price: p.price };
+    if (p.changePct != null) next.changePct = p.changePct;
+    if (it.kind === 'metal' && it.usdTry) next.tryPerGram = Math.round((p.price / 31.1034768) * it.usdTry * 100) / 100;
+    return next;
+  });
+  return changed ? { ...data, items, priceUpdatedAt: live.updatedAt } : data;
+}
+
 const SIGNAL_STYLES = {
   AL: { label: 'AL', bg: '#0f5132', fg: '#4ade80' },
   TUT: { label: 'TUT', bg: '#665200', fg: '#fbbf24' },
@@ -505,15 +522,29 @@ export default function App() {
   async function load() {
     try {
       setError(null);
-      const res = await fetch(`${API_BASE}/api/recommendations`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
+      const [recRes, priceRes] = await Promise.allSettled([
+        fetch(`${API_BASE}/api/recommendations`).then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
+        fetch(`${API_BASE}/api/prices`).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+      ]);
+      if (recRes.status !== 'fulfilled') throw recRes.reason;
+      let json = recRes.value;
+      if (priceRes.status === 'fulfilled' && priceRes.value) json = mergeLivePrices(json, priceRes.value);
       setData(json);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
+  }
+
+  // Sadece güncel fiyatları çekip mevcut veriye işler (dakikalık).
+  async function refreshPrices() {
+    try {
+      const r = await fetch(`${API_BASE}/api/prices`);
+      if (!r.ok) return;
+      const live = await r.json();
+      setData((prev) => mergeLivePrices(prev, live));
+    } catch { /* yoksay */ }
   }
 
   async function triggerRefresh() {
@@ -532,12 +563,14 @@ export default function App() {
   // arka planda sessizce yeniden çeker (spinner göstermeden).
   useEffect(() => {
     load();
-    const id = setInterval(load, 5 * 60 * 1000);
-    const onFocus = () => { if (document.visibilityState === 'visible') load(); };
+    const idFull = setInterval(load, 15 * 60 * 1000);      // tüm veri (göstergeler) 15 dk
+    const idPrice = setInterval(refreshPrices, 60 * 1000); // sadece fiyat 1 dk
+    const onFocus = () => { if (document.visibilityState === 'visible') refreshPrices(); };
     document.addEventListener('visibilitychange', onFocus);
     window.addEventListener('focus', onFocus);
     return () => {
-      clearInterval(id);
+      clearInterval(idFull);
+      clearInterval(idPrice);
       document.removeEventListener('visibilitychange', onFocus);
       window.removeEventListener('focus', onFocus);
     };
@@ -707,9 +740,9 @@ export default function App() {
             {f === 'ALL' ? 'Tümü' : f}
           </button>
         ))}
-        {data.updatedAt && (
+        {(data.priceUpdatedAt || data.updatedAt) && (
           <span className="updated">
-            Son güncelleme: {new Date(data.updatedAt).toLocaleString('tr-TR')}
+            Fiyat: {new Date(data.priceUpdatedAt || data.updatedAt).toLocaleTimeString('tr-TR')}
           </span>
         )}
       </div>

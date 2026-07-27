@@ -1,4 +1,4 @@
-import { toSymbol } from './stocks.js';
+import { toSymbol, INSTRUMENTS } from './stocks.js';
 
 // Yahoo Finance chart endpoint'i BIST hisseleri için ".IS" ekiyle çalışır
 // ve crumb/cookie gerektirmez. 1 aylık günlük veriyi çekiyoruz.
@@ -104,6 +104,49 @@ export async function diagnose(ticker = 'THYAO') {
     steps.error = e.message;
   }
   return steps;
+}
+
+// --- Toplu GÜNCEL (intraday) fiyatlar -- spark ucu (crumb'sız, hızlı) -------
+// Sadece anlık fiyat + günlük değişim döner; göstergeler/analist bunun kapsamında
+// değildir. Dakikalık yenileme için kullanılır. ~45sn bellek önbelleği.
+const SPARK_URL = 'https://query1.finance.yahoo.com/v8/finance/spark';
+let livePriceCache = { at: 0, data: null };
+export async function fetchLivePrices() {
+  if (Date.now() - livePriceCache.at < 45000 && livePriceCache.data) return livePriceCache.data;
+  const bySym = new Map(INSTRUMENTS.map((i) => [i.symbol, i.ticker]));
+  const symbols = INSTRUMENTS.map((i) => i.symbol);
+  const prices = {};
+  const CHUNK = 20; // spark en fazla 20 sembol kabul ediyor
+  const CONC = 5;   // eşzamanlı istek
+  const chunks = [];
+  for (let i = 0; i < symbols.length; i += CHUNK) chunks.push(symbols.slice(i, i + CHUNK));
+
+  const doChunk = async (chunk) => {
+    try {
+      const url = `${SPARK_URL}?symbols=${chunk.map(encodeURIComponent).join(',')}&range=1d&interval=1d`;
+      const res = await fetch(url, { headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(12000) });
+      if (!res.ok) return;
+      const j = await res.json();
+      for (const [sym, d] of Object.entries(j || {})) {
+        const closes = (d?.close || []).filter((x) => x != null);
+        const price = closes[closes.length - 1];
+        const prev = d?.chartPreviousClose;
+        const ticker = bySym.get(sym);
+        if (ticker && price != null) {
+          prices[ticker] = {
+            price: Math.round(price * 100) / 100,
+            changePct: prev ? Math.round(((price - prev) / prev) * 10000) / 100 : null,
+          };
+        }
+      }
+    } catch { /* bu parçayı atla */ }
+  };
+
+  for (let i = 0; i < chunks.length; i += CONC) {
+    await Promise.all(chunks.slice(i, i + CONC).map(doChunk));
+  }
+  livePriceCache = { at: Date.now(), data: { updatedAt: new Date().toISOString(), prices } };
+  return livePriceCache.data;
 }
 
 // --- TCMB USD/TRY kuru ------------------------------------------------------

@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import { initDb } from './db.js';
 import { syncData, getRecommendations } from './service.js';
-import { diagnose, fetchOhlc } from './dataSource.js';
+import { diagnose, fetchOhlc, fetchLivePrices } from './dataSource.js';
 import { fetchNews, fetchKap } from './newsSource.js';
 import { INSTRUMENTS } from './stocks.js';
 
@@ -16,6 +16,15 @@ app.use(express.json());
 
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, time: new Date().toISOString() });
+});
+
+// Toplu güncel (intraday) fiyatlar — dakikalık yenileme için (spark ucu).
+app.get('/api/prices', async (req, res) => {
+  try {
+    res.json(await fetchLivePrices());
+  } catch (err) {
+    res.status(502).json({ error: err.message, prices: {} });
+  }
 });
 
 // Grafik için günlük OHLC mum verisi (frontend Lightweight Charts ile çizer).
