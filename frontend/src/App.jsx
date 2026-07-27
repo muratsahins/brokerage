@@ -565,7 +565,7 @@ export default function App() {
   useEffect(() => {
     load();
     const idFull = setInterval(load, 15 * 60 * 1000);      // tüm veri (göstergeler) 15 dk
-    const idPrice = setInterval(refreshPrices, 10 * 1000); // sadece fiyat ~10 sn (anlık)
+    const idPrice = setInterval(refreshPrices, 18 * 1000); // sadece fiyat ~18 sn (throttle'a takılmadan)
     const onFocus = () => { if (document.visibilityState === 'visible') refreshPrices(); };
     document.addEventListener('visibilitychange', onFocus);
     window.addEventListener('focus', onFocus);
