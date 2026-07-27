@@ -119,12 +119,17 @@ function ChartModal({ item, onClose }) {
         if (candles.length === 0) throw new Error('boş veri');
         setStatus('ok');
         const closes = candles.map((c) => c.close);
+        // Değeri olmayan barları whitespace (yalnız time) yapar; böylece tüm seriler
+        // aynı zaman aralığını kaplar ve paneller birebir hizalı olur.
+        const ws = (arr, colorFn) => candles.map((c, i) => (arr[i] != null
+          ? (colorFn ? { time: c.time, value: arr[i], color: colorFn(i) } : { time: c.time, value: arr[i] })
+          : { time: c.time }));
 
         // --- Fiyat + hacim ---
         const priceChart = createChart(priceRef.current, { ...base, timeScale: { visible: false, borderColor: BORDER } });
         const candleSeries = priceChart.addCandlestickSeries({ upColor: UP, downColor: DOWN, wickUpColor: UP, wickDownColor: DOWN, borderVisible: false });
         candleSeries.setData(candles);
-        const volSeries = priceChart.addHistogramSeries({ priceFormat: { type: 'volume' }, priceScaleId: '' });
+        const volSeries = priceChart.addHistogramSeries({ priceFormat: { type: 'volume' }, priceScaleId: '', lastValueVisible: false, priceLineVisible: false });
         volSeries.priceScale().applyOptions({ scaleMargins: { top: 0.82, bottom: 0 } });
         volSeries.setData(candles.map((c) => ({ time: c.time, value: c.volume, color: c.close >= c.open ? 'rgba(74,222,128,0.4)' : 'rgba(248,113,113,0.4)' })));
 
@@ -135,40 +140,60 @@ function ChartModal({ item, onClose }) {
         const { wt1, wt2 } = computeWaveTrend(highs, lows, closes);
         const wtChart = createChart(wtRef.current, { ...base, timeScale: { visible: false, borderColor: BORDER } });
         const wt1s = wtChart.addLineSeries({ color: '#4ade80', lineWidth: 2, priceLineVisible: false, lastValueVisible: false });
-        wt1s.setData(candles.map((c, i) => ({ time: c.time, value: wt1[i] })).filter((d) => d.value != null));
+        wt1s.setData(ws(wt1));
         const wt2s = wtChart.addLineSeries({ color: '#f87171', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
-        wt2s.setData(candles.map((c, i) => ({ time: c.time, value: wt2[i] })).filter((d) => d.value != null));
+        wt2s.setData(ws(wt2));
         [60, 53, 0, -53, -60].forEach((lvl) => wt1s.createPriceLine({ price: lvl, color: lvl === 0 ? 'rgba(139,147,161,0.45)' : 'rgba(139,147,161,0.25)', lineWidth: 1, lineStyle: 2 }));
 
         // --- Stochastic RSI (14,14,3,3): %K mavi, %D turuncu, 20/80 ---
         const { k: srK, d: srD } = computeStochRSI(closes);
         const stochChart = createChart(stochRef.current, { ...base, timeScale: { visible: false, borderColor: BORDER } });
         const kSeries = stochChart.addLineSeries({ color: '#60a5fa', lineWidth: 2, priceLineVisible: false, lastValueVisible: false, autoscaleInfoProvider: () => ({ priceRange: { minValue: 0, maxValue: 100 } }) });
-        kSeries.setData(candles.map((c, i) => ({ time: c.time, value: srK[i] })).filter((d) => d.value != null));
+        kSeries.setData(ws(srK));
         const dSeries = stochChart.addLineSeries({ color: '#fbbf24', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
-        dSeries.setData(candles.map((c, i) => ({ time: c.time, value: srD[i] })).filter((d) => d.value != null));
+        dSeries.setData(ws(srD));
         kSeries.createPriceLine({ price: 80, color: 'rgba(248,113,113,0.6)', lineWidth: 1, lineStyle: 2 });
         kSeries.createPriceLine({ price: 20, color: 'rgba(74,222,128,0.6)', lineWidth: 1, lineStyle: 2 });
 
         // --- MACD 12/26/9 ---
         const { macd, signal, hist } = computeMACD(closes);
         const macdChart = createChart(macdRef.current, { ...base, timeScale: { visible: true, borderColor: BORDER } });
-        const histSeries = macdChart.addHistogramSeries({ priceLineVisible: false });
-        histSeries.setData(candles.map((c, i) => ({ time: c.time, value: hist[i], color: hist[i] >= 0 ? 'rgba(74,222,128,0.55)' : 'rgba(248,113,113,0.55)' })).filter((d) => d.value != null));
+        const histSeries = macdChart.addHistogramSeries({ priceLineVisible: false, lastValueVisible: false });
+        histSeries.setData(ws(hist, (i) => (hist[i] >= 0 ? 'rgba(74,222,128,0.55)' : 'rgba(248,113,113,0.55)')));
         const macdLine = macdChart.addLineSeries({ color: '#60a5fa', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
-        macdLine.setData(candles.map((c, i) => ({ time: c.time, value: macd[i] })).filter((d) => d.value != null));
+        macdLine.setData(ws(macd));
         const sigLine = macdChart.addLineSeries({ color: '#fbbf24', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
-        sigLine.setData(candles.map((c, i) => ({ time: c.time, value: signal[i] })).filter((d) => d.value != null));
+        sigLine.setData(ws(signal));
 
-        // --- Zaman eksenlerini senkronla ---
-        charts = [priceChart, wtChart, stochChart, macdChart];
+        // --- Panelleri senkronla: zaman ekseni + imleç (crosshair) ---
+        const panes = [
+          { chart: priceChart, series: candleSeries },
+          { chart: wtChart, series: wt1s },
+          { chart: stochChart, series: kSeries },
+          { chart: macdChart, series: macdLine },
+        ];
+        charts = panes.map((p) => p.chart);
         let syncing = false;
-        charts.forEach((src) => {
-          src.timeScale().subscribeVisibleLogicalRangeChange((range) => {
+        panes.forEach(({ chart }) => {
+          chart.timeScale().subscribeVisibleLogicalRangeChange((range) => {
             if (!range || syncing) return;
             syncing = true;
-            charts.forEach((c) => { if (c !== src) c.timeScale().setVisibleLogicalRange(range); });
+            charts.forEach((c) => { if (c !== chart) c.timeScale().setVisibleLogicalRange(range); });
             syncing = false;
+          });
+        });
+        // İmleç: bir panelde gezerken diğer paneller de aynı zaman üzerinde işaretlenir.
+        let syncingC = false;
+        panes.forEach(({ chart }) => {
+          chart.subscribeCrosshairMove((param) => {
+            if (syncingC) return;
+            syncingC = true;
+            panes.forEach((p) => {
+              if (p.chart === chart) return;
+              if (param.time !== undefined && param.point) p.chart.setCrosshairPosition(0, param.time, p.series);
+              else p.chart.clearCrosshairPosition();
+            });
+            syncingC = false;
           });
         });
         priceChart.timeScale().fitContent();
