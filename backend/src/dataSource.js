@@ -110,6 +110,13 @@ export async function diagnose(ticker = 'THYAO') {
 // Sadece anlık fiyat + günlük değişim döner; göstergeler/analist bunun kapsamında
 // değildir. Dakikalık yenileme için kullanılır. ~45sn bellek önbelleği.
 const SPARK_URL = 'https://query1.finance.yahoo.com/v8/finance/spark';
+// Küçük fiyatlarda (kripto) daha çok ondalık koru.
+function roundPrice(x) {
+  const a = Math.abs(x);
+  const d = a >= 1 ? 2 : a >= 0.01 ? 6 : 10;
+  const f = 10 ** d;
+  return Math.round(x * f) / f;
+}
 let livePriceCache = { at: 0, data: null };
 export async function fetchLivePrices() {
   if (Date.now() - livePriceCache.at < 15000 && livePriceCache.data) return livePriceCache.data;
@@ -134,7 +141,7 @@ export async function fetchLivePrices() {
         const ticker = bySym.get(sym);
         if (ticker && price != null) {
           prices[ticker] = {
-            price: Math.round(price * 100) / 100,
+            price: roundPrice(price),
             changePct: prev ? Math.round(((price - prev) / prev) * 10000) / 100 : null,
           };
         }

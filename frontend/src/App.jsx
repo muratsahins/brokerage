@@ -195,7 +195,7 @@ function mergeLivePrices(data, live) {
     const next = { ...it, price: p.price };
     if (p.changePct != null) next.changePct = p.changePct;
     if (it.kind === 'metal' && it.usdTry) next.tryPerGram = Math.round((p.price / 31.1034768) * it.usdTry * 100) / 100;
-    if (it.kind === 'crypto' && it.usdTry) next.tryPrice = Math.round(p.price * it.usdTry * 100) / 100;
+    if (it.kind === 'crypto' && it.usdTry) next.tryPrice = roundPrice(p.price * it.usdTry);
     return next;
   });
   return changed ? { ...data, items, priceUpdatedAt: live.updatedAt } : data;
@@ -209,10 +209,18 @@ const SIGNAL_STYLES = {
 
 function fmtNum(x, digits = 2) {
   if (x == null || Number.isNaN(x)) return '—';
+  const a = Math.abs(x);
+  const maxD = a > 0 && a < 1 ? (a >= 0.01 ? 4 : 8) : digits; // küçük fiyatlarda (kripto) daha çok ondalık
   return Number(x).toLocaleString('tr-TR', {
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits,
+    minimumFractionDigits: Math.min(digits, maxD),
+    maximumFractionDigits: Math.max(digits, maxD),
   });
+}
+function roundPrice(x) {
+  const a = Math.abs(x);
+  const d = a >= 1 ? 2 : a >= 0.01 ? 6 : 10;
+  const f = 10 ** d;
+  return Math.round(x * f) / f;
 }
 
 // Türkçe karakter duyarsız normalleştirme (arama için): "Şişecam" -> "sisecam".

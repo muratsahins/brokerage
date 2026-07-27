@@ -1,6 +1,6 @@
 import { BIST_STOCKS, INSTRUMENTS, toSymbol } from './stocks.js';
 import { fetchQuotes, fetchUsdTryRate, fetchAltinInPrices } from './dataSource.js';
-import { buildRecommendations } from './recommend.js';
+import { buildRecommendations, roundPrice } from './recommend.js';
 import {
   isDbAvailable,
   upsertStock,
@@ -74,7 +74,7 @@ export async function computeRecommendations() {
     }
     if (kind === 'crypto' && item.price != null && usdTry) {
       // Kripto fiyatı USD -> TRY karşılığı (sanal borsa/₺ gösterim için).
-      item.tryPrice = Math.round(item.price * usdTry * 100) / 100;
+      item.tryPrice = roundPrice(item.price * usdTry);
       item.usdTry = usdTry;
     }
     return item;

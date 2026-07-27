@@ -14,6 +14,14 @@ import {
 function clamp01(x) {
   return Math.max(0, Math.min(1, x));
 }
+// Fiyat için uyarlamalı yuvarlama: küçük fiyatlarda (kripto) daha çok ondalık.
+export function roundPrice(x) {
+  if (x == null || Number.isNaN(x)) return null;
+  const a = Math.abs(x);
+  const d = a >= 1 ? 2 : a >= 0.01 ? 6 : 10;
+  const f = 10 ** d;
+  return Math.round(x * f) / f;
+}
 function round(x, digits = 2) {
   if (x == null || Number.isNaN(x)) return null;
   const f = 10 ** digits;
@@ -90,7 +98,7 @@ export function scoreQuote(q) {
   return {
     symbol: q.symbol,
     ticker: q.ticker,
-    price: round(price),
+    price: roundPrice(price),
     currency: q.currency,
     changePct: round(changePct),
     momentum1m: round(momentum1m),
