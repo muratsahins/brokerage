@@ -227,10 +227,10 @@ export async function fetchOhlc(symbol, range = '1y') {
 
 // --- Fiyat + geçmiş (chart) -------------------------------------------------
 async function fetchChart(symbol) {
-  // 6 aylık günlük veri: hem 1 aylık momentum hem de teknik göstergeler
-  // (WaveTrend, Supertrend) için yeterli bar sağlar. symbol tam Yahoo sembolüdür
-  // (ör. THYAO.IS veya GC=F) — '=' gibi karakterler için URL-kodlanır.
-  const url = `${CHART_URL}/${encodeURIComponent(symbol)}?range=6mo&interval=1d`;
+  // 1 yıllık günlük veri — grafik modalı (/api/chart) da 1y kullanıyor; sinyaller
+  // grafiktekiyle BİREBİR aynı veri+aralıktan hesaplansın diye eşitlendi (özellikle
+  // durumlu SuperTrend için). symbol tam Yahoo sembolüdür; '=' için URL-kodlanır.
+  const url = `${CHART_URL}/${encodeURIComponent(symbol)}?range=1y&interval=1d`;
   const res = await fetch(url, { headers: { 'User-Agent': UA } });
   if (!res.ok) throw new Error(`Yahoo ${symbol} -> HTTP ${res.status}`);
   const json = await res.json();
