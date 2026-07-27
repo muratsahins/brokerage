@@ -112,7 +112,7 @@ export async function diagnose(ticker = 'THYAO') {
 const SPARK_URL = 'https://query1.finance.yahoo.com/v8/finance/spark';
 let livePriceCache = { at: 0, data: null };
 export async function fetchLivePrices() {
-  if (Date.now() - livePriceCache.at < 45000 && livePriceCache.data) return livePriceCache.data;
+  if (Date.now() - livePriceCache.at < 8000 && livePriceCache.data) return livePriceCache.data;
   const bySym = new Map(INSTRUMENTS.map((i) => [i.symbol, i.ticker]));
   const symbols = INSTRUMENTS.map((i) => i.symbol);
   const prices = {};

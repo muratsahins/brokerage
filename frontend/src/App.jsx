@@ -537,8 +537,9 @@ export default function App() {
     }
   }
 
-  // Sadece güncel fiyatları çekip mevcut veriye işler (dakikalık).
+  // Sadece güncel fiyatları çekip mevcut veriye işler (anlık ~10 sn).
   async function refreshPrices() {
+    if (typeof document !== 'undefined' && document.hidden) return; // sekme arkadaysa atla
     try {
       const r = await fetch(`${API_BASE}/api/prices`);
       if (!r.ok) return;
@@ -564,7 +565,7 @@ export default function App() {
   useEffect(() => {
     load();
     const idFull = setInterval(load, 15 * 60 * 1000);      // tüm veri (göstergeler) 15 dk
-    const idPrice = setInterval(refreshPrices, 60 * 1000); // sadece fiyat 1 dk
+    const idPrice = setInterval(refreshPrices, 10 * 1000); // sadece fiyat ~10 sn (anlık)
     const onFocus = () => { if (document.visibilityState === 'visible') refreshPrices(); };
     document.addEventListener('visibilitychange', onFocus);
     window.addEventListener('focus', onFocus);
