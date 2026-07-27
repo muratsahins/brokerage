@@ -1,4 +1,5 @@
 import OTHER_STOCKS_DATA from './other-stocks.js';
+import CRYPTOS from './crypto.js';
 
 // Takip edilen BIST hisseleri. `bist` alanı, hissenin ait olduğu EN DAR endeksi
 // belirtir (30 ⊂ 50 ⊂ 100). Frontend sekmeleri bunu iç içe filtre olarak kullanır:
@@ -134,6 +135,7 @@ export const INSTRUMENTS = [
   ...BIST_STOCKS.map((s) => ({ ...s, symbol: `${s.ticker}.IS`, currency: 'TRY', kind: 'stock' })),
   ...OTHER_STOCKS.map((s) => ({ ...s, symbol: `${s.ticker}.IS`, currency: 'TRY', bist: null, kind: 'stock' })),
   ...METALS.map((m) => ({ ...m, sector: 'Kıymetli Maden', bist: null, kind: 'metal' })),
+  ...CRYPTOS.map((c) => ({ ...c, sector: 'Kripto', bist: null, currency: 'USD', kind: 'crypto' })),
 ];
 
 export function toSymbol(ticker) {

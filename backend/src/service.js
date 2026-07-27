@@ -41,10 +41,11 @@ export async function computeRecommendations() {
   const quotes = await fetchQuotes(INSTRUMENTS);
   const recos = buildRecommendations(quotes);
 
-  // Kıymetli madenler için TCMB USD/TRY kuru + altin.in alış/satış fiyatları.
+  // USD fiyatlı enstrümanlar (kıymetli maden, kripto) için TCMB USD/TRY + altin.in.
   const hasMetal = INSTRUMENTS.some((i) => i.kind === 'metal');
-  const [usdTry, altinIn] = hasMetal
-    ? await Promise.all([fetchUsdTryRate(), fetchAltinInPrices()])
+  const hasUsd = INSTRUMENTS.some((i) => i.kind === 'metal' || i.kind === 'crypto');
+  const [usdTry, altinIn] = hasUsd
+    ? await Promise.all([fetchUsdTryRate(), hasMetal ? fetchAltinInPrices() : Promise.resolve({})])
     : [null, {}];
 
   return recos.map((r) => {
@@ -70,6 +71,11 @@ export async function computeRecommendations() {
         item.buyPrice = ai.buy ?? null;
         item.sellPrice = ai.sell ?? null;
       }
+    }
+    if (kind === 'crypto' && item.price != null && usdTry) {
+      // Kripto fiyatı USD -> TRY karşılığı (sanal borsa/₺ gösterim için).
+      item.tryPrice = Math.round(item.price * usdTry * 100) / 100;
+      item.usdTry = usdTry;
     }
     return item;
   });

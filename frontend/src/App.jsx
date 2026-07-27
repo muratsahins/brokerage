@@ -195,6 +195,7 @@ function mergeLivePrices(data, live) {
     const next = { ...it, price: p.price };
     if (p.changePct != null) next.changePct = p.changePct;
     if (it.kind === 'metal' && it.usdTry) next.tryPerGram = Math.round((p.price / 31.1034768) * it.usdTry * 100) / 100;
+    if (it.kind === 'crypto' && it.usdTry) next.tryPrice = Math.round(p.price * it.usdTry * 100) / 100;
     return next;
   });
   return changed ? { ...data, items, priceUpdatedAt: live.updatedAt } : data;
@@ -376,7 +377,12 @@ function vbLoad(email) {
   catch { return { cash: VB_START, positions: {}, history: [] }; }
 }
 function vbSave(email, pf) { try { localStorage.setItem('vb_pf_' + email, JSON.stringify(pf)); } catch { /* yoksay */ } }
-function vbUnitPrice(it) { return it ? (it.kind === 'metal' ? it.tryPerGram : it.price) : null; }
+function vbUnitPrice(it) {
+  if (!it) return null;
+  if (it.kind === 'metal') return it.tryPerGram;
+  if (it.kind === 'crypto') return it.tryPrice;
+  return it.price;
+}
 function vbUnitLabel(it) { return it && it.kind === 'metal' ? 'gr' : 'adet'; }
 function vbTrade(email, item, side, qtyRaw) {
   const pf = vbLoad(email);
@@ -414,8 +420,8 @@ function VirtualTrade({ items }) {
   const [msg, setMsg] = useState(null);
 
   const byTicker = useMemo(() => new Map(items.map((i) => [i.ticker, i])), [items]);
-  const unitPrice = (it) => (it ? (it.kind === 'metal' ? it.tryPerGram : it.price) : null);
-  const unitLabel = (it) => (it && it.kind === 'metal' ? 'gr' : 'adet');
+  const unitPrice = (it) => vbUnitPrice(it);
+  const unitLabel = (it) => vbUnitLabel(it);
 
   useEffect(() => {
     if (!email) { setPf(null); return; }
@@ -469,7 +475,7 @@ function VirtualTrade({ items }) {
   const totalPnl = total - VB_START;
 
   const nq = norm(q.trim());
-  const results = nq ? items.filter((i) => (i.kind === 'stock' || i.kind === 'metal') && unitPrice(i) != null && (norm(i.ticker).includes(nq) || norm(i.name).includes(nq))).slice(0, 8) : [];
+  const results = nq ? items.filter((i) => i.kind !== undefined && unitPrice(i) != null && (norm(i.ticker).includes(nq) || norm(i.name).includes(nq))).slice(0, 8) : [];
   const selIt = byTicker.get(sel);
 
   return (
@@ -631,6 +637,7 @@ export default function App() {
     { key: 'bist50',  label: 'BIST 50',        match: (i) => i.bist != null && i.bist <= 50 },
     { key: 'bist100', label: 'BIST 100',       match: (i) => i.bist != null && i.bist <= 100 },
     { key: 'metal',   label: 'Kıymetli Maden', match: (i) => i.kind === 'metal' },
+    { key: 'crypto',  label: 'Kripto',         match: (i) => i.kind === 'crypto' },
   ];
   const NEWS_TABS = [
     { key: 'news', label: '📰 Haberler', news: 'news' },
@@ -861,6 +868,9 @@ export default function App() {
                     {s.tryPerGram != null && (
                       <div className="exp-note">≈ {fmtNum(s.tryPerGram)} ₺/gr</div>
                     )}
+                    {s.tryPrice != null && (
+                      <div className="exp-note">≈ {fmtNum(s.tryPrice)} ₺</div>
+                    )}
                   </td>
                   {showBuySell && (
                     <td className="num">
@@ -922,6 +932,9 @@ export default function App() {
               </div>
               {s.tryPerGram != null && (
                 <div className="exp-note">≈ {fmtNum(s.tryPerGram)} ₺/gr</div>
+              )}
+              {s.tryPrice != null && (
+                <div className="exp-note">≈ {fmtNum(s.tryPrice)} ₺</div>
               )}
 
               {s.kind === 'metal' && (
