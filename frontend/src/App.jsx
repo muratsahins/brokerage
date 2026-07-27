@@ -75,6 +75,55 @@ function computeStochRSI(closes, rsiLen = 14, stochLen = 14, kS = 3, dS = 3) {
   return { k, d };
 }
 
+// Wilder ATR + SuperTrend (Kıvanç) — fiyat overlay'i, tablo sinyaliyle uyumlu.
+function atrArr(highs, lows, closes, period = 10) {
+  const n = closes.length;
+  const out = new Array(n).fill(null);
+  if (n < period) return out;
+  const tr = new Array(n);
+  tr[0] = highs[0] - lows[0];
+  for (let i = 1; i < n; i++) tr[i] = Math.max(highs[i] - lows[i], Math.abs(highs[i] - closes[i - 1]), Math.abs(lows[i] - closes[i - 1]));
+  let prev = 0; for (let i = 0; i < period; i++) prev += tr[i]; prev /= period;
+  out[period - 1] = prev;
+  for (let i = period; i < n; i++) { prev = (prev * (period - 1) + tr[i]) / period; out[i] = prev; }
+  return out;
+}
+function computeSuperTrend(highs, lows, closes, period = 10, mult = 3) {
+  const a = atrArr(highs, lows, closes, period);
+  const n = closes.length;
+  const line = new Array(n).fill(null), dir = new Array(n).fill(null);
+  let prevUp = null, prevDn = null, prevTrend = 1, prevClose = null, started = false;
+  for (let i = 0; i < n; i++) {
+    const av = a[i]; if (av == null) continue;
+    const src = (highs[i] + lows[i]) / 2;
+    let up = src - mult * av, dn = src + mult * av, trend;
+    if (!started) { trend = 1; started = true; }
+    else {
+      up = prevClose > prevUp ? Math.max(up, prevUp) : up;
+      dn = prevClose < prevDn ? Math.min(dn, prevDn) : dn;
+      trend = prevTrend;
+      if (prevTrend === -1 && closes[i] > prevDn) trend = 1;
+      else if (prevTrend === 1 && closes[i] < prevUp) trend = -1;
+    }
+    line[i] = trend === 1 ? up : dn; dir[i] = trend;
+    prevUp = up; prevDn = dn; prevTrend = trend; prevClose = closes[i];
+  }
+  return { line, dir };
+}
+
+const CHART_INDS = [
+  { key: 'supertrend', label: 'SuperTrend' },
+  { key: 'volume', label: 'Hacim' },
+  { key: 'wavetrend', label: 'WaveTrend' },
+  { key: 'stochrsi', label: 'Stoch RSI' },
+  { key: 'macd', label: 'MACD' },
+];
+function loadChartInds() {
+  const def = { supertrend: true, volume: true, wavetrend: true, stochrsi: true, macd: true };
+  try { const raw = localStorage.getItem('chart_inds'); return raw ? { ...def, ...JSON.parse(raw) } : def; }
+  catch { return def; }
+}
+
 // Grafik pop-up'ı: kendi Yahoo OHLC verimizi (backend /api/chart) Lightweight
 // Charts (açık kaynak, ücretsiz) ile çizer — mum + hacim, altında RSI ve MACD
 // panelleri (zaman eksenleri senkron). TradingView embed'i BIST verisini
@@ -87,6 +136,13 @@ function ChartModal({ item, onClose }) {
   const [status, setStatus] = useState('loading'); // loading | ok | error
   const [tqty, setTqty] = useState('');
   const [tmsg, setTmsg] = useState(null);
+  const [inds, setInds] = useState(loadChartInds);
+  const indKey = JSON.stringify(inds);
+  const toggleInd = (k) => setInds((s) => {
+    const next = { ...s, [k]: !s[k] };
+    try { localStorage.setItem('chart_inds', JSON.stringify(next)); } catch { /* yoksay */ }
+    return next;
+  });
   const vbe = vbEmail();
   const doTrade = (side) => {
     const res = vbTrade(vbe, item, side, tqty);
@@ -125,53 +181,74 @@ function ChartModal({ item, onClose }) {
           ? (colorFn ? { time: c.time, value: arr[i], color: colorFn(i) } : { time: c.time, value: arr[i] })
           : { time: c.time }));
 
-        // --- Fiyat + hacim ---
-        const priceChart = createChart(priceRef.current, { ...base, timeScale: { visible: false, borderColor: BORDER } });
-        const candleSeries = priceChart.addCandlestickSeries({ upColor: UP, downColor: DOWN, wickUpColor: UP, wickDownColor: DOWN, borderVisible: false });
-        candleSeries.setData(candles);
-        const volSeries = priceChart.addHistogramSeries({ priceFormat: { type: 'volume' }, priceScaleId: '', lastValueVisible: false, priceLineVisible: false });
-        volSeries.priceScale().applyOptions({ scaleMargins: { top: 0.82, bottom: 0 } });
-        volSeries.setData(candles.map((c) => ({ time: c.time, value: c.volume, color: c.close >= c.open ? 'rgba(74,222,128,0.4)' : 'rgba(248,113,113,0.4)' })));
-
         const highs = candles.map((c) => c.high);
         const lows = candles.map((c) => c.low);
+        // Aktif alt paneller (zaman ekseni son panelde görünür).
+        const paneKeys = ['price'];
+        if (inds.wavetrend) paneKeys.push('wt');
+        if (inds.stochrsi) paneKeys.push('stoch');
+        if (inds.macd) paneKeys.push('macd');
+        const lastKey = paneKeys[paneKeys.length - 1];
+        const tsOpt = (key) => ({ visible: key === lastKey, borderColor: BORDER });
+        const panes = [];
 
-        // --- WaveTrend (LazyBear) — tablo sinyaliyle uyumlu: wt1 yeşil, wt2 kırmızı ---
-        const { wt1, wt2 } = computeWaveTrend(highs, lows, closes);
-        const wtChart = createChart(wtRef.current, { ...base, timeScale: { visible: false, borderColor: BORDER } });
-        const wt1s = wtChart.addLineSeries({ color: '#4ade80', lineWidth: 2, priceLineVisible: false, lastValueVisible: false });
-        wt1s.setData(ws(wt1));
-        const wt2s = wtChart.addLineSeries({ color: '#f87171', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
-        wt2s.setData(ws(wt2));
-        [60, 53, 0, -53, -60].forEach((lvl) => wt1s.createPriceLine({ price: lvl, color: lvl === 0 ? 'rgba(139,147,161,0.45)' : 'rgba(139,147,161,0.25)', lineWidth: 1, lineStyle: 2 }));
+        // --- Fiyat (+ hacim + SuperTrend overlay) ---
+        const priceChart = createChart(priceRef.current, { ...base, timeScale: tsOpt('price') });
+        const candleSeries = priceChart.addCandlestickSeries({ upColor: UP, downColor: DOWN, wickUpColor: UP, wickDownColor: DOWN, borderVisible: false });
+        candleSeries.setData(candles);
+        if (inds.volume) {
+          const volSeries = priceChart.addHistogramSeries({ priceFormat: { type: 'volume' }, priceScaleId: '', lastValueVisible: false, priceLineVisible: false });
+          volSeries.priceScale().applyOptions({ scaleMargins: { top: 0.82, bottom: 0 } });
+          volSeries.setData(candles.map((c) => ({ time: c.time, value: c.volume, color: c.close >= c.open ? 'rgba(74,222,128,0.4)' : 'rgba(248,113,113,0.4)' })));
+        }
+        if (inds.supertrend) {
+          const { line: stLine, dir: stDir } = computeSuperTrend(highs, lows, closes);
+          const stUp = priceChart.addLineSeries({ color: UP, lineWidth: 2, priceLineVisible: false, lastValueVisible: false });
+          stUp.setData(candles.map((c, i) => (stDir[i] === 1 && stLine[i] != null) ? { time: c.time, value: stLine[i] } : { time: c.time }));
+          const stDown = priceChart.addLineSeries({ color: DOWN, lineWidth: 2, priceLineVisible: false, lastValueVisible: false });
+          stDown.setData(candles.map((c, i) => (stDir[i] === -1 && stLine[i] != null) ? { time: c.time, value: stLine[i] } : { time: c.time }));
+        }
+        panes.push({ chart: priceChart, series: candleSeries });
 
-        // --- Stochastic RSI (14,14,3,3): %K mavi, %D turuncu, 20/80 ---
-        const { k: srK, d: srD } = computeStochRSI(closes);
-        const stochChart = createChart(stochRef.current, { ...base, timeScale: { visible: false, borderColor: BORDER } });
-        const kSeries = stochChart.addLineSeries({ color: '#60a5fa', lineWidth: 2, priceLineVisible: false, lastValueVisible: false, autoscaleInfoProvider: () => ({ priceRange: { minValue: 0, maxValue: 100 } }) });
-        kSeries.setData(ws(srK));
-        const dSeries = stochChart.addLineSeries({ color: '#fbbf24', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
-        dSeries.setData(ws(srD));
-        kSeries.createPriceLine({ price: 80, color: 'rgba(248,113,113,0.6)', lineWidth: 1, lineStyle: 2 });
-        kSeries.createPriceLine({ price: 20, color: 'rgba(74,222,128,0.6)', lineWidth: 1, lineStyle: 2 });
+        // --- WaveTrend (LazyBear) — tablo sinyaliyle uyumlu ---
+        if (inds.wavetrend && wtRef.current) {
+          const { wt1, wt2 } = computeWaveTrend(highs, lows, closes);
+          const wtChart = createChart(wtRef.current, { ...base, timeScale: tsOpt('wt') });
+          const wt1s = wtChart.addLineSeries({ color: '#4ade80', lineWidth: 2, priceLineVisible: false, lastValueVisible: false });
+          wt1s.setData(ws(wt1));
+          const wt2s = wtChart.addLineSeries({ color: '#f87171', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
+          wt2s.setData(ws(wt2));
+          [60, 53, 0, -53, -60].forEach((lvl) => wt1s.createPriceLine({ price: lvl, color: lvl === 0 ? 'rgba(139,147,161,0.45)' : 'rgba(139,147,161,0.25)', lineWidth: 1, lineStyle: 2 }));
+          panes.push({ chart: wtChart, series: wt1s });
+        }
+
+        // --- Stochastic RSI (14,14,3,3) ---
+        if (inds.stochrsi && stochRef.current) {
+          const { k: srK, d: srD } = computeStochRSI(closes);
+          const stochChart = createChart(stochRef.current, { ...base, timeScale: tsOpt('stoch') });
+          const kSeries = stochChart.addLineSeries({ color: '#60a5fa', lineWidth: 2, priceLineVisible: false, lastValueVisible: false, autoscaleInfoProvider: () => ({ priceRange: { minValue: 0, maxValue: 100 } }) });
+          kSeries.setData(ws(srK));
+          const dSeries = stochChart.addLineSeries({ color: '#fbbf24', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
+          dSeries.setData(ws(srD));
+          kSeries.createPriceLine({ price: 80, color: 'rgba(248,113,113,0.6)', lineWidth: 1, lineStyle: 2 });
+          kSeries.createPriceLine({ price: 20, color: 'rgba(74,222,128,0.6)', lineWidth: 1, lineStyle: 2 });
+          panes.push({ chart: stochChart, series: kSeries });
+        }
 
         // --- MACD 12/26/9 ---
-        const { macd, signal, hist } = computeMACD(closes);
-        const macdChart = createChart(macdRef.current, { ...base, timeScale: { visible: true, borderColor: BORDER } });
-        const histSeries = macdChart.addHistogramSeries({ priceLineVisible: false, lastValueVisible: false });
-        histSeries.setData(ws(hist, (i) => (hist[i] >= 0 ? 'rgba(74,222,128,0.55)' : 'rgba(248,113,113,0.55)')));
-        const macdLine = macdChart.addLineSeries({ color: '#60a5fa', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
-        macdLine.setData(ws(macd));
-        const sigLine = macdChart.addLineSeries({ color: '#fbbf24', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
-        sigLine.setData(ws(signal));
+        if (inds.macd && macdRef.current) {
+          const { macd, signal, hist } = computeMACD(closes);
+          const macdChart = createChart(macdRef.current, { ...base, timeScale: tsOpt('macd') });
+          const histSeries = macdChart.addHistogramSeries({ priceLineVisible: false, lastValueVisible: false });
+          histSeries.setData(ws(hist, (i) => (hist[i] >= 0 ? 'rgba(74,222,128,0.55)' : 'rgba(248,113,113,0.55)')));
+          const macdLine = macdChart.addLineSeries({ color: '#60a5fa', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
+          macdLine.setData(ws(macd));
+          const sigLine = macdChart.addLineSeries({ color: '#fbbf24', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
+          sigLine.setData(ws(signal));
+          panes.push({ chart: macdChart, series: macdLine });
+        }
 
-        // --- Panelleri senkronla: zaman ekseni + imleç (crosshair) ---
-        const panes = [
-          { chart: priceChart, series: candleSeries },
-          { chart: wtChart, series: wt1s },
-          { chart: stochChart, series: kSeries },
-          { chart: macdChart, series: macdLine },
-        ];
+        // --- Senkron: zaman ekseni + imleç (crosshair) ---
         charts = panes.map((p) => p.chart);
         let syncing = false;
         panes.forEach(({ chart }) => {
@@ -182,7 +259,6 @@ function ChartModal({ item, onClose }) {
             syncing = false;
           });
         });
-        // İmleç: bir panelde gezerken diğer paneller de aynı zaman üzerinde işaretlenir.
         let syncingC = false;
         panes.forEach(({ chart }) => {
           chart.subscribeCrosshairMove((param) => {
@@ -207,7 +283,7 @@ function ChartModal({ item, onClose }) {
       document.removeEventListener('keydown', onKey);
       charts.forEach((c) => { try { c.remove(); } catch { /* yoksay */ } });
     };
-  }, [item, onClose]);
+  }, [item, indKey]);
 
   const cur = item.currency || (item.kind === 'metal' ? 'USD' : 'TRY');
   return (
@@ -237,12 +313,25 @@ function ChartModal({ item, onClose }) {
           )}
         </div>
         {tmsg && <div className={`vb-msg ${tmsg.ok ? 'ok' : 'err'}`} style={{ margin: '0 14px' }}>{tmsg.m}</div>}
+        <div className="modal-ind">
+          {CHART_INDS.map((ind) => (
+            <button
+              key={ind.key}
+              className={`ind-chip ${inds[ind.key] ? 'active' : ''}`}
+              onClick={() => toggleInd(ind.key)}
+            >
+              {ind.label}
+            </button>
+          ))}
+        </div>
         <div className="modal-chart">
           <div className="chart-panes">
-            <div className="pane" style={{ flex: 3 }} ref={priceRef}><span className="pane-label">Fiyat · Hacim</span></div>
-            <div className="pane" style={{ flex: 1.5 }} ref={wtRef}><span className="pane-label">WaveTrend (LazyBear)</span></div>
-            <div className="pane" style={{ flex: 1.5 }} ref={stochRef}><span className="pane-label">Stoch RSI 14</span></div>
-            <div className="pane" style={{ flex: 1.5 }} ref={macdRef}><span className="pane-label">MACD 12/26/9</span></div>
+            <div className="pane" style={{ flex: 3 }} ref={priceRef}>
+              <span className="pane-label">Fiyat{inds.volume ? ' · Hacim' : ''}{inds.supertrend ? ' · SuperTrend' : ''}</span>
+            </div>
+            {inds.wavetrend && <div className="pane" style={{ flex: 1.5 }} ref={wtRef}><span className="pane-label">WaveTrend (LazyBear)</span></div>}
+            {inds.stochrsi && <div className="pane" style={{ flex: 1.5 }} ref={stochRef}><span className="pane-label">Stoch RSI 14</span></div>}
+            {inds.macd && <div className="pane" style={{ flex: 1.5 }} ref={macdRef}><span className="pane-label">MACD 12/26/9</span></div>}
           </div>
           {status !== 'ok' && (
             <div className="chart-state">
