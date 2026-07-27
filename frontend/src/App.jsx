@@ -320,6 +320,173 @@ function NewsList({ kind }) {
   );
 }
 
+// Sanal borsa (paper trading): e-posta ile giriş, localStorage'da portföy.
+// Gerçek para/işlem yok; fiyatlar sitedeki verilerden. Cihaza özeldir.
+const VB_START = 100000; // başlangıç sanal bakiye (₺)
+function VirtualTrade({ items }) {
+  const [email, setEmail] = useState(() => { try { return localStorage.getItem('vb_email') || ''; } catch { return ''; } });
+  const [emailInput, setEmailInput] = useState('');
+  const [pf, setPf] = useState(null);
+  const [q, setQ] = useState('');
+  const [sel, setSel] = useState('');
+  const [qty, setQty] = useState('');
+  const [msg, setMsg] = useState(null);
+
+  const byTicker = useMemo(() => new Map(items.map((i) => [i.ticker, i])), [items]);
+  const unitPrice = (it) => (it ? (it.kind === 'metal' ? it.tryPerGram : it.price) : null);
+  const unitLabel = (it) => (it && it.kind === 'metal' ? 'gr' : 'adet');
+
+  useEffect(() => {
+    if (!email) { setPf(null); return; }
+    let p = null;
+    try { const raw = localStorage.getItem('vb_pf_' + email); p = raw ? JSON.parse(raw) : null; } catch { p = null; }
+    setPf(p || { cash: VB_START, positions: {}, history: [] });
+  }, [email]);
+
+  function persist(next) { setPf(next); try { localStorage.setItem('vb_pf_' + email, JSON.stringify(next)); } catch { /* yoksay */ } }
+  function login(e) {
+    e.preventDefault();
+    const em = emailInput.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { setMsg({ t: 'err', m: 'Geçerli bir e-posta girin.' }); return; }
+    try { localStorage.setItem('vb_email', em); } catch { /* */ }
+    setEmail(em); setMsg(null);
+  }
+  function logout() { try { localStorage.removeItem('vb_email'); } catch { /* */ } setEmail(''); setEmailInput(''); setSel(''); setQ(''); }
+  function reset() {
+    if (!window.confirm('Portföyü sıfırlamak istediğine emin misin?')) return;
+    persist({ cash: VB_START, positions: {}, history: [] });
+    setMsg({ t: 'ok', m: 'Portföy sıfırlandı.' });
+  }
+  function trade(side) {
+    const it = byTicker.get(sel); const price = unitPrice(it); const n = Number(qty);
+    if (!it || price == null) { setMsg({ t: 'err', m: 'Önce bir enstrüman seç.' }); return; }
+    if (!(n > 0)) { setMsg({ t: 'err', m: 'Geçerli miktar gir.' }); return; }
+    const cost = n * price;
+    const pos = pf.positions[sel] || { qty: 0, avgCost: 0 };
+    if (side === 'buy') {
+      if (cost > pf.cash + 1e-6) { setMsg({ t: 'err', m: 'Yetersiz bakiye.' }); return; }
+      const nqp = pos.qty + n;
+      const positions = { ...pf.positions, [sel]: { qty: nqp, avgCost: (pos.qty * pos.avgCost + cost) / nqp } };
+      persist({ cash: pf.cash - cost, positions, history: [{ time: new Date().toISOString(), ticker: sel, side: 'AL', qty: n, price }, ...pf.history].slice(0, 100) });
+      setMsg({ t: 'ok', m: `${fmtNum(n)} ${unitLabel(it)} ${sel} alındı.` });
+    } else {
+      if (n > pos.qty + 1e-6) { setMsg({ t: 'err', m: 'Elinde yeterli miktar yok.' }); return; }
+      const nqp = pos.qty - n;
+      const positions = { ...pf.positions };
+      if (nqp <= 1e-6) delete positions[sel]; else positions[sel] = { qty: nqp, avgCost: pos.avgCost };
+      persist({ cash: pf.cash + cost, positions, history: [{ time: new Date().toISOString(), ticker: sel, side: 'SAT', qty: n, price }, ...pf.history].slice(0, 100) });
+      setMsg({ t: 'ok', m: `${fmtNum(n)} ${unitLabel(it)} ${sel} satıldı.` });
+    }
+    setQty('');
+  }
+
+  if (!email) {
+    return (
+      <div className="vb-login">
+        <p className="subtitle">E-posta ile giriş yap; <strong>{fmtNum(VB_START)} ₺</strong> sanal bakiye ile başla. (Gerçek para/işlem değildir.)</p>
+        <form onSubmit={login} className="vb-loginform">
+          <input className="search-input vb-emailin" type="email" placeholder="e-posta adresin" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} />
+          <button className="refresh-btn" type="submit">Giriş</button>
+        </form>
+        {msg && <div className={`vb-msg ${msg.t}`}>{msg.m}</div>}
+      </div>
+    );
+  }
+  if (!pf) return <div className="state">Yükleniyor…</div>;
+
+  const posList = Object.entries(pf.positions).map(([t, p]) => {
+    const it = byTicker.get(t); const price = unitPrice(it);
+    const value = p.qty * (price != null ? price : p.avgCost);
+    const cost = p.qty * p.avgCost;
+    return { t, it, qty: p.qty, avgCost: p.avgCost, price, value, pnl: value - cost, pnlPct: cost ? (value - cost) / cost * 100 : 0 };
+  }).sort((a, b) => b.value - a.value);
+  const holdings = posList.reduce((s, p) => s + p.value, 0);
+  const total = pf.cash + holdings;
+  const totalPnl = total - VB_START;
+
+  const nq = norm(q.trim());
+  const results = nq ? items.filter((i) => (i.kind === 'stock' || i.kind === 'metal') && unitPrice(i) != null && (norm(i.ticker).includes(nq) || norm(i.name).includes(nq))).slice(0, 8) : [];
+  const selIt = byTicker.get(sel);
+
+  return (
+    <div className="vb">
+      <div className="vb-user">{email} · <button className="vb-link" onClick={logout}>çıkış</button> · <button className="vb-link" onClick={reset}>sıfırla</button></div>
+      <div className="vb-summary">
+        <div className="vb-stat"><span className="metric-label">Toplam Değer</span><span className="vb-big">{fmtNum(total)} ₺</span></div>
+        <div className="vb-stat"><span className="metric-label">Nakit</span><span>{fmtNum(pf.cash)} ₺</span></div>
+        <div className="vb-stat"><span className="metric-label">Kâr / Zarar</span><span style={{ color: totalPnl >= 0 ? '#4ade80' : '#f87171' }}>{totalPnl >= 0 ? '+' : ''}{fmtNum(totalPnl)} ₺ · %{fmtNum(totalPnl / VB_START * 100)}</span></div>
+      </div>
+
+      <div className="vb-trade">
+        <input className="search-input vb-search" placeholder="Al/sat için hisse veya maden ara (ör. GARAN, altın)" value={q} onChange={(e) => setQ(e.target.value)} />
+        {results.length > 0 && (
+          <div className="vb-results">
+            {results.map((i) => (
+              <button key={i.ticker} className="vb-result" onClick={() => { setSel(i.ticker); setQ(''); }}>
+                <span><strong>{i.ticker}</strong> · {i.name}</span>
+                <span>{fmtNum(unitPrice(i))} ₺/{unitLabel(i)}</span>
+              </button>
+            ))}
+          </div>
+        )}
+        {selIt && (
+          <div className="vb-order">
+            <div className="vb-orderhead">{selIt.ticker} · {selIt.name} — <strong>{fmtNum(unitPrice(selIt))} ₺</strong>/{unitLabel(selIt)}</div>
+            <div className="vb-orderrow">
+              <input className="search-input" type="number" min="0" step="any" placeholder={`miktar (${unitLabel(selIt)})`} value={qty} onChange={(e) => setQty(e.target.value)} />
+              <button className="vb-buy" onClick={() => trade('buy')}>AL</button>
+              <button className="vb-sell" onClick={() => trade('sell')}>SAT</button>
+            </div>
+            {Number(qty) > 0 && <div className="exp-note">Tutar: {fmtNum(Number(qty) * unitPrice(selIt))} ₺</div>}
+          </div>
+        )}
+        {msg && <div className={`vb-msg ${msg.t}`}>{msg.m}</div>}
+      </div>
+
+      <div className="vb-section">Portföy ({posList.length})</div>
+      {posList.length === 0 ? (
+        <div className="state">Henüz pozisyon yok. Yukarıdan arayıp AL ile başla.</div>
+      ) : (
+        <div className="news-list">
+          {posList.map((p) => (
+            <div key={p.t} className="vb-pos" onClick={() => { setSel(p.t); setQty(String(p.qty)); }}>
+              <div className="vb-posmain">
+                <div><strong>{p.t}</strong> <span className="name">{p.it?.name}</span></div>
+                <div className="vb-posval">{fmtNum(p.value)} ₺</div>
+              </div>
+              <div className="vb-posdetail">
+                {fmtNum(p.qty)} {unitLabel(p.it)} · maliyet {fmtNum(p.avgCost)} ₺ · fiyat {fmtNum(p.price)} ₺
+                <span style={{ color: p.pnl >= 0 ? '#4ade80' : '#f87171', marginLeft: 8 }}>{p.pnl >= 0 ? '+' : ''}{fmtNum(p.pnl)} ₺ (%{fmtNum(p.pnlPct)})</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {pf.history.length > 0 && (
+        <>
+          <div className="vb-section">İşlem Geçmişi</div>
+          <div className="vb-history">
+            {pf.history.slice(0, 20).map((h, i) => (
+              <div key={i} className="vb-hrow">
+                <span className={h.side === 'AL' ? 'vb-al' : 'vb-sat'}>{h.side}</span>
+                <span className="ticker">{h.ticker}</span>
+                <span>{fmtNum(h.qty)} × {fmtNum(h.price)} ₺</span>
+                <span className="news-time">{new Date(h.time).toLocaleDateString('tr-TR')}</span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      <p className="disclaimer" style={{ marginTop: 16 }}>
+        ⚠️ Sanal borsa — <strong>gerçek para değildir</strong>, gerçek işlem yapılmaz. Fiyatlar sitedeki
+        (gecikmeli) verilerdir. Portföy bu tarayıcıda saklanır (cihaza özel, güvenli giriş değildir).
+      </p>
+    </div>
+  );
+}
+
 export default function App() {
   const [data, setData] = useState({ items: [], updatedAt: null, source: null });
   const [loading, setLoading] = useState(true);
@@ -402,7 +569,8 @@ export default function App() {
     label: '🎯 SMC',
     match: (i) => i.kind === 'stock' && i.smc === true,
   };
-  const activeTab = [...TABS, FAV_TAB, SMC_TAB, ...NEWS_TABS].find((t) => t.key === tab) ?? TABS[0];
+  const TRADE_TAB = { key: 'trade', label: '💼 Sanal Borsa' };
+  const activeTab = [...TABS, FAV_TAB, SMC_TAB, TRADE_TAB, ...NEWS_TABS].find((t) => t.key === tab) ?? TABS[0];
   const isNews = !!activeTab.news;
 
   // Önce aktif sekmeye göre, sonra sinyale göre süz.
@@ -434,7 +602,9 @@ export default function App() {
         <div>
           <h1>📈 BIST Hisse Önerileri</h1>
           <p className="subtitle">
-            {isNews
+            {tab === 'trade'
+              ? 'Sanal borsa · e-posta ile giriş, sanal alım-satım (gerçek para değildir)'
+              : isNews
               ? (activeTab.news === 'kap' ? 'KAP bildirimleri · yatırımcı diline özet' : 'Piyasa, kıymetli maden ve analist önerisi haberleri')
               : <>Analist hedef fiyatı + temel verilere dayalı beklenen getiri · {searching ? `“${query.trim()}” için ${items.length} sonuç` : `${inTab.length} kayıt`}
                 {data.source && <> · kaynak: {data.source === 'postgres' ? 'PostgreSQL' : 'bellek'}</>}</>}
@@ -486,6 +656,12 @@ export default function App() {
         >
           {SMC_TAB.label}
         </button>
+        <button
+          className={`news-tab trade-tab ${tab === 'trade' ? 'active' : ''}`}
+          onClick={() => setTab('trade')}
+        >
+          {TRADE_TAB.label}
+        </button>
       </div>
 
       <div className="tabs">
@@ -502,6 +678,8 @@ export default function App() {
 
       {isNews ? (
         <NewsList kind={activeTab.news} />
+      ) : tab === 'trade' ? (
+        <VirtualTrade items={data.items} />
       ) : (
       <>
       <div className="search">
