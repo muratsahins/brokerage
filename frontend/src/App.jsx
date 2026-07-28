@@ -867,7 +867,8 @@ export default function App() {
     { key: 'bist50',  label: 'BIST 50',        match: (i) => i.bist != null && i.bist <= 50 },
     { key: 'bist100', label: 'BIST 100',       match: (i) => i.bist != null && i.bist <= 100 },
     { key: 'metal',   label: 'Kıymetli Maden', match: (i) => i.kind === 'metal' },
-    { key: 'crypto',  label: 'Kripto',         match: (i) => i.kind === 'crypto' },
+    // Kripto sekmesi kaldırıldı. Kripto verisi duruyor: aramada, Hacim Dönüşü
+    // taramasında ve Sanal Borsa'da görünmeye devam eder.
   ];
   const NEWS_TABS = [
     { key: 'news', label: '📰 Haberler', news: 'news' },
