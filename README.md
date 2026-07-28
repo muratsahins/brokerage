@@ -43,6 +43,12 @@ npm start                 # http://localhost:4000
 - İlk açılışta Yahoo'dan veri çeker ve puanlar.
 - `REFRESH_INTERVAL_MINUTES` ile otomatik yenileme (varsayılan 30 dk).
 - Elle yenileme: `POST /api/refresh` veya `npm run refresh`.
+- Teknik göstergeler `/api/prices` ile fiyatla **aynı anda** tazelenir: 1 yıllık
+  bar geçmişi bellekte tutulur (seans içinde değişmez), her fiyat yenilemesinde
+  son bar canlı fiyatla güncellenip göstergeler yeniden hesaplanır.
+  `SERIES_TTL_MINUTES` (varsayılan 60) bar geçmişinin tazelenme sıklığı,
+  `SERIES_CHECK_MINUTES` (15) kontrol aralığı, `SERIES_FETCH_GAP_MS` (350)
+  Yahoo istekleri arası bekleme. Önbellek durumu: `GET /api/health`.
 
 ### 3) Frontend
 ```bash
@@ -56,8 +62,10 @@ npm run dev               # http://localhost:5173
 
 | Metot | Yol                     | Açıklama                                  |
 |-------|-------------------------|-------------------------------------------|
-| GET   | `/api/health`           | Sağlık kontrolü                           |
+| GET   | `/api/health`           | Sağlık kontrolü + bar geçmişi önbelleği   |
 | GET   | `/api/recommendations`  | Puana göre sıralı öneri listesi           |
+| GET   | `/api/prices`           | Canlı fiyat + aynı andaki gösterge sinyalleri |
+| GET   | `/api/chart`            | Grafik için günlük OHLC serisi            |
 | POST  | `/api/refresh`          | Veriyi Yahoo'dan yeniden çeker ve puanlar |
 
 ## Takip edilen hisseler

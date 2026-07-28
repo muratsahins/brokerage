@@ -143,6 +143,9 @@ export async function fetchLivePrices() {
           prices[ticker] = {
             price: roundPrice(price),
             changePct: prev ? Math.round(((price - prev) / prev) * 10000) / 100 : null,
+            // Fiyatın ait olduğu an — canlı gösterge tazelemesinde yeni seansa
+            // geçildi mi anlamak için (liveSignals.js).
+            ts: d?.timestamp?.[d.timestamp.length - 1] ?? null,
           };
         }
       }
@@ -236,23 +239,30 @@ function normalizeBars(result) {
   return bars;
 }
 
-// --- Grafik için tam OHLC serisi (mum grafiği) ------------------------------
-// Frontend'de Lightweight Charts ile çizmek üzere günlük mum verisini döner.
-export async function fetchOhlc(symbol, range = '1y') {
+// Günlük normalleştirilmiş barlar + meta — grafiğin, göstergelerin ve canlı
+// gösterge tazelemesinin (liveSignals.js) ORTAK tek kaynağı.
+export async function fetchDailyBars(symbol, range = '1y') {
   const url = `${CHART_URL}/${encodeURIComponent(symbol)}?range=${range}&interval=1d`;
   const res = await fetch(url, { headers: { 'User-Agent': UA } });
   if (!res.ok) throw new Error(`Yahoo ${symbol} -> HTTP ${res.status}`);
   const json = await res.json();
   const r = json?.chart?.result?.[0];
   if (!r) throw new Error(`Yahoo ${symbol} -> boş sonuç`);
+  return { bars: normalizeBars(r), meta: r.meta ?? {} };
+}
+
+// --- Grafik için tam OHLC serisi (mum grafiği) ------------------------------
+// Frontend'de Lightweight Charts ile çizmek üzere günlük mum verisini döner.
+export async function fetchOhlc(symbol, range = '1y') {
+  const { bars, meta } = await fetchDailyBars(symbol, range);
   // Lightweight Charts günlük seri için 'yyyy-mm-dd' bekliyor; gün etiketi borsa
   // saatine göre hesaplanır (UTC'ye göre bir gün kaymasın).
-  const off = r.meta?.gmtoffset ?? 0;
-  const candles = normalizeBars(r).map((b) => ({
+  const off = meta.gmtoffset ?? 0;
+  const candles = bars.map((b) => ({
     time: new Date((b.ts + off) * 1000).toISOString().slice(0, 10),
     open: b.open, high: b.high, low: b.low, close: b.close, volume: b.volume,
   }));
-  return { symbol, currency: r.meta?.currency ?? null, candles };
+  return { symbol, currency: meta.currency ?? null, candles };
 }
 
 // --- Fiyat + geçmiş (chart) -------------------------------------------------
@@ -260,16 +270,8 @@ async function fetchChart(symbol) {
   // 1 yıllık günlük veri — grafik modalı (/api/chart) da 1y kullanıyor; sinyaller
   // grafiktekiyle BİREBİR aynı veri+aralıktan hesaplansın diye eşitlendi (özellikle
   // durumlu SuperTrend için). symbol tam Yahoo sembolüdür; '=' için URL-kodlanır.
-  const url = `${CHART_URL}/${encodeURIComponent(symbol)}?range=1y&interval=1d`;
-  const res = await fetch(url, { headers: { 'User-Agent': UA } });
-  if (!res.ok) throw new Error(`Yahoo ${symbol} -> HTTP ${res.status}`);
-  const json = await res.json();
-  const result = json?.chart?.result?.[0];
-  if (!result) throw new Error(`Yahoo ${symbol} -> boş sonuç`);
-
-  const meta = result.meta;
-  // Grafikle BİREBİR aynı barlar (son/canlı bar dahil) — normalizeBars.
-  const bars = normalizeBars(result);
+  // Grafikle BİREBİR aynı barlar (son/canlı bar dahil) — fetchDailyBars.
+  const { bars, meta } = await fetchDailyBars(symbol, '1y');
   const highs = bars.map((b) => b.high);
   const lows = bars.map((b) => b.low);
   const closes = bars.map((b) => b.close);

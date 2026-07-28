@@ -280,7 +280,9 @@ function computeWaveTrend(highs, lows, closes, n1 = WT_CHANNEL_LEN, n2 = WT_AVER
 // YUKARI kestiğinde AL, AŞAĞI kestiğinde SAT. Son kesişimin yönünü döner.
 export function wavetrendCrossSignal(highs, lows, closes) {
   const w = computeWaveTrend(highs, lows, closes);
-  if (!w) return null;
+  return w ? crossFrom(w) : null;
+}
+function crossFrom(w) {
   const { wt1, wt2, n } = w;
   let signal = null;
   for (let i = 1; i < n; i++) {
@@ -300,7 +302,17 @@ export function wavetrendCrossSignal(highs, lows, closes) {
 //         sonraki YUKARI kesişim (tersi) olunca boşalır.
 export function wavetrendSignal(highs, lows, closes) {
   const w = computeWaveTrend(highs, lows, closes);
-  if (!w) return null;
+  return w ? overzoneFrom(w) : null;
+}
+
+// İki WaveTrend sinyalini TEK geçişte döner (seriyi iki kez hesaplamamak için).
+export function wavetrendSignals(highs, lows, closes) {
+  const w = computeWaveTrend(highs, lows, closes);
+  if (!w) return { cross: null, overzone: null };
+  return { cross: crossFrom(w), overzone: overzoneFrom(w) };
+}
+
+function overzoneFrom(w) {
   const { wt1, wt2, n } = w;
   let signal = null;
   for (let i = 1; i < n; i++) {

@@ -1,9 +1,11 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import compression from 'compression';
 import { initDb } from './db.js';
 import { syncData, getRecommendations } from './service.js';
-import { diagnose, fetchOhlc, fetchLivePrices } from './dataSource.js';
+import { diagnose, fetchOhlc } from './dataSource.js';
+import { getLivePrices, refreshSeries, seriesStats } from './liveSignals.js';
 import { fetchNews, fetchKap } from './newsSource.js';
 import { INSTRUMENTS } from './stocks.js';
 
@@ -12,18 +14,23 @@ const VALID_RANGE = /^(1mo|3mo|6mo|1y|2y|5y)$/;
 
 const app = express();
 app.use(cors());
+// /api/prices artık fiyatla birlikte ~700 enstrümanın gösterge sinyallerini de
+// taşıyor ve 18 sn'de bir çekiliyor — gzip ile tel üstünde ~10 kat küçülüyor.
+app.use(compression());
 app.use(express.json());
 
 app.get('/api/health', (req, res) => {
-  res.json({ ok: true, time: new Date().toISOString() });
+  res.json({ ok: true, time: new Date().toISOString(), series: seriesStats() });
 });
 
-// Toplu güncel (intraday) fiyatlar — dakikalık yenileme için (spark ucu).
+// Toplu güncel (intraday) fiyatlar + AYNI ANDAKİ gösterge sinyalleri.
+// Göstergeler bellekteki bar geçmişi + canlı fiyattan yeniden hesaplanır
+// (liveSignals.js); bar geçmişi yoksa alan boş kalır, yayınlanan değer geçerlidir.
 app.get('/api/prices', async (req, res) => {
   try {
-    res.json(await fetchLivePrices());
+    res.json(await getLivePrices());
   } catch (err) {
-    res.status(502).json({ error: err.message, prices: {} });
+    res.status(502).json({ error: err.message, prices: {}, signals: {} });
   }
 });
 
@@ -95,6 +102,16 @@ async function start() {
 
   // İlk veriyi yükle (yayınlanan JSON → yoksa canlı). Sunucuyu bloklama.
   syncData().catch((err) => console.warn(`[start] İlk veri yüklemesi başarısız: ${err.message}`));
+
+  // Canlı gösterge tazelemesi için bar geçmişini arka planda doldur ve
+  // periyodik olarak (yeni günlük barlar kapandıkça) tazele. Sunucuyu bloklamaz.
+  refreshSeries().catch((err) => console.warn(`[live] Bar geçmişi doldurulamadı: ${err.message}`));
+  const seriesCheck = Number(process.env.SERIES_CHECK_MINUTES ?? 15);
+  if (seriesCheck > 0) {
+    setInterval(() => {
+      refreshSeries().catch((err) => console.warn(`[live] Bar geçmişi tazelenemedi: ${err.message}`));
+    }, seriesCheck * 60 * 1000);
+  }
 
   const minutes = Number(process.env.REFRESH_INTERVAL_MINUTES ?? 30);
   if (minutes > 0) {

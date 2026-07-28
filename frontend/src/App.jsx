@@ -359,10 +359,12 @@ function ChartModal({ item, onClose }) {
 // Dev'de boş kalır → '/api...' Vite proxy üzerinden backend'e gider.
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
-// Dakikalık güncel fiyatları (/api/prices) mevcut veriye işler: yalnızca fiyat +
-// günlük değişim (+ metal ₺/gram) güncellenir; göstergeler/analist değişmez.
+// Güncel fiyatları (/api/prices) mevcut veriye işler: fiyat + günlük değişim
+// (+ metal ₺/gram) ve AYNI ANDA hesaplanan teknik göstergeler. Analist verisi,
+// hedef ve puan yayınlanan veriden gelir, burada değişmez.
 function mergeLivePrices(data, live) {
   if (!live || !live.prices || !data || !data.items) return data;
+  const signals = live.signals || {};
   let changed = false;
   const items = data.items.map((it) => {
     const p = live.prices[it.ticker];
@@ -372,6 +374,18 @@ function mergeLivePrices(data, live) {
     if (p.changePct != null) next.changePct = p.changePct;
     if (it.kind === 'metal' && it.usdTry) next.tryPerGram = Math.round((p.price / 31.1034768) * it.usdTry * 100) / 100;
     if (it.kind === 'crypto' && it.usdTry) next.tryPrice = roundPrice(p.price * it.usdTry);
+    // Göstergeler: backend bar geçmişi + canlı fiyattan yeniden hesapladıysa
+    // yayınlanan (3 saatte bir) değerlerin üstüne yazılır. Sinyal yoksa alan
+    // boştur — bu da "artık sinyal yok" demektir, o yüzden temizlenir.
+    const s = signals[it.ticker];
+    if (s) {
+      next.stSignal = s.st ?? null;
+      next.wtCrossSignal = s.wt ?? null;
+      next.wtSignal = s.wo ?? null;
+      next.smc = !!s.smc;
+      next.volRev = s.vr ?? null;
+      next.signalsLive = true;
+    }
     return next;
   });
   return changed ? { ...data, items, priceUpdatedAt: live.updatedAt } : data;
@@ -1021,7 +1035,8 @@ export default function App() {
         ))}
         {(data.priceUpdatedAt || data.updatedAt) && (
           <span className="updated">
-            Fiyat: {new Date(data.priceUpdatedAt || data.updatedAt).toLocaleTimeString('tr-TR')}
+            {items.some((i) => i.signalsLive) ? 'Fiyat + göstergeler' : 'Fiyat'}:{' '}
+            {new Date(data.priceUpdatedAt || data.updatedAt).toLocaleTimeString('tr-TR')}
           </span>
         )}
       </div>
