@@ -19,8 +19,8 @@ const MAX_ITEMS = Number(process.env.ALERT_MAX_ITEMS ?? 600);
 
 const IND_LABEL = { oz: 'overzone', wt: 'WaveTrend', st: 'SuperTrend' };
 
-// Tüm enstrümanları tarar, YENİ sinyalleri döner. Aynı hisse birden çok
-// göstergede tetiklenebilir (teyit).
+// Tüm enstrümanları tarar. HİSSE BAŞINA TEK KAYIT döner; bir hisse birden çok
+// göstergede tetiklenmişse hepsi `signals` içinde toplanır (teyit).
 function scan() {
   const items = [];
   let ready = 0;
@@ -30,32 +30,34 @@ function scan() {
     if (!s) continue; // bar geçmişi henüz önbellekte değil
     ready++;
     const r = recentSignals(s.high, s.low, s.close, LOOKBACK);
+
+    const signals = [];
     for (const ind of ['oz', 'wt', 'st']) {
       const ev = r[ind];
       if (!ev) continue;
-      items.push({
-        ticker: inst.ticker,
-        ind,
-        indLabel: IND_LABEL[ind],
-        dir: ev.dir,
-        barsAgo: ev.barsAgo,
-      });
+      signals.push({ ind, indLabel: IND_LABEL[ind], dir: ev.dir, barsAgo: ev.barsAgo });
     }
+    if (signals.length === 0) continue;
+
+    // Satır yönü: hepsi aynıysa o yön, karışıksa 'MIX'.
+    const dirs = new Set(signals.map((x) => x.dir));
+    items.push({
+      ticker: inst.ticker,
+      dir: dirs.size === 1 ? signals[0].dir : 'MIX',
+      hits: signals.length,
+      barsAgo: Math.min(...signals.map((x) => x.barsAgo)),
+      signals,
+    });
   }
 
-  // Sıralama: (1) en taze; (2) aynı anda birden çok gösterge tetiklenen hisse
-  // (teyit) üstte; (3) ticker (kararlı sıra).
-  const confluence = new Map();
-  for (const it of items) confluence.set(it.ticker, (confluence.get(it.ticker) ?? 0) + 1);
+  // Sıralama: (1) en taze; (2) birden çok gösterge tetiklenen hisse (teyit)
+  // üstte; (3) ticker (kararlı sıra).
   items.sort((a, b) =>
     a.barsAgo - b.barsAgo
-    || confluence.get(b.ticker) - confluence.get(a.ticker)
+    || b.hits - a.hits
     || a.ticker.localeCompare(b.ticker));
 
-  return {
-    items: items.slice(0, MAX_ITEMS).map((it) => ({ ...it, hits: confluence.get(it.ticker) })),
-    ready,
-  };
+  return { items: items.slice(0, MAX_ITEMS), ready };
 }
 
 let scanCache = { at: 0, items: [], ready: 0 };

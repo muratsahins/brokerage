@@ -148,11 +148,22 @@ h1 { font-size: 26px; margin: 0 0 6px; }
 .alert-main .ticker { font-weight: 700; }
 .alert-main .name { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .alert-meta { display: flex; align-items: center; gap: 10px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
-.alert-ind { font-size: 12px; font-weight: 600; color: #cbd5e1; }
+.alert-row.mix { border-left-color: #fbbf24; }
 .alert-hits {
   font-size: 11px; font-weight: 700; color: #fbbf24;
   background: #3a2f05; border-radius: 999px; padding: 2px 8px;
 }
+/* Tetiklenen gösterge rozetleri (hisse başına birden çok olabilir) */
+.alert-sig {
+  font-size: 11px; color: #cbd5e1;
+  border: 1px solid var(--border); border-radius: 999px; padding: 2px 9px;
+  white-space: nowrap;
+}
+.alert-sig strong { font-weight: 700; letter-spacing: 0.3px; }
+.alert-sig.al { border-color: #14532d; background: #0f2a1b; }
+.alert-sig.al strong { color: #4ade80; }
+.alert-sig.sat { border-color: #4c1d1d; background: #2a1212; }
+.alert-sig.sat strong { color: #f87171; }
 .alert-tf {
   font-size: 11px; color: var(--muted);
   border: 1px solid var(--border); border-radius: 999px; padding: 1px 8px;

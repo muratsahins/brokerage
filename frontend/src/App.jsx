@@ -617,8 +617,10 @@ function AlertList({ items, onSelect }) {
   }, []);
 
   const byTicker = useMemo(() => new Map(items.map((i) => [i.ticker, i])), [items]);
+  // Hisse başına tek satır; filtreler "sinyallerinden biri uyuyorsa göster".
   const list = state.items.filter((a) =>
-    (dir === 'ALL' || a.dir === dir) && (ind === 'ALL' || a.ind === ind));
+    (dir === 'ALL' || a.signals.some((s) => s.dir === dir))
+    && (ind === 'ALL' || a.signals.some((s) => s.ind === ind)));
   const warming = state.stats && state.stats.ready < state.stats.total * 0.9;
 
   if (state.loading) return <div className="state">Taranıyor…</div>;
@@ -660,8 +662,8 @@ function AlertList({ items, onSelect }) {
             const it = byTicker.get(a.ticker);
             return (
               <button
-                key={`${a.ticker}-${a.ind}-${i}`}
-                className={`alert-row ${a.dir === 'AL' ? 'al' : 'sat'}`}
+                key={a.ticker}
+                className={`alert-row ${a.dir === 'AL' ? 'al' : a.dir === 'SAT' ? 'sat' : 'mix'}`}
                 onClick={() => it && onSelect(it)}
                 title={it ? 'Grafiği aç' : ''}
               >
@@ -670,9 +672,14 @@ function AlertList({ items, onSelect }) {
                   <span className="name">{it?.name || ''}</span>
                 </span>
                 <span className="alert-meta">
-                  {a.hits > 1 && <span className="alert-hits" title="Bu hisse aynı anda birden çok sinyal veriyor">{a.hits} sinyal</span>}
-                  <span className="alert-ind">{a.indLabel}</span>
-                  <IndicatorBadge signal={a.dir} />
+                  {a.hits > 1 && (
+                    <span className="alert-hits" title="Aynı anda birden çok gösterge tetiklendi">{a.hits} gösterge</span>
+                  )}
+                  {a.signals.map((s) => (
+                    <span key={s.ind} className={`alert-sig ${s.dir === 'AL' ? 'al' : 'sat'}`}>
+                      {s.indLabel} <strong>{s.dir}</strong>
+                    </span>
+                  ))}
                   <span className="news-time">{a.barsAgo === 0 ? 'son bar' : `${a.barsAgo} bar önce`}</span>
                 </span>
               </button>
