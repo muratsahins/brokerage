@@ -52,11 +52,14 @@ npm start                 # http://localhost:4000
   `SERIES_TTL_MINUTES` (varsayılan 30) bar geçmişinin tazelenme sıklığı,
   `SERIES_CHECK_MINUTES` (15) kontrol aralığı, `SERIES_FETCH_GAP_MS` (350)
   Yahoo istekleri arası bekleme. Önbellek durumu: `GET /api/health`.
-- **UYARI taraması** (`/api/alerts`): overzone / WaveTrend / SuperTrend sinyalini
-  YENİ veren hisseler — günlük grafikte, yalnızca son bar (`ALERT_LOOKBACK_BARS`,
-  varsayılan 1). Yukarıdaki bar geçmişini kullanır, **ek veri çekmez**. Son bar
-  canlı fiyatla güncellendiği için sinyal, günlük kapanış beklenmeden gün içinde
-  görünür. **Yalnızca BUGÜN**: son barı bugüne (borsa saati, `EXCHANGE_GMT_OFFSET`
+- **UYARI taraması** (`/api/alerts`): günlük grafikte **iki koşulu birden**
+  sağlayan hisseler — (1) `overzone` **AL**: aşırı satımda (−53/−60) kurulan
+  yukarı kesişim, yalnızca son barda (`ALERT_LOOKBACK_BARS`, varsayılan 1);
+  (2) `SuperTrend` **SAT**: trend hâlâ düşüşte (durum ölçütü, dönüş barı
+  aranmaz — aynı barda iki zıt dönüş pratikte olmaz). Yani trend dönmeden aşırı
+  satımdan gelen erken dönüş adayları. Bar geçmişini kullanır, **ek veri
+  çekmez**. Son bar canlı fiyatla güncellendiği için sinyal, günlük kapanış
+  beklenmeden gün içinde görünür. **Yalnızca BUGÜN**: son barı bugüne (borsa saati, `EXCHANGE_GMT_OFFSET`
   varsayılan UTC+3) ait olmayan hisse taranmaz; bugün seans yoksa liste boş döner
   (`lastBarDate` son seansın tarihini söyler). Liste tavanı `ALERT_MAX_ITEMS` (600).
   Arayüzde tarama sekme kapalıyken de sürer: görülmemiş yeni sinyal varsa **UYARI

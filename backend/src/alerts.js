@@ -1,17 +1,21 @@
-// UYARI taraması: overzone / WaveTrend / SuperTrend sinyalini YENİ veren
-// hisseler — GÜNLÜK grafikte.
+// UYARI taraması: GÜNLÜK grafikte aşağıdaki İKİ koşulu BİRDEN sağlayan hisseler.
 //
-// "Yeni" = sinyalin kalıcı durumu değil, OLUŞTUĞU bar. SuperTrend'de trend
-// dönüşü, WaveTrend'de kesişim, overzone'da aşırı bölgede kurulan kesişim.
-// Yalnızca SON bar taranır (dünkü kesişim "yeni" değildir) ve o son bar
-// BUGÜNE ait olmalıdır — bugün seans yoksa liste boştur.
+//   1) overzone AL: aşırı satım bölgesinde (wt2 <= -53) kurulan YUKARI kesişim,
+//      SON BARDA oluşmuş olacak ("yeni" = kalıcı durum değil, oluştuğu bar).
+//   2) SuperTrend SAT: trend hâlâ düşüşte (durum ölçütü, dönüş barı aranmaz).
+//
+// Yani trend daha dönmemişken aşırı satımdan gelen erken dönüş adayları. Aynı
+// barda hem overzone AL hem SuperTrend SAT DÖNÜŞÜ olması pratikte imkânsız
+// olduğu için SuperTrend'de bar değil DURUM aranır.
+//
+// Son bar BUGÜNE ait olmalıdır — bugün seans yoksa liste boştur.
 //
 // Veri: liveSignals'ın canlı fiyatla yamalı günlük bar geçmişi — UYARI için
 // Yahoo'ya EK İSTEK YOK. Son barın kapanışı/hacmi canlı olduğu için sinyal,
 // günlük bar kapanışını beklemeden gün içinde yakalanır.
 
 import { INSTRUMENTS } from './stocks.js';
-import { recentSignals } from './indicators.js';
+import { recentSignals, supertrendSignal } from './indicators.js';
 import { liveDailySeries } from './liveSignals.js';
 
 // Kaç bar geriye kadar "yeni" sayılır (1 = yalnızca bugünün günlük barı).
@@ -23,8 +27,7 @@ const DEFAULT_OFF = Number(process.env.EXCHANGE_GMT_OFFSET ?? 10800);
 
 const IND_LABEL = { oz: 'overzone', wt: 'WaveTrend', st: 'SuperTrend' };
 
-// Tüm enstrümanları tarar. HİSSE BAŞINA TEK KAYIT döner; bir hisse birden çok
-// göstergede tetiklenmişse hepsi `signals` içinde toplanır (teyit).
+// Tüm enstrümanları tarar; hisse başına tek kayıt döner.
 //
 // YALNIZCA BUGÜN: bir hissenin son barı eski bir güne ait olabilir (bugün işlem
 // görmemiş/durdurulmuş; ya da hafta sonu/tatil, yeniden başlatma sonrası henüz
@@ -58,33 +61,25 @@ function scan() {
     // Son barı BUGÜNE ait olmayan hisseyi atla (eski sinyal taze görünmesin).
     const off = s.gmtoffset ?? DEFAULT_OFF;
     if (s.lastTs == null || day(s.lastTs, off) !== day(now, off)) continue;
-    const r = recentSignals(s.high, s.low, s.close, LOOKBACK);
+    // 1) overzone AL, son barda oluşmuş olmalı.
+    const oz = recentSignals(s.high, s.low, s.close, LOOKBACK).oz;
+    if (!oz || oz.dir !== 'AL') continue;
+    // 2) SuperTrend hâlâ SAT (trend dönmemiş).
+    if (supertrendSignal(s.high, s.low, s.close) !== 'SAT') continue;
 
-    const signals = [];
-    for (const ind of ['oz', 'wt', 'st']) {
-      const ev = r[ind];
-      if (!ev) continue;
-      signals.push({ ind, indLabel: IND_LABEL[ind], dir: ev.dir, barsAgo: ev.barsAgo });
-    }
-    if (signals.length === 0) continue;
-
-    // Satır yönü: hepsi aynıysa o yön, karışıksa 'MIX'.
-    const dirs = new Set(signals.map((x) => x.dir));
     items.push({
       ticker: inst.ticker,
-      dir: dirs.size === 1 ? signals[0].dir : 'MIX',
-      hits: signals.length,
-      barsAgo: Math.min(...signals.map((x) => x.barsAgo)),
-      signals,
+      dir: 'AL', // aranan sinyal overzone AL; SuperTrend SAT trend süzgeci
+      hits: 2,
+      barsAgo: oz.barsAgo,
+      signals: [
+        { ind: 'oz', indLabel: IND_LABEL.oz, dir: 'AL', barsAgo: oz.barsAgo },
+        { ind: 'st', indLabel: IND_LABEL.st, dir: 'SAT', state: true }, // durum, dönüş barı değil
+      ],
     });
   }
 
-  // Sıralama: (1) en taze; (2) birden çok gösterge tetiklenen hisse (teyit)
-  // üstte; (3) ticker (kararlı sıra).
-  items.sort((a, b) =>
-    a.barsAgo - b.barsAgo
-    || b.hits - a.hits
-    || a.ticker.localeCompare(b.ticker));
+  items.sort((a, b) => a.ticker.localeCompare(b.ticker));
 
   // Taranan gün (borsa saatine göre bugün) ve önbellekteki en yeni bar tarihi —
   // ikisi farklıysa arayüz "bugün seans yok" diyebilsin diye ayrı döner.

@@ -591,14 +591,8 @@ function NewsList({ kind }) {
   );
 }
 
-// UYARI sekmesi: overzone / WaveTrend / SuperTrend sinyalini YENİ veren hisseler
-// (günlük grafik). Backend /api/alerts tarar.
-const ALERT_INDS = [
-  { key: 'ALL', label: 'Tüm göstergeler' },
-  { key: 'oz', label: 'overzone' },
-  { key: 'wt', label: 'WaveTrend' },
-  { key: 'st', label: 'SuperTrend' },
-];
+// UYARI sekmesi: günlük grafikte son barda overzone AL verip SuperTrend'i hâlâ
+// SAT olan hisseler (erken dönüş adayları). Backend /api/alerts tarar.
 
 // UYARI taraması UYGULAMA SEVİYESİNDE tutulur: sekme kapalıyken de sürer ki
 // yeni sinyal geldiğinde sekme yanıp sönerek haber verebilsin.
@@ -674,14 +668,9 @@ function useNewAlerts(alerts, active) {
 }
 
 function AlertList({ items, onSelect, state, highlight }) {
-  const [dir, setDir] = useState('ALL');
-  const [ind, setInd] = useState('ALL');
-
   const byTicker = useMemo(() => new Map(items.map((i) => [i.ticker, i])), [items]);
-  // Hisse başına tek satır; filtreler "sinyallerinden biri uyuyorsa göster".
-  const list = state.items.filter((a) =>
-    (dir === 'ALL' || a.signals.some((s) => s.dir === dir))
-    && (ind === 'ALL' || a.signals.some((s) => s.ind === ind)));
+  // Tek bir ölçüt var (overzone AL + SuperTrend SAT), süzgeç gerekmiyor.
+  const list = state.items;
   const warming = state.stats && state.stats.ready < state.stats.total * 0.9;
   // Bugün hiçbir hissenin barı yoksa seans yok (hafta sonu/tatil) ya da veri
   // henüz gelmedi — önceki seansın sinyalleri gösterilmez, durum yazılır.
@@ -693,32 +682,23 @@ function AlertList({ items, onSelect, state, highlight }) {
   return (
     <>
       <div className="fav-note">
-        <strong>UYARI:</strong> <code>overzone</code>, <code>WaveTrend</code> ve <code>SuperTrend</code>{' '}
-        sinyalini <strong>yeni veren</strong> hisseler — günlük grafikte taranır. Kalıcı durum değil,
-        sinyalin <strong>oluştuğu bar</strong> yakalanır: SuperTrend'de trend dönüşü, WaveTrend'de kesişim,
-        overzone'da aşırı bölgede (−53/−60 ve +53/+60) kurulan kesişim. Yalnızca{' '}
+        <strong>UYARI:</strong> günlük grafikte <strong>iki koşulu birden</strong> sağlayan hisseler:{' '}
+        <code>overzone</code> <strong>AL</strong> — aşırı satım bölgesinde (−53/−60) kurulan yukarı kesişim,{' '}
         <strong>
           {trDate(state.sessionDate) ? `bugünün (${trDate(state.sessionDate)})` : 'bugünün'}
         </strong>{' '}
-        günlük barı taranır — önceki günlerde üretilmiş sinyaller listeye girmez. Son bar canlı fiyatla
-        güncellendiği için sinyal, gün içinde kapanış beklenmeden görünür.
+        barında oluşmuş olacak — <em>ve</em> <code>SuperTrend</code> <strong>SAT</strong>: trend hâlâ düşüşte
+        (durum ölçütü, dönüş barı aranmaz). Yani trend dönmeden, aşırı satımdan gelen{' '}
+        <strong>erken dönüş adayları</strong>. Önceki günlerde üretilmiş sinyaller listeye girmez; son bar
+        canlı fiyatla güncellendiği için sinyal, kapanış beklenmeden gün içinde görünür.
         {state.stats && ` (${state.stats.scanned} hisse bugün işlem gördü.)`}
       </div>
 
       <div className="filters">
-        {['ALL', 'AL', 'SAT'].map((d) => (
-          <button key={d} className={`filter ${dir === d ? 'active' : ''}`} onClick={() => setDir(d)}>{d === 'ALL' ? 'AL + SAT' : d}</button>
-        ))}
+        <span className="updated">{list.length} hisse</span>
         {state.updatedAt && (
           <span className="updated">Tarama: {new Date(state.updatedAt).toLocaleTimeString('tr-TR')}</span>
         )}
-      </div>
-
-      <div className="filters">
-        {ALERT_INDS.map((x) => (
-          <button key={x.key} className={`filter ${ind === x.key ? 'active' : ''}`} onClick={() => setInd(x.key)}>{x.label}</button>
-        ))}
-        <span className="updated">{list.length} sinyal</span>
       </div>
 
       {list.length === 0 ? (
@@ -731,7 +711,7 @@ function AlertList({ items, onSelect, state, highlight }) {
             </>
           ) : (
             <>
-              Bu filtrede bugün yeni sinyal veren hisse yok.
+              Bugün overzone AL verip SuperTrend'i hâlâ SAT olan hisse yok.
               {warming && ' Bar geçmişi hâlâ hazırlanıyor, birazdan tekrar bakın.'}
             </>
           )}
@@ -753,12 +733,13 @@ function AlertList({ items, onSelect, state, highlight }) {
                   <span className="name">{it?.name || ''}</span>
                 </span>
                 <span className="alert-meta">
-                  {a.hits > 1 && (
-                    <span className="alert-hits" title="Aynı anda birden çok gösterge tetiklendi">{a.hits} gösterge</span>
-                  )}
                   {a.signals.map((s) => (
-                    <span key={s.ind} className={`alert-sig ${s.dir === 'AL' ? 'al' : 'sat'}`}>
-                      {s.indLabel} <strong>{s.dir}</strong>
+                    <span
+                      key={s.ind}
+                      className={`alert-sig ${s.dir === 'AL' ? 'al' : 'sat'}`}
+                      title={s.state ? 'Gösterge durumu (dönüş barı değil)' : 'Sinyalin oluştuğu bar'}
+                    >
+                      {s.indLabel} <strong>{s.dir}</strong>{s.state ? ' (trend)' : ''}
                     </span>
                   ))}
                   <span className="news-time">{a.barsAgo === 0 ? 'son bar' : `${a.barsAgo} bar önce`}</span>
