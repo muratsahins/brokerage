@@ -55,7 +55,9 @@ npm start                 # http://localhost:4000
 - **UYARI taraması** (`/api/alerts`): günlük grafikte **iki grup** döner —
   `items` = **alım adayları**: `overzone` **AL** (aşırı satımda, −53/−60,
   kurulan yukarı kesişim) son barda oluşanlar (`ALERT_LOOKBACK_BARS`,
-  varsayılan 1); `stSell` = `SuperTrend`in **son barda SAT'a döndüğü** hisseler.
+  varsayılan 1) **ve** aynı hissede **hacim dönüşü** olanlar (Hacim Dönüşü
+  sekmesiyle aynı tanım; kaç bar geriye bakılacağı `ALERT_VR_LOOKBACK_BARS`,
+  varsayılan 3); `stSell` = `SuperTrend`in **son barda SAT'a döndüğü** hisseler.
   Arayüz `stSell`i kullanıcının **Sanal Borsa portföyüyle kesiştirir** ("kendi
   hisselerim" — satış uyarısı); portföy tarayıcıda durduğu için sunucuya
   gönderilmez, süzme istemcide yapılır. Bar geçmişini kullanır, **ek veri

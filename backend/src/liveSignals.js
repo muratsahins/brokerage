@@ -118,15 +118,22 @@ function seriesWithLive(entry, price, priceTs, bar) {
 // Fiyat/gün içi bar önbellekleri beklenmez; yoksa ham önbellek serisi döner.
 // lastTs/gmtoffset: son barın hangi SEANSA ait olduğunu çağıran taraf bilsin
 // diye — bugün işlem görmeyen hissede son bar eski bir güne aittir.
+// open/volume de döner: UYARI'daki hacim dönüşü şartı mum gövdesi ve hacim ister.
 export function liveDailySeries(ticker) {
   const entry = cache.get(ticker);
   if (!entry) return null;
   const p = peekLivePrices(5 * 60 * 1000)?.prices?.[ticker];
   if (p?.price == null) {
-    return { high: entry.high, low: entry.low, close: entry.close, lastTs: entry.lastTs, gmtoffset: entry.gmtoffset };
+    return {
+      open: entry.open, high: entry.high, low: entry.low, close: entry.close, volume: entry.volume,
+      lastTs: entry.lastTs, gmtoffset: entry.gmtoffset,
+    };
   }
   const s = seriesWithLive(entry, p.price, p.ts, peekLiveBars()?.[ticker]);
-  return { high: s.highs, low: s.lows, close: s.closes, lastTs: s.lastTs, gmtoffset: entry.gmtoffset };
+  return {
+    open: s.opens, high: s.highs, low: s.lows, close: s.closes, volume: s.volumes,
+    lastTs: s.lastTs, gmtoffset: entry.gmtoffset,
+  };
 }
 
 // Canlı fiyatlardan gösterge sinyallerini üretir. Yanıt küçük kalsın diye kısa

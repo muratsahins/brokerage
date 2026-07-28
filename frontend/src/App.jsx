@@ -711,9 +711,14 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
             <span
               key={s.ind}
               className={`alert-sig ${s.dir === 'AL' ? 'al' : 'sat'}`}
-              title={s.state ? 'Gösterge durumu (dönüş barı değil)' : 'Sinyalin oluştuğu bar'}
+              title={s.state
+                ? 'Gösterge durumu (dönüş barı değil)'
+                : s.ind === 'vr'
+                  ? `${s.reds} kırmızı mumun ardından hacmi ${s.volRatio}× güçlü yeşil mum${s.barsAgo ? ` — ${s.barsAgo} bar önce` : ''}`
+                  : 'Sinyalin oluştuğu bar'}
             >
-              {s.indLabel} <strong>{s.dir}</strong>{s.state ? ' (trend)' : ''}
+              {s.indLabel} {s.ind === 'vr' ? <strong>{s.volRatio}×</strong> : <strong>{s.dir}</strong>}
+              {s.state ? ' (trend)' : ''}
             </span>
           ))}
           <span className="news-time">{a.barsAgo === 0 ? 'son bar' : `${a.barsAgo} bar önce`}</span>
@@ -731,7 +736,8 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
         </strong>{' '}
         barı taranır, iki grup:{' '}
         <strong>Alım adayları</strong> = <code>overzone</code> <strong>AL</strong> (aşırı satım bölgesinde,
-        −53/−60, kurulan yukarı kesişim) — tüm BIST'te;{' '}
+        −53/−60, kurulan yukarı kesişim) <em>ve</em> <code>hacim dönüşü</code> (kırmızı mumların ardından
+        hepsinden yüksek hacimli güçlü yeşil mum) — tüm BIST'te;{' '}
         <strong>Kendi hisselerim</strong> = <code>SuperTrend</code> <strong>SAT</strong>'a dönenlerden Sanal
         Borsa portföyünde olanlar. Önceki günlerde üretilmiş sinyaller listeye girmez; son bar canlı fiyatla
         güncellendiği için sinyal, kapanış beklenmeden gün içinde görünür.
@@ -753,10 +759,10 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
         </div>
       ) : (
         <>
-          <div className="alert-group">Alım adayları — overzone AL (tüm BIST)</div>
+          <div className="alert-group">Alım adayları — overzone AL + hacim dönüşü (tüm BIST)</div>
           {list.length === 0 ? (
             <div className="state">
-              Bugün overzone AL veren hisse yok.
+              Bugün overzone AL verip aynı zamanda hacim dönüşü yapan hisse yok.
               {warming && ' Bar geçmişi hâlâ hazırlanıyor, birazdan tekrar bakın.'}
             </div>
           ) : (
