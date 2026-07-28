@@ -591,18 +591,21 @@ function NewsList({ kind }) {
   );
 }
 
-// UYARI sekmesi: günlük grafikte son barda overzone AL verip SuperTrend'i hâlâ
-// SAT olan hisseler (erken dönüş adayları). Backend /api/alerts tarar.
+// UYARI sekmesi iki grup gösterir (Backend /api/alerts tarar):
+//   • ALIM ADAYLARI (tüm BIST): son barda overzone AL.
+//   • KENDİ HİSSELERİM: SuperTrend son barda SAT'a dönen hisselerden Sanal
+//     Borsa portföyünde olanlar. Portföy tarayıcıda durur, sunucuya gitmez —
+//     kesişim burada yapılır.
 
 // UYARI taraması UYGULAMA SEVİYESİNDE tutulur: sekme kapalıyken de sürer ki
 // yeni sinyal geldiğinde sekme yanıp sönerek haber verebilsin.
 function useAlerts() {
-  const [state, setState] = useState({ loading: true, items: [], updatedAt: null, stats: null });
+  const [state, setState] = useState({ loading: true, items: [], stSell: [], updatedAt: null, stats: null });
   useEffect(() => {
     let cancelled = false;
     const load = () => fetch(`${API_BASE}/api/alerts`)
       .then((r) => r.json())
-      .then((d) => { if (!cancelled) setState({ loading: false, items: d.items || [], updatedAt: d.updatedAt, stats: d.stats, sessionDate: d.sessionDate, lastBarDate: d.lastBarDate }); })
+      .then((d) => { if (!cancelled) setState({ loading: false, items: d.items || [], stSell: d.stSell || [], updatedAt: d.updatedAt, stats: d.stats, sessionDate: d.sessionDate, lastBarDate: d.lastBarDate }); })
       .catch(() => { if (!cancelled) setState((s) => ({ ...s, loading: false })); });
     load();
     const id = setInterval(load, 60 * 1000); // tarama sunucuda ~60 sn önbellekli
@@ -611,9 +614,19 @@ function useAlerts() {
   return state;
 }
 
-// Bir uyarı satırının kimliği: hisse + tetiklenen gösterge/yön kümesi. Aynı
-// hisseye sonradan başka bir gösterge eklenirse kimlik değişir — yeni sayılır.
-const alertKey = (a) => `${a.ticker}:${a.signals.map((s) => `${s.ind}${s.dir}`).sort().join('|')}`;
+// Sanal Borsa portföyündeki hisse kodları ("kendi hisselerim"). Tarama her
+// tazelendiğinde ve UYARI sekmesine girildiğinde yeniden okunur — arada alım
+// satım yapılmış olabilir.
+function usePortfolioTickers(dep) {
+  return useMemo(() => {
+    const pf = vbLoad(vbEmail());
+    return new Set(Object.keys(pf?.positions || {}));
+  }, [dep]);
+}
+
+// Bir uyarı satırının kimliği: grup + hisse + tetiklenen gösterge/yön kümesi.
+// Grup da girer, çünkü aynı hisse iki grupta birden çıkabilir.
+const alertKey = (a) => `${a.grup || 'al'}/${a.ticker}:${a.signals.map((s) => `${s.ind}${s.dir}`).sort().join('|')}`;
 
 // GÖRÜLDÜ durumu: hangi uyarıları kullanıcı UYARI sekmesinde açıkça gördü.
 // Tarayıcıda saklanır, gün (sessionDate) değişince sıfırlanır — yeni seansın
@@ -667,9 +680,8 @@ function useNewAlerts(alerts, active) {
   return { newCount: newKeys.size, highlight: highlightRef.current };
 }
 
-function AlertList({ items, onSelect, state, highlight }) {
+function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
   const byTicker = useMemo(() => new Map(items.map((i) => [i.ticker, i])), [items]);
-  // Tek bir ölçüt var (overzone AL + SuperTrend SAT), süzgeç gerekmiyor.
   const list = state.items;
   const warming = state.stats && state.stats.ready < state.stats.total * 0.9;
   // Bugün hiçbir hissenin barı yoksa seans yok (hafta sonu/tatil) ya da veri
@@ -679,75 +691,89 @@ function AlertList({ items, onSelect, state, highlight }) {
 
   if (state.loading) return <div className="state">Taranıyor…</div>;
 
+  const satir = (a) => {
+    const it = byTicker.get(a.ticker);
+    const taze = highlight?.has(alertKey(a));
+    return (
+      <button
+        key={alertKey(a)}
+        className={`alert-row ${a.dir === 'AL' ? 'al' : 'sat'} ${taze ? 'fresh' : ''}`}
+        onClick={() => it && onSelect(it)}
+        title={it ? 'Grafiği aç' : ''}
+      >
+        <span className="alert-main">
+          {taze && <span className="alert-new" title="Bu ziyarette yeni gelen sinyal">YENİ</span>}
+          <span className="ticker">{a.ticker}</span>
+          <span className="name">{it?.name || ''}</span>
+        </span>
+        <span className="alert-meta">
+          {a.signals.map((s) => (
+            <span
+              key={s.ind}
+              className={`alert-sig ${s.dir === 'AL' ? 'al' : 'sat'}`}
+              title={s.state ? 'Gösterge durumu (dönüş barı değil)' : 'Sinyalin oluştuğu bar'}
+            >
+              {s.indLabel} <strong>{s.dir}</strong>{s.state ? ' (trend)' : ''}
+            </span>
+          ))}
+          <span className="news-time">{a.barsAgo === 0 ? 'son bar' : `${a.barsAgo} bar önce`}</span>
+        </span>
+      </button>
+    );
+  };
+
   return (
     <>
       <div className="fav-note">
-        <strong>UYARI:</strong> günlük grafikte <strong>iki koşulu birden</strong> sağlayan hisseler:{' '}
-        <code>overzone</code> <strong>AL</strong> — aşırı satım bölgesinde (−53/−60) kurulan yukarı kesişim,{' '}
+        <strong>UYARI</strong> — günlük grafikte{' '}
         <strong>
           {trDate(state.sessionDate) ? `bugünün (${trDate(state.sessionDate)})` : 'bugünün'}
         </strong>{' '}
-        barında oluşmuş olacak — <em>ve</em> <code>SuperTrend</code> <strong>SAT</strong>: trend hâlâ düşüşte
-        (durum ölçütü, dönüş barı aranmaz). Yani trend dönmeden, aşırı satımdan gelen{' '}
-        <strong>erken dönüş adayları</strong>. Önceki günlerde üretilmiş sinyaller listeye girmez; son bar
-        canlı fiyatla güncellendiği için sinyal, kapanış beklenmeden gün içinde görünür.
+        barı taranır, iki grup:{' '}
+        <strong>Alım adayları</strong> = <code>overzone</code> <strong>AL</strong> (aşırı satım bölgesinde,
+        −53/−60, kurulan yukarı kesişim) — tüm BIST'te;{' '}
+        <strong>Kendi hisselerim</strong> = <code>SuperTrend</code> <strong>SAT</strong>'a dönenlerden Sanal
+        Borsa portföyünde olanlar. Önceki günlerde üretilmiş sinyaller listeye girmez; son bar canlı fiyatla
+        güncellendiği için sinyal, kapanış beklenmeden gün içinde görünür.
         {state.stats && ` (${state.stats.scanned} hisse bugün işlem gördü.)`}
       </div>
 
       <div className="filters">
-        <span className="updated">{list.length} hisse</span>
+        <span className="updated">{list.length + mine.length} uyarı</span>
         {state.updatedAt && (
           <span className="updated">Tarama: {new Date(state.updatedAt).toLocaleTimeString('tr-TR')}</span>
         )}
       </div>
 
-      {list.length === 0 ? (
+      {noSession ? (
         <div className="state">
-          {noSession ? (
-            <>
-              Bugün{trDate(state.sessionDate) ? ` (${trDate(state.sessionDate)})` : ''} işlem gören hisse yok —
-              seans kapalı (hafta sonu/tatil) ya da veri henüz gelmedi.
-              {trDate(state.lastBarDate) && ` Son seans: ${trDate(state.lastBarDate)}; o günün sinyalleri burada gösterilmez.`}
-            </>
-          ) : (
-            <>
-              Bugün overzone AL verip SuperTrend'i hâlâ SAT olan hisse yok.
-              {warming && ' Bar geçmişi hâlâ hazırlanıyor, birazdan tekrar bakın.'}
-            </>
-          )}
+          Bugün{trDate(state.sessionDate) ? ` (${trDate(state.sessionDate)})` : ''} işlem gören hisse yok —
+          seans kapalı (hafta sonu/tatil) ya da veri henüz gelmedi.
+          {trDate(state.lastBarDate) && ` Son seans: ${trDate(state.lastBarDate)}; o günün sinyalleri burada gösterilmez.`}
         </div>
       ) : (
-        <div className="news-list">
-          {list.map((a, i) => {
-            const it = byTicker.get(a.ticker);
-            return (
-              <button
-                key={a.ticker}
-                className={`alert-row ${a.dir === 'AL' ? 'al' : a.dir === 'SAT' ? 'sat' : 'mix'} ${highlight?.has(alertKey(a)) ? 'fresh' : ''}`}
-                onClick={() => it && onSelect(it)}
-                title={it ? 'Grafiği aç' : ''}
-              >
-                <span className="alert-main">
-                  {highlight?.has(alertKey(a)) && <span className="alert-new" title="Bu ziyarette yeni gelen sinyal">YENİ</span>}
-                  <span className="ticker">{a.ticker}</span>
-                  <span className="name">{it?.name || ''}</span>
-                </span>
-                <span className="alert-meta">
-                  {a.signals.map((s) => (
-                    <span
-                      key={s.ind}
-                      className={`alert-sig ${s.dir === 'AL' ? 'al' : 'sat'}`}
-                      title={s.state ? 'Gösterge durumu (dönüş barı değil)' : 'Sinyalin oluştuğu bar'}
-                    >
-                      {s.indLabel} <strong>{s.dir}</strong>{s.state ? ' (trend)' : ''}
-                    </span>
-                  ))}
-                  <span className="news-time">{a.barsAgo === 0 ? 'son bar' : `${a.barsAgo} bar önce`}</span>
-                </span>
-              </button>
-            );
-          })}
-        </div>
+        <>
+          <div className="alert-group">Kendi hisselerim — SuperTrend SAT'a döndü</div>
+          {mine.length === 0 ? (
+            <div className="state">
+              {hasPortfolio
+                ? 'Portföyündeki hisselerde bugün SuperTrend SAT dönüşü yok.'
+                : 'Sanal Borsa portföyün boş — hisse aldığında SAT dönüşleri burada uyarır.'}
+            </div>
+          ) : (
+            <div className="news-list">{mine.map(satir)}</div>
+          )}
+
+          <div className="alert-group">Alım adayları — overzone AL (tüm BIST)</div>
+          {list.length === 0 ? (
+            <div className="state">
+              Bugün overzone AL veren hisse yok.
+              {warming && ' Bar geçmişi hâlâ hazırlanıyor, birazdan tekrar bakın.'}
+            </div>
+          ) : (
+            <div className="news-list">{list.map(satir)}</div>
+          )}
+        </>
       )}
     </>
   );
@@ -1106,8 +1132,19 @@ export default function App() {
 
   // UYARI taraması sekme kapalıyken de sürer; görülmemiş yeni sinyal varsa
   // sekme yanıp söner, sekmeye girilince (sayfa görünürken) söner.
+  // "Kendi hisselerim" grubu: SuperTrend SAT dönüşlerinden portföyde olanlar.
   const alerts = useAlerts();
-  const { newCount, highlight } = useNewAlerts(alerts, tab === 'uyari');
+  const myTickers = usePortfolioTickers(`${tab}|${alerts.updatedAt}`);
+  const mine = useMemo(
+    () => (alerts.stSell || []).filter((a) => myTickers.has(a.ticker)),
+    [alerts.stSell, myTickers],
+  );
+  // Yanıp sönme iki grubun toplamına bakar.
+  const alertsAll = useMemo(
+    () => ({ ...alerts, items: [...mine, ...alerts.items] }),
+    [alerts, mine],
+  );
+  const { newCount, highlight } = useNewAlerts(alertsAll, tab === 'uyari');
 
   // Önce aktif sekmeye göre, sonra sinyale göre süz.
   const inTab = useMemo(
@@ -1240,7 +1277,14 @@ export default function App() {
       {isNews ? (
         <NewsList kind={activeTab.news} />
       ) : tab === 'uyari' ? (
-        <AlertList items={data.items} onSelect={setChartItem} state={alerts} highlight={highlight} />
+        <AlertList
+          items={data.items}
+          onSelect={setChartItem}
+          state={alerts}
+          highlight={highlight}
+          mine={mine}
+          hasPortfolio={myTickers.size > 0}
+        />
       ) : tab === 'trade' ? (
         <VirtualTrade items={data.items} />
       ) : (

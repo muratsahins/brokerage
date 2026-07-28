@@ -52,12 +52,13 @@ npm start                 # http://localhost:4000
   `SERIES_TTL_MINUTES` (varsayılan 30) bar geçmişinin tazelenme sıklığı,
   `SERIES_CHECK_MINUTES` (15) kontrol aralığı, `SERIES_FETCH_GAP_MS` (350)
   Yahoo istekleri arası bekleme. Önbellek durumu: `GET /api/health`.
-- **UYARI taraması** (`/api/alerts`): günlük grafikte **iki koşulu birden**
-  sağlayan hisseler — (1) `overzone` **AL**: aşırı satımda (−53/−60) kurulan
-  yukarı kesişim, yalnızca son barda (`ALERT_LOOKBACK_BARS`, varsayılan 1);
-  (2) `SuperTrend` **SAT**: trend hâlâ düşüşte (durum ölçütü, dönüş barı
-  aranmaz — aynı barda iki zıt dönüş pratikte olmaz). Yani trend dönmeden aşırı
-  satımdan gelen erken dönüş adayları. Bar geçmişini kullanır, **ek veri
+- **UYARI taraması** (`/api/alerts`): günlük grafikte **iki grup** döner —
+  `items` = **alım adayları**: `overzone` **AL** (aşırı satımda, −53/−60,
+  kurulan yukarı kesişim) son barda oluşanlar (`ALERT_LOOKBACK_BARS`,
+  varsayılan 1); `stSell` = `SuperTrend`in **son barda SAT'a döndüğü** hisseler.
+  Arayüz `stSell`i kullanıcının **Sanal Borsa portföyüyle kesiştirir** ("kendi
+  hisselerim" — satış uyarısı); portföy tarayıcıda durduğu için sunucuya
+  gönderilmez, süzme istemcide yapılır. Bar geçmişini kullanır, **ek veri
   çekmez**. Son bar canlı fiyatla güncellendiği için sinyal, günlük kapanış
   beklenmeden gün içinde görünür. **Yalnızca BUGÜN**: son barı bugüne (borsa saati, `EXCHANGE_GMT_OFFSET`
   varsayılan UTC+3) ait olmayan hisse taranmaz; bugün seans yoksa liste boş döner

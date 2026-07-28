@@ -1,14 +1,15 @@
-// UYARI taraması: GÜNLÜK grafikte aşağıdaki İKİ koşulu BİRDEN sağlayan hisseler.
+// UYARI taraması — GÜNLÜK grafikte, İKİ AYRI grup:
 //
-//   1) overzone AL: aşırı satım bölgesinde (wt2 <= -53) kurulan YUKARI kesişim,
-//      SON BARDA oluşmuş olacak ("yeni" = kalıcı durum değil, oluştuğu bar).
-//   2) SuperTrend SAT: trend hâlâ düşüşte (durum ölçütü, dönüş barı aranmaz).
+//   items  (ALIM ADAYLARI, tüm enstrümanlar): overzone AL — aşırı satım
+//          bölgesinde (wt2 <= -53) kurulan YUKARI kesişim, SON BARDA oluşmuş
+//          olacak. Bilgi olarak SuperTrend'in o anki durumu (stState) eklenir.
+//   stSell (SATIŞ UYARISI adayları): SuperTrend'in SON BARDA SAT'a döndüğü
+//          hisseler. Arayüz bunu kullanıcının Sanal Borsa portföyüyle kesiştirir
+//          ("kendi hisselerim"); portföy tarayıcıda durduğu için sunucuya
+//          gönderilmez, süzme istemcide yapılır.
 //
-// Yani trend daha dönmemişken aşırı satımdan gelen erken dönüş adayları. Aynı
-// barda hem overzone AL hem SuperTrend SAT DÖNÜŞÜ olması pratikte imkânsız
-// olduğu için SuperTrend'de bar değil DURUM aranır.
-//
-// Son bar BUGÜNE ait olmalıdır — bugün seans yoksa liste boştur.
+// Her iki grupta da "yeni" = kalıcı durum değil, sinyalin OLUŞTUĞU bar; ve o
+// son bar BUGÜNE ait olmalıdır — bugün seans yoksa listeler boştur.
 //
 // Veri: liveSignals'ın canlı fiyatla yamalı günlük bar geçmişi — UYARI için
 // Yahoo'ya EK İSTEK YOK. Son barın kapanışı/hacmi canlı olduğu için sinyal,
@@ -36,7 +37,8 @@ const IND_LABEL = { oz: 'overzone', wt: 'WaveTrend', st: 'SuperTrend' };
 // göre BUGÜNÜN gününe ait olmalı. Bugün seans yoksa liste boş döner — dünün
 // sinyalleri bugünmüş gibi gösterilmez.
 function scan() {
-  const items = [];
+  const items = [];   // alım adayları (overzone AL)
+  const stSell = [];  // SuperTrend SAT dönüşü — portföy süzgeci istemcide
   let ready = 0;
 
   const day = (ts, off) => Math.floor((ts + (off ?? 0)) / 86400);
@@ -61,25 +63,38 @@ function scan() {
     // Son barı BUGÜNE ait olmayan hisseyi atla (eski sinyal taze görünmesin).
     const off = s.gmtoffset ?? DEFAULT_OFF;
     if (s.lastTs == null || day(s.lastTs, off) !== day(now, off)) continue;
-    // 1) overzone AL, son barda oluşmuş olmalı.
-    const oz = recentSignals(s.high, s.low, s.close, LOOKBACK).oz;
-    if (!oz || oz.dir !== 'AL') continue;
-    // 2) SuperTrend hâlâ SAT (trend dönmemiş).
-    if (supertrendSignal(s.high, s.low, s.close) !== 'SAT') continue;
+    const r = recentSignals(s.high, s.low, s.close, LOOKBACK);
 
-    items.push({
-      ticker: inst.ticker,
-      dir: 'AL', // aranan sinyal overzone AL; SuperTrend SAT trend süzgeci
-      hits: 2,
-      barsAgo: oz.barsAgo,
-      signals: [
-        { ind: 'oz', indLabel: IND_LABEL.oz, dir: 'AL', barsAgo: oz.barsAgo },
-        { ind: 'st', indLabel: IND_LABEL.st, dir: 'SAT', state: true }, // durum, dönüş barı değil
-      ],
-    });
+    // ALIM ADAYI: overzone AL, son barda oluşmuş.
+    if (r.oz && r.oz.dir === 'AL') {
+      const stState = supertrendSignal(s.high, s.low, s.close); // bilgi amaçlı trend
+      items.push({
+        ticker: inst.ticker,
+        grup: 'al',
+        dir: 'AL',
+        barsAgo: r.oz.barsAgo,
+        signals: [
+          { ind: 'oz', indLabel: IND_LABEL.oz, dir: 'AL', barsAgo: r.oz.barsAgo },
+          ...(stState ? [{ ind: 'st', indLabel: IND_LABEL.st, dir: stState, state: true }] : []),
+        ],
+      });
+    }
+
+    // SATIŞ UYARISI adayı: SuperTrend son barda SAT'a döndü. (Arayüz portföyle
+    // kesiştirir; burada tüm hisseler için üretilir.)
+    if (r.st && r.st.dir === 'SAT') {
+      stSell.push({
+        ticker: inst.ticker,
+        grup: 'pf',
+        dir: 'SAT',
+        barsAgo: r.st.barsAgo,
+        signals: [{ ind: 'st', indLabel: IND_LABEL.st, dir: 'SAT', barsAgo: r.st.barsAgo }],
+      });
+    }
   }
 
   items.sort((a, b) => a.ticker.localeCompare(b.ticker));
+  stSell.sort((a, b) => a.ticker.localeCompare(b.ticker));
 
   // Taranan gün (borsa saatine göre bugün) ve önbellekteki en yeni bar tarihi —
   // ikisi farklıysa arayüz "bugün seans yok" diyebilsin diye ayrı döner.
@@ -88,10 +103,14 @@ function scan() {
   const scanned = series.filter(({ s }) =>
     s.lastTs != null && day(s.lastTs, s.gmtoffset ?? DEFAULT_OFF) === day(now, s.gmtoffset ?? DEFAULT_OFF)).length;
 
-  return { items: items.slice(0, MAX_ITEMS), ready, scanned, sessionDate, lastBarDate };
+  return {
+    items: items.slice(0, MAX_ITEMS),
+    stSell: stSell.slice(0, MAX_ITEMS),
+    ready, scanned, sessionDate, lastBarDate,
+  };
 }
 
-let scanCache = { at: 0, items: [], ready: 0, scanned: 0, sessionDate: null, lastBarDate: null };
+let scanCache = { at: 0, items: [], stSell: [], ready: 0, scanned: 0, sessionDate: null, lastBarDate: null };
 export function getAlerts() {
   if (Date.now() - scanCache.at > 60000) {
     scanCache = { at: Date.now(), ...scan() };
@@ -101,6 +120,7 @@ export function getAlerts() {
     sessionDate: scanCache.sessionDate,
     lastBarDate: scanCache.lastBarDate,
     items: scanCache.items,
+    stSell: scanCache.stSell,
     stats: { ready: scanCache.ready, scanned: scanCache.scanned, total: INSTRUMENTS.length },
   };
 }
