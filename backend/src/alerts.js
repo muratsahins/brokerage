@@ -21,14 +21,33 @@ const IND_LABEL = { oz: 'overzone', wt: 'WaveTrend', st: 'SuperTrend' };
 
 // Tüm enstrümanları tarar. HİSSE BAŞINA TEK KAYIT döner; bir hisse birden çok
 // göstergede tetiklenmişse hepsi `signals` içinde toplanır (teyit).
+//
+// SADECE GÜNCEL SEANS: bir hissenin son barı eski bir güne ait olabilir (bugün
+// işlem görmemiş / durdurulmuş). Öyle bir hissenin "son bar" sinyali aslında
+// önceki günlerde üretilmiştir; listeye girmemesi için önce piyasanın güncel
+// seans günü bulunur (enstrümanların son bar tarihlerinin en yenisi), sonra
+// yalnızca son barı O GÜNE ait olanlar taranır.
 function scan() {
   const items = [];
   let ready = 0;
 
+  const day = (ts, off) => Math.floor((ts + (off ?? 0)) / 86400);
+  const series = [];
+  let sessionDay = -Infinity, sessionOff = 0, sessionTs = null;
   for (const inst of INSTRUMENTS) {
     const s = liveDailySeries(inst.ticker);
     if (!s) continue; // bar geçmişi henüz önbellekte değil
     ready++;
+    series.push({ inst, s });
+    if (s.lastTs != null) {
+      const d = day(s.lastTs, s.gmtoffset);
+      if (d > sessionDay) { sessionDay = d; sessionOff = s.gmtoffset ?? 0; sessionTs = s.lastTs; }
+    }
+  }
+
+  for (const { inst, s } of series) {
+    // Son barı güncel seansa ait olmayan hisseyi atla (eski sinyal taze görünmesin).
+    if (s.lastTs == null || day(s.lastTs, s.gmtoffset) !== sessionDay) continue;
     const r = recentSignals(s.high, s.low, s.close, LOOKBACK);
 
     const signals = [];
@@ -57,18 +76,24 @@ function scan() {
     || b.hits - a.hits
     || a.ticker.localeCompare(b.ticker));
 
-  return { items: items.slice(0, MAX_ITEMS), ready };
+  // Taranan seansın tarihi (borsa saatine göre) — arayüzde gösterilir.
+  const sessionDate = sessionTs != null
+    ? new Date((sessionTs + sessionOff) * 1000).toISOString().slice(0, 10)
+    : null;
+  const scanned = series.filter(({ s }) => s.lastTs != null && day(s.lastTs, s.gmtoffset) === sessionDay).length;
+
+  return { items: items.slice(0, MAX_ITEMS), ready, scanned, sessionDate };
 }
 
-let scanCache = { at: 0, items: [], ready: 0 };
+let scanCache = { at: 0, items: [], ready: 0, scanned: 0, sessionDate: null };
 export function getAlerts() {
   if (Date.now() - scanCache.at > 60000) {
-    const { items, ready } = scan();
-    scanCache = { at: Date.now(), items, ready };
+    scanCache = { at: Date.now(), ...scan() };
   }
   return {
     updatedAt: new Date(scanCache.at).toISOString(),
+    sessionDate: scanCache.sessionDate,
     items: scanCache.items,
-    stats: { ready: scanCache.ready, total: INSTRUMENTS.length },
+    stats: { ready: scanCache.ready, scanned: scanCache.scanned, total: INSTRUMENTS.length },
   };
 }

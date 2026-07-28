@@ -94,6 +94,7 @@ function seriesWithLive(entry, price, priceTs, bar) {
       lows: [...entry.low, Math.min(b?.low ?? price, price)],
       closes: [...entry.close, price],
       volumes: [...entry.volume, b?.volume ?? 0],
+      lastTs: priceTs ?? bar?.ts ?? entry.lastTs, // eklenen barın anı
     };
   }
 
@@ -110,18 +111,22 @@ function seriesWithLive(entry, price, priceTs, bar) {
     volumes = entry.volume.slice();
     volumes[i] = b.volume; // gün içi hacim (önbellektekinin yerine)
   }
-  return { opens, highs, lows, closes, volumes };
+  return { opens, highs, lows, closes, volumes, lastTs: entry.lastTs };
 }
 
 // Bir enstrümanın CANLI yamalı günlük serisi (UYARI taraması için).
 // Fiyat/gün içi bar önbellekleri beklenmez; yoksa ham önbellek serisi döner.
+// lastTs/gmtoffset: son barın hangi SEANSA ait olduğunu çağıran taraf bilsin
+// diye — bugün işlem görmeyen hissede son bar eski bir güne aittir.
 export function liveDailySeries(ticker) {
   const entry = cache.get(ticker);
   if (!entry) return null;
   const p = peekLivePrices(5 * 60 * 1000)?.prices?.[ticker];
-  if (p?.price == null) return { high: entry.high, low: entry.low, close: entry.close };
+  if (p?.price == null) {
+    return { high: entry.high, low: entry.low, close: entry.close, lastTs: entry.lastTs, gmtoffset: entry.gmtoffset };
+  }
   const s = seriesWithLive(entry, p.price, p.ts, peekLiveBars()?.[ticker]);
-  return { high: s.highs, low: s.lows, close: s.closes };
+  return { high: s.highs, low: s.lows, close: s.closes, lastTs: s.lastTs, gmtoffset: entry.gmtoffset };
 }
 
 // Canlı fiyatlardan gösterge sinyallerini üretir. Yanıt küçük kalsın diye kısa

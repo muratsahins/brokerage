@@ -609,7 +609,7 @@ function AlertList({ items, onSelect }) {
     let cancelled = false;
     const load = () => fetch(`${API_BASE}/api/alerts`)
       .then((r) => r.json())
-      .then((d) => { if (!cancelled) setState({ loading: false, items: d.items || [], updatedAt: d.updatedAt, stats: d.stats }); })
+      .then((d) => { if (!cancelled) setState({ loading: false, items: d.items || [], updatedAt: d.updatedAt, stats: d.stats, sessionDate: d.sessionDate }); })
       .catch(() => { if (!cancelled) setState((s) => ({ ...s, loading: false })); });
     load();
     const id = setInterval(load, 60 * 1000); // tarama sunucuda ~60 sn önbellekli
@@ -631,8 +631,13 @@ function AlertList({ items, onSelect }) {
         <strong>UYARI:</strong> <code>overzone</code>, <code>WaveTrend</code> ve <code>SuperTrend</code>{' '}
         sinyalini <strong>yeni veren</strong> hisseler — günlük grafikte taranır. Kalıcı durum değil,
         sinyalin <strong>oluştuğu bar</strong> yakalanır: SuperTrend'de trend dönüşü, WaveTrend'de kesişim,
-        overzone'da aşırı bölgede (−53/−60 ve +53/+60) kurulan kesişim. Yalnızca <strong>bugünün</strong>{' '}
-        günlük barı taranır; son bar canlı fiyatla güncellendiği için sinyal kapanışı beklemeden görünür.
+        overzone'da aşırı bölgede (−53/−60 ve +53/+60) kurulan kesişim. Yalnızca{' '}
+        <strong>
+          {state.sessionDate ? `${new Date(state.sessionDate).toLocaleDateString('tr-TR')} seansının` : 'güncel seansın'}
+        </strong>{' '}
+        günlük barı taranır — önceki günlerde üretilmiş sinyaller listeye girmez. Son bar canlı fiyatla
+        güncellendiği için sinyal, gün içinde kapanış beklenmeden görünür.
+        {state.stats && ` (${state.stats.scanned} hisse bu seansta işlem gördü.)`}
       </div>
 
       <div className="filters">
