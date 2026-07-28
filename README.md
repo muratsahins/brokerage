@@ -46,7 +46,7 @@ npm start                 # http://localhost:4000
 - Teknik göstergeler `/api/prices` ile fiyatla **aynı anda** tazelenir: 1 yıllık
   bar geçmişi bellekte tutulur (seans içinde değişmez), her fiyat yenilemesinde
   son bar canlı fiyatla güncellenip göstergeler yeniden hesaplanır.
-  `SERIES_TTL_MINUTES` (varsayılan 60) bar geçmişinin tazelenme sıklığı,
+  `SERIES_TTL_MINUTES` (varsayılan 30) bar geçmişinin tazelenme sıklığı,
   `SERIES_CHECK_MINUTES` (15) kontrol aralığı, `SERIES_FETCH_GAP_MS` (350)
   Yahoo istekleri arası bekleme. Önbellek durumu: `GET /api/health`.
 

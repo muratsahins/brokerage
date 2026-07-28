@@ -4,7 +4,7 @@ import cors from 'cors';
 import compression from 'compression';
 import { initDb } from './db.js';
 import { syncData, getRecommendations, getCachedItems } from './service.js';
-import { diagnose, fetchOhlc } from './dataSource.js';
+import { diagnose, fetchOhlc, peekLivePrices } from './dataSource.js';
 import { getLivePrices, refreshSeries, seriesStats } from './liveSignals.js';
 import { fetchNews, fetchKap } from './newsSource.js';
 import { INSTRUMENTS } from './stocks.js';
@@ -42,7 +42,22 @@ app.get('/api/chart', async (req, res) => {
     if (!ticker) return res.status(400).json({ error: 'ticker gerekli' });
     const symbol = symbolByTicker.get(ticker) || `${ticker}.IS`;
     const range = VALID_RANGE.test(String(req.query.range)) ? String(req.query.range) : '1y';
-    res.json(await fetchOhlc(symbol, range));
+    const data = await fetchOhlc(symbol, range);
+    // Son mumu, tablonun kullandığı CANLI fiyatla (spark) eşitle. Grafik verisi
+    // Yahoo'nun chart ucundan, tablo fiyatı spark ucundan geliyor; ikisi arasında
+    // saniyelik kotasyon farkı kalmasın diye grafik tabloya bağlanır.
+    // Yalnızca canlı fiyat son mumla AYNI seansa aitse uygulanır.
+    const last = data.candles[data.candles.length - 1];
+    const lp = peekLivePrices()?.prices?.[ticker];
+    if (last && lp?.price != null && lp.ts != null) {
+      const d = new Date((lp.ts + (data.gmtoffset ?? 0)) * 1000).toISOString().slice(0, 10);
+      if (d === last.time) {
+        last.close = lp.price;
+        last.high = Math.max(last.high, lp.price);
+        last.low = Math.min(last.low, lp.price);
+      }
+    }
+    res.json(data);
   } catch (err) {
     res.status(502).json({ error: err.message });
   }

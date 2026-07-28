@@ -118,6 +118,11 @@ function roundPrice(x) {
   return Math.round(x * f) / f;
 }
 let livePriceCache = { at: 0, data: null };
+// Önbellekteki canlı fiyatları BEKLEMEDEN döner (yoksa/çok eskiyse null).
+// Grafik ucu bunu kullanır: modal açılışı fiyat çekimini beklemesin.
+export function peekLivePrices(maxAgeMs = 60000) {
+  return Date.now() - livePriceCache.at < maxAgeMs ? livePriceCache.data : null;
+}
 export async function fetchLivePrices() {
   if (Date.now() - livePriceCache.at < 15000 && livePriceCache.data) return livePriceCache.data;
   const bySym = new Map(INSTRUMENTS.map((i) => [i.symbol, i.ticker]));
@@ -262,7 +267,9 @@ export async function fetchOhlc(symbol, range = '1y') {
     time: new Date((b.ts + off) * 1000).toISOString().slice(0, 10),
     open: b.open, high: b.high, low: b.low, close: b.close, volume: b.volume,
   }));
-  return { symbol, currency: meta.currency ?? null, candles };
+  // gmtoffset: çağıran taraf son mumun hangi seansa ait olduğunu doğrulayabilsin
+  // diye (bkz. /api/chart — son mumu canlı fiyatla eşitleme).
+  return { symbol, currency: meta.currency ?? null, gmtoffset: off, candles };
 }
 
 // --- Fiyat + geçmiş (chart) -------------------------------------------------

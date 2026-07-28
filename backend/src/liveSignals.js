@@ -15,9 +15,11 @@ import {
 } from './indicators.js';
 import { priceDerived } from './recommend.js';
 
-// Bar geçmişi önbelleği ömrü — geçmiş barlar seans içinde değişmediği için uzun
-// tutulabilir; yalnızca yeni bir günlük bar kapandığında tazelenmesi gerekir.
-const TTL_MS = Number(process.env.SERIES_TTL_MINUTES ?? 60) * 60 * 1000;
+// Bar geçmişi önbelleği ömrü. Geçmiş barlar seans içinde değişmez; tazelik
+// yalnızca SON barın gün içi yüksek/düşük ve HACİM değerleri için gerekir
+// (kapanışı zaten canlı fiyatla güncelleniyor). 30 dk: tam tur ~4 dk sürdüğü
+// için saatte ~8 dk arka plan çekimi demek.
+const TTL_MS = Number(process.env.SERIES_TTL_MINUTES ?? 30) * 60 * 1000;
 // Yahoo'yu yormamak için enstrümanlar arası bekleme.
 const GAP_MS = Number(process.env.SERIES_FETCH_GAP_MS ?? 350);
 
