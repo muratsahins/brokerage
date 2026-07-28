@@ -867,8 +867,7 @@ export default function App() {
     { key: 'bist50',  label: 'BIST 50',        match: (i) => i.bist != null && i.bist <= 50 },
     { key: 'bist100', label: 'BIST 100',       match: (i) => i.bist != null && i.bist <= 100 },
     { key: 'metal',   label: 'Kıymetli Maden', match: (i) => i.kind === 'metal' },
-    // Kripto sekmesi kaldırıldı. Kripto verisi duruyor: aramada, Hacim Dönüşü
-    // taramasında ve Sanal Borsa'da görünmeye devam eder.
+    // Kripto kaldırıldı (backend'de de takip listesi dışında — stocks.js).
   ];
   const NEWS_TABS = [
     { key: 'news', label: '📰 Haberler', news: 'news' },
@@ -1268,7 +1267,7 @@ export default function App() {
         <p>
           <strong>Puan</strong>; analist potansiyeli (%45), analist tavsiyesi (%20), 1 aylık momentum (%20) ve
           ileri F/K (%15) bileşenlerinden hesaplanır; eksik bileşen varsa kalanların ağırlığı normalize edilir.
-          <strong>Analist kapsamı olmayan</strong> enstrümanlarda (kripto, kıymetli maden ve analist izlemeyen
+          <strong>Analist kapsamı olmayan</strong> enstrümanlarda (kıymetli madenler ve analist izlemeyen
           hisseler) puanın yalnızca fiyat hareketinden geldiği için <strong>tavanı 60'tır</strong> — sıralama
           korunur ama analist teyitli hisselerle aynı puana çıkamaz ve <code>AL</code> rozeti almaz.
         </p>

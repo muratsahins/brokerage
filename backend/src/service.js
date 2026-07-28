@@ -98,10 +98,15 @@ export async function loadPublished() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     if (!Array.isArray(data.items) || data.items.length === 0) throw new Error('boş veri');
-    memory.recommendations = data.items;
+    // Yayınlanan veri, takip listesinden ÇIKARILMIŞ enstrümanları hâlâ taşıyor
+    // olabilir (bir sonraki yayın turuna kadar). Güncel listede olmayanları ele —
+    // böylece liste değişikliği (ör. kriptonun kapatılması) anında geçerli olur.
+    const items = data.items.filter((it) => byTicker.has(it.ticker));
+    const dropped = data.items.length - items.length;
+    memory.recommendations = items;
     memory.updatedAt = data.updatedAt ?? new Date().toISOString();
     memory.source = 'github';
-    console.log(`[service] Yayınlanan veri yüklendi — ${data.items.length} hisse (${memory.updatedAt}).`);
+    console.log(`[service] Yayınlanan veri yüklendi — ${items.length} hisse${dropped ? ` (${dropped} takip dışı kayıt elendi)` : ''} (${memory.updatedAt}).`);
     return true;
   } catch (err) {
     console.warn(`[service] Yayınlanan veri yüklenemedi: ${err.message}`);

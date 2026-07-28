@@ -1,4 +1,5 @@
 import OTHER_STOCKS_DATA from './other-stocks.js';
+// eslint-disable-next-line no-unused-vars -- kripto kapalı; liste geri açmak için duruyor
 import CRYPTOS from './crypto.js';
 
 // Takip edilen BIST hisseleri. `bist` alanı, hissenin ait olduğu EN DAR endeksi
@@ -131,11 +132,13 @@ export const METALS = [
 
 // Fiyat/gösterge çekimi için birleşik enstrüman listesi. Her enstrümanın açık
 // Yahoo `symbol`'ü, `currency`'si ve `kind`'i (stock/metal) vardır.
+// KRİPTO KAPALI: sitede hiç görünmemesi istendi. Geri açmak için aşağıdaki
+// satırın yorumunu kaldırmak yeterli (crypto.js ve kind:'crypto' desteği duruyor).
 export const INSTRUMENTS = [
   ...BIST_STOCKS.map((s) => ({ ...s, symbol: `${s.ticker}.IS`, currency: 'TRY', kind: 'stock' })),
   ...OTHER_STOCKS.map((s) => ({ ...s, symbol: `${s.ticker}.IS`, currency: 'TRY', bist: null, kind: 'stock' })),
   ...METALS.map((m) => ({ ...m, sector: 'Kıymetli Maden', bist: null, kind: 'metal' })),
-  ...CRYPTOS.map((c) => ({ ...c, sector: 'Kripto', bist: null, currency: 'USD', kind: 'crypto' })),
+  // ...CRYPTOS.map((c) => ({ ...c, sector: 'Kripto', bist: null, currency: 'USD', kind: 'crypto' })),
 ];
 
 export function toSymbol(ticker) {
