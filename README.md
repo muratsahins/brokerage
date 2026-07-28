@@ -56,7 +56,9 @@ npm start                 # http://localhost:4000
   YENİ veren hisseler — günlük grafikte, yalnızca son bar (`ALERT_LOOKBACK_BARS`,
   varsayılan 1). Yukarıdaki bar geçmişini kullanır, **ek veri çekmez**. Son bar
   canlı fiyatla güncellendiği için sinyal, günlük kapanış beklenmeden gün içinde
-  görünür. Liste tavanı `ALERT_MAX_ITEMS` (600).
+  görünür. **Yalnızca BUGÜN**: son barı bugüne (borsa saati, `EXCHANGE_GMT_OFFSET`
+  varsayılan UTC+3) ait olmayan hisse taranmaz; bugün seans yoksa liste boş döner
+  (`lastBarDate` son seansın tarihini söyler). Liste tavanı `ALERT_MAX_ITEMS` (600).
 
 ### 3) Frontend
 ```bash

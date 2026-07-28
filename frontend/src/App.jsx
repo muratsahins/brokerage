@@ -609,7 +609,7 @@ function AlertList({ items, onSelect }) {
     let cancelled = false;
     const load = () => fetch(`${API_BASE}/api/alerts`)
       .then((r) => r.json())
-      .then((d) => { if (!cancelled) setState({ loading: false, items: d.items || [], updatedAt: d.updatedAt, stats: d.stats, sessionDate: d.sessionDate }); })
+      .then((d) => { if (!cancelled) setState({ loading: false, items: d.items || [], updatedAt: d.updatedAt, stats: d.stats, sessionDate: d.sessionDate, lastBarDate: d.lastBarDate }); })
       .catch(() => { if (!cancelled) setState((s) => ({ ...s, loading: false })); });
     load();
     const id = setInterval(load, 60 * 1000); // tarama sunucuda ~60 sn önbellekli
@@ -622,6 +622,10 @@ function AlertList({ items, onSelect }) {
     (dir === 'ALL' || a.signals.some((s) => s.dir === dir))
     && (ind === 'ALL' || a.signals.some((s) => s.ind === ind)));
   const warming = state.stats && state.stats.ready < state.stats.total * 0.9;
+  // Bugün hiçbir hissenin barı yoksa seans yok (hafta sonu/tatil) ya da veri
+  // henüz gelmedi — önceki seansın sinyalleri gösterilmez, durum yazılır.
+  const noSession = state.stats && state.stats.scanned === 0;
+  const trDate = (d) => (d ? new Date(d).toLocaleDateString('tr-TR') : null);
 
   if (state.loading) return <div className="state">Taranıyor…</div>;
 
@@ -633,11 +637,11 @@ function AlertList({ items, onSelect }) {
         sinyalin <strong>oluştuğu bar</strong> yakalanır: SuperTrend'de trend dönüşü, WaveTrend'de kesişim,
         overzone'da aşırı bölgede (−53/−60 ve +53/+60) kurulan kesişim. Yalnızca{' '}
         <strong>
-          {state.sessionDate ? `${new Date(state.sessionDate).toLocaleDateString('tr-TR')} seansının` : 'güncel seansın'}
+          {trDate(state.sessionDate) ? `bugünün (${trDate(state.sessionDate)})` : 'bugünün'}
         </strong>{' '}
         günlük barı taranır — önceki günlerde üretilmiş sinyaller listeye girmez. Son bar canlı fiyatla
         güncellendiği için sinyal, gün içinde kapanış beklenmeden görünür.
-        {state.stats && ` (${state.stats.scanned} hisse bu seansta işlem gördü.)`}
+        {state.stats && ` (${state.stats.scanned} hisse bugün işlem gördü.)`}
       </div>
 
       <div className="filters">
@@ -658,8 +662,18 @@ function AlertList({ items, onSelect }) {
 
       {list.length === 0 ? (
         <div className="state">
-          Bu filtrede bugün yeni sinyal veren hisse yok.
-          {warming && ' Bar geçmişi hâlâ hazırlanıyor, birazdan tekrar bakın.'}
+          {noSession ? (
+            <>
+              Bugün{trDate(state.sessionDate) ? ` (${trDate(state.sessionDate)})` : ''} işlem gören hisse yok —
+              seans kapalı (hafta sonu/tatil) ya da veri henüz gelmedi.
+              {trDate(state.lastBarDate) && ` Son seans: ${trDate(state.lastBarDate)}; o günün sinyalleri burada gösterilmez.`}
+            </>
+          ) : (
+            <>
+              Bu filtrede bugün yeni sinyal veren hisse yok.
+              {warming && ' Bar geçmişi hâlâ hazırlanıyor, birazdan tekrar bakın.'}
+            </>
+          )}
         </div>
       ) : (
         <div className="news-list">
