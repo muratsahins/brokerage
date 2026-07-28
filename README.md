@@ -45,7 +45,10 @@ npm start                 # http://localhost:4000
 - Elle yenileme: `POST /api/refresh` veya `npm run refresh`.
 - Teknik göstergeler `/api/prices` ile fiyatla **aynı anda** tazelenir: 1 yıllık
   bar geçmişi bellekte tutulur (seans içinde değişmez), her fiyat yenilemesinde
-  son bar canlı fiyatla güncellenip göstergeler yeniden hesaplanır.
+  son bar canlı veriyle güncellenip göstergeler yeniden hesaplanır. Son barın
+  kapanışı spark ucundan, **hacmi ve gün içi yüksek/düşüğü** toplu `v7/quote`
+  ucundan gelir (100'er sembol tek istekte; crumb gerektirir, alınamazsa
+  önbellekteki bara düşülür).
   `SERIES_TTL_MINUTES` (varsayılan 30) bar geçmişinin tazelenme sıklığı,
   `SERIES_CHECK_MINUTES` (15) kontrol aralığı, `SERIES_FETCH_GAP_MS` (350)
   Yahoo istekleri arası bekleme. Önbellek durumu: `GET /api/health`.

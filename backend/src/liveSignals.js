@@ -9,7 +9,7 @@
 // gün içi yüksek/düşüğü önbellek tazeliği kadar gecikir).
 
 import { INSTRUMENTS } from './stocks.js';
-import { fetchDailyBars, fetchLivePrices } from './dataSource.js';
+import { fetchDailyBars, fetchLivePrices, fetchLiveBars } from './dataSource.js';
 import {
   supertrendSignal, wavetrendSignals, smcBullish, volumeReversal,
 } from './indicators.js';
@@ -72,40 +72,56 @@ export async function refreshSeries() {
   }
 }
 
-// Önbellekteki seriyi canlı fiyatla günceller: aynı seanssa son barı güncelle,
-// yeni seansa geçildiyse canlı fiyattan yeni bar ekle. (Yalnızca değişen diziler
-// kopyalanır; open/volume aynı seansta olduğu gibi kullanılır.)
-function seriesWithLive(entry, price, priceTs) {
+// Önbellekteki seriyi canlı veriyle günceller: kapanış canlı fiyattan, son barın
+// açılış/yüksek/düşük/HACİM değerleri ise canlı gün içi bardan (v7/quote) gelir —
+// böylece son bar fiyatla tamamen aynı tazelikte olur. Canlı bar yoksa (crumb
+// alınamadıysa) önbellekteki değerler kullanılır, kapanış yine canlıdır.
+// Yeni seansa geçildiyse yeni bar eklenir.
+function seriesWithLive(entry, price, priceTs, bar) {
   const { gmtoffset: off } = entry;
-  const newSession = priceTs != null && day(priceTs, off) > day(entry.lastTs, off);
-  if (newSession) {
+  const lastDay = day(entry.lastTs, off);
+  const liveDay = priceTs != null ? day(priceTs, off)
+    : (bar?.ts != null ? day(bar.ts, off) : null);
+  // Gün içi bar yalnızca canlı fiyatla AYNI seansa aitse kullanılabilir.
+  const b = (bar && bar.ts != null && liveDay != null && day(bar.ts, off) === liveDay)
+    ? bar : null;
+
+  if (liveDay != null && liveDay > lastDay) {
+    // Yeni seans: önbellekte henüz barı yok.
     return {
-      opens: [...entry.open, price],
-      highs: [...entry.high, price],
-      lows: [...entry.low, price],
+      opens: [...entry.open, b?.open ?? price],
+      highs: [...entry.high, Math.max(b?.high ?? price, price)],
+      lows: [...entry.low, Math.min(b?.low ?? price, price)],
       closes: [...entry.close, price],
-      volumes: [...entry.volume, 0], // yeni seansın hacmi henüz bilinmiyor
+      volumes: [...entry.volume, b?.volume ?? 0],
     };
   }
+
   const i = entry.close.length - 1;
   const closes = entry.close.slice();
   const highs = entry.high.slice();
   const lows = entry.low.slice();
   closes[i] = price;
-  highs[i] = Math.max(highs[i], price);
-  lows[i] = Math.min(lows[i], price);
-  return { opens: entry.open, highs, lows, closes, volumes: entry.volume };
+  highs[i] = Math.max(b?.high ?? -Infinity, highs[i], price);
+  lows[i] = Math.min(b?.low ?? Infinity, lows[i], price);
+  let opens = entry.open, volumes = entry.volume;
+  if (b) {
+    if (b.open != null) { opens = entry.open.slice(); opens[i] = b.open; }
+    volumes = entry.volume.slice();
+    volumes[i] = b.volume; // gün içi hacim (önbellektekinin yerine)
+  }
+  return { opens, highs, lows, closes, volumes };
 }
 
 // Canlı fiyatlardan gösterge sinyallerini üretir. Yanıt küçük kalsın diye kısa
 // anahtar + yalnızca dolu alanlar: st=SuperTrend, wt=WaveTrend kesişimi,
 // wo=overzone (53-60), smc=SMC yükseliş, vr=hacim dönüşü.
-export function computeLiveSignals(prices) {
+export function computeLiveSignals(prices, bars = {}) {
   const out = {};
   for (const [ticker, p] of Object.entries(prices)) {
     const entry = cache.get(ticker);
     if (!entry || p?.price == null) continue; // geçmişi yoksa yayınlanan değer kalsın
-    const s = seriesWithLive(entry, p.price, p.ts);
+    const s = seriesWithLive(entry, p.price, p.ts, bars?.[ticker]);
     const sig = {};
     const st = supertrendSignal(s.highs, s.lows, s.closes);
     if (st) sig.st = st;
@@ -161,12 +177,17 @@ export function computeLiveScores(items, prices) {
 // fetchLivePrices zaten ~15 sn önbellekli; hesaplar da aynı ana bağlanır.
 let sigCache = { key: null, signals: {}, scores: {} };
 export async function getLivePrices(items = []) {
-  const live = await fetchLivePrices();
+  // Fiyat ve gün içi bar (hacim/yüksek/düşük) paralel çekilir; ikisi de ~15 sn
+  // önbellekli. Gün içi bar alınamazsa göstergeler önbellekteki barla hesaplanır.
+  const [live, bars] = await Promise.all([
+    fetchLivePrices(),
+    fetchLiveBars().catch(() => null),
+  ]);
   if (sigCache.key !== live.updatedAt) {
     const t0 = Date.now();
     sigCache = {
       key: live.updatedAt,
-      signals: computeLiveSignals(live.prices),
+      signals: computeLiveSignals(live.prices, bars ?? {}),
       scores: computeLiveScores(items, live.prices),
     };
     const ms = Date.now() - t0;

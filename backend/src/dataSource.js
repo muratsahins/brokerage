@@ -164,6 +164,70 @@ export async function fetchLivePrices() {
   return livePriceCache.data;
 }
 
+// --- Toplu GÜN İÇİ bar verisi (v7/quote) ------------------------------------
+// Süregelen günlük barın HACMİ + gün içi yüksek/düşük/açılışı. 100'er sembol tek
+// istekte geldiği için fiyatla aynı sıklıkta (~15 sn) tazelenebilir; tek tek
+// chart çekmek 692 istek demek olurdu. crumb gerektirir (analist verisiyle aynı
+// oturum); alınamazsa null döner ve çağıran taraf önbellekteki bara düşer.
+const QUOTE_URL = 'https://query1.finance.yahoo.com/v7/finance/quote';
+let liveBarCache = { at: 0, data: null };
+// crumb datacenter IP'lerinde throttle olabiliyor; başarısızlıkta bir süre hiç
+// denemeyiz ki /api/prices her seferinde crumb turunu beklemesin.
+let liveBarPausedUntil = 0;
+const LIVE_BAR_PAUSE_MS = 10 * 60 * 1000;
+export async function fetchLiveBars() {
+  if (Date.now() - liveBarCache.at < 15000 && liveBarCache.data) return liveBarCache.data;
+  if (Date.now() < liveBarPausedUntil) return liveBarCache.data;
+  const { cookie, crumb } = await ensureSession();
+  if (!crumb) {
+    liveBarPausedUntil = Date.now() + LIVE_BAR_PAUSE_MS;
+    return liveBarCache.data;
+  }
+
+  const bySym = new Map(INSTRUMENTS.map((i) => [i.symbol, i.ticker]));
+  const symbols = INSTRUMENTS.map((i) => i.symbol);
+  const out = {};
+  const CHUNK = 100; // v7/quote çok sembol kabul ediyor
+  const CONC = 3;
+  const chunks = [];
+  for (let i = 0; i < symbols.length; i += CHUNK) chunks.push(symbols.slice(i, i + CHUNK));
+
+  let failed = 0;
+  const doChunk = async (chunk) => {
+    try {
+      const url = `${QUOTE_URL}?symbols=${chunk.map(encodeURIComponent).join(',')}&crumb=${encodeURIComponent(crumb)}`;
+      const res = await fetch(url, {
+        headers: { ...BROWSER_HEADERS, Cookie: cookie },
+        signal: AbortSignal.timeout(12000),
+      });
+      if (!res.ok) { failed++; return; }
+      const j = await res.json();
+      for (const q of j?.quoteResponse?.result ?? []) {
+        const ticker = bySym.get(q.symbol);
+        if (!ticker || q.regularMarketVolume == null) continue;
+        out[ticker] = {
+          open: q.regularMarketOpen ?? null,
+          high: q.regularMarketDayHigh ?? null,
+          low: q.regularMarketDayLow ?? null,
+          volume: q.regularMarketVolume,
+          ts: q.regularMarketTime ?? null,
+        };
+      }
+    } catch { failed++; }
+  };
+
+  for (let i = 0; i < chunks.length; i += CONC) {
+    await Promise.all(chunks.slice(i, i + CONC).map(doChunk));
+  }
+  if (Object.keys(out).length === 0) {
+    if (failed) console.warn(`[data] v7/quote gün içi bar verisi alınamadı (${failed} parça) — ${LIVE_BAR_PAUSE_MS / 60000} dk duraklatılıyor.`);
+    liveBarPausedUntil = Date.now() + LIVE_BAR_PAUSE_MS;
+    return liveBarCache.data; // eldeki (varsa) veriyi koru
+  }
+  liveBarCache = { at: Date.now(), data: out };
+  return out;
+}
+
 // --- TCMB USD/TRY kuru ------------------------------------------------------
 // Kıymetli madenlerin (USD/ons) TRY/gram karşılığı için güncel döviz satış kuru.
 export async function fetchUsdTryRate() {
