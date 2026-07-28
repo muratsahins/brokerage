@@ -29,9 +29,10 @@ const MAX_ITEMS = Number(process.env.ALERT_MAX_ITEMS ?? 600);
 // "Bugün" hangi saate göre: enstrümanın kendi borsa saati (Yahoo meta.gmtoffset).
 // Bilinmiyorsa BIST varsayılır (UTC+3).
 const DEFAULT_OFF = Number(process.env.EXCHANGE_GMT_OFFSET ?? 10800);
-// Hacim dönüşü formasyonu kaç bar geriye kadar sayılır (Hacim Dönüşü sekmesiyle
-// aynı varsayılan: 3). Şart sıkı gelirse büyütmek yeterli.
-const VR_LOOKBACK = Number(process.env.ALERT_VR_LOOKBACK_BARS ?? 3);
+// Hacim dönüşü formasyonu kaç bar geriye kadar sayılır. Hacim Dönüşü sekmesi 3
+// bar bakar; UYARI'da şart overzone AL ile kesiştiği için daha geniş tutuldu (5)
+// — dip formasyonu birkaç gün önce kurulmuş, kesişim bugün gelmiş olabilir.
+const VR_LOOKBACK = Number(process.env.ALERT_VR_LOOKBACK_BARS ?? 5);
 
 const IND_LABEL = { oz: 'overzone', wt: 'WaveTrend', st: 'SuperTrend', vr: 'Hacim dönüşü' };
 
