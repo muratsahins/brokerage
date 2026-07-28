@@ -614,6 +614,44 @@ function vbUnitPrice(it) {
   return it.price;
 }
 function vbUnitLabel(it) { return it && it.kind === 'metal' ? 'gr' : 'adet'; }
+
+// Takip dışı bırakılan enstrümanlar (kripto). Sitede artık yoklar; sanal
+// portföyde kalırlarsa fiyatsız görünür ve satılamazlar. Portföy açılırken
+// MALİYET fiyatından tasfiye edilirler: kâr/zarar yaratmaz, para nakde döner.
+// (BIST ticker'larıyla çakışma yok — kontrol edildi.) Başka bir enstrüman
+// takipten çıkarsa ticker'ını buraya eklemek yeterli.
+const VB_RETIRED = new Set([
+  'BTC', 'ETH', 'USDT', 'BNB', 'USDC', 'XRP', 'SOL', 'TRX', 'WBT', 'HYPE', 'DOGE',
+  'USDS', 'RAIN', 'LEO', 'ZEC', 'XMR', 'XLM', 'ADA', 'CC', 'DAI', 'BCH', 'USD1', 'GRAM',
+  'USDE', 'LTC', 'USDG', 'HBAR', 'SHIB', 'SUI', 'AVAX', 'CRO', 'PYUSD', 'BUIDL', 'XAUT',
+  'UNI', 'NEAR', 'USDY', 'ONDO', 'TAO', 'PAXG', 'OKB', 'WLFI', 'ASTER', 'HTX', 'RLUSD',
+  'AAVE', 'USDD', 'USDF', 'DOT', 'MNT', 'SKY', 'BFUSD', 'WLD', 'MORPHO', 'BEAT', 'PEPE',
+  'ICP', 'BGB', 'USDGO', 'ETC', 'STABLE', 'KCS', 'QNT', 'PI', 'ENA', 'JST', 'POL',
+  'KAS', 'RENDER', 'ALGO', 'NEXO', 'ATOM', 'GT', 'BDX', 'GHO', 'VVV', 'JUP', 'FIL',
+  'YLDS', 'LIT', 'XDC', 'FLR', 'USD0', 'ARB', 'APT', 'USX', 'TUSD', 'INJ',
+]);
+
+// Portföydeki takip dışı pozisyonları maliyet fiyatından tasfiye eder.
+// Değişiklik yoksa portföyü olduğu gibi (aynı nesneyle) döner.
+function vbCleanRetired(pf) {
+  const hit = Object.entries(pf.positions || {}).filter(([t]) => VB_RETIRED.has(t));
+  if (hit.length === 0) return { pf, note: null };
+  const positions = { ...pf.positions };
+  const time = new Date().toISOString();
+  const entries = [];
+  let cash = pf.cash;
+  for (const [t, p] of hit) {
+    delete positions[t];
+    cash += p.qty * p.avgCost;
+    entries.push({ time, ticker: t, side: 'SAT', qty: p.qty, price: p.avgCost });
+  }
+  const refund = cash - pf.cash;
+  return {
+    pf: { ...pf, cash, positions, history: [...entries, ...(pf.history || [])].slice(0, 100) },
+    note: `${hit.length} kripto pozisyonu (${hit.map(([t]) => t).join(', ')}) artık takip edilmediği için `
+      + `maliyet fiyatından tasfiye edildi; ${fmtNum(refund)} ₺ nakde geçti.`,
+  };
+}
 function vbTrade(email, item, side, qtyRaw) {
   const pf = vbLoad(email);
   if (!pf) return { ok: false, msg: 'Önce Sanal Borsa sekmesinden e-posta ile giriş yap.' };
@@ -657,7 +695,13 @@ function VirtualTrade({ items }) {
     if (!email) { setPf(null); return; }
     let p = null;
     try { const raw = localStorage.getItem('vb_pf_' + email); p = raw ? JSON.parse(raw) : null; } catch { p = null; }
-    setPf(p || { cash: VB_START, positions: {}, history: [] });
+    // Takip dışı kalan (kripto) pozisyonları maliyetinden tasfiye et ve kalıcı yaz.
+    const { pf: cleaned, note } = vbCleanRetired(p || { cash: VB_START, positions: {}, history: [] });
+    if (note) {
+      try { localStorage.setItem('vb_pf_' + email, JSON.stringify(cleaned)); } catch { /* yoksay */ }
+      setMsg({ t: 'ok', m: note });
+    }
+    setPf(cleaned);
   }, [email]);
 
   function persist(next) { setPf(next); try { localStorage.setItem('vb_pf_' + email, JSON.stringify(next)); } catch { /* yoksay */ } }
