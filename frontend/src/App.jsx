@@ -870,7 +870,7 @@ function vbTrade(email, item, side, qtyRaw) {
   return { ok: true, msg: `${fmtNum(n)} ${vbUnitLabel(item)} ${t} ${side === 'buy' ? 'alındı' : 'satıldı'}.`, pf: next };
 }
 
-function VirtualTrade({ items }) {
+function VirtualTrade({ items, onSelect }) {
   const [email, setEmail] = useState(() => { try { return localStorage.getItem('vb_email') || ''; } catch { return ''; } });
   const [emailInput, setEmailInput] = useState('');
   const [pf, setPf] = useState(null);
@@ -987,7 +987,23 @@ function VirtualTrade({ items }) {
           {posList.map((p) => (
             <div key={p.t} className="vb-pos" onClick={() => { setSel(p.t); setQty(String(p.qty)); }}>
               <div className="vb-posmain">
-                <div><strong>{p.t}</strong> <span className="name">{p.it?.name}</span></div>
+                <div>
+                  {/* Hisse başlığı grafiği açar; satırın kalanı işlem için seçer.
+                      Tıklama yukarı da yayılır, yani grafik açılırken pozisyon
+                      alım-satım formunda da seçili olur. */}
+                  {p.it ? (
+                    <button
+                      className="ticker ticker-link"
+                      onClick={() => onSelect?.(p.it)}
+                      title="Grafiği aç"
+                    >
+                      {p.t} <span className="chart-ico">📈</span>
+                    </button>
+                  ) : (
+                    <strong>{p.t}</strong>
+                  )}
+                  {' '}<span className="name">{p.it?.name}</span>
+                </div>
                 <div className="vb-posval">{fmtNum(p.value)} ₺</div>
               </div>
               <div className="vb-posdetail">
@@ -1301,7 +1317,7 @@ export default function App() {
           hasPortfolio={myTickers.size > 0}
         />
       ) : tab === 'trade' ? (
-        <VirtualTrade items={data.items} />
+        <VirtualTrade items={data.items} onSelect={setChartItem} />
       ) : (
       <>
       <div className="search">
