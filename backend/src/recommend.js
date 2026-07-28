@@ -78,7 +78,16 @@ export function priceDerived({ price, firstClose, targetMean, recommendationKey,
     { v: nValue, w: 0.15 },
   ].filter((p) => p.v != null);
   const wsum = parts.reduce((s, p) => s + p.w, 0) || 1;
-  const score = Math.round((parts.reduce((s, p) => s + p.v * p.w, 0) / wsum) * 100);
+  const raw = parts.reduce((s, p) => s + p.v * p.w, 0) / wsum;
+
+  // Analist kapsamı yoksa (hedef fiyat da tavsiye de yok) puan yalnızca fiyat
+  // hareketinden geliyor demektir — puanın %65'i normalde analist bileşenlerinden
+  // gelir. Böyle bir enstrüman analist teyitli hisseyle aynı kefeye konmasın diye
+  // puan tavanla ORANTILI ölçeklenir: sıralama korunur, tam puan verilmez
+  // (ham 100 -> 60). Tavanın altında kaldığı için AL rozeti de çıkamaz (eşik 65).
+  const NO_ANALYST_CAP = 60;
+  const hasAnalystCoverage = nUpside != null || nRec != null;
+  const score = Math.round(raw * (hasAnalystCoverage ? 100 : NO_ANALYST_CAP));
 
   let signal = 'İZLE';
   if (score >= 65) signal = 'AL';

@@ -1265,6 +1265,13 @@ export default function App() {
           bu potansiyelin zamana bölünmüş (bileşik) karşılığıdır. Analist kapsamı olmayan hisselerde tahmin gösterilmez.
         </p>
         <p>
+          <strong>Puan</strong>; analist potansiyeli (%45), analist tavsiyesi (%20), 1 aylık momentum (%20) ve
+          ileri F/K (%15) bileşenlerinden hesaplanır; eksik bileşen varsa kalanların ağırlığı normalize edilir.
+          <strong>Analist kapsamı olmayan</strong> enstrümanlarda (kripto, kıymetli maden ve analist izlemeyen
+          hisseler) puanın yalnızca fiyat hareketinden geldiği için <strong>tavanı 60'tır</strong> — sıralama
+          korunur ama analist teyitli hisselerle aynı puana çıkamaz ve <code>AL</code> rozeti almaz.
+        </p>
+        <p>
           <strong>WaveTrend</strong> (LazyBear WaveTrend Oscillator) ve <strong>SuperTrend</strong>
           (Kıvanç Özbilgiç), günlük fiyat verisinden hesaplanan teknik göstergelerdir.
           <strong>overzone</strong>: yeşil çizgi kırmızı sinyal çizgisini aşırı satım bölgesinde
