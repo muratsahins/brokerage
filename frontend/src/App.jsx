@@ -753,6 +753,16 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
         </div>
       ) : (
         <>
+          <div className="alert-group">Alım adayları — overzone AL (tüm BIST)</div>
+          {list.length === 0 ? (
+            <div className="state">
+              Bugün overzone AL veren hisse yok.
+              {warming && ' Bar geçmişi hâlâ hazırlanıyor, birazdan tekrar bakın.'}
+            </div>
+          ) : (
+            <div className="news-list">{list.map(satir)}</div>
+          )}
+
           <div className="alert-group">Kendi hisselerim — SuperTrend SAT'a döndü</div>
           {mine.length === 0 ? (
             <div className="state">
@@ -762,16 +772,6 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
             </div>
           ) : (
             <div className="news-list">{mine.map(satir)}</div>
-          )}
-
-          <div className="alert-group">Alım adayları — overzone AL (tüm BIST)</div>
-          {list.length === 0 ? (
-            <div className="state">
-              Bugün overzone AL veren hisse yok.
-              {warming && ' Bar geçmişi hâlâ hazırlanıyor, birazdan tekrar bakın.'}
-            </div>
-          ) : (
-            <div className="news-list">{list.map(satir)}</div>
           )}
         </>
       )}
@@ -1141,7 +1141,7 @@ export default function App() {
   );
   // Yanıp sönme iki grubun toplamına bakar.
   const alertsAll = useMemo(
-    () => ({ ...alerts, items: [...mine, ...alerts.items] }),
+    () => ({ ...alerts, items: [...alerts.items, ...mine] }),
     [alerts, mine],
   );
   const { newCount, highlight } = useNewAlerts(alertsAll, tab === 'uyari');
