@@ -7,7 +7,7 @@ import { syncData, getRecommendations, getCachedItems } from './service.js';
 import { diagnose, fetchOhlc, peekLivePrices } from './dataSource.js';
 import { getLivePrices, refreshSeries, seriesStats } from './liveSignals.js';
 import { fetchNews } from './newsSource.js';
-import { getAlerts, refreshIntraday, alertStats } from './alerts.js';
+import { getAlerts } from './alerts.js';
 import { INSTRUMENTS } from './stocks.js';
 
 const symbolByTicker = new Map(INSTRUMENTS.map((i) => [i.ticker, i.symbol]));
@@ -21,7 +21,7 @@ app.use(compression());
 app.use(express.json());
 
 app.get('/api/health', (req, res) => {
-  res.json({ ok: true, time: new Date().toISOString(), series: seriesStats(), alerts: alertStats() });
+  res.json({ ok: true, time: new Date().toISOString(), series: seriesStats() });
 });
 
 // Toplu güncel (intraday) fiyatlar + AYNI ANDAKİ gösterge sinyalleri ve
@@ -74,7 +74,8 @@ app.get('/api/news', async (req, res) => {
 });
 
 // UYARI: overzone / WaveTrend / SuperTrend sinyalini YENİ veren hisseler
-// (saatlik, 4 saatlik ve günlük grafiklerde). KAP bildirimlerinin yerini aldı.
+// (günlük grafik). KAP bildirimlerinin yerini aldı. Bar geçmişi zaten bellekte
+// olduğu için ek veri çekimi gerektirmez.
 app.get('/api/alerts', (req, res) => {
   try {
     res.json(getAlerts());
@@ -128,18 +129,6 @@ async function start() {
     setInterval(() => {
       refreshSeries().catch((err) => console.warn(`[live] Bar geçmişi tazelenemedi: ${err.message}`));
     }, seriesCheck * 60 * 1000);
-  }
-
-  // UYARI taraması için gün içi (1h/4h) barlar. Günlük barlar zaten yukarıda.
-  // Günlük tur bittikten sonra başlar ki iki tarama Yahoo'yu aynı anda yormasın.
-  const alertCheck = Number(process.env.ALERT_CHECK_MINUTES ?? 10);
-  if (alertCheck > 0) {
-    setTimeout(() => {
-      refreshIntraday().catch((err) => console.warn(`[uyarı] Gün içi barlar alınamadı: ${err.message}`));
-      setInterval(() => {
-        refreshIntraday().catch((err) => console.warn(`[uyarı] Gün içi barlar tazelenemedi: ${err.message}`));
-      }, alertCheck * 60 * 1000);
-    }, 60 * 1000);
   }
 
   const minutes = Number(process.env.REFRESH_INTERVAL_MINUTES ?? 30);

@@ -592,14 +592,7 @@ function NewsList({ kind }) {
 }
 
 // UYARI sekmesi: overzone / WaveTrend / SuperTrend sinyalini YENİ veren hisseler
-// (saatlik, 4 saatlik ve günlük grafiklerde). Backend /api/alerts tarar.
-const ALERT_TFS = [
-  { key: 'ALL', label: 'Tümü' },
-  { key: '1h', label: '1 saat' },
-  { key: '4h', label: '4 saat' },
-  { key: '1d', label: 'Günlük' },
-];
-
+// (günlük grafik). Backend /api/alerts tarar.
 const ALERT_INDS = [
   { key: 'ALL', label: 'Tüm göstergeler' },
   { key: 'oz', label: 'overzone' },
@@ -609,7 +602,6 @@ const ALERT_INDS = [
 
 function AlertList({ items, onSelect }) {
   const [state, setState] = useState({ loading: true, items: [], updatedAt: null, stats: null });
-  const [tf, setTf] = useState('ALL');
   const [dir, setDir] = useState('ALL');
   const [ind, setInd] = useState('ALL');
 
@@ -626,25 +618,22 @@ function AlertList({ items, onSelect }) {
 
   const byTicker = useMemo(() => new Map(items.map((i) => [i.ticker, i])), [items]);
   const list = state.items.filter((a) =>
-    (tf === 'ALL' || a.tf === tf) && (dir === 'ALL' || a.dir === dir) && (ind === 'ALL' || a.ind === ind));
+    (dir === 'ALL' || a.dir === dir) && (ind === 'ALL' || a.ind === ind));
+  const warming = state.stats && state.stats.ready < state.stats.total * 0.9;
 
-  if (state.loading) return <div className="state">Taranıyor… (ilk açılışta gün içi barların hazırlanması birkaç dakika sürebilir)</div>;
+  if (state.loading) return <div className="state">Taranıyor…</div>;
 
   return (
     <>
       <div className="fav-note">
         <strong>UYARI:</strong> <code>overzone</code>, <code>WaveTrend</code> ve <code>SuperTrend</code>{' '}
-        sinyalini <strong>yeni veren</strong> hisseler — saatlik, 4 saatlik ve günlük grafiklerde taranır.
-        Kalıcı durum değil, sinyalin <strong>oluştuğu bar</strong> yakalanır: SuperTrend'de trend dönüşü,
-        WaveTrend'de kesişim, overzone'da aşırı bölgede (−53/−60 ve +53/+60) kurulan kesişim.
-        Saatlikte son 6 bar, 4 saatlikte son 3 bar, günlükte son 2 bar taranır.
+        sinyalini <strong>yeni veren</strong> hisseler — günlük grafikte taranır. Kalıcı durum değil,
+        sinyalin <strong>oluştuğu bar</strong> yakalanır: SuperTrend'de trend dönüşü, WaveTrend'de kesişim,
+        overzone'da aşırı bölgede (−53/−60 ve +53/+60) kurulan kesişim. Yalnızca <strong>bugünün</strong>{' '}
+        günlük barı taranır; son bar canlı fiyatla güncellendiği için sinyal kapanışı beklemeden görünür.
       </div>
 
       <div className="filters">
-        {ALERT_TFS.map((t) => (
-          <button key={t.key} className={`filter ${tf === t.key ? 'active' : ''}`} onClick={() => setTf(t.key)}>{t.label}</button>
-        ))}
-        <span className="filter-sep" />
         {['ALL', 'AL', 'SAT'].map((d) => (
           <button key={d} className={`filter ${dir === d ? 'active' : ''}`} onClick={() => setDir(d)}>{d === 'ALL' ? 'AL + SAT' : d}</button>
         ))}
@@ -662,8 +651,8 @@ function AlertList({ items, onSelect }) {
 
       {list.length === 0 ? (
         <div className="state">
-          Bu filtrede yeni sinyal veren hisse yok.
-          {state.stats?.filling && ' Gün içi barlar hâlâ hazırlanıyor, birazdan tekrar bakın.'}
+          Bu filtrede bugün yeni sinyal veren hisse yok.
+          {warming && ' Bar geçmişi hâlâ hazırlanıyor, birazdan tekrar bakın.'}
         </div>
       ) : (
         <div className="news-list">
@@ -671,7 +660,7 @@ function AlertList({ items, onSelect }) {
             const it = byTicker.get(a.ticker);
             return (
               <button
-                key={`${a.ticker}-${a.tf}-${a.ind}-${i}`}
+                key={`${a.ticker}-${a.ind}-${i}`}
                 className={`alert-row ${a.dir === 'AL' ? 'al' : 'sat'}`}
                 onClick={() => it && onSelect(it)}
                 title={it ? 'Grafiği aç' : ''}
@@ -683,7 +672,6 @@ function AlertList({ items, onSelect }) {
                 <span className="alert-meta">
                   {a.hits > 1 && <span className="alert-hits" title="Bu hisse aynı anda birden çok sinyal veriyor">{a.hits} sinyal</span>}
                   <span className="alert-ind">{a.indLabel}</span>
-                  <span className="alert-tf">{a.tfLabel}</span>
                   <IndicatorBadge signal={a.dir} />
                   <span className="news-time">{a.barsAgo === 0 ? 'son bar' : `${a.barsAgo} bar önce`}</span>
                 </span>
@@ -1091,7 +1079,7 @@ export default function App() {
             {tab === 'trade'
               ? 'Sanal borsa · e-posta ile giriş, sanal alım-satım (gerçek para değildir)'
               : tab === 'uyari'
-              ? 'Yeni sinyal veren hisseler · saatlik, 4 saatlik ve günlük grafik taraması'
+              ? 'Bugün yeni sinyal veren hisseler · günlük grafik taraması'
               : isNews
               ? 'Piyasa, kıymetli maden ve analist önerisi haberleri'
               : <>Analist hedef fiyatı + temel verilere dayalı beklenen getiri · {searching ? `“${query.trim()}” için ${items.length} sonuç` : `${inTab.length} kayıt`}
