@@ -201,6 +201,41 @@ export async function fetchAltinInPrices() {
   }
 }
 
+// --- Günlük barların normalleştirilmesi -------------------------------------
+// Yahoo, İÇİNDE BULUNULAN seansın günlük barını BIST sembollerinde kapanışı
+// `null` olarak döndürüyor (O/H/L ve hacim dolu). Bu bar atıldığında grafik ve
+// göstergeler bir seans geride kalıyor, tabloda ise canlı fiyat (meta.
+// regularMarketPrice) görünüyordu — ör. THYAO 318 iken grafikte 312.
+// Çözüm: son bar canlı fiyatın seansına aitse kapanışını canlı fiyata eşitle
+// (yoksa tamamla) ve gerekiyorsa yüksek/düşük değerlerini genişlet. Böylece
+// tablo, grafik ve göstergeler AYNI son fiyattan hesaplanır.
+function normalizeBars(result) {
+  const ts = result.timestamp ?? [];
+  const q = result.indicators?.quote?.[0] ?? {};
+  const meta = result.meta ?? {};
+  const live = meta.regularMarketPrice;
+  // Borsa saat dilimine göre gün indeksi (son bar ile canlı fiyat aynı seansta mı?)
+  const off = meta.gmtoffset ?? 0;
+  const day = (t) => Math.floor((t + off) / 86400);
+  const liveDay = meta.regularMarketTime != null ? day(meta.regularMarketTime) : null;
+
+  const bars = [];
+  for (let i = 0; i < ts.length; i++) {
+    let o = q.open?.[i] ?? null, h = q.high?.[i] ?? null, l = q.low?.[i] ?? null;
+    let c = q.close?.[i] ?? null;
+    const isLast = i === ts.length - 1;
+    if (isLast && live != null && liveDay != null && day(ts[i]) === liveDay) {
+      c = live;
+      o = o ?? live;
+      h = h != null ? Math.max(h, live) : live;
+      l = l != null ? Math.min(l, live) : live;
+    }
+    if (o == null || h == null || l == null || c == null) continue;
+    bars.push({ ts: ts[i], open: o, high: h, low: l, close: c, volume: q.volume?.[i] ?? 0 });
+  }
+  return bars;
+}
+
 // --- Grafik için tam OHLC serisi (mum grafiği) ------------------------------
 // Frontend'de Lightweight Charts ile çizmek üzere günlük mum verisini döner.
 export async function fetchOhlc(symbol, range = '1y') {
@@ -210,18 +245,13 @@ export async function fetchOhlc(symbol, range = '1y') {
   const json = await res.json();
   const r = json?.chart?.result?.[0];
   if (!r) throw new Error(`Yahoo ${symbol} -> boş sonuç`);
-  const ts = r.timestamp ?? [];
-  const q = r.indicators?.quote?.[0] ?? {};
-  const candles = [];
-  for (let i = 0; i < ts.length; i++) {
-    const o = q.open?.[i], h = q.high?.[i], l = q.low?.[i], c = q.close?.[i];
-    if (o == null || h == null || l == null || c == null) continue;
-    // Lightweight Charts günlük seri için 'yyyy-mm-dd' bekliyor.
-    candles.push({
-      time: new Date(ts[i] * 1000).toISOString().slice(0, 10),
-      open: o, high: h, low: l, close: c, volume: q.volume?.[i] ?? 0,
-    });
-  }
+  // Lightweight Charts günlük seri için 'yyyy-mm-dd' bekliyor; gün etiketi borsa
+  // saatine göre hesaplanır (UTC'ye göre bir gün kaymasın).
+  const off = r.meta?.gmtoffset ?? 0;
+  const candles = normalizeBars(r).map((b) => ({
+    time: new Date((b.ts + off) * 1000).toISOString().slice(0, 10),
+    open: b.open, high: b.high, low: b.low, close: b.close, volume: b.volume,
+  }));
   return { symbol, currency: r.meta?.currency ?? null, candles };
 }
 
@@ -238,15 +268,14 @@ async function fetchChart(symbol) {
   if (!result) throw new Error(`Yahoo ${symbol} -> boş sonuç`);
 
   const meta = result.meta;
-  const q = result.indicators?.quote?.[0] ?? {};
-  const rawC = q.close ?? [], rawH = q.high ?? [], rawL = q.low ?? [];
-  // OHLC'yi hizalı tut: yalnızca kapanış/yüksek/düşük değerlerinin üçü de dolu
-  // olan barları al (göstergeler eşit uzunlukta diziler bekliyor).
-  const highs = [], lows = [], closes = [];
-  for (let i = 0; i < rawC.length; i++) {
-    if (rawC[i] == null || rawH[i] == null || rawL[i] == null) continue;
-    closes.push(rawC[i]); highs.push(rawH[i]); lows.push(rawL[i]);
-  }
+  // Grafikle BİREBİR aynı barlar (son/canlı bar dahil) — normalizeBars.
+  const bars = normalizeBars(result);
+  const highs = bars.map((b) => b.high);
+  const lows = bars.map((b) => b.low);
+  const closes = bars.map((b) => b.close);
+  // Mum rengi (açılış-kapanış) ve hacim taraması için — grafikteki mumların aynısı.
+  const opens = bars.map((b) => b.open);
+  const volumes = bars.map((b) => b.volume);
   if (closes.length === 0 || meta?.regularMarketPrice == null) {
     throw new Error(`Yahoo ${symbol} -> fiyat verisi yok`);
   }
@@ -269,7 +298,7 @@ async function fetchChart(symbol) {
     fiftyTwoWeekHigh: meta.fiftyTwoWeekHigh ?? Math.max(...closes),
     fiftyTwoWeekLow: meta.fiftyTwoWeekLow ?? Math.min(...closes),
     firstClose: monthAgoClose,
-    highs, lows, closes,
+    highs, lows, closes, opens, volumes,
   };
 }
 
