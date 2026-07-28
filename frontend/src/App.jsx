@@ -1029,7 +1029,12 @@ export default function App() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('ALL');
-  const [tab, setTab] = useState('bist30');
+  const [tab, setTab] = useState('all'); // açılış: BIST (tüm hisseler)
+  // Sıralama: 'ticker' (alfabetik, varsayılan) | 'score' (puan) | 'fresh'
+  // (yalnızca Hacim Dönüşü sekmesinde: formasyon tazeliği). Tercih saklanır.
+  const [sort, setSort] = useState(() => {
+    try { return localStorage.getItem('sortMode') || 'ticker'; } catch { return 'ticker'; }
+  });
   const [query, setQuery] = useState('');
   const [chartItem, setChartItem] = useState(null); // grafik pop-up'ı için seçili enstrüman
   // Görünüm: 'mobile' (kart, yatay scroll yok) | 'web' (tam tablo).
@@ -1167,18 +1172,21 @@ export default function App() {
           norm(i.ticker).includes(nq) || norm(i.name).includes(nq) || norm(i.sector).includes(nq))
       : inTab;
     if (filter !== 'ALL') list = list.filter((i) => i.signal === filter);
-    // Hacim dönüşü sekmesi puana değil, formasyonun tazeliğine göre sıralanır
-    // (eşitlikte hacim patlaması güçlü olan üstte).
-    if (tab === 'vol' && !nq) {
+    // Sıralama kullanıcının seçimine göre: varsayılan alfabetik (hisse kodu),
+    // 'score' seçilirse puana göre. Hacim dönüşü sekmesinde ek olarak formasyon
+    // tazeliği ('fresh') seçilebilir; puan canlı fiyatla değiştiği için sıralama
+    // her tazelemede yeniden yapılır (yayınlanan sıra bayatlamasın).
+    const freshOk = tab === 'vol' && !nq;
+    if (sort === 'fresh' && freshOk) {
       list = [...list].sort((a, b) =>
         (a.volRev.barsAgo - b.volRev.barsAgo) || (b.volRev.volRatio - a.volRev.volRatio));
-    } else {
-      // Puan canlı fiyatla değiştiği için sıralamayı da tazele — liste "puana
-      // göre sıralı" kalsın (yayınlanan sıra bayatlamasın).
+    } else if (sort === 'score') {
       list = [...list].sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+    } else {
+      list = [...list].sort((a, b) => a.ticker.localeCompare(b.ticker, 'tr'));
     }
     return list;
-  }, [data.items, inTab, query, filter, tab]);
+  }, [data.items, inTab, query, filter, tab, sort]);
 
   // Alış/Satış sütunları: görünen listede kıymetli maden varsa göster.
   const showBuySell = items.some((s) => s.kind === 'metal');
@@ -1186,6 +1194,7 @@ export default function App() {
   const showVolRev = tab === 'vol' && !searching;
 
   useEffect(() => { try { localStorage.setItem('viewMode', view); } catch { /* yoksay */ } }, [view]);
+  useEffect(() => { try { localStorage.setItem('sortMode', sort); } catch { /* yoksay */ } }, [sort]);
 
   return (
     <div className="page">
@@ -1318,6 +1327,23 @@ export default function App() {
             onClick={() => setFilter(f)}
           >
             {f === 'ALL' ? 'Tümü' : f}
+          </button>
+        ))}
+        <span className="filter-sep" aria-hidden="true" />
+        {/* Sıralama: varsayılan alfabetik; puana göre sıralamak isteyene düğme.
+            Tazelik yalnızca Hacim Dönüşü sekmesinde anlamlı. */}
+        {[
+          { key: 'ticker', label: 'A→Z', title: 'Hisse koduna göre alfabetik' },
+          { key: 'score', label: 'Puan', title: 'Puana göre (yüksekten düşüğe)' },
+          ...(tab === 'vol' ? [{ key: 'fresh', label: 'Tazelik', title: 'Formasyonun tazeliğine göre' }] : []),
+        ].map((s) => (
+          <button
+            key={s.key}
+            className={`filter sort ${sort === s.key ? 'active' : ''}`}
+            onClick={() => setSort(s.key)}
+            title={s.title}
+          >
+            {s.label}
           </button>
         ))}
         {(data.priceUpdatedAt || data.updatedAt) && (
