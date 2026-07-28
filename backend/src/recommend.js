@@ -9,6 +9,7 @@
 import {
   supertrendSignal, wavetrendSignal, wavetrendCrossSignal,
   rsiValue, macdBullish, rsiBullishReversal, macdBullCross, smcBullish,
+  volumeReversal,
 } from './indicators.js';
 
 function clamp01(x) {
@@ -94,6 +95,8 @@ export function scoreQuote(q) {
   const rsiReversal = rsiBullishReversal(q.closes);   // aşırı satımdan yukarı dönüş
   const macdCross = macdBullCross(q.closes);          // MACD pozitif kesişim
   const smc = smcBullish(q.highs, q.lows, q.closes);  // SMC yükseliş yapı kırılımı
+  // Hacim dönüşü: 2-3 kırmızı mumdan sonra hacmi hepsinden yüksek güçlü yeşil mum.
+  const vr = volumeReversal(q.opens, q.highs, q.lows, q.closes, q.volumes);
 
   return {
     symbol: q.symbol,
@@ -124,6 +127,16 @@ export function scoreQuote(q) {
     rsiReversal,   // RSI aşırı satımdan (30 altı) yukarı dönüş
     macdCross,     // MACD pozitif kesişim (sıfır çizgisi şartsız)
     smc,           // SMC yükseliş (likidite süpürme + yapı kırılımı)
+    // Hacim dönüşü formasyonu (yoksa null): kaç bar önce, kaç kırmızı mumdan sonra,
+    // hacim oranları ve mum yüzdeleri.
+    volRev: vr ? {
+      barsAgo: vr.barsAgo,
+      reds: vr.reds,
+      volRatio: round(vr.volRatio),
+      volAvgRatio: vr.volAvgRatio != null ? round(vr.volAvgRatio) : null,
+      gainPct: round(vr.gainPct),
+      dropPct: round(vr.dropPct),
+    } : null,
   };
 }
 

@@ -127,8 +127,14 @@ h1 { font-size: 26px; margin: 0 0 6px; }
 .fav-tab.active { background: #b45309; color: #fff; border-color: #b45309; }
 .smc-tab { border-color: #0e3a34; color: #2dd4bf; }
 .smc-tab.active { background: #0d9488; color: #fff; border-color: #0d9488; }
+.vol-tab { border-color: #0e2f4a; color: #38bdf8; }
+.vol-tab.active { background: #0284c7; color: #fff; border-color: #0284c7; }
 .trade-tab { border-color: #3a2a4d; color: #c084fc; }
 .trade-tab.active { background: #7c3aed; color: #fff; border-color: #7c3aed; }
+
+/* Hacim dönüşü hücresi */
+.volrev-main { color: #4ade80; font-weight: 600; font-size: 13px; font-variant-numeric: tabular-nums; }
+.volrev-main strong { color: #38bdf8; }
 
 /* --- Sanal borsa --- */
 .vb { display: flex; flex-direction: column; gap: 14px; margin-top: 8px; }

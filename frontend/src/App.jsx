@@ -203,10 +203,21 @@ function ChartModal({ item, onClose }) {
         }
         if (inds.supertrend) {
           const { line: stLine, dir: stDir } = computeSuperTrend(highs, lows, closes);
-          const stUp = priceChart.addLineSeries({ color: UP, lineWidth: 2, priceLineVisible: false, lastValueVisible: false });
+          const stOpt = { lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false };
+          // Yükseliş trendinde yeşil (destek), düşüşte kırmızı (direnç); dönüşte
+          // çizgi kopar (zıplama yok), yönü AL/SAT okları belirtir.
+          const stUp = priceChart.addLineSeries({ color: UP, ...stOpt });
           stUp.setData(candles.map((c, i) => (stDir[i] === 1 && stLine[i] != null) ? { time: c.time, value: stLine[i] } : { time: c.time }));
-          const stDown = priceChart.addLineSeries({ color: DOWN, lineWidth: 2, priceLineVisible: false, lastValueVisible: false });
+          const stDown = priceChart.addLineSeries({ color: DOWN, ...stOpt });
           stDown.setData(candles.map((c, i) => (stDir[i] === -1 && stLine[i] != null) ? { time: c.time, value: stLine[i] } : { time: c.time }));
+          // Trend dönüşlerine AL/SAT ok işaretleri (TradingView gibi net sinyal).
+          const stMarkers = [];
+          for (let i = 1; i < candles.length; i++) {
+            if (stDir[i] == null || stDir[i - 1] == null) continue;
+            if (stDir[i - 1] === -1 && stDir[i] === 1) stMarkers.push({ time: candles[i].time, position: 'belowBar', color: UP, shape: 'arrowUp', text: 'AL' });
+            else if (stDir[i - 1] === 1 && stDir[i] === -1) stMarkers.push({ time: candles[i].time, position: 'aboveBar', color: DOWN, shape: 'arrowDown', text: 'SAT' });
+          }
+          candleSeries.setMarkers(stMarkers);
         }
         panes.push({ chart: priceChart, series: candleSeries });
 
@@ -445,6 +456,24 @@ function IndicatorBadge({ signal }) {
     }}>
       {signal}
     </span>
+  );
+}
+
+// Hacim dönüşü formasyonu: kaç kırmızı mumdan sonra geldi, yeşil mumun hacmi
+// kırmızıların en yükseğinin kaç katı, mum ne kadar kazandırdı, kaç bar önce oldu.
+function VolRevCell({ v }) {
+  if (!v) return <span className="muted-dash">—</span>;
+  return (
+    <div className="exp">
+      <span className="volrev-main">
+        {v.reds} kırmızı → yeşil <strong>×{fmtNum(v.volRatio)}</strong>
+      </span>
+      <div className="exp-note">
+        {v.volAvgRatio != null && <>ort. hacmin ×{fmtNum(v.volAvgRatio)}’ı · </>}
+        mum %{fmtNum(v.gainPct)} · öncesi %{fmtNum(v.dropPct)} ·{' '}
+        {v.barsAgo === 0 ? 'son bar' : `${v.barsAgo} bar önce`}
+      </div>
+    </div>
   );
 }
 
@@ -830,8 +859,16 @@ export default function App() {
     label: '🎯 SMC',
     match: (i) => i.kind === 'stock' && i.smc === true,
   };
+  // Hacim dönüşü: 2-3 (en çok 5) kırmızı mumun ardından, hacmi o kırmızıların
+  // HEPSİNDEN yüksek olan güçlü bir yeşil mum — satıcı tükendi, alıcı hacimle döndü.
+  // Kıymetli madenlerde hacim verisi güvenilir olmadığı için onlar hariç.
+  const VOL_TAB = {
+    key: 'vol',
+    label: '📊 Hacim Dönüşü',
+    match: (i) => i.kind !== 'metal' && i.volRev != null,
+  };
   const TRADE_TAB = { key: 'trade', label: '💼 Sanal Borsa' };
-  const activeTab = [...TABS, FAV_TAB, SMC_TAB, TRADE_TAB, ...NEWS_TABS].find((t) => t.key === tab) ?? TABS[0];
+  const activeTab = [...TABS, FAV_TAB, SMC_TAB, VOL_TAB, TRADE_TAB, ...NEWS_TABS].find((t) => t.key === tab) ?? TABS[0];
   const isNews = !!activeTab.news;
 
   // Önce aktif sekmeye göre, sonra sinyale göre süz.
@@ -849,11 +886,19 @@ export default function App() {
           norm(i.ticker).includes(nq) || norm(i.name).includes(nq) || norm(i.sector).includes(nq))
       : inTab;
     if (filter !== 'ALL') list = list.filter((i) => i.signal === filter);
+    // Hacim dönüşü sekmesi puana değil, formasyonun tazeliğine göre sıralanır
+    // (eşitlikte hacim patlaması güçlü olan üstte).
+    if (tab === 'vol' && !nq) {
+      list = [...list].sort((a, b) =>
+        (a.volRev.barsAgo - b.volRev.barsAgo) || (b.volRev.volRatio - a.volRev.volRatio));
+    }
     return list;
-  }, [data.items, inTab, query, filter]);
+  }, [data.items, inTab, query, filter, tab]);
 
   // Alış/Satış sütunları: görünen listede kıymetli maden varsa göster.
   const showBuySell = items.some((s) => s.kind === 'metal');
+  // Hacim dönüşü sütunu yalnızca kendi sekmesinde.
+  const showVolRev = tab === 'vol' && !searching;
 
   useEffect(() => { try { localStorage.setItem('viewMode', view); } catch { /* yoksay */ } }, [view]);
 
@@ -916,6 +961,12 @@ export default function App() {
           onClick={() => setTab('smc')}
         >
           {SMC_TAB.label}
+        </button>
+        <button
+          className={`news-tab vol-tab ${tab === 'vol' ? 'active' : ''}`}
+          onClick={() => setTab('vol')}
+        >
+          {VOL_TAB.label}
         </button>
         <button
           className={`news-tab trade-tab ${tab === 'trade' ? 'active' : ''}`}
@@ -993,6 +1044,16 @@ export default function App() {
         </div>
       )}
 
+      {tab === 'vol' && (
+        <div className="fav-note">
+          <strong>Hacim Dönüşü — günlük:</strong> arka arkaya <code>2-5</code> kırmızı mumun ardından gelen
+          <code>yeşil</code> mumun hacmi, o kırmızı mumların <strong>hepsinden yüksek</strong>; ayrıca mum
+          “güçlü”: gövdesi mum boyunun en az yarısı ve kırmızıların gövdesinden büyük. Satıcı tükenip alıcının
+          hacimle döndüğü noktalar. Son <code>3</code> barda oluşan formasyonlar listelenir; en tazesi üstte.
+          <span className="muted-dash"> (Hacim verisi güvenilir olmadığından kıymetli madenler hariçtir.)</span>
+        </div>
+      )}
+
       {!loading && !error && items.length === 0 && (
         <div className="state">
           {searching
@@ -1001,6 +1062,8 @@ export default function App() {
               ? 'Şu an üç sinyali (overzone + WaveTrend + SuperTrend) birden AL olan ve analist AL tavsiyesi bulunan hisse yok.'
             : tab === 'smc'
               ? 'Şu an SMC yükseliş sinyali (likidite süpürme + yapı kırılımı) veren hisse yok.'
+            : tab === 'vol'
+              ? 'Son 3 barda hacim dönüşü formasyonu (2-5 kırmızı mum → hacmi hepsinden yüksek güçlü yeşil mum) veren enstrüman yok.'
               : data.items.length > 0
                 ? 'Bu sekme/filtrede gösterilecek hisse yok.'
                 : 'Henüz veri yok. “Yenile”ye basın veya backend’in çalıştığından emin olun.'}
@@ -1018,6 +1081,7 @@ export default function App() {
                 {showBuySell && <th className="num">Alış</th>}
                 {showBuySell && <th className="num">Satış</th>}
                 <th className="num">Günlük</th>
+                {showVolRev && <th style={{ minWidth: 190 }}>Hacim Dönüşü</th>}
                 <th className="num">Hedef</th>
                 <th style={{ minWidth: 110 }}>Puan</th>
                 <th>Sinyal</th>
@@ -1060,6 +1124,7 @@ export default function App() {
                     </td>
                   )}
                   <td className="num"><Pct value={s.changePct} /></td>
+                  {showVolRev && <td><VolRevCell v={s.volRev} /></td>}
                   <td className="num">
                     <Expected
                       value={s.upside12m}
@@ -1108,6 +1173,15 @@ export default function App() {
               )}
               {s.tryPrice != null && (
                 <div className="exp-note">≈ {fmtNum(s.tryPrice)} ₺</div>
+              )}
+
+              {showVolRev && (
+                <div className="card-metrics">
+                  <div className="metric">
+                    <span className="metric-label">Hacim Dönüşü</span>
+                    <VolRevCell v={s.volRev} />
+                  </div>
+                </div>
               )}
 
               {s.kind === 'metal' && (
