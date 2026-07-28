@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import compression from 'compression';
 import { initDb } from './db.js';
-import { syncData, getRecommendations } from './service.js';
+import { syncData, getRecommendations, getCachedItems } from './service.js';
 import { diagnose, fetchOhlc } from './dataSource.js';
 import { getLivePrices, refreshSeries, seriesStats } from './liveSignals.js';
 import { fetchNews, fetchKap } from './newsSource.js';
@@ -23,14 +23,15 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true, time: new Date().toISOString(), series: seriesStats() });
 });
 
-// Toplu güncel (intraday) fiyatlar + AYNI ANDAKİ gösterge sinyalleri.
-// Göstergeler bellekteki bar geçmişi + canlı fiyattan yeniden hesaplanır
-// (liveSignals.js); bar geçmişi yoksa alan boş kalır, yayınlanan değer geçerlidir.
+// Toplu güncel (intraday) fiyatlar + AYNI ANDAKİ gösterge sinyalleri ve
+// puan/analist potansiyeli. Göstergeler bellekteki bar geçmişi + canlı fiyattan,
+// puan/hedef ise yayınlanan analist verisi + canlı fiyattan hesaplanır
+// (liveSignals.js). Veri yoksa alan boş kalır, yayınlanan değer geçerlidir.
 app.get('/api/prices', async (req, res) => {
   try {
-    res.json(await getLivePrices());
+    res.json(await getLivePrices(getCachedItems()));
   } catch (err) {
-    res.status(502).json({ error: err.message, prices: {}, signals: {} });
+    res.status(502).json({ error: err.message, prices: {}, signals: {}, scores: {} });
   }
 });
 

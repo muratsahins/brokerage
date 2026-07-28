@@ -13,6 +13,7 @@ import { fetchDailyBars, fetchLivePrices } from './dataSource.js';
 import {
   supertrendSignal, wavetrendSignals, smcBullish, volumeReversal,
 } from './indicators.js';
+import { priceDerived } from './recommend.js';
 
 // Bar geçmişi önbelleği ömrü — geçmiş barlar seans içinde değişmediği için uzun
 // tutulabilir; yalnızca yeni bir günlük bar kapandığında tazelenmesi gerekir.
@@ -126,16 +127,48 @@ export function computeLiveSignals(prices) {
   return out;
 }
 
-// /api/prices yanıtı: fiyat + aynı andaki gösterge sinyalleri.
-// fetchLivePrices zaten ~15 sn önbellekli; sinyaller de aynı ana bağlanır.
-let sigCache = { key: null, data: {} };
-export async function getLivePrices() {
+// Analist potansiyeli, momentum, puan ve AL/TUT/İZLE sinyalini canlı fiyattan
+// yeniden hesaplar (formül recommend.js'te — tek yerde). Analist hedefi ve temel
+// veriler yayınlanan kalemden gelir; yalnızca fiyat tazedir.
+// 1 ay önceki kapanış (firstClose) yayında yok: yayındaki fiyat + momentum1m'den
+// birebir geri türetilir.
+export function computeLiveScores(items, prices) {
+  const out = {};
+  for (const it of items) {
+    const p = prices[it.ticker];
+    if (!p || p.price == null) continue;
+    const firstClose = it.momentum1m != null && it.price
+      ? it.price / (1 + it.momentum1m / 100)
+      : null;
+    const d = priceDerived({
+      price: p.price,
+      firstClose,
+      targetMean: it.targetMean,
+      recommendationKey: it.recommendationKey,
+      forwardPE: it.forwardPE,
+    });
+    const o = { sc: d.score, sg: d.signal };
+    if (d.momentum1m != null) o.m = d.momentum1m;
+    if (d.upside12m != null) { o.u = d.upside12m; o.e1 = d.exp1m; o.e3 = d.exp3m; }
+    out[it.ticker] = o;
+  }
+  return out;
+}
+
+// /api/prices yanıtı: fiyat + aynı andaki gösterge sinyalleri + puan/hedef.
+// fetchLivePrices zaten ~15 sn önbellekli; hesaplar da aynı ana bağlanır.
+let sigCache = { key: null, signals: {}, scores: {} };
+export async function getLivePrices(items = []) {
   const live = await fetchLivePrices();
   if (sigCache.key !== live.updatedAt) {
     const t0 = Date.now();
-    sigCache = { key: live.updatedAt, data: computeLiveSignals(live.prices) };
+    sigCache = {
+      key: live.updatedAt,
+      signals: computeLiveSignals(live.prices),
+      scores: computeLiveScores(items, live.prices),
+    };
     const ms = Date.now() - t0;
-    if (ms > 500) console.log(`[live] ${Object.keys(sigCache.data).length} enstrümanın göstergeleri ${ms} ms'de hesaplandı.`);
+    if (ms > 500) console.log(`[live] ${Object.keys(sigCache.signals).length} enstrüman ${ms} ms'de hesaplandı.`);
   }
-  return { ...live, signals: sigCache.data };
+  return { ...live, signals: sigCache.signals, scores: sigCache.scores };
 }

@@ -149,6 +149,12 @@ export async function syncData() {
   await refresh();
 }
 
+// Bellekteki (yayınlanan ya da canlı çekilen) kalemler. Canlı fiyat tazelemesi
+// puan/hedefi bunlardan yeniden hesaplar — DB'ye gitmeden, senkron ve ucuz.
+export function getCachedItems() {
+  return memory.recommendations;
+}
+
 export async function getRecommendations() {
   if (isDbAvailable()) {
     try {

@@ -360,11 +360,13 @@ function ChartModal({ item, onClose }) {
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
 // Güncel fiyatları (/api/prices) mevcut veriye işler: fiyat + günlük değişim
-// (+ metal ₺/gram) ve AYNI ANDA hesaplanan teknik göstergeler. Analist verisi,
-// hedef ve puan yayınlanan veriden gelir, burada değişmez.
+// (+ metal ₺/gram), AYNI ANDA hesaplanan teknik göstergeler ve canlı fiyattan
+// yeniden hesaplanan analist potansiyeli / momentum / puan / sinyal.
+// Analist hedefi ve temel veriler yayınlanan veriden gelir (3 saatte bir).
 function mergeLivePrices(data, live) {
   if (!live || !live.prices || !data || !data.items) return data;
   const signals = live.signals || {};
+  const scores = live.scores || {};
   let changed = false;
   const items = data.items.map((it) => {
     const p = live.prices[it.ticker];
@@ -384,6 +386,18 @@ function mergeLivePrices(data, live) {
       next.wtSignal = s.wo ?? null;
       next.smc = !!s.smc;
       next.volRev = s.vr ?? null;
+      next.signalsLive = true;
+    }
+    // Analist potansiyeli, momentum, puan ve AL/TUT/İZLE sinyali de canlı
+    // fiyattan yeniden hesaplanır (analist hedefi/temel veri yayından gelir).
+    const sc = scores[it.ticker];
+    if (sc) {
+      next.score = sc.sc;
+      next.signal = sc.sg;
+      next.momentum1m = sc.m ?? null;
+      next.upside12m = sc.u ?? null;
+      next.exp1m = sc.e1 ?? null;
+      next.exp3m = sc.e3 ?? null;
       next.signalsLive = true;
     }
     return next;
@@ -905,6 +919,10 @@ export default function App() {
     if (tab === 'vol' && !nq) {
       list = [...list].sort((a, b) =>
         (a.volRev.barsAgo - b.volRev.barsAgo) || (b.volRev.volRatio - a.volRev.volRatio));
+    } else {
+      // Puan canlı fiyatla değiştiği için sıralamayı da tazele — liste "puana
+      // göre sıralı" kalsın (yayınlanan sıra bayatlamasın).
+      list = [...list].sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
     }
     return list;
   }, [data.items, inTab, query, filter, tab]);
