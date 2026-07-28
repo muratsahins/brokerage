@@ -59,6 +59,10 @@ npm start                 # http://localhost:4000
   görünür. **Yalnızca BUGÜN**: son barı bugüne (borsa saati, `EXCHANGE_GMT_OFFSET`
   varsayılan UTC+3) ait olmayan hisse taranmaz; bugün seans yoksa liste boş döner
   (`lastBarDate` son seansın tarihini söyler). Liste tavanı `ALERT_MAX_ITEMS` (600).
+  Arayüzde tarama sekme kapalıyken de sürer: görülmemiş yeni sinyal varsa **UYARI
+  sekmesi yanıp söner** (rozette sayısı yazar), sekme açılıp sayfa görünür
+  olduğunda söner. Görülenler tarayıcıda (`localStorage: alertsSeen`) tutulur ve
+  gün değişince sıfırlanır; o ziyarette yeni gelenler satırda **YENİ** rozeti alır.
 
 ### 3) Frontend
 ```bash

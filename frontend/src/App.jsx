@@ -600,11 +600,10 @@ const ALERT_INDS = [
   { key: 'st', label: 'SuperTrend' },
 ];
 
-function AlertList({ items, onSelect }) {
+// UYARI taraması UYGULAMA SEVİYESİNDE tutulur: sekme kapalıyken de sürer ki
+// yeni sinyal geldiğinde sekme yanıp sönerek haber verebilsin.
+function useAlerts() {
   const [state, setState] = useState({ loading: true, items: [], updatedAt: null, stats: null });
-  const [dir, setDir] = useState('ALL');
-  const [ind, setInd] = useState('ALL');
-
   useEffect(() => {
     let cancelled = false;
     const load = () => fetch(`${API_BASE}/api/alerts`)
@@ -615,6 +614,68 @@ function AlertList({ items, onSelect }) {
     const id = setInterval(load, 60 * 1000); // tarama sunucuda ~60 sn önbellekli
     return () => { cancelled = true; clearInterval(id); };
   }, []);
+  return state;
+}
+
+// Bir uyarı satırının kimliği: hisse + tetiklenen gösterge/yön kümesi. Aynı
+// hisseye sonradan başka bir gösterge eklenirse kimlik değişir — yeni sayılır.
+const alertKey = (a) => `${a.ticker}:${a.signals.map((s) => `${s.ind}${s.dir}`).sort().join('|')}`;
+
+// GÖRÜLDÜ durumu: hangi uyarıları kullanıcı UYARI sekmesinde açıkça gördü.
+// Tarayıcıda saklanır, gün (sessionDate) değişince sıfırlanır — yeni seansın
+// sinyalleri yeniden haber verilir.
+const SEEN_KEY = 'alertsSeen';
+function loadSeen() {
+  try {
+    const s = JSON.parse(localStorage.getItem(SEEN_KEY) || 'null');
+    return s && Array.isArray(s.keys) ? { date: s.date, keys: new Set(s.keys) } : null;
+  } catch { return null; }
+}
+
+// Yeni (henüz görülmemiş) uyarı sayısı + "gördüm" işaretleyicisi.
+function useNewAlerts(alerts, active) {
+  const [seen, setSeen] = useState(() => loadSeen());
+  const { sessionDate, items, loading } = alerts;
+
+  // Gün değiştiyse görüldü listesi geçersiz — yeni seansın sinyalleri haber verilir.
+  const valid = seen && sessionDate && seen.date === sessionDate ? seen : null;
+  const newKeys = useMemo(() => {
+    if (loading) return new Set();
+    return new Set(items.map(alertKey).filter((k) => !valid || !valid.keys.has(k)));
+  }, [items, valid, loading]);
+  // "YENİ" rozetli satırlar: sekmeye girildiği ANDA görülmemiş olanlar. Değer
+  // render sırasında dondurulur (efekt içinde state güncellemek yerine) — sekme
+  // değişimiyle aynı render'da hesaplandığı için görüldü kaydı yazıldıktan
+  // sonra da o ziyaret boyunca sabit kalır.
+  const wasActive = useRef(false);
+  const highlightRef = useRef(new Set());
+  if (!active) highlightRef.current = new Set();
+  else if (!wasActive.current) highlightRef.current = new Set(newKeys); // memo'yu kirletmemek için kopya
+  else newKeys.forEach((k) => highlightRef.current.add(k)); // sekme açıkken gelen yeniler
+  wasActive.current = active;
+
+  // GÖRÜLDÜ kaydı yalnızca sayfa gerçekten görünürken yazılır — sekme arka
+  // planda açık duruyorsa kullanıcı görmemiştir; sayfaya döndüğünde
+  // (visibilitychange) işaretlenir.
+  useEffect(() => {
+    if (!active || loading || !sessionDate) return undefined;
+    const mark = () => {
+      if (document.visibilityState !== 'visible') return;
+      const next = { date: sessionDate, keys: items.map(alertKey) };
+      try { localStorage.setItem(SEEN_KEY, JSON.stringify(next)); } catch { /* yoksay */ }
+      setSeen({ date: next.date, keys: new Set(next.keys) });
+    };
+    mark();
+    document.addEventListener('visibilitychange', mark);
+    return () => document.removeEventListener('visibilitychange', mark);
+  }, [active, loading, sessionDate, items]);
+
+  return { newCount: newKeys.size, highlight: highlightRef.current };
+}
+
+function AlertList({ items, onSelect, state, highlight }) {
+  const [dir, setDir] = useState('ALL');
+  const [ind, setInd] = useState('ALL');
 
   const byTicker = useMemo(() => new Map(items.map((i) => [i.ticker, i])), [items]);
   // Hisse başına tek satır; filtreler "sinyallerinden biri uyuyorsa göster".
@@ -682,11 +743,12 @@ function AlertList({ items, onSelect }) {
             return (
               <button
                 key={a.ticker}
-                className={`alert-row ${a.dir === 'AL' ? 'al' : a.dir === 'SAT' ? 'sat' : 'mix'}`}
+                className={`alert-row ${a.dir === 'AL' ? 'al' : a.dir === 'SAT' ? 'sat' : 'mix'} ${highlight?.has(alertKey(a)) ? 'fresh' : ''}`}
                 onClick={() => it && onSelect(it)}
                 title={it ? 'Grafiği aç' : ''}
               >
                 <span className="alert-main">
+                  {highlight?.has(alertKey(a)) && <span className="alert-new" title="Bu ziyarette yeni gelen sinyal">YENİ</span>}
                   <span className="ticker">{a.ticker}</span>
                   <span className="name">{it?.name || ''}</span>
                 </span>
@@ -1061,6 +1123,11 @@ export default function App() {
   const activeTab = [...TABS, FAV_TAB, SMC_TAB, VOL_TAB, TRADE_TAB, ...NEWS_TABS].find((t) => t.key === tab) ?? TABS[0];
   const isNews = !!activeTab.news;
 
+  // UYARI taraması sekme kapalıyken de sürer; görülmemiş yeni sinyal varsa
+  // sekme yanıp söner, sekmeye girilince (sayfa görünürken) söner.
+  const alerts = useAlerts();
+  const { newCount, highlight } = useNewAlerts(alerts, tab === 'uyari');
+
   // Önce aktif sekmeye göre, sonra sinyale göre süz.
   const inTab = useMemo(
     () => (activeTab.match ? data.items.filter(activeTab.match) : []),
@@ -1134,15 +1201,20 @@ export default function App() {
       </header>
 
       <div className="news-nav">
-        {NEWS_TABS.map((t) => (
-          <button
-            key={t.key}
-            className={`news-tab ${t.key === 'uyari' ? 'uyari-tab' : ''} ${tab === t.key ? 'active' : ''}`}
-            onClick={() => setTab(t.key)}
-          >
-            {t.label}
-          </button>
-        ))}
+        {NEWS_TABS.map((t) => {
+          const blink = t.key === 'uyari' && newCount > 0 && tab !== 'uyari';
+          return (
+            <button
+              key={t.key}
+              className={`news-tab ${t.key === 'uyari' ? 'uyari-tab' : ''} ${blink ? 'blink' : ''} ${tab === t.key ? 'active' : ''}`}
+              onClick={() => setTab(t.key)}
+              title={blink ? `${newCount} yeni sinyal — görmek için aç` : undefined}
+            >
+              {t.label}
+              {blink && <span className="tab-badge">{newCount}</span>}
+            </button>
+          );
+        })}
       </div>
 
       <div className="news-nav">
@@ -1187,7 +1259,7 @@ export default function App() {
       {isNews ? (
         <NewsList kind={activeTab.news} />
       ) : tab === 'uyari' ? (
-        <AlertList items={data.items} onSelect={setChartItem} />
+        <AlertList items={data.items} onSelect={setChartItem} state={alerts} highlight={highlight} />
       ) : tab === 'trade' ? (
         <VirtualTrade items={data.items} />
       ) : (
