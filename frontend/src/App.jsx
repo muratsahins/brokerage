@@ -555,8 +555,6 @@ function NewsList({ kind }) {
   }, [kind]);
 
   if (state.loading) return <div className="state">Yükleniyor… (ilk açılışta backend uyanması birkaç saniye sürebilir)</div>;
-  if (kind === 'kap' && !state.ok && state.items.length === 0)
-    return <div className="state">KAP bildirimleri şu an alınamadı. Birazdan tekrar deneyin.</div>;
   if (state.items.length === 0) return <div className="state">İçerik bulunamadı.</div>;
 
   const cats = ['ALL', 'Hisse', 'Kıymetli Maden', 'Öneri', 'Ekonomi'];
@@ -589,6 +587,111 @@ function NewsList({ kind }) {
           </a>
         ))}
       </div>
+    </>
+  );
+}
+
+// UYARI sekmesi: overzone / WaveTrend / SuperTrend sinyalini YENİ veren hisseler
+// (saatlik, 4 saatlik ve günlük grafiklerde). Backend /api/alerts tarar.
+const ALERT_TFS = [
+  { key: 'ALL', label: 'Tümü' },
+  { key: '1h', label: '1 saat' },
+  { key: '4h', label: '4 saat' },
+  { key: '1d', label: 'Günlük' },
+];
+
+const ALERT_INDS = [
+  { key: 'ALL', label: 'Tüm göstergeler' },
+  { key: 'oz', label: 'overzone' },
+  { key: 'wt', label: 'WaveTrend' },
+  { key: 'st', label: 'SuperTrend' },
+];
+
+function AlertList({ items, onSelect }) {
+  const [state, setState] = useState({ loading: true, items: [], updatedAt: null, stats: null });
+  const [tf, setTf] = useState('ALL');
+  const [dir, setDir] = useState('ALL');
+  const [ind, setInd] = useState('ALL');
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = () => fetch(`${API_BASE}/api/alerts`)
+      .then((r) => r.json())
+      .then((d) => { if (!cancelled) setState({ loading: false, items: d.items || [], updatedAt: d.updatedAt, stats: d.stats }); })
+      .catch(() => { if (!cancelled) setState((s) => ({ ...s, loading: false })); });
+    load();
+    const id = setInterval(load, 60 * 1000); // tarama sunucuda ~60 sn önbellekli
+    return () => { cancelled = true; clearInterval(id); };
+  }, []);
+
+  const byTicker = useMemo(() => new Map(items.map((i) => [i.ticker, i])), [items]);
+  const list = state.items.filter((a) =>
+    (tf === 'ALL' || a.tf === tf) && (dir === 'ALL' || a.dir === dir) && (ind === 'ALL' || a.ind === ind));
+
+  if (state.loading) return <div className="state">Taranıyor… (ilk açılışta gün içi barların hazırlanması birkaç dakika sürebilir)</div>;
+
+  return (
+    <>
+      <div className="fav-note">
+        <strong>UYARI:</strong> <code>overzone</code>, <code>WaveTrend</code> ve <code>SuperTrend</code>{' '}
+        sinyalini <strong>yeni veren</strong> hisseler — saatlik, 4 saatlik ve günlük grafiklerde taranır.
+        Kalıcı durum değil, sinyalin <strong>oluştuğu bar</strong> yakalanır: SuperTrend'de trend dönüşü,
+        WaveTrend'de kesişim, overzone'da aşırı bölgede (−53/−60 ve +53/+60) kurulan kesişim.
+        Saatlikte son 6 bar, 4 saatlikte son 3 bar, günlükte son 2 bar taranır.
+      </div>
+
+      <div className="filters">
+        {ALERT_TFS.map((t) => (
+          <button key={t.key} className={`filter ${tf === t.key ? 'active' : ''}`} onClick={() => setTf(t.key)}>{t.label}</button>
+        ))}
+        <span className="filter-sep" />
+        {['ALL', 'AL', 'SAT'].map((d) => (
+          <button key={d} className={`filter ${dir === d ? 'active' : ''}`} onClick={() => setDir(d)}>{d === 'ALL' ? 'AL + SAT' : d}</button>
+        ))}
+        {state.updatedAt && (
+          <span className="updated">Tarama: {new Date(state.updatedAt).toLocaleTimeString('tr-TR')}</span>
+        )}
+      </div>
+
+      <div className="filters">
+        {ALERT_INDS.map((x) => (
+          <button key={x.key} className={`filter ${ind === x.key ? 'active' : ''}`} onClick={() => setInd(x.key)}>{x.label}</button>
+        ))}
+        <span className="updated">{list.length} sinyal</span>
+      </div>
+
+      {list.length === 0 ? (
+        <div className="state">
+          Bu filtrede yeni sinyal veren hisse yok.
+          {state.stats?.filling && ' Gün içi barlar hâlâ hazırlanıyor, birazdan tekrar bakın.'}
+        </div>
+      ) : (
+        <div className="news-list">
+          {list.map((a, i) => {
+            const it = byTicker.get(a.ticker);
+            return (
+              <button
+                key={`${a.ticker}-${a.tf}-${a.ind}-${i}`}
+                className={`alert-row ${a.dir === 'AL' ? 'al' : 'sat'}`}
+                onClick={() => it && onSelect(it)}
+                title={it ? 'Grafiği aç' : ''}
+              >
+                <span className="alert-main">
+                  <span className="ticker">{a.ticker}</span>
+                  <span className="name">{it?.name || ''}</span>
+                </span>
+                <span className="alert-meta">
+                  {a.hits > 1 && <span className="alert-hits" title="Bu hisse aynı anda birden çok sinyal veriyor">{a.hits} sinyal</span>}
+                  <span className="alert-ind">{a.indLabel}</span>
+                  <span className="alert-tf">{a.tfLabel}</span>
+                  <IndicatorBadge signal={a.dir} />
+                  <span className="news-time">{a.barsAgo === 0 ? 'son bar' : `${a.barsAgo} bar önce`}</span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
     </>
   );
 }
@@ -913,9 +1016,10 @@ export default function App() {
     { key: 'metal',   label: 'Kıymetli Maden', match: (i) => i.kind === 'metal' },
     // Kripto kaldırıldı (backend'de de takip listesi dışında — stocks.js).
   ];
+  // Üst şerit: haberler + UYARI (yeni sinyal taraması; KAP'ın yerini aldı).
   const NEWS_TABS = [
-    { key: 'news', label: '📰 Haberler', news: 'news' },
-    { key: 'kap',  label: '📋 KAP',      news: 'kap' },
+    { key: 'news',  label: '📰 Haberler', news: 'news' },
+    { key: 'uyari', label: '⚠️ UYARI' },
   ];
   // Favori listesi: 5 teknik koşulu birden sağlayan hisseler.
   const FAV_TAB = {
@@ -986,8 +1090,10 @@ export default function App() {
           <p className="subtitle">
             {tab === 'trade'
               ? 'Sanal borsa · e-posta ile giriş, sanal alım-satım (gerçek para değildir)'
+              : tab === 'uyari'
+              ? 'Yeni sinyal veren hisseler · saatlik, 4 saatlik ve günlük grafik taraması'
               : isNews
-              ? (activeTab.news === 'kap' ? 'KAP bildirimleri · yatırımcı diline özet' : 'Piyasa, kıymetli maden ve analist önerisi haberleri')
+              ? 'Piyasa, kıymetli maden ve analist önerisi haberleri'
               : <>Analist hedef fiyatı + temel verilere dayalı beklenen getiri · {searching ? `“${query.trim()}” için ${items.length} sonuç` : `${inTab.length} kayıt`}
                 {data.source && <> · kaynak: {data.source === 'postgres' ? 'PostgreSQL' : 'bellek'}</>}</>}
           </p>
@@ -1017,7 +1123,7 @@ export default function App() {
         {NEWS_TABS.map((t) => (
           <button
             key={t.key}
-            className={`news-tab ${tab === t.key ? 'active' : ''}`}
+            className={`news-tab ${t.key === 'uyari' ? 'uyari-tab' : ''} ${tab === t.key ? 'active' : ''}`}
             onClick={() => setTab(t.key)}
           >
             {t.label}
@@ -1066,6 +1172,8 @@ export default function App() {
 
       {isNews ? (
         <NewsList kind={activeTab.news} />
+      ) : tab === 'uyari' ? (
+        <AlertList items={data.items} onSelect={setChartItem} />
       ) : tab === 'trade' ? (
         <VirtualTrade items={data.items} />
       ) : (

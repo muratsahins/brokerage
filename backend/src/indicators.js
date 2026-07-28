@@ -224,11 +224,12 @@ function atr(highs, lows, closes, period) {
   return out;
 }
 
-// SuperTrend (Kıvanç Özbilgiç): fiyat trend çizgisinin üstündeyse AL, altındaysa SAT.
+// SuperTrend (Kıvanç Özbilgiç) tam serisi: her bar için trend yönü (1/-1).
 // Pine mantığının birebir aktarımı (src=hl2, up/dn ratchet, trend flip).
-export function supertrendSignal(highs, lows, closes, period = ST_ATR_PERIOD, mult = ST_MULTIPLIER) {
+export function supertrendSeries(highs, lows, closes, period = ST_ATR_PERIOD, mult = ST_MULTIPLIER) {
   const n = closes?.length ?? 0;
-  if (n < period + 2) return null;
+  const dir = new Array(n).fill(null);
+  if (n < period + 2) return dir;
   const atrArr = atr(highs, lows, closes, period);
 
   let prevUp = null, prevDn = null, prevTrend = 1, prevClose = null;
@@ -253,10 +254,18 @@ export function supertrendSignal(highs, lows, closes, period = ST_ATR_PERIOD, mu
       else if (prevTrend === 1 && closes[i] < prevUp) trend = -1;
     }
 
+    dir[i] = trend;
     prevUp = up; prevDn = dn; prevTrend = trend; prevClose = closes[i];
   }
 
-  return trend === 1 ? 'AL' : 'SAT';
+  return dir;
+}
+
+// SuperTrend: fiyat trend çizgisinin üstündeyse AL, altındaysa SAT (son bar).
+export function supertrendSignal(highs, lows, closes, period = ST_ATR_PERIOD, mult = ST_MULTIPLIER) {
+  const dir = supertrendSeries(highs, lows, closes, period, mult);
+  const last = dir[dir.length - 1];
+  return last == null ? null : (last === 1 ? 'AL' : 'SAT');
 }
 
 // WaveTrend Oscillator (LazyBear): yeşil çizgi wt1, sinyal (kırmızı) çizgi wt2.
@@ -293,6 +302,41 @@ function crossFrom(w) {
   }
   if (signal == null) signal = wt1[n - 1] >= wt2[n - 1] ? 'AL' : 'SAT';
   return signal;
+}
+
+// --- YENİ sinyal tespiti (UYARI taraması) -----------------------------------
+// Kalıcı durumu değil, sinyalin OLUŞTUĞU BARI arar: son `lookback` bar içinde
+// SuperTrend trend dönüşü, WaveTrend kesişimi ve overzone (53-60) sinyalinin
+// kurulması. Her biri için en yeni olay { dir, barsAgo } olarak döner (yoksa null).
+export function recentSignals(highs, lows, closes, lookback = 6) {
+  const n = closes?.length ?? 0;
+  const out = { st: null, wt: null, oz: null };
+  if (n < 3) return out;
+  const from = Math.max(1, n - lookback);
+
+  // SuperTrend: yön değişimi (AL <-> SAT)
+  const dir = supertrendSeries(highs, lows, closes);
+  for (let i = from; i < n; i++) {
+    if (dir[i] == null || dir[i - 1] == null || dir[i] === dir[i - 1]) continue;
+    out.st = { dir: dir[i] === 1 ? 'AL' : 'SAT', barsAgo: n - 1 - i };
+  }
+
+  const w = computeWaveTrend(highs, lows, closes);
+  if (w) {
+    const { wt1, wt2 } = w;
+    for (let i = from; i < n; i++) {
+      if (wt1[i - 1] == null || wt2[i - 1] == null || wt1[i] == null || wt2[i] == null) continue;
+      const prev = wt1[i - 1] - wt2[i - 1], cur = wt1[i] - wt2[i];
+      const up = prev <= 0 && cur > 0, down = prev >= 0 && cur < 0;
+      if (up) out.wt = { dir: 'AL', barsAgo: n - 1 - i };
+      else if (down) out.wt = { dir: 'SAT', barsAgo: n - 1 - i };
+      // overzone: yalnızca aşırı bölgede kurulan kesişimler sinyaldir
+      const level = wt2[i];
+      if (up && level <= WT_OS_LEVEL) out.oz = { dir: 'AL', barsAgo: n - 1 - i };
+      else if (down && level >= WT_OB_LEVEL) out.oz = { dir: 'SAT', barsAgo: n - 1 - i };
+    }
+  }
+  return out;
 }
 
 // 53-60 WaveTrend: sinyal TERS kesişime kadar kalıcıdır, sonra boşalır (null).

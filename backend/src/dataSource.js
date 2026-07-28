@@ -175,6 +175,10 @@ let liveBarCache = { at: 0, data: null };
 // denemeyiz ki /api/prices her seferinde crumb turunu beklemesin.
 let liveBarPausedUntil = 0;
 const LIVE_BAR_PAUSE_MS = 10 * 60 * 1000;
+// Önbellekteki gün içi barları BEKLEMEDEN döner (yoksa/çok eskiyse null).
+export function peekLiveBars(maxAgeMs = 5 * 60 * 1000) {
+  return Date.now() - liveBarCache.at < maxAgeMs ? liveBarCache.data : null;
+}
 export async function fetchLiveBars() {
   if (Date.now() - liveBarCache.at < 15000 && liveBarCache.data) return liveBarCache.data;
   if (Date.now() < liveBarPausedUntil) return liveBarCache.data;
@@ -308,10 +312,11 @@ function normalizeBars(result) {
   return bars;
 }
 
-// Günlük normalleştirilmiş barlar + meta — grafiğin, göstergelerin ve canlı
-// gösterge tazelemesinin (liveSignals.js) ORTAK tek kaynağı.
-export async function fetchDailyBars(symbol, range = '1y') {
-  const url = `${CHART_URL}/${encodeURIComponent(symbol)}?range=${range}&interval=1d`;
+// Normalleştirilmiş barlar + meta — grafiğin, göstergelerin, canlı gösterge
+// tazelemesinin (liveSignals.js) ve UYARI taramasının (alerts.js) ORTAK kaynağı.
+// interval: '1d' (varsayılan), '1h', '4h' — Yahoo üçünü de yerel destekliyor.
+export async function fetchBars(symbol, range = '1y', interval = '1d') {
+  const url = `${CHART_URL}/${encodeURIComponent(symbol)}?range=${range}&interval=${interval}`;
   const res = await fetch(url, { headers: { 'User-Agent': UA } });
   if (!res.ok) throw new Error(`Yahoo ${symbol} -> HTTP ${res.status}`);
   const json = await res.json();
@@ -323,7 +328,7 @@ export async function fetchDailyBars(symbol, range = '1y') {
 // --- Grafik için tam OHLC serisi (mum grafiği) ------------------------------
 // Frontend'de Lightweight Charts ile çizmek üzere günlük mum verisini döner.
 export async function fetchOhlc(symbol, range = '1y') {
-  const { bars, meta } = await fetchDailyBars(symbol, range);
+  const { bars, meta } = await fetchBars(symbol, range);
   // Lightweight Charts günlük seri için 'yyyy-mm-dd' bekliyor; gün etiketi borsa
   // saatine göre hesaplanır (UTC'ye göre bir gün kaymasın).
   const off = meta.gmtoffset ?? 0;
@@ -341,8 +346,8 @@ async function fetchChart(symbol) {
   // 1 yıllık günlük veri — grafik modalı (/api/chart) da 1y kullanıyor; sinyaller
   // grafiktekiyle BİREBİR aynı veri+aralıktan hesaplansın diye eşitlendi (özellikle
   // durumlu SuperTrend için). symbol tam Yahoo sembolüdür; '=' için URL-kodlanır.
-  // Grafikle BİREBİR aynı barlar (son/canlı bar dahil) — fetchDailyBars.
-  const { bars, meta } = await fetchDailyBars(symbol, '1y');
+  // Grafikle BİREBİR aynı barlar (son/canlı bar dahil) — fetchBars.
+  const { bars, meta } = await fetchBars(symbol, '1y');
   const highs = bars.map((b) => b.high);
   const lows = bars.map((b) => b.low);
   const closes = bars.map((b) => b.close);

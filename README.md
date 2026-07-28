@@ -52,6 +52,13 @@ npm start                 # http://localhost:4000
   `SERIES_TTL_MINUTES` (varsayılan 30) bar geçmişinin tazelenme sıklığı,
   `SERIES_CHECK_MINUTES` (15) kontrol aralığı, `SERIES_FETCH_GAP_MS` (350)
   Yahoo istekleri arası bekleme. Önbellek durumu: `GET /api/health`.
+- **UYARI taraması** (`/api/alerts`): overzone / WaveTrend / SuperTrend sinyalini
+  YENİ veren hisseler — saatlik, 4 saatlik (Yahoo ikisini de yerel destekliyor)
+  ve günlük grafiklerde. Gün içi barlar ayrı önbellekte tutulur:
+  `ALERT_CHECK_MINUTES` (10) kontrol aralığı, `ALERT_FETCH_GAP_MS` (350) istek
+  arası bekleme, `ALERT_MAX_ITEMS` (600) liste tavanı. Zaman dilimi başına
+  "yeni" penceresi `alerts.js` içindeki `TIMEFRAMES` tablosundadır
+  (1s: son 6 bar, 4s: son 2 bar, günlük: son 1 bar).
 
 ### 3) Frontend
 ```bash
@@ -69,6 +76,7 @@ npm run dev               # http://localhost:5173
 | GET   | `/api/recommendations`  | Puana göre sıralı öneri listesi           |
 | GET   | `/api/prices`           | Canlı fiyat + aynı andaki gösterge sinyalleri |
 | GET   | `/api/chart`            | Grafik için günlük OHLC serisi            |
+| GET   | `/api/alerts`           | UYARI: yeni sinyal veren hisseler (1s/4s/günlük) |
 | POST  | `/api/refresh`          | Veriyi Yahoo'dan yeniden çeker ve puanlar |
 
 ## Takip edilen hisseler

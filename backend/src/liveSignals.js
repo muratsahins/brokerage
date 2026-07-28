@@ -9,7 +9,7 @@
 // gün içi yüksek/düşüğü önbellek tazeliği kadar gecikir).
 
 import { INSTRUMENTS } from './stocks.js';
-import { fetchDailyBars, fetchLivePrices, fetchLiveBars } from './dataSource.js';
+import { fetchBars, fetchLivePrices, fetchLiveBars, peekLivePrices, peekLiveBars } from './dataSource.js';
 import {
   supertrendSignal, wavetrendSignals, smcBullish, volumeReversal,
 } from './indicators.js';
@@ -45,7 +45,7 @@ export async function refreshSeries() {
       const cur = cache.get(inst.ticker);
       if (cur && Date.now() - cur.at < TTL_MS) { skip++; continue; }
       try {
-        const { bars, meta } = await fetchDailyBars(inst.symbol);
+        const { bars, meta } = await fetchBars(inst.symbol);
         if (bars.length) {
           cache.set(inst.ticker, {
             open: bars.map((b) => b.open),
@@ -111,6 +111,17 @@ function seriesWithLive(entry, price, priceTs, bar) {
     volumes[i] = b.volume; // gün içi hacim (önbellektekinin yerine)
   }
   return { opens, highs, lows, closes, volumes };
+}
+
+// Bir enstrümanın CANLI yamalı günlük serisi (UYARI taraması için).
+// Fiyat/gün içi bar önbellekleri beklenmez; yoksa ham önbellek serisi döner.
+export function liveDailySeries(ticker) {
+  const entry = cache.get(ticker);
+  if (!entry) return null;
+  const p = peekLivePrices(5 * 60 * 1000)?.prices?.[ticker];
+  if (p?.price == null) return { high: entry.high, low: entry.low, close: entry.close };
+  const s = seriesWithLive(entry, p.price, p.ts, peekLiveBars()?.[ticker]);
+  return { high: s.highs, low: s.lows, close: s.closes };
 }
 
 // Canlı fiyatlardan gösterge sinyallerini üretir. Yanıt küçük kalsın diye kısa
