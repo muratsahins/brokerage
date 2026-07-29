@@ -235,12 +235,16 @@ h1 { font-size: 26px; margin: 0 0 6px; }
 .vb-user { color: var(--muted); font-size: 13px; }
 .vb-link { background: none; border: none; color: #60a5fa; cursor: pointer; font: inherit; padding: 0; }
 .vb-link:hover { text-decoration: underline; }
+/* Kutu sayısı duruma göre değişiyor (Bugün yalnızca pozisyon varken çıkar),
+   o yüzden sabit 3 sütun yerine sığdıkça dizilen ızgara. */
 .vb-summary {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px 14px;
   background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 14px;
 }
 .vb-stat { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .vb-big { font-size: 20px; font-weight: 700; }
+/* Tutar ve yüzde bir arada dursun, araya satır sonu girmesin. */
+.vb-gunluk { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
 .vb-trade { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
 .vb-search { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
 .vb-results { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }

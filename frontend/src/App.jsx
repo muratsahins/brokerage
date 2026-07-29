@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, lazy, memo, Suspense } from 'react';
 import { API_BASE, fmtNum, norm, roundPrice } from './lib/common.js';
-import { Pct } from './lib/ui.jsx';
+import { Pct, Tutar } from './lib/ui.jsx';
 import {
   VB_START, vbCleanRetired, vbEmail, vbLoad, vbSave, vbTrade, vbUnitLabel, vbUnitPrice,
 } from './lib/vb.js';
@@ -669,11 +669,33 @@ function VirtualTrade({ items, onSelect }) {
     const it = byTicker.get(t); const price = unitPrice(it);
     const value = p.qty * (price != null ? price : p.avgCost);
     const cost = p.qty * p.avgCost;
-    return { t, it, qty: p.qty, avgCost: p.avgCost, price, value, pnl: value - cost, pnlPct: cost ? (value - cost) / cost * 100 : 0 };
+    // Bugünkü K/Z: dünkü kapanış = fiyat / (1 + günlük% / 100).
+    // Kıymetli maden kapsam dışı — changePct USD/ons değişimi, ₺/gram fiyatı
+    // ayrıca kurdan etkileniyor; ikisini çarpmak yanlış sayı üretir
+    // (ChartModal'daki ile aynı gerekçe).
+    const gunlukVar = it && it.kind === 'stock' && price != null && it.changePct != null;
+    const dunkuFiyat = gunlukVar ? price / (1 + it.changePct / 100) : null;
+    return {
+      t, it, qty: p.qty, avgCost: p.avgCost, price, value,
+      pnl: value - cost, pnlPct: cost ? (value - cost) / cost * 100 : 0,
+      gunluk: gunlukVar ? p.qty * (price - dunkuFiyat) : null,
+      dunkuDeger: gunlukVar ? p.qty * dunkuFiyat : null,
+    };
   }).sort((a, b) => b.value - a.value);
   const holdings = posList.reduce((s, p) => s + p.value, 0);
   const total = pf.cash + holdings;
   const totalPnl = total - VB_START;
+
+  // Portföyün bugünkü toplam K/Z'si. Yüzde, kapsanan pozisyonların DÜNKÜ
+  // değerine göre — nakit gün içinde hareket etmediği için toplam portföye
+  // bölmek günlük hareketi olduğundan küçük gösterirdi.
+  const gunlukKapsam = posList.filter((p) => p.gunluk != null);
+  const gunlukToplam = gunlukKapsam.length
+    ? gunlukKapsam.reduce((s, p) => s + p.gunluk, 0)
+    : null;
+  const gunlukDunku = gunlukKapsam.reduce((s, p) => s + p.dunkuDeger, 0);
+  const gunlukPct = gunlukToplam != null && gunlukDunku ? gunlukToplam / gunlukDunku * 100 : null;
+  const gunlukDisi = posList.length - gunlukKapsam.length;
 
   const nq = norm(q.trim());
   const results = nq ? items.filter((i) => i.kind !== undefined && unitPrice(i) != null && (norm(i.ticker).includes(nq) || norm(i.name).includes(nq))).slice(0, 8) : [];
@@ -686,6 +708,26 @@ function VirtualTrade({ items, onSelect }) {
         <div className="vb-stat"><span className="metric-label">Toplam Değer</span><span className="vb-big">{fmtNum(total)} ₺</span></div>
         <div className="vb-stat"><span className="metric-label">Nakit</span><span>{fmtNum(pf.cash)} ₺</span></div>
         <div className="vb-stat"><span className="metric-label">Kâr / Zarar</span><span style={{ color: totalPnl >= 0 ? '#4ade80' : '#f87171' }}>{totalPnl >= 0 ? '+' : ''}{fmtNum(totalPnl)} ₺ · %{fmtNum(totalPnl / VB_START * 100)}</span></div>
+        {posList.length > 0 && (
+          <div className="vb-stat">
+            <span className="metric-label">Bugün</span>
+            {gunlukToplam != null ? (
+              /* Not AYRI satırda: aynı span içinde akınca yüzdeye yapışıp
+                 "%2,651 maden…" gibi okunuyordu. .vb-stat sütun yönlü flex
+                 olduğu için kardeş öğeler alt alta dizilir. */
+              <>
+                <span className="vb-gunluk"><Tutar value={gunlukToplam} /> <Pct value={gunlukPct} /></span>
+                {gunlukDisi > 0 && (
+                  <span className="exp-note" title="Kıymetli madende günlük yüzde USD/ons değişimidir; ₺/gram ayrıca kurdan etkilendiği için hesaba katılmıyor.">
+                    {gunlukDisi} maden pozisyonu hariç
+                  </span>
+                )}
+              </>
+            ) : (
+              <span className="muted-dash" title="Yalnızca kıymetli maden pozisyonu var; günlük K/Z kur etkisi nedeniyle hesaplanmıyor.">—</span>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="vb-trade">
