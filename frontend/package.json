@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/copy-seed.mjs",
     "build": "vite build",
     "preview": "vite preview"
   },

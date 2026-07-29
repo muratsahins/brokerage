@@ -1,0 +1,42 @@
+name: API'yi uyanık tut
+
+# Render'ın ücretsiz planında servis 15 dakika trafik almazsa uykuya geçiyor;
+# uyanması 30-60 sn sürdüğü için o aralıkta gelen ilk ziyaretçi boş ekran
+# bekliyor. Seans saatlerinde düzenli ping atarak servisi ayakta tutuyoruz.
+#
+# Neden 7/24 değil: Render ücretsiz hesabı ayda 750 instance-saat veriyor.
+# Hafta içi 06:00-15:59 UTC (TR 09:00-18:59) ≈ 10 saat × 22 gün ≈ 220 saat —
+# kotanın rahat içinde. Seans dışında zaten fiyat hareket etmediği için
+# servisin uyuması sorun değil; ilk ziyaretçi statik tohum veriyi görür
+# (frontend/scripts/copy-seed.mjs).
+on:
+  schedule:
+    - cron: '*/10 6-15 * * 1-5'   # BIST seansı boyunca 10 dakikada bir (UTC)
+  workflow_dispatch:               # elle tetikleme
+
+concurrency:
+  group: keep-warm
+  cancel-in-progress: true
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      # API adresi repo değişkeniyle (Settings > Variables > API_URL) ezilebilir.
+      - name: /api/health'e ping at
+        env:
+          API_URL: ${{ vars.API_URL || 'https://brokerage-api.onrender.com' }}
+        run: |
+          # Servis uykudaysa ilk istek ~60 sn sürebilir; --max-time bunu kaldırır.
+          # Ping'in kendisi başarısız olsa da iş akışı kırmızıya düşmesin: bu bir
+          # bakım görevi, bildirim gürültüsü üretmesin diye uyarıyla geçiyoruz.
+          for i in 1 2 3; do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 90 "$API_URL/api/health" || echo 000)
+            if [ "$code" = "200" ]; then
+              echo "API ayakta (deneme $i)."
+              exit 0
+            fi
+            echo "Deneme $i başarısız (HTTP $code); 15 sn sonra tekrar."
+            sleep 15
+          done
+          echo "::warning::API 3 denemede de yanıt vermedi ($API_URL)."

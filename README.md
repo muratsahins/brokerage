@@ -79,6 +79,35 @@ npm run dev               # http://localhost:5173
 ```
 `/api` istekleri otomatik olarak backend'e (4000) proxy'lenir.
 
+**İlk açılış hızı.** İki önlem var:
+- `npm run build` öncesinde `scripts/copy-seed.mjs`, `data/recommendations.json`'u
+  `public/seed.json`'a kopyalar. Uygulama açılışta bu **tohumu** CDN'den (~50 ms)
+  çekip tabloyu hemen basar; `/api/recommendations` yanıtı gelince üstüne yazılır.
+  Backend uykudaysa/erişilemezse bile liste görünür (üstte "kaynak: CDN önbelleği"
+  yazar). Tohum yoksa uygulama eskisi gibi doğrudan API'yi bekler.
+- `.github/workflows/keep-warm.yml`, seans saatlerinde (hafta içi 06:00–15:59 UTC)
+  10 dakikada bir `/api/health`'e ping atarak Render'ın ücretsiz planındaki
+  15 dakikalık uyku + 30–60 sn cold start'ı önler. API adresi repo değişkeni
+  `API_URL` ile ezilebilir.
+
+**Grafik yığını tembel yükleniyor.** `lightweight-charts` (48 KB gzip) ilk
+bundle'ın yarısıydı; `ChartModal.jsx` ayrı bir parça olarak yalnızca bir
+enstrümana tıklanınca indiriliyor. Açılıştaki JS: 109 KB → 58 KB gzip.
+
+**Liste kademeli basılıyor.** 619 kaydın hepsi birden ~16.700 DOM düğümü
+demekti. `useKademeliListe` önce `SAYFA` (120) kayıt basar; listenin sonundaki
+nöbetçi görününce IntersectionObserver bir parti daha ekler. Nöbetçi aynı
+zamanda **düğmedir** — gözlemci çalışmazsa kalan kayıtlara erişim kapanmasın
+diye. Sekme/filtre/sıralama/arama değişince baştan başlar. İlk boyamada
+DOM: 16.727 → 3.255 düğüm. Arama tüm kalemler üzerinde çalıştığı için
+basılmamış satırlar arama sonuçlarından düşmez.
+
+**Satırlar `memo`'lu.** `mergeLivePrices`, bir kalemin hiçbir alanı oynamadıysa
+**eski nesneyi** geri verir (`volRev` değerce karşılaştırılır — her yanıtta yeni
+nesne olarak gelir). Böylece 18 saniyelik fiyat tazelemesinde yalnızca gerçekten
+değişen satırlar yeniden render edilir; hiçbir şey değişmediyse liste referansı
+da korunur ve React tüm güncellemeyi atlar (yalnızca "Fiyat: …" saati ilerler).
+
 ## API
 
 | Metot | Yol                     | Açıklama                                  |

@@ -1,2 +1,5 @@
 node_modules/
 dist/
+
+# Build sırasında data/recommendations.json'dan üretilir (scripts/copy-seed.mjs)
+public/seed.json

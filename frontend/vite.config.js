@@ -11,4 +11,13 @@ export default defineConfig({
       '/api': 'http://localhost:4000',
     },
   },
+  // Üretim derlemesini yerelde gerçekçi biçimde denemek için (dev sunucusu
+  // StrictMode çift render'ı ve geliştirme React'iyle yavaş ölçüm verir).
+  preview: {
+    port: 5181,
+    strictPort: true,
+    proxy: {
+      '/api': 'http://localhost:4000',
+    },
+  },
 });
