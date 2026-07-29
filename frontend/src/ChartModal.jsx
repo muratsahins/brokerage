@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { createChart } from "lightweight-charts";
-import { API_BASE, fmtNum } from "./lib/common.js";
-import { vbEmail, vbTrade, vbUnitLabel, vbUnitPrice } from "./lib/vb.js";
+import { API_BASE, fmtNum } from './lib/common.js';
+import { Pct, Tutar } from './lib/ui.jsx';
+import { vbEmail, vbLoad, vbTrade, vbUnitLabel, vbUnitPrice } from './lib/vb.js';
 
 // --- Gösterge hesaplayıcıları (kapanışlardan) --------------------------------
 function emaArr(vals, period) {
@@ -146,11 +147,35 @@ export default function ChartModal({ item, onClose }) {
     return next;
   });
   const vbe = vbEmail();
+  // Portföyü pop-up içinde tutuyoruz ki alım-satımdan hemen sonra pozisyon ve
+  // kâr/zarar satırı tazelensin (Sanal Borsa sekmesine gitmeye gerek kalmasın).
+  const [pf, setPf] = useState(() => (vbe ? vbLoad(vbe) : null));
   const doTrade = (side) => {
     const res = vbTrade(vbe, item, side, tqty);
     setTmsg({ ok: res.ok, m: res.msg });
-    if (res.ok) setTqty('');
+    if (res.ok) { setTqty(''); setPf(res.pf); }
   };
+
+  // --- Pozisyon ve kâr/zarar -------------------------------------------------
+  // Portföy ₺ birim fiyatı üzerinden tutulur (kıymetli madende ₺/gram),
+  // o yüzden K/Z hesabı item.price değil vbUnitPrice ile yapılır.
+  const birim = vbUnitPrice(item);
+  const birimAdi = vbUnitLabel(item);
+  const poz = pf?.positions?.[item.ticker] || null;
+  const nakit = pf?.cash ?? 0;
+
+  const toplamKZ = poz && birim != null ? poz.qty * (birim - poz.avgCost) : null;
+  const toplamKZPct = poz && birim != null && poz.avgCost
+    ? (birim - poz.avgCost) / poz.avgCost * 100
+    : null;
+
+  // Bugünkü K/Z: dünkü kapanış = fiyat / (1 + günlük% / 100).
+  // Yalnızca hisselerde gösteriliyor — kıymetli madende changePct USD/ons
+  // değişimi, ₺/gram ise ayrıca kurdan etkileniyor; ikisini karıştırmak
+  // yanlış sayı üretirdi.
+  const bugunKZ = poz && item.kind === 'stock' && birim != null && item.changePct != null
+    ? poz.qty * (birim - birim / (1 + item.changePct / 100))
+    : null;
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };
@@ -296,7 +321,10 @@ export default function ChartModal({ item, onClose }) {
       document.removeEventListener('keydown', onKey);
       charts.forEach((c) => { try { c.remove(); } catch { /* yoksay */ } });
     };
-  }, [item, indKey]);
+    // item her fiyat tazelemesinde yeni bir nesne; bağımlılık `item` olsaydı
+    // grafik 18 saniyede bir baştan çizilirdi. Grafik yalnızca ENSTRÜMANA
+    // bağlı, fiyat değişimi başlıktaki canlı alanlara yansıyor.
+  }, [item.ticker, indKey]);
 
   const cur = item.currency || (item.kind === 'metal' ? 'USD' : 'TRY');
   return (
@@ -304,25 +332,68 @@ export default function ChartModal({ item, onClose }) {
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-head">
           <div className="modal-title">
-            <span className="modal-ticker">{item.ticker} · {fmtNum(item.price)} {cur}</span>
+            <span className="modal-ticker">
+              {item.ticker} · {fmtNum(item.price)} {cur}
+              <span className="modal-gunluk"><Pct value={item.changePct} strong /> bugün</span>
+            </span>
             <span className="modal-name">{item.name}{item.sector ? ` · ${item.sector}` : ''} · son 1 yıl (günlük)</span>
           </div>
           <button className="modal-close" onClick={onClose} aria-label="Kapat">✕</button>
         </div>
+
+        {poz && (
+          <div className="modal-pos">
+            <div className="modal-pos-kalem">
+              <span className="metric-label">Pozisyonum</span>
+              <span>{fmtNum(poz.qty)} {birimAdi} · maliyet {fmtNum(poz.avgCost)} ₺</span>
+            </div>
+            {bugunKZ != null && (
+              <div className="modal-pos-kalem">
+                <span className="metric-label">Bugün</span>
+                <span><Tutar value={bugunKZ} /> <Pct value={item.changePct} /></span>
+              </div>
+            )}
+            <div className="modal-pos-kalem">
+              <span className="metric-label">Toplam K/Z</span>
+              <span><Tutar value={toplamKZ} /> <Pct value={toplamKZPct} /></span>
+            </div>
+            <div className="modal-pos-kalem">
+              <span className="metric-label">Değeri</span>
+              <span>{fmtNum(poz.qty * birim)} ₺</span>
+            </div>
+          </div>
+        )}
+
         <div className="modal-trade">
           {vbe ? (
             <>
-              <span className="modal-trade-price">{fmtNum(vbUnitPrice(item))} ₺/{vbUnitLabel(item)}</span>
+              <span className="modal-trade-price">{fmtNum(birim)} ₺/{birimAdi}</span>
               <input
                 className="search-input" type="number" min="0" step="any"
-                placeholder={`miktar (${vbUnitLabel(item)})`}
+                placeholder={`miktar (${birimAdi})`}
                 value={tqty} onChange={(e) => setTqty(e.target.value)}
               />
               <button className="vb-buy" onClick={() => doTrade('buy')}>AL</button>
-              <button className="vb-sell" onClick={() => doTrade('sell')}>SAT</button>
+              <button className="vb-sell" onClick={() => doTrade('sell')} disabled={!poz}>SAT</button>
+              {/* Hızlı miktar: alımda nakde sığan tam miktar, satışta elde ne varsa. */}
+              {birim > 0 && (
+                <button
+                  className="vb-tumu"
+                  onClick={() => setTqty(String(poz ? poz.qty : Math.floor(nakit / birim)))}
+                  title={poz ? 'Elimdeki tüm miktar' : 'Nakde sığan en çok miktar'}
+                >
+                  Tümü
+                </button>
+              )}
+              <span className="modal-trade-limit">
+                nakit {fmtNum(nakit)} ₺{poz ? ` · elimde ${fmtNum(poz.qty)} ${birimAdi}` : ''}
+              </span>
             </>
           ) : (
-            <span className="muted-dash">Alım-satım için Sanal Borsa sekmesinden e-posta ile giriş yap.</span>
+            <span className="muted-dash">
+              Alım-satım ve kâr/zarar için <strong>Sanal Borsa</strong> sekmesinden e-posta ile giriş yap.
+              (Sanal para; gerçek işlem değildir.)
+            </span>
           )}
         </div>
         {tmsg && <div className={`vb-msg ${tmsg.ok ? 'ok' : 'err'}`} style={{ margin: '0 14px' }}>{tmsg.m}</div>}

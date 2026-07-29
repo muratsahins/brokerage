@@ -79,6 +79,18 @@ npm run dev               # http://localhost:5173
 ```
 `/api` istekleri otomatik olarak backend'e (4000) proxy'lenir.
 
+**Grafik pop-up'ı.** Hisse koduna tıklayınca 1 yıllık mum grafiği açılır.
+Başlıkta canlı fiyat ve **günlük değişim**; Sanal Borsa'ya girilmişse altında
+**pozisyon şeridi** (adet/gram, maliyet, bugünkü K/Z, toplam K/Z, güncel değer)
+ve doğrudan **AL/SAT** paneli bulunur — Sanal Borsa sekmesine gitmeye gerek yok.
+İşlemden sonra şerit anında tazelenir. "Tümü" düğmesi alımda nakde sığan en çok
+miktarı, satışta elde olanı doldurur. Kâr/zarar portföyün ₺ birim fiyatı
+üzerinden hesaplanır (kıymetli madende ₺/gram). **Bugünkü K/Z yalnızca
+hisselerde** gösterilir: kıymetli madende günlük yüzde USD/ons değişimidir,
+₺/gram ise ayrıca kurdan etkilendiği için ikisini çarpmak yanlış olurdu.
+Pop-up canlı kaleme bağlıdır (fiyat tazelendikçe başlık ve K/Z güncellenir),
+ama grafik yalnızca enstrüman değişince yeniden çizilir.
+
 **İlk açılış hızı.** İki önlem var:
 - `npm run build` öncesinde `scripts/copy-seed.mjs`, `data/recommendations.json`'u
   `public/seed.json`'a kopyalar. Uygulama açılışta bu **tohumu** CDN'den (~50 ms)

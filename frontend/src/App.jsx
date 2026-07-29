@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, lazy, memo, Suspense } from 'react';
 import { API_BASE, fmtNum, norm, roundPrice } from './lib/common.js';
+import { Pct } from './lib/ui.jsx';
 import {
   VB_START, vbCleanRetired, vbEmail, vbLoad, vbSave, vbTrade, vbUnitLabel, vbUnitPrice,
 } from './lib/vb.js';
@@ -91,20 +92,6 @@ const SIGNAL_STYLES = {
   TUT: { label: 'TUT', bg: '#665200', fg: '#fbbf24' },
   'İZLE': { label: 'İZLE', bg: '#3a3a3a', fg: '#cbd5e1' },
 };
-
-function Pct({ value, strong }) {
-  if (value == null) return <span className="muted-dash">—</span>;
-  const up = value >= 0;
-  return (
-    <span style={{
-      color: up ? '#4ade80' : '#f87171',
-      fontVariantNumeric: 'tabular-nums',
-      fontWeight: strong ? 700 : 400,
-    }}>
-      {up ? '▲' : '▼'} %{fmtNum(Math.abs(value))}
-    </span>
-  );
-}
 
 // Analist beklentisine dayalı ileriye dönük getiri hücresi
 function Expected({ value, note }) {
@@ -983,6 +970,13 @@ export default function App() {
   // Hacim dönüşü sütunu yalnızca kendi sekmesinde.
   const showVolRev = tab === 'vol' && !searching;
 
+  // Grafik pop-up'ındaki kalemin canlı karşılığı (fiyat/değişim tazelendikçe
+  // pop-up da tazelensin). data.items içinde yoksa açılış kopyası kullanılır.
+  const chartLive = useMemo(
+    () => (chartItem ? data.items.find((i) => i.ticker === chartItem.ticker) || chartItem : null),
+    [chartItem, data.items],
+  );
+
   // Listeyi partiler hâlinde bas; sekme/filtre/sıralama/arama/görünüm
   // değişince baştan başla.
   const { gorunen, nobetciRef, hepsi, dahaGoster } = useKademeliListe(items, `${tab}|${filter}|${sort}|${query}|${view}`);
@@ -1293,9 +1287,14 @@ export default function App() {
 
       {/* Grafik yığını (lightweight-charts) ilk tıklamada indirilir; inerken
           pop-up boş açılmasın diye aynı kılıkta bir bekleme katmanı gösterilir. */}
-      {chartItem && (
+      {/* chartItem tıklama anındaki nesnenin kopyası; fiyat tazelendikçe
+          bayatlar. Pop-up canlı fiyatı, günlük değişimi ve kâr/zararı
+          gösterdiği (ve o fiyattan işlem yaptığı) için güncel kaleme
+          çözümlüyoruz. Kalem listeden düşerse (süzme değişti) elimizdeki
+          kopyayla devam. */}
+      {chartLive && (
         <Suspense fallback={<div className="modal-overlay"><div className="chart-state">Grafik yükleniyor…</div></div>}>
-          <ChartModal item={chartItem} onClose={() => setChartItem(null)} />
+          <ChartModal item={chartLive} onClose={() => setChartItem(null)} />
         </Suspense>
       )}
     </div>
