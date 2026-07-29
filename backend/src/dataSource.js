@@ -123,8 +123,28 @@ let livePriceCache = { at: 0, data: null };
 export function peekLivePrices(maxAgeMs = 60000) {
   return Date.now() - livePriceCache.at < maxAgeMs ? livePriceCache.data : null;
 }
+// Aynı anda birden çok istek gelirse tek çekim yapılsın diye uçuştaki söz.
+let livePriceInflight = null;
+const LIVE_TTL_MS = 15000;
+// Bayat veri en fazla bu kadar servis edilir; daha eskiyse istek çekimi bekler.
+const LIVE_STALE_MS = Number(process.env.LIVE_PRICE_STALE_MS ?? 120000);
+
+// Önbellek tazeyse onu döner. Bayatsa TAZELEMEYİ ARKA PLANDA başlatır ve elde
+// olan veriyi HEMEN döner — istemci Yahoo turunu beklemez (ölçüldü: bekleyen
+// istek 3,5 sn, önbellekten gelen 5 ms). Hiç veri yoksa (ilk istek) beklenir.
 export async function fetchLivePrices() {
-  if (Date.now() - livePriceCache.at < 15000 && livePriceCache.data) return livePriceCache.data;
+  const yas = Date.now() - livePriceCache.at;
+  if (livePriceCache.data && yas < LIVE_TTL_MS) return livePriceCache.data;
+  if (!livePriceInflight) {
+    livePriceInflight = refreshLivePrices()
+      .catch((err) => { console.warn(`[live] Fiyat tazelenemedi: ${err.message}`); return livePriceCache.data; })
+      .finally(() => { livePriceInflight = null; });
+  }
+  if (livePriceCache.data && yas < LIVE_STALE_MS) return livePriceCache.data;
+  return livePriceInflight;
+}
+
+async function refreshLivePrices() {
   const bySym = new Map(INSTRUMENTS.map((i) => [i.symbol, i.ticker]));
   const symbols = INSTRUMENTS.map((i) => i.symbol);
   const prices = {};
@@ -179,9 +199,23 @@ const LIVE_BAR_PAUSE_MS = 10 * 60 * 1000;
 export function peekLiveBars(maxAgeMs = 5 * 60 * 1000) {
   return Date.now() - liveBarCache.at < maxAgeMs ? liveBarCache.data : null;
 }
+let liveBarInflight = null;
+// Fiyatla aynı mantık: bayat önbellek varken istek bekletilmez, tazeleme arka
+// planda döner. Eşzamanlı istekler tek çekimi paylaşır.
 export async function fetchLiveBars() {
-  if (Date.now() - liveBarCache.at < 15000 && liveBarCache.data) return liveBarCache.data;
+  const yas = Date.now() - liveBarCache.at;
+  if (liveBarCache.data && yas < 15000) return liveBarCache.data;
   if (Date.now() < liveBarPausedUntil) return liveBarCache.data;
+  if (!liveBarInflight) {
+    liveBarInflight = refreshLiveBars()
+      .catch((err) => { console.warn(`[live] Gün içi bar tazelenemedi: ${err.message}`); return liveBarCache.data; })
+      .finally(() => { liveBarInflight = null; });
+  }
+  if (liveBarCache.data && yas < LIVE_STALE_MS) return liveBarCache.data;
+  return liveBarInflight;
+}
+
+async function refreshLiveBars() {
   const { cookie, crumb } = await ensureSession();
   if (!crumb) {
     liveBarPausedUntil = Date.now() + LIVE_BAR_PAUSE_MS;

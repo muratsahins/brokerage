@@ -608,8 +608,18 @@ function useAlerts() {
       .then((d) => { if (!cancelled) setState({ loading: false, items: d.items || [], stSell: d.stSell || [], updatedAt: d.updatedAt, stats: d.stats, sessionDate: d.sessionDate, lastBarDate: d.lastBarDate }); })
       .catch(() => { if (!cancelled) setState((s) => ({ ...s, loading: false })); });
     load();
-    const id = setInterval(load, 60 * 1000); // tarama sunucuda ~60 sn önbellekli
-    return () => { cancelled = true; clearInterval(id); };
+    // Sayfa arka plandayken tarama çekilmez; sayfaya dönülünce hemen tazelenir
+    // (yeni sinyal varsa sekme o an yanıp sönmeye başlar).
+    const id = setInterval(() => {
+      if (document.visibilityState === 'visible') load();
+    }, 60 * 1000); // tarama sunucuda ~60 sn önbellekli
+    const donunce = () => { if (document.visibilityState === 'visible') load(); };
+    document.addEventListener('visibilitychange', donunce);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+      document.removeEventListener('visibilitychange', donunce);
+    };
   }, []);
   return state;
 }
@@ -1104,9 +1114,13 @@ export default function App() {
   // arka planda sessizce yeniden çeker (spinner göstermeden).
   useEffect(() => {
     load();
-    const idFull = setInterval(load, 15 * 60 * 1000);      // tüm veri (göstergeler) 15 dk
-    const idPrice = setInterval(refreshPrices, 18 * 1000); // sadece fiyat ~18 sn (throttle'a takılmadan)
-    const onFocus = () => { if (document.visibilityState === 'visible') refreshPrices(); };
+    // Sayfa arka plandayken (başka sekme/uygulama) çekim yapılmaz: kullanıcı
+    // görmüyor, ama sunucu her seferinde ~700 enstrümanın göstergesini
+    // hesaplıyor ve telefonda pil yakıyordu. Sayfaya dönülünce hemen tazelenir.
+    const gorunur = () => document.visibilityState === 'visible';
+    const idFull = setInterval(() => { if (gorunur()) load(); }, 15 * 60 * 1000); // tüm veri 15 dk
+    const idPrice = setInterval(() => { if (gorunur()) refreshPrices(); }, 18 * 1000); // fiyat ~18 sn
+    const onFocus = () => { if (gorunur()) refreshPrices(); };
     document.addEventListener('visibilitychange', onFocus);
     window.addEventListener('focus', onFocus);
     return () => {
