@@ -425,6 +425,39 @@ thead th {
   border-bottom: 1px solid var(--border);
   white-space: nowrap;
 }
+/* Ekran dışındaki kartların yerleşim ve boyama işini tarayıcı atlar;
+   contain-intrinsic-size yalnızca yükseklik ipucudur (auto = ilk ölçümden
+   sonra gerçek değeri hatırlar, kaydırma çubuğu oynamaz). Desteklemeyen
+   tarayıcı yok sayar.
+   Tablo satırlarına UYGULANMAZ: CSS containment içsel tablo öğelerinde
+   (display: table-row) geçersiz, ölçtük — ekran dışı satır yine yerleşiyor.
+   Tabloda ekran dışı maliyeti kademeli render sınırlıyor. */
+.card { content-visibility: auto; contain-intrinsic-size: auto 260px; }
+
+/* Kademeli listede sıradaki partiyi getiren nöbetçi. Görünür olunca
+   IntersectionObserver kendiliğinden tetikler; düğme olarak da tıklanabilir,
+   böylece gözlemci çalışmasa bile kalan kayıtlara erişim kapanmaz. */
+.liste-nobetci {
+  display: block;
+  width: 100%;
+  padding: 16px 12px;
+  border: none;
+  border-top: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  text-align: center;
+  cursor: pointer;
+}
+.liste-nobetci:hover { background: #1c2029; color: var(--text); }
+.cards .liste-nobetci {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel);
+}
+.nobetci-kalan { opacity: 0.7; }
+
 tbody td { padding: 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
 tbody tr:last-child td { border-bottom: none; }
 tbody tr:hover { background: #1c2029; }
@@ -504,6 +537,31 @@ th.num { text-align: right; }
   background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
 }
 .modal-trade .vb-buy, .modal-trade .vb-sell { padding: 8px 16px; }
+.modal-trade .vb-sell:disabled { background: #4a2020; color: #9c8080; cursor: not-allowed; }
+.vb-tumu {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.vb-tumu:hover { color: var(--text); border-color: var(--muted); }
+.modal-trade-limit { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+/* Başlıktaki günlük değişim ve pop-up içindeki pozisyon/kâr-zarar şeridi. */
+.modal-gunluk { margin-left: 10px; font-size: 13px; font-weight: 400; }
+.modal-gunluk > span:first-child { margin-right: 4px; }
+.modal-pos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: #1a1e26;
+}
+.modal-pos-kalem { display: flex; flex-direction: column; gap: 3px; font-size: 13px; }
 
 .modal-ind {
   display: flex;

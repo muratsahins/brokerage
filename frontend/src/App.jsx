@@ -1,368 +1,42 @@
-import { useEffect, useState, useMemo, useRef } from 'react';
-import { createChart } from 'lightweight-charts';
+import { useEffect, useMemo, useRef, useState, lazy, memo, Suspense } from 'react';
+import { API_BASE, fmtNum, norm, roundPrice } from './lib/common.js';
+import { Pct } from './lib/ui.jsx';
+import {
+  VB_START, vbCleanRetired, vbEmail, vbLoad, vbSave, vbTrade, vbUnitLabel, vbUnitPrice,
+} from './lib/vb.js';
 
-// --- Gösterge hesaplayıcıları (kapanışlardan) --------------------------------
-function emaArr(vals, period) {
-  const k = 2 / (period + 1);
-  const out = new Array(vals.length).fill(null);
-  let prev = null;
-  for (let i = 0; i < vals.length; i++) {
-    if (vals[i] == null) continue;
-    prev = prev == null ? vals[i] : vals[i] * k + prev * (1 - k);
-    out[i] = prev;
-  }
-  return out;
-}
-function computeRSI(closes, period = 14) {
-  const out = new Array(closes.length).fill(null);
-  if (closes.length <= period) return out;
-  let gain = 0, loss = 0;
-  for (let i = 1; i <= period; i++) {
-    const ch = closes[i] - closes[i - 1];
-    if (ch >= 0) gain += ch; else loss -= ch;
-  }
-  let ag = gain / period, al = loss / period;
-  out[period] = al === 0 ? 100 : 100 - 100 / (1 + ag / al);
-  for (let i = period + 1; i < closes.length; i++) {
-    const ch = closes[i] - closes[i - 1];
-    ag = (ag * (period - 1) + (ch > 0 ? ch : 0)) / period;
-    al = (al * (period - 1) + (ch < 0 ? -ch : 0)) / period;
-    out[i] = al === 0 ? 100 : 100 - 100 / (1 + ag / al);
-  }
-  return out;
-}
-function computeMACD(closes, fast = 12, slow = 26, sig = 9) {
-  const ef = emaArr(closes, fast);
-  const es = emaArr(closes, slow);
-  const macd = closes.map((_, i) => (ef[i] != null && es[i] != null && i >= slow - 1) ? ef[i] - es[i] : null);
-  const signal = emaArr(macd, sig);
-  const hist = macd.map((v, i) => (v != null && signal[i] != null) ? v - signal[i] : null);
-  return { macd, signal, hist };
-}
-// Basit hareketli ortalama (pencere içinde null varsa null).
-function smaArr(vals, period) {
-  const out = new Array(vals.length).fill(null);
-  for (let i = period - 1; i < vals.length; i++) {
-    let sum = 0, ok = true;
-    for (let j = i - period + 1; j <= i; j++) { if (vals[j] == null) { ok = false; break; } sum += vals[j]; }
-    if (ok) out[i] = sum / period;
-  }
-  return out;
-}
-// WaveTrend (LazyBear) — tablo sinyaliyle aynı: wt1 (yeşil), wt2 (kırmızı sinyal).
-function computeWaveTrend(highs, lows, closes, n1 = 10, n2 = 21) {
-  const ap = closes.map((c, i) => (highs[i] + lows[i] + c) / 3);
-  const esa = emaArr(ap, n1);
-  const de = emaArr(ap.map((v, i) => Math.abs(v - esa[i])), n1);
-  const ci = ap.map((v, i) => { const d = de[i]; return d === 0 ? 0 : (v - esa[i]) / (0.015 * d); });
-  const wt1 = emaArr(ci, n2);
-  const wt2 = smaArr(wt1, 4);
-  return { wt1, wt2 };
-}
-// Stochastic RSI (14,14,3,3): %K ve %D (0..100).
-function computeStochRSI(closes, rsiLen = 14, stochLen = 14, kS = 3, dS = 3) {
-  const rsi = computeRSI(closes, rsiLen);
-  const n = closes.length;
-  const stoch = new Array(n).fill(null);
-  for (let i = 0; i < n; i++) {
-    if (rsi[i] == null || i < rsiLen + stochLen - 1) continue;
-    let mn = Infinity, mx = -Infinity, ok = true;
-    for (let j = i - stochLen + 1; j <= i; j++) { const r = rsi[j]; if (r == null) { ok = false; break; } if (r < mn) mn = r; if (r > mx) mx = r; }
-    if (ok) stoch[i] = mx === mn ? 0 : ((rsi[i] - mn) / (mx - mn)) * 100;
-  }
-  const k = smaArr(stoch, kS);
-  const d = smaArr(k, dS);
-  return { k, d };
-}
+// Grafik pop-up'ı lightweight-charts'a bağlı: bundle'ın 109 KB gzip'inin
+// 48 KB'ı ondan geliyordu. Yalnızca bir enstrümana tıklanınca gerektiği için
+// tembel yükleniyor — ilk açılışta inen JS neredeyse yarıya iniyor.
+const ChartModal = lazy(() => import('./ChartModal.jsx'));
 
-// Wilder ATR + SuperTrend (Kıvanç) — fiyat overlay'i, tablo sinyaliyle uyumlu.
-function atrArr(highs, lows, closes, period = 10) {
-  const n = closes.length;
-  const out = new Array(n).fill(null);
-  if (n < period) return out;
-  const tr = new Array(n);
-  tr[0] = highs[0] - lows[0];
-  for (let i = 1; i < n; i++) tr[i] = Math.max(highs[i] - lows[i], Math.abs(highs[i] - closes[i - 1]), Math.abs(lows[i] - closes[i - 1]));
-  let prev = 0; for (let i = 0; i < period; i++) prev += tr[i]; prev /= period;
-  out[period - 1] = prev;
-  for (let i = period; i < n; i++) { prev = (prev * (period - 1) + tr[i]) / period; out[i] = prev; }
-  return out;
-}
-function computeSuperTrend(highs, lows, closes, period = 10, mult = 3) {
-  const a = atrArr(highs, lows, closes, period);
-  const n = closes.length;
-  const line = new Array(n).fill(null), dir = new Array(n).fill(null);
-  let prevUp = null, prevDn = null, prevTrend = 1, prevClose = null, started = false;
-  for (let i = 0; i < n; i++) {
-    const av = a[i]; if (av == null) continue;
-    const src = (highs[i] + lows[i]) / 2;
-    let up = src - mult * av, dn = src + mult * av, trend;
-    if (!started) { trend = 1; started = true; }
-    else {
-      up = prevClose > prevUp ? Math.max(up, prevUp) : up;
-      dn = prevClose < prevDn ? Math.min(dn, prevDn) : dn;
-      trend = prevTrend;
-      if (prevTrend === -1 && closes[i] > prevDn) trend = 1;
-      else if (prevTrend === 1 && closes[i] < prevUp) trend = -1;
-    }
-    line[i] = trend === 1 ? up : dn; dir[i] = trend;
-    prevUp = up; prevDn = dn; prevTrend = trend; prevClose = closes[i];
-  }
-  return { line, dir };
-}
-
-const CHART_INDS = [
-  { key: 'supertrend', label: 'SuperTrend' },
-  { key: 'volume', label: 'Hacim' },
-  { key: 'wavetrend', label: 'WaveTrend' },
-  { key: 'stochrsi', label: 'Stoch RSI' },
-  { key: 'macd', label: 'MACD' },
-];
-function loadChartInds() {
-  const def = { supertrend: true, volume: true, wavetrend: true, stochrsi: true, macd: true };
-  try { const raw = localStorage.getItem('chart_inds'); return raw ? { ...def, ...JSON.parse(raw) } : def; }
-  catch { return def; }
-}
-
-// Grafik pop-up'ı: kendi Yahoo OHLC verimizi (backend /api/chart) Lightweight
-// Charts (açık kaynak, ücretsiz) ile çizer — mum + hacim, altında RSI ve MACD
-// panelleri (zaman eksenleri senkron). TradingView embed'i BIST verisini
-// göstermediği için harici widget yerine kendi grafiğimizi çiziyoruz.
-function ChartModal({ item, onClose }) {
-  const priceRef = useRef(null);
-  const wtRef = useRef(null);
-  const stochRef = useRef(null);
-  const macdRef = useRef(null);
-  const [status, setStatus] = useState('loading'); // loading | ok | error
-  const [tqty, setTqty] = useState('');
-  const [tmsg, setTmsg] = useState(null);
-  const [inds, setInds] = useState(loadChartInds);
-  const indKey = JSON.stringify(inds);
-  const toggleInd = (k) => setInds((s) => {
-    const next = { ...s, [k]: !s[k] };
-    try { localStorage.setItem('chart_inds', JSON.stringify(next)); } catch { /* yoksay */ }
-    return next;
-  });
-  const vbe = vbEmail();
-  const doTrade = (side) => {
-    const res = vbTrade(vbe, item, side, tqty);
-    setTmsg({ ok: res.ok, m: res.msg });
-    if (res.ok) setTqty('');
-  };
-
-  useEffect(() => {
-    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', onKey);
-    let charts = [];
-    let cancelled = false;
-
-    const G = '#20242d', BORDER = '#262a33', UP = '#4ade80', DOWN = '#f87171';
-    const base = {
-      autoSize: true,
-      layout: { background: { color: '#171a21' }, textColor: '#8b93a1' },
-      grid: { vertLines: { color: G }, horzLines: { color: G } },
-      rightPriceScale: { borderColor: BORDER, minimumWidth: 60 },
-      crosshair: { horzLine: { labelVisible: false } },
-    };
-
-    (async () => {
-      try {
-        const res = await fetch(`${API_BASE}/api/chart?ticker=${encodeURIComponent(item.ticker)}`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        if (cancelled || !priceRef.current) return;
-        const candles = data.candles || [];
-        if (candles.length === 0) throw new Error('boş veri');
-        setStatus('ok');
-        const closes = candles.map((c) => c.close);
-        // Değeri olmayan barları whitespace (yalnız time) yapar; böylece tüm seriler
-        // aynı zaman aralığını kaplar ve paneller birebir hizalı olur.
-        const ws = (arr, colorFn) => candles.map((c, i) => (arr[i] != null
-          ? (colorFn ? { time: c.time, value: arr[i], color: colorFn(i) } : { time: c.time, value: arr[i] })
-          : { time: c.time }));
-
-        const highs = candles.map((c) => c.high);
-        const lows = candles.map((c) => c.low);
-        // Aktif alt paneller (zaman ekseni son panelde görünür).
-        const paneKeys = ['price'];
-        if (inds.wavetrend) paneKeys.push('wt');
-        if (inds.stochrsi) paneKeys.push('stoch');
-        if (inds.macd) paneKeys.push('macd');
-        const lastKey = paneKeys[paneKeys.length - 1];
-        const tsOpt = (key) => ({ visible: key === lastKey, borderColor: BORDER });
-        const panes = [];
-
-        // --- Fiyat (+ hacim + SuperTrend overlay) ---
-        const priceChart = createChart(priceRef.current, { ...base, timeScale: tsOpt('price') });
-        const candleSeries = priceChart.addCandlestickSeries({ upColor: UP, downColor: DOWN, wickUpColor: UP, wickDownColor: DOWN, borderVisible: false });
-        candleSeries.setData(candles);
-        if (inds.volume) {
-          const volSeries = priceChart.addHistogramSeries({ priceFormat: { type: 'volume' }, priceScaleId: '', lastValueVisible: false, priceLineVisible: false });
-          volSeries.priceScale().applyOptions({ scaleMargins: { top: 0.82, bottom: 0 } });
-          volSeries.setData(candles.map((c) => ({ time: c.time, value: c.volume, color: c.close >= c.open ? 'rgba(74,222,128,0.4)' : 'rgba(248,113,113,0.4)' })));
-        }
-        if (inds.supertrend) {
-          const { line: stLine, dir: stDir } = computeSuperTrend(highs, lows, closes);
-          const stOpt = { lineWidth: 2, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false };
-          // Yükseliş trendinde yeşil (destek), düşüşte kırmızı (direnç); dönüşte
-          // çizgi kopar (zıplama yok), yönü AL/SAT okları belirtir.
-          const stUp = priceChart.addLineSeries({ color: UP, ...stOpt });
-          stUp.setData(candles.map((c, i) => (stDir[i] === 1 && stLine[i] != null) ? { time: c.time, value: stLine[i] } : { time: c.time }));
-          const stDown = priceChart.addLineSeries({ color: DOWN, ...stOpt });
-          stDown.setData(candles.map((c, i) => (stDir[i] === -1 && stLine[i] != null) ? { time: c.time, value: stLine[i] } : { time: c.time }));
-          // Trend dönüşlerine AL/SAT ok işaretleri (TradingView gibi net sinyal).
-          const stMarkers = [];
-          for (let i = 1; i < candles.length; i++) {
-            if (stDir[i] == null || stDir[i - 1] == null) continue;
-            if (stDir[i - 1] === -1 && stDir[i] === 1) stMarkers.push({ time: candles[i].time, position: 'belowBar', color: UP, shape: 'arrowUp', text: 'AL' });
-            else if (stDir[i - 1] === 1 && stDir[i] === -1) stMarkers.push({ time: candles[i].time, position: 'aboveBar', color: DOWN, shape: 'arrowDown', text: 'SAT' });
-          }
-          candleSeries.setMarkers(stMarkers);
-        }
-        panes.push({ chart: priceChart, series: candleSeries });
-
-        // --- WaveTrend (LazyBear) — tablo sinyaliyle uyumlu ---
-        if (inds.wavetrend && wtRef.current) {
-          const { wt1, wt2 } = computeWaveTrend(highs, lows, closes);
-          const wtChart = createChart(wtRef.current, { ...base, timeScale: tsOpt('wt') });
-          const wt1s = wtChart.addLineSeries({ color: '#4ade80', lineWidth: 2, priceLineVisible: false, lastValueVisible: false });
-          wt1s.setData(ws(wt1));
-          const wt2s = wtChart.addLineSeries({ color: '#f87171', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
-          wt2s.setData(ws(wt2));
-          [60, 53, 0, -53, -60].forEach((lvl) => wt1s.createPriceLine({ price: lvl, color: lvl === 0 ? 'rgba(139,147,161,0.45)' : 'rgba(139,147,161,0.25)', lineWidth: 1, lineStyle: 2 }));
-          panes.push({ chart: wtChart, series: wt1s });
-        }
-
-        // --- Stochastic RSI (14,14,3,3) ---
-        if (inds.stochrsi && stochRef.current) {
-          const { k: srK, d: srD } = computeStochRSI(closes);
-          const stochChart = createChart(stochRef.current, { ...base, timeScale: tsOpt('stoch') });
-          const kSeries = stochChart.addLineSeries({ color: '#60a5fa', lineWidth: 2, priceLineVisible: false, lastValueVisible: false, autoscaleInfoProvider: () => ({ priceRange: { minValue: 0, maxValue: 100 } }) });
-          kSeries.setData(ws(srK));
-          const dSeries = stochChart.addLineSeries({ color: '#fbbf24', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
-          dSeries.setData(ws(srD));
-          kSeries.createPriceLine({ price: 80, color: 'rgba(248,113,113,0.6)', lineWidth: 1, lineStyle: 2 });
-          kSeries.createPriceLine({ price: 20, color: 'rgba(74,222,128,0.6)', lineWidth: 1, lineStyle: 2 });
-          panes.push({ chart: stochChart, series: kSeries });
-        }
-
-        // --- MACD 12/26/9 ---
-        if (inds.macd && macdRef.current) {
-          const { macd, signal, hist } = computeMACD(closes);
-          const macdChart = createChart(macdRef.current, { ...base, timeScale: tsOpt('macd') });
-          const histSeries = macdChart.addHistogramSeries({ priceLineVisible: false, lastValueVisible: false });
-          histSeries.setData(ws(hist, (i) => (hist[i] >= 0 ? 'rgba(74,222,128,0.55)' : 'rgba(248,113,113,0.55)')));
-          const macdLine = macdChart.addLineSeries({ color: '#60a5fa', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
-          macdLine.setData(ws(macd));
-          const sigLine = macdChart.addLineSeries({ color: '#fbbf24', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
-          sigLine.setData(ws(signal));
-          panes.push({ chart: macdChart, series: macdLine });
-        }
-
-        // --- Senkron: zaman ekseni + imleç (crosshair) ---
-        charts = panes.map((p) => p.chart);
-        let syncing = false;
-        panes.forEach(({ chart }) => {
-          chart.timeScale().subscribeVisibleLogicalRangeChange((range) => {
-            if (!range || syncing) return;
-            syncing = true;
-            charts.forEach((c) => { if (c !== chart) c.timeScale().setVisibleLogicalRange(range); });
-            syncing = false;
-          });
-        });
-        let syncingC = false;
-        panes.forEach(({ chart }) => {
-          chart.subscribeCrosshairMove((param) => {
-            if (syncingC) return;
-            syncingC = true;
-            panes.forEach((p) => {
-              if (p.chart === chart) return;
-              if (param.time !== undefined && param.point) p.chart.setCrosshairPosition(0, param.time, p.series);
-              else p.chart.clearCrosshairPosition();
-            });
-            syncingC = false;
-          });
-        });
-        priceChart.timeScale().fitContent();
-      } catch {
-        if (!cancelled) setStatus('error');
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-      document.removeEventListener('keydown', onKey);
-      charts.forEach((c) => { try { c.remove(); } catch { /* yoksay */ } });
-    };
-  }, [item, indKey]);
-
-  const cur = item.currency || (item.kind === 'metal' ? 'USD' : 'TRY');
-  return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-head">
-          <div className="modal-title">
-            <span className="modal-ticker">{item.ticker} · {fmtNum(item.price)} {cur}</span>
-            <span className="modal-name">{item.name}{item.sector ? ` · ${item.sector}` : ''} · son 1 yıl (günlük)</span>
-          </div>
-          <button className="modal-close" onClick={onClose} aria-label="Kapat">✕</button>
-        </div>
-        <div className="modal-trade">
-          {vbe ? (
-            <>
-              <span className="modal-trade-price">{fmtNum(vbUnitPrice(item))} ₺/{vbUnitLabel(item)}</span>
-              <input
-                className="search-input" type="number" min="0" step="any"
-                placeholder={`miktar (${vbUnitLabel(item)})`}
-                value={tqty} onChange={(e) => setTqty(e.target.value)}
-              />
-              <button className="vb-buy" onClick={() => doTrade('buy')}>AL</button>
-              <button className="vb-sell" onClick={() => doTrade('sell')}>SAT</button>
-            </>
-          ) : (
-            <span className="muted-dash">Alım-satım için Sanal Borsa sekmesinden e-posta ile giriş yap.</span>
-          )}
-        </div>
-        {tmsg && <div className={`vb-msg ${tmsg.ok ? 'ok' : 'err'}`} style={{ margin: '0 14px' }}>{tmsg.m}</div>}
-        <div className="modal-ind">
-          {CHART_INDS.map((ind) => (
-            <button
-              key={ind.key}
-              className={`ind-chip ${inds[ind.key] ? 'active' : ''}`}
-              onClick={() => toggleInd(ind.key)}
-            >
-              {ind.label}
-            </button>
-          ))}
-        </div>
-        <div className="modal-chart">
-          <div className="chart-panes">
-            <div className="pane" style={{ flex: 3 }} ref={priceRef}>
-              <span className="pane-label">Fiyat{inds.volume ? ' · Hacim' : ''}{inds.supertrend ? ' · SuperTrend' : ''}</span>
-            </div>
-            {inds.wavetrend && <div className="pane" style={{ flex: 1.5 }} ref={wtRef}><span className="pane-label">WaveTrend (LazyBear)</span></div>}
-            {inds.stochrsi && <div className="pane" style={{ flex: 1.5 }} ref={stochRef}><span className="pane-label">Stoch RSI 14</span></div>}
-            {inds.macd && <div className="pane" style={{ flex: 1.5 }} ref={macdRef}><span className="pane-label">MACD 12/26/9</span></div>}
-          </div>
-          {status !== 'ok' && (
-            <div className="chart-state">
-              {status === 'loading' ? 'Grafik yükleniyor…' : 'Grafik verisi alınamadı.'}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Canlıda backend ayrı bir origin'de (Render). VITE_API_URL ile verilir.
-// Dev'de boş kalır → '/api...' Vite proxy üzerinden backend'e gider.
-const API_BASE = import.meta.env.VITE_API_URL || '';
 
 // Güncel fiyatları (/api/prices) mevcut veriye işler: fiyat + günlük değişim
 // (+ metal ₺/gram), AYNI ANDA hesaplanan teknik göstergeler ve canlı fiyattan
 // yeniden hesaplanan analist potansiyeli / momentum / puan / sinyal.
 // Analist hedefi ve temel veriler yayınlanan veriden gelir (3 saatte bir).
+// volRev her yanıtta yeni bir nesne olarak geldiği için referansla değil
+// değerle karşılaştırılır; yoksa formasyon hiç değişmese de satır "değişti"
+// sayılırdı.
+function sameVolRev(a, b) {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  return a.barsAgo === b.barsAgo && a.reds === b.reds && a.volRatio === b.volRatio
+    && a.volAvgRatio === b.volAvgRatio && a.gainPct === b.gainPct && a.dropPct === b.dropPct;
+}
+
+// next, it'in kopyası üzerine kurulduğu için anahtar kümesi it'i kapsar;
+// sayıları eşitse alan alan karşılaştırmak yeterli.
+function sameItem(it, next) {
+  const kn = Object.keys(next);
+  if (kn.length !== Object.keys(it).length) return false;
+  for (const k of kn) {
+    if (k === 'volRev') { if (!sameVolRev(it[k], next[k])) return false; continue; }
+    if (it[k] !== next[k]) return false;
+  }
+  return true;
+}
+
 function mergeLivePrices(data, live) {
   if (!live || !live.prices || !data || !data.items) return data;
   const signals = live.signals || {};
@@ -371,7 +45,6 @@ function mergeLivePrices(data, live) {
   const items = data.items.map((it) => {
     const p = live.prices[it.ticker];
     if (!p || p.price == null) return it;
-    changed = true;
     const next = { ...it, price: p.price };
     if (p.changePct != null) next.changePct = p.changePct;
     if (it.kind === 'metal' && it.usdTry) next.tryPerGram = Math.round((p.price / 31.1034768) * it.usdTry * 100) / 100;
@@ -400,9 +73,18 @@ function mergeLivePrices(data, live) {
       next.exp3m = sc.e3 ?? null;
       next.signalsLive = true;
     }
+    // Hiçbir alan oynamadıysa ESKİ nesneyi döndür. Satır bileşenleri memo'lu
+    // olduğu için aynı referans = o satır hiç yeniden render edilmez. Seans
+    // dışında hiçbir şey değişmediğinden data da aynı kalır ve React tüm
+    // güncellemeyi baştan iptal eder.
+    if (sameItem(it, next)) return it;
+    changed = true;
     return next;
   });
-  return changed ? { ...data, items, priceUpdatedAt: live.updatedAt } : data;
+  // Hiçbir kalem oynamadıysa ESKİ diziyi geri veriyoruz: "Fiyat: …" saati yine
+  // ilerler (anket çalışıyor, ekran donmuş görünmez) ama liste referansı
+  // değişmediği için süzme/sıralama useMemo'ları ve tüm satırlar atlanır.
+  return { ...data, items: changed ? items : data.items, priceUpdatedAt: live.updatedAt };
 }
 
 const SIGNAL_STYLES = {
@@ -410,48 +92,6 @@ const SIGNAL_STYLES = {
   TUT: { label: 'TUT', bg: '#665200', fg: '#fbbf24' },
   'İZLE': { label: 'İZLE', bg: '#3a3a3a', fg: '#cbd5e1' },
 };
-
-function fmtNum(x, digits = 2) {
-  if (x == null || Number.isNaN(x)) return '—';
-  const a = Math.abs(x);
-  const maxD = a > 0 && a < 1 ? (a >= 0.01 ? 4 : 8) : digits; // küçük fiyatlarda (kripto) daha çok ondalık
-  return Number(x).toLocaleString('tr-TR', {
-    minimumFractionDigits: Math.min(digits, maxD),
-    maximumFractionDigits: Math.max(digits, maxD),
-  });
-}
-function roundPrice(x) {
-  const a = Math.abs(x);
-  const d = a >= 1 ? 2 : a >= 0.01 ? 6 : 10;
-  const f = 10 ** d;
-  return Math.round(x * f) / f;
-}
-
-// Türkçe karakter duyarsız normalleştirme (arama için): "Şişecam" -> "sisecam".
-function norm(s) {
-  return (s || '')
-    .replace(/[İIı]/g, 'i')
-    .replace(/[Şş]/g, 's')
-    .replace(/[Ğğ]/g, 'g')
-    .replace(/[Üü]/g, 'u')
-    .replace(/[Öö]/g, 'o')
-    .replace(/[Çç]/g, 'c')
-    .toLowerCase();
-}
-
-function Pct({ value, strong }) {
-  if (value == null) return <span className="muted-dash">—</span>;
-  const up = value >= 0;
-  return (
-    <span style={{
-      color: up ? '#4ade80' : '#f87171',
-      fontVariantNumeric: 'tabular-nums',
-      fontWeight: strong ? 700 : 400,
-    }}>
-      {up ? '▲' : '▼'} %{fmtNum(Math.abs(value))}
-    </span>
-  );
-}
 
 // Analist beklentisine dayalı ileriye dönük getiri hücresi
 function Expected({ value, note }) {
@@ -515,6 +155,176 @@ function SignalBadge({ signal }) {
       {s.label}
     </span>
   );
+}
+
+// Tablo satırı ve mobil kart ayrı, memo'lu bileşenler. 619 kalemin fiyatı
+// 18 saniyede bir tazeleniyor ama tek tick'te hepsi birden oynamıyor;
+// mergeLivePrices değişmeyen kaleme ESKİ nesneyi geri verdiği için burada
+// referans karşılaştırması tutuyor ve o satır hiç yeniden render edilmiyor.
+// onSelect olarak setChartItem geçiliyor; useState kurucusunun kimliği sabit
+// olduğu için memo bozulmuyor (satır içi ok fonksiyonu geçilseydi bozulurdu).
+const StockRow = memo(function StockRow({ s, rank, showBuySell, showVolRev, onSelect }) {
+  return (
+    <tr>
+      <td className="rank">{rank}</td>
+      <td>
+        <button className="ticker ticker-link" onClick={() => onSelect(s)} title="Grafiği aç">
+          {s.ticker} <span className="chart-ico">📈</span>
+        </button>
+        <div className="name">{s.name}{s.sector ? ` · ${s.sector}` : ''}</div>
+      </td>
+      <td className="num">
+        {fmtNum(s.price)} <span className="cur">{s.currency || 'TRY'}</span>
+        {s.tryPerGram != null && (
+          <div className="exp-note">≈ {fmtNum(s.tryPerGram)} ₺/gr</div>
+        )}
+        {s.tryPrice != null && (
+          <div className="exp-note">≈ {fmtNum(s.tryPrice)} ₺</div>
+        )}
+      </td>
+      {showBuySell && (
+        <td className="num">
+          {s.buyPrice != null
+            ? <>{fmtNum(s.buyPrice)} <span className="cur">₺</span></>
+            : <span className="muted-dash">—</span>}
+        </td>
+      )}
+      {showBuySell && (
+        <td className="num">
+          {s.sellPrice != null
+            ? <>{fmtNum(s.sellPrice)} <span className="cur">₺</span></>
+            : <span className="muted-dash">—</span>}
+        </td>
+      )}
+      <td className="num"><Pct value={s.changePct} /></td>
+      {showVolRev && <td><VolRevCell v={s.volRev} /></td>}
+      <td className="num">
+        <Expected
+          value={s.upside12m}
+          note={s.upside12m != null
+            ? `${s.numAnalysts ?? '?'} analist · hedef ${fmtNum(s.targetMean)}₺`
+            : null}
+        />
+      </td>
+      <td><ScoreBar score={s.score} /></td>
+      <td><SignalBadge signal={s.signal} /></td>
+      <td><IndicatorBadge signal={s.wtSignal} /></td>
+      <td><IndicatorBadge signal={s.wtCrossSignal} /></td>
+      <td><IndicatorBadge signal={s.stSignal} /></td>
+    </tr>
+  );
+});
+
+const StockCard = memo(function StockCard({ s, rank, showVolRev, onSelect }) {
+  return (
+    <div className="card">
+      <div className="card-top">
+        <div className="card-id">
+          <span className="rank">{rank}</span>
+          <div>
+            <button className="ticker ticker-link" onClick={() => onSelect(s)} title="Grafiği aç">
+              {s.ticker} <span className="chart-ico">📈</span>
+            </button>
+            <div className="name">{s.name}{s.sector ? ` · ${s.sector}` : ''}</div>
+          </div>
+        </div>
+        <SignalBadge signal={s.signal} />
+      </div>
+
+      <div className="card-price">
+        <span className="card-price-val">
+          {fmtNum(s.price)} <span className="cur">{s.currency || 'TRY'}</span>
+        </span>
+        <Pct value={s.changePct} />
+      </div>
+      {s.tryPerGram != null && (
+        <div className="exp-note">≈ {fmtNum(s.tryPerGram)} ₺/gr</div>
+      )}
+      {s.tryPrice != null && (
+        <div className="exp-note">≈ {fmtNum(s.tryPrice)} ₺</div>
+      )}
+
+      {showVolRev && (
+        <div className="card-metrics">
+          <div className="metric">
+            <span className="metric-label">Hacim Dönüşü</span>
+            <VolRevCell v={s.volRev} />
+          </div>
+        </div>
+      )}
+
+      {s.kind === 'metal' && (
+        <div className="card-metrics">
+          <div className="metric">
+            <span className="metric-label">Alış</span>
+            <span>{s.buyPrice != null ? <>{fmtNum(s.buyPrice)} ₺</> : <span className="muted-dash">—</span>}</span>
+          </div>
+          <div className="metric">
+            <span className="metric-label">Satış</span>
+            <span>{s.sellPrice != null ? <>{fmtNum(s.sellPrice)} ₺</> : <span className="muted-dash">—</span>}</span>
+          </div>
+        </div>
+      )}
+
+      <div className="card-metrics">
+        <div className="metric">
+          <span className="metric-label">Hedef</span>
+          <Expected
+            value={s.upside12m}
+            note={s.upside12m != null
+              ? `${s.numAnalysts ?? '?'} analist · hedef ${fmtNum(s.targetMean)}₺`
+              : null}
+          />
+        </div>
+        <div className="metric">
+          <span className="metric-label">Puan</span>
+          <ScoreBar score={s.score} />
+        </div>
+      </div>
+
+      <div className="card-signals">
+        <div className="sig"><span className="metric-label">overzone</span><IndicatorBadge signal={s.wtSignal} /></div>
+        <div className="sig"><span className="metric-label">WaveTrend</span><IndicatorBadge signal={s.wtCrossSignal} /></div>
+        <div className="sig"><span className="metric-label">SuperTrend</span><IndicatorBadge signal={s.stSignal} /></div>
+      </div>
+    </div>
+  );
+});
+
+// Kademeli render: 619 kalemin hepsini birden basmak ~17.000 DOM düğümü demek
+// ve ilk boyamayı (özellikle telefonda) uzatıyor. Önce bir parti basılır,
+// listenin sonundaki nöbetçi öğe görünür olunca bir parti daha eklenir —
+// kullanıcı kaydırdıkça büyür. Sabit satır yüksekliği varsaymadığı için
+// klasik sanallaştırmanın zıplama/kaydırma sorunları yok.
+// Not: arama zaten TÜM kalemler üzerinde çalışıyor (data.items), yani
+// basılmamış satırlar arama sonuçlarından düşmez.
+const SAYFA = 120;
+
+function useKademeliListe(items, sifirlaAnahtari) {
+  const [n, setN] = useState(SAYFA);
+  const nobetciRef = useRef(null);
+  const hepsi = n >= items.length;
+
+  // Sekme/filtre/sıralama/arama değişince baştan başla.
+  useEffect(() => { setN(SAYFA); }, [sifirlaAnahtari]);
+
+  const dahaGoster = () => setN((mevcut) => Math.min(mevcut + SAYFA, items.length));
+
+  useEffect(() => {
+    const el = nobetciRef.current;
+    if (!el || hepsi) return;
+    // rootMargin: ekranın biraz altındakini de önceden bas, kaydırırken
+    // boşluk görünmesin.
+    const io = new IntersectionObserver((girisler) => {
+      if (girisler.some((g) => g.isIntersecting)) {
+        setN((mevcut) => Math.min(mevcut + SAYFA, items.length));
+      }
+    }, { rootMargin: '600px 0px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [n, items.length, hepsi]);
+
+  return { gorunen: hepsi ? items : items.slice(0, n), nobetciRef, hepsi, dahaGoster };
 }
 
 function ScoreBar({ score }) {
@@ -795,91 +605,6 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
   );
 }
 
-// Sanal borsa (paper trading): e-posta ile giriş, localStorage'da portföy.
-// Gerçek para/işlem yok; fiyatlar sitedeki verilerden. Cihaza özeldir.
-const VB_START = 100000; // başlangıç sanal bakiye (₺)
-const VB_OZ = 31.1034768;
-
-// --- Sanal borsa paylaşımlı yardımcıları (localStorage) ----------------------
-// Hem Sanal Borsa sekmesi hem grafik pop-up'ındaki AL/SAT aynı portföyü kullanır.
-function vbEmail() { try { return localStorage.getItem('vb_email') || ''; } catch { return ''; } }
-function vbLoad(email) {
-  if (!email) return null;
-  try { const raw = localStorage.getItem('vb_pf_' + email); return raw ? JSON.parse(raw) : { cash: VB_START, positions: {}, history: [] }; }
-  catch { return { cash: VB_START, positions: {}, history: [] }; }
-}
-function vbSave(email, pf) { try { localStorage.setItem('vb_pf_' + email, JSON.stringify(pf)); } catch { /* yoksay */ } }
-function vbUnitPrice(it) {
-  if (!it) return null;
-  if (it.kind === 'metal') return it.tryPerGram;
-  if (it.kind === 'crypto') return it.tryPrice;
-  return it.price;
-}
-function vbUnitLabel(it) { return it && it.kind === 'metal' ? 'gr' : 'adet'; }
-
-// Takip dışı bırakılan enstrümanlar (kripto). Sitede artık yoklar; sanal
-// portföyde kalırlarsa fiyatsız görünür ve satılamazlar. Portföy açılırken
-// MALİYET fiyatından tasfiye edilirler: kâr/zarar yaratmaz, para nakde döner.
-// (BIST ticker'larıyla çakışma yok — kontrol edildi.) Başka bir enstrüman
-// takipten çıkarsa ticker'ını buraya eklemek yeterli.
-const VB_RETIRED = new Set([
-  'BTC', 'ETH', 'USDT', 'BNB', 'USDC', 'XRP', 'SOL', 'TRX', 'WBT', 'HYPE', 'DOGE',
-  'USDS', 'RAIN', 'LEO', 'ZEC', 'XMR', 'XLM', 'ADA', 'CC', 'DAI', 'BCH', 'USD1', 'GRAM',
-  'USDE', 'LTC', 'USDG', 'HBAR', 'SHIB', 'SUI', 'AVAX', 'CRO', 'PYUSD', 'BUIDL', 'XAUT',
-  'UNI', 'NEAR', 'USDY', 'ONDO', 'TAO', 'PAXG', 'OKB', 'WLFI', 'ASTER', 'HTX', 'RLUSD',
-  'AAVE', 'USDD', 'USDF', 'DOT', 'MNT', 'SKY', 'BFUSD', 'WLD', 'MORPHO', 'BEAT', 'PEPE',
-  'ICP', 'BGB', 'USDGO', 'ETC', 'STABLE', 'KCS', 'QNT', 'PI', 'ENA', 'JST', 'POL',
-  'KAS', 'RENDER', 'ALGO', 'NEXO', 'ATOM', 'GT', 'BDX', 'GHO', 'VVV', 'JUP', 'FIL',
-  'YLDS', 'LIT', 'XDC', 'FLR', 'USD0', 'ARB', 'APT', 'USX', 'TUSD', 'INJ',
-]);
-
-// Portföydeki takip dışı pozisyonları maliyet fiyatından tasfiye eder.
-// Değişiklik yoksa portföyü olduğu gibi (aynı nesneyle) döner.
-function vbCleanRetired(pf) {
-  const hit = Object.entries(pf.positions || {}).filter(([t]) => VB_RETIRED.has(t));
-  if (hit.length === 0) return { pf, note: null };
-  const positions = { ...pf.positions };
-  const time = new Date().toISOString();
-  const entries = [];
-  let cash = pf.cash;
-  for (const [t, p] of hit) {
-    delete positions[t];
-    cash += p.qty * p.avgCost;
-    entries.push({ time, ticker: t, side: 'SAT', qty: p.qty, price: p.avgCost });
-  }
-  const refund = cash - pf.cash;
-  return {
-    pf: { ...pf, cash, positions, history: [...entries, ...(pf.history || [])].slice(0, 100) },
-    note: `${hit.length} kripto pozisyonu (${hit.map(([t]) => t).join(', ')}) artık takip edilmediği için `
-      + `maliyet fiyatından tasfiye edildi; ${fmtNum(refund)} ₺ nakde geçti.`,
-  };
-}
-function vbTrade(email, item, side, qtyRaw) {
-  const pf = vbLoad(email);
-  if (!pf) return { ok: false, msg: 'Önce Sanal Borsa sekmesinden e-posta ile giriş yap.' };
-  const price = vbUnitPrice(item);
-  const n = Number(qtyRaw);
-  if (!item || price == null) return { ok: false, msg: 'Fiyat bulunamadı.' };
-  if (!(n > 0)) return { ok: false, msg: 'Geçerli miktar gir.' };
-  const cost = n * price;
-  const t = item.ticker;
-  const pos = pf.positions[t] || { qty: 0, avgCost: 0 };
-  let next;
-  if (side === 'buy') {
-    if (cost > pf.cash + 1e-6) return { ok: false, msg: 'Yetersiz bakiye.' };
-    const nq = pos.qty + n;
-    next = { ...pf, cash: pf.cash - cost, positions: { ...pf.positions, [t]: { qty: nq, avgCost: (pos.qty * pos.avgCost + cost) / nq } }, history: [{ time: new Date().toISOString(), ticker: t, side: 'AL', qty: n, price }, ...pf.history].slice(0, 100) };
-  } else {
-    if (n > pos.qty + 1e-6) return { ok: false, msg: 'Elinde yeterli miktar yok.' };
-    const nq = pos.qty - n;
-    const positions = { ...pf.positions };
-    if (nq <= 1e-6) delete positions[t]; else positions[t] = { qty: nq, avgCost: pos.avgCost };
-    next = { ...pf, cash: pf.cash + cost, positions, history: [{ time: new Date().toISOString(), ticker: t, side: 'SAT', qty: n, price }, ...pf.history].slice(0, 100) };
-  }
-  vbSave(email, next);
-  return { ok: true, msg: `${fmtNum(n)} ${vbUnitLabel(item)} ${t} ${side === 'buy' ? 'alındı' : 'satıldı'}.`, pf: next };
-}
-
 function VirtualTrade({ items, onSelect }) {
   const [email, setEmail] = useState(() => { try { return localStorage.getItem('vb_email') || ''; } catch { return ''; } });
   const [emailInput, setEmailInput] = useState('');
@@ -1069,6 +794,27 @@ export default function App() {
     catch { return 'web'; }
   });
 
+  // İlk boyama için statik tohum: build anındaki data/recommendations.json,
+  // Vercel'in CDN'inden (~50 ms) gelir. Render uykudaysa /api/recommendations
+  // 30-60 sn sürebiliyor; tablo o süre boyunca boş kalmasın diye tohumla
+  // basılır. Gerçek yanıt gelir gelmez üstüne yazılır — bu yüzden tohum
+  // YALNIZCA elde henüz veri yokken uygulanır (setData içindeki kontrol).
+  async function loadSeed() {
+    try {
+      const r = await fetch(`${import.meta.env.BASE_URL}seed.json`);
+      if (!r.ok) return; // tohum üretilmemişse (ör. dev) sessizce geç
+      const json = await r.json();
+      if (!json?.items?.length) return;
+      let used = false;
+      setData((prev) => {
+        if (prev.items.length) return prev; // gerçek veri önce geldi
+        used = true;
+        return { ...json, source: 'seed' };
+      });
+      if (used) setLoading(false);
+    } catch { /* yoksay — API yüklemesi zaten sürüyor */ }
+  }
+
   async function load() {
     try {
       setError(null);
@@ -1113,6 +859,7 @@ export default function App() {
   // İlk yükleme + kendini yenileme: her 5 dakikada bir ve sekmeye geri dönünce
   // arka planda sessizce yeniden çeker (spinner göstermeden).
   useEffect(() => {
+    loadSeed(); // CDN'den anlık tohum; load() ile yarışır, geç kalan kaybeder
     load();
     // Sayfa arka plandayken (başka sekme/uygulama) çekim yapılmaz: kullanıcı
     // görmüyor, ama sunucu her seferinde ~700 enstrümanın göstergesini
@@ -1223,6 +970,17 @@ export default function App() {
   // Hacim dönüşü sütunu yalnızca kendi sekmesinde.
   const showVolRev = tab === 'vol' && !searching;
 
+  // Grafik pop-up'ındaki kalemin canlı karşılığı (fiyat/değişim tazelendikçe
+  // pop-up da tazelensin). data.items içinde yoksa açılış kopyası kullanılır.
+  const chartLive = useMemo(
+    () => (chartItem ? data.items.find((i) => i.ticker === chartItem.ticker) || chartItem : null),
+    [chartItem, data.items],
+  );
+
+  // Listeyi partiler hâlinde bas; sekme/filtre/sıralama/arama/görünüm
+  // değişince baştan başla.
+  const { gorunen, nobetciRef, hepsi, dahaGoster } = useKademeliListe(items, `${tab}|${filter}|${sort}|${query}|${view}`);
+
   useEffect(() => { try { localStorage.setItem('viewMode', view); } catch { /* yoksay */ } }, [view]);
   useEffect(() => { try { localStorage.setItem('sortMode', sort); } catch { /* yoksay */ } }, [sort]);
 
@@ -1239,7 +997,7 @@ export default function App() {
               : isNews
               ? 'Piyasa, kıymetli maden ve analist önerisi haberleri'
               : <>Analist hedef fiyatı + temel verilere dayalı beklenen getiri · {searching ? `“${query.trim()}” için ${items.length} sonuç` : `${inTab.length} kayıt`}
-                {data.source && <> · kaynak: {data.source === 'postgres' ? 'PostgreSQL' : 'bellek'}</>}</>}
+                {data.source && <> · kaynak: {data.source === 'postgres' ? 'PostgreSQL' : data.source === 'seed' ? 'CDN önbelleği (güncelleniyor…)' : 'bellek'}</>}</>}
           </p>
         </div>
         <div className="header-actions">
@@ -1449,135 +1207,44 @@ export default function App() {
               </tr>
             </thead>
             <tbody>
-              {items.map((s, i) => (
-                <tr key={s.ticker}>
-                  <td className="rank">{i + 1}</td>
-                  <td>
-                    <button className="ticker ticker-link" onClick={() => setChartItem(s)} title="Grafiği aç">
-                      {s.ticker} <span className="chart-ico">📈</span>
-                    </button>
-                    <div className="name">{s.name}{s.sector ? ` · ${s.sector}` : ''}</div>
-                  </td>
-                  <td className="num">
-                    {fmtNum(s.price)} <span className="cur">{s.currency || 'TRY'}</span>
-                    {s.tryPerGram != null && (
-                      <div className="exp-note">≈ {fmtNum(s.tryPerGram)} ₺/gr</div>
-                    )}
-                    {s.tryPrice != null && (
-                      <div className="exp-note">≈ {fmtNum(s.tryPrice)} ₺</div>
-                    )}
-                  </td>
-                  {showBuySell && (
-                    <td className="num">
-                      {s.buyPrice != null
-                        ? <>{fmtNum(s.buyPrice)} <span className="cur">₺</span></>
-                        : <span className="muted-dash">—</span>}
-                    </td>
-                  )}
-                  {showBuySell && (
-                    <td className="num">
-                      {s.sellPrice != null
-                        ? <>{fmtNum(s.sellPrice)} <span className="cur">₺</span></>
-                        : <span className="muted-dash">—</span>}
-                    </td>
-                  )}
-                  <td className="num"><Pct value={s.changePct} /></td>
-                  {showVolRev && <td><VolRevCell v={s.volRev} /></td>}
-                  <td className="num">
-                    <Expected
-                      value={s.upside12m}
-                      note={s.upside12m != null
-                        ? `${s.numAnalysts ?? '?'} analist · hedef ${fmtNum(s.targetMean)}₺`
-                        : null}
-                    />
-                  </td>
-                  <td><ScoreBar score={s.score} /></td>
-                  <td><SignalBadge signal={s.signal} /></td>
-                  <td><IndicatorBadge signal={s.wtSignal} /></td>
-                  <td><IndicatorBadge signal={s.wtCrossSignal} /></td>
-                  <td><IndicatorBadge signal={s.stSignal} /></td>
-                </tr>
+              {gorunen.map((s, i) => (
+                <StockRow
+                  key={s.ticker}
+                  s={s}
+                  rank={i + 1}
+                  showBuySell={showBuySell}
+                  showVolRev={showVolRev}
+                  onSelect={setChartItem}
+                />
               ))}
             </tbody>
           </table>
+          {!hepsi && (
+            <button className="liste-nobetci" ref={nobetciRef} onClick={dahaGoster}>
+              +{Math.min(SAYFA, items.length - gorunen.length)} kayıt daha göster
+              <span className="nobetci-kalan"> · kalan {items.length - gorunen.length}</span>
+            </button>
+          )}
         </div>
       )}
 
       {items.length > 0 && view === 'mobile' && (
         <div className="cards">
-          {items.map((s, i) => (
-            <div className="card" key={s.ticker}>
-              <div className="card-top">
-                <div className="card-id">
-                  <span className="rank">{i + 1}</span>
-                  <div>
-                    <button className="ticker ticker-link" onClick={() => setChartItem(s)} title="Grafiği aç">
-                      {s.ticker} <span className="chart-ico">📈</span>
-                    </button>
-                    <div className="name">{s.name}{s.sector ? ` · ${s.sector}` : ''}</div>
-                  </div>
-                </div>
-                <SignalBadge signal={s.signal} />
-              </div>
-
-              <div className="card-price">
-                <span className="card-price-val">
-                  {fmtNum(s.price)} <span className="cur">{s.currency || 'TRY'}</span>
-                </span>
-                <Pct value={s.changePct} />
-              </div>
-              {s.tryPerGram != null && (
-                <div className="exp-note">≈ {fmtNum(s.tryPerGram)} ₺/gr</div>
-              )}
-              {s.tryPrice != null && (
-                <div className="exp-note">≈ {fmtNum(s.tryPrice)} ₺</div>
-              )}
-
-              {showVolRev && (
-                <div className="card-metrics">
-                  <div className="metric">
-                    <span className="metric-label">Hacim Dönüşü</span>
-                    <VolRevCell v={s.volRev} />
-                  </div>
-                </div>
-              )}
-
-              {s.kind === 'metal' && (
-                <div className="card-metrics">
-                  <div className="metric">
-                    <span className="metric-label">Alış</span>
-                    <span>{s.buyPrice != null ? <>{fmtNum(s.buyPrice)} ₺</> : <span className="muted-dash">—</span>}</span>
-                  </div>
-                  <div className="metric">
-                    <span className="metric-label">Satış</span>
-                    <span>{s.sellPrice != null ? <>{fmtNum(s.sellPrice)} ₺</> : <span className="muted-dash">—</span>}</span>
-                  </div>
-                </div>
-              )}
-
-              <div className="card-metrics">
-                <div className="metric">
-                  <span className="metric-label">Hedef</span>
-                  <Expected
-                    value={s.upside12m}
-                    note={s.upside12m != null
-                      ? `${s.numAnalysts ?? '?'} analist · hedef ${fmtNum(s.targetMean)}₺`
-                      : null}
-                  />
-                </div>
-                <div className="metric">
-                  <span className="metric-label">Puan</span>
-                  <ScoreBar score={s.score} />
-                </div>
-              </div>
-
-              <div className="card-signals">
-                <div className="sig"><span className="metric-label">overzone</span><IndicatorBadge signal={s.wtSignal} /></div>
-                <div className="sig"><span className="metric-label">WaveTrend</span><IndicatorBadge signal={s.wtCrossSignal} /></div>
-                <div className="sig"><span className="metric-label">SuperTrend</span><IndicatorBadge signal={s.stSignal} /></div>
-              </div>
-            </div>
+          {gorunen.map((s, i) => (
+            <StockCard
+              key={s.ticker}
+              s={s}
+              rank={i + 1}
+              showVolRev={showVolRev}
+              onSelect={setChartItem}
+            />
           ))}
+          {!hepsi && (
+            <button className="liste-nobetci" ref={nobetciRef} onClick={dahaGoster}>
+              +{Math.min(SAYFA, items.length - gorunen.length)} kayıt daha göster
+              <span className="nobetci-kalan"> · kalan {items.length - gorunen.length}</span>
+            </button>
+          )}
         </div>
       )}
       </>
@@ -1618,7 +1285,18 @@ export default function App() {
         </p>
       </footer>
 
-      {chartItem && <ChartModal item={chartItem} onClose={() => setChartItem(null)} />}
+      {/* Grafik yığını (lightweight-charts) ilk tıklamada indirilir; inerken
+          pop-up boş açılmasın diye aynı kılıkta bir bekleme katmanı gösterilir. */}
+      {/* chartItem tıklama anındaki nesnenin kopyası; fiyat tazelendikçe
+          bayatlar. Pop-up canlı fiyatı, günlük değişimi ve kâr/zararı
+          gösterdiği (ve o fiyattan işlem yaptığı) için güncel kaleme
+          çözümlüyoruz. Kalem listeden düşerse (süzme değişti) elimizdeki
+          kopyayla devam. */}
+      {chartLive && (
+        <Suspense fallback={<div className="modal-overlay"><div className="chart-state">Grafik yükleniyor…</div></div>}>
+          <ChartModal item={chartLive} onClose={() => setChartItem(null)} />
+        </Suspense>
+      )}
     </div>
   );
 }
