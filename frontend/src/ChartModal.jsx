@@ -341,26 +341,45 @@ export default function ChartModal({ item, onClose }) {
           <button className="modal-close" onClick={onClose} aria-label="Kapat">✕</button>
         </div>
 
-        {poz && (
+        {/* Şerit giriş yapılmışsa HER ZAMAN görünür. Pozisyon yokken gizlemek,
+            "K/Z neden yok?" sorusunu cevapsız bırakıyordu: eksik özellikle
+            hatasız-ama-boş durum ayırt edilemiyordu. */}
+        {vbe && (
           <div className="modal-pos">
-            <div className="modal-pos-kalem">
-              <span className="metric-label">Pozisyonum</span>
-              <span>{fmtNum(poz.qty)} {birimAdi} · maliyet {fmtNum(poz.avgCost)} ₺</span>
-            </div>
-            {bugunKZ != null && (
-              <div className="modal-pos-kalem">
-                <span className="metric-label">Bugün</span>
-                <span><Tutar value={bugunKZ} /> <Pct value={item.changePct} /></span>
+            {poz ? (
+              <>
+                <div className="modal-pos-kalem">
+                  <span className="metric-label">Pozisyonum</span>
+                  <span>{fmtNum(poz.qty)} {birimAdi} · maliyet {fmtNum(poz.avgCost)} ₺</span>
+                </div>
+                <div className="modal-pos-kalem">
+                  <span className="metric-label">Bugün</span>
+                  {bugunKZ != null
+                    ? <span><Tutar value={bugunKZ} /> <Pct value={item.changePct} /></span>
+                    : (
+                      <span
+                        className="muted-dash"
+                        title="Günlük yüzde USD/ons değişimi; ₺/gram fiyatı ayrıca döviz kurundan etkilendiği için günlük kâr/zarar hesaplanmıyor."
+                      >
+                        — kur etkisi nedeniyle yok
+                      </span>
+                    )}
+                </div>
+                <div className="modal-pos-kalem">
+                  <span className="metric-label">Toplam K/Z</span>
+                  <span><Tutar value={toplamKZ} /> <Pct value={toplamKZPct} /></span>
+                </div>
+                <div className="modal-pos-kalem">
+                  <span className="metric-label">Değeri</span>
+                  <span>{fmtNum(poz.qty * birim)} ₺</span>
+                </div>
+              </>
+            ) : (
+              <div className="modal-pos-bos">
+                Bu enstrümanda pozisyonun yok. <strong>AL</strong> ile açtığında
+                bugünkü ve toplam kâr/zararın burada görünür.
               </div>
             )}
-            <div className="modal-pos-kalem">
-              <span className="metric-label">Toplam K/Z</span>
-              <span><Tutar value={toplamKZ} /> <Pct value={toplamKZPct} /></span>
-            </div>
-            <div className="modal-pos-kalem">
-              <span className="metric-label">Değeri</span>
-              <span>{fmtNum(poz.qty * birim)} ₺</span>
-            </div>
           </div>
         )}
 
