@@ -43,7 +43,7 @@ export async function computeRecommendations() {
 
   // USD fiyatlı enstrümanlar (kıymetli maden, kripto) için TCMB USD/TRY + altin.in.
   const hasMetal = INSTRUMENTS.some((i) => i.kind === 'metal');
-  const hasUsd = INSTRUMENTS.some((i) => i.kind === 'metal' || i.kind === 'crypto');
+  const hasUsd = INSTRUMENTS.some((i) => i.kind === 'metal' || i.kind === 'crypto' || i.kind === 'emtia');
   const [usdTry, altinIn] = hasUsd
     ? await Promise.all([fetchUsdTryRate(), hasMetal ? fetchAltinInPrices() : Promise.resolve({})])
     : [null, {}];
@@ -72,10 +72,12 @@ export async function computeRecommendations() {
         item.sellPrice = ai.sell ?? null;
       }
     }
-    if (kind === 'crypto' && item.price != null && usdTry) {
-      // Kripto fiyatı USD -> TRY karşılığı (sanal borsa/₺ gösterim için).
+    if ((kind === 'crypto' || kind === 'emtia') && item.price != null && usdTry) {
+      // USD fiyatının doğrudan ₺ karşılığı (sanal borsa ve ₺ gösterimi için).
+      // Emtiada birim çevrimi YOK: Brent varil başına, dolayısıyla ₺/varil.
       item.tryPrice = roundPrice(item.price * usdTry);
       item.usdTry = usdTry;
+      if (meta.unit) item.unit = meta.unit;
     }
     return item;
   });

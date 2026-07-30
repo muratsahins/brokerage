@@ -136,6 +136,22 @@ da korunur ve React tüm güncellemeyi atlar (yalnızca "Fiyat: …" saati ilerl
 `backend/src/stocks.js` içinde ~30 BIST hissesi (BIST-30 ağırlıklı) tanımlı.
 Yeni hisse eklemek için listeye bir satır eklemek yeterli.
 
+Aynı dosyada iki liste daha var, ikisi de **Kıymetli Maden** sekmesinde görünür:
+
+| Liste | `kind` | Birim | ₺ karşılığı |
+|-------|--------|-------|-------------|
+| `METALS` (altın, gümüş, platin, paladyum) | `metal` | troy ons → **gram** | `tryPerGram` = USD/ons ÷ 31,1035 × kur |
+| `COMMODITIES` (Brent petrol) | `emtia` | kendi birimi (**varil**) | `tryPrice` = USD × kur |
+
+Emtia ayrı bir `kind`: maden mantığı fiyatı troy onsa bölüp ₺/gram üretiyor,
+varil başına fiyatlanan Brent'te bu anlamsız olurdu. Sanal borsada işlem birimi
+`unit` alanından gelir (Brent'te "varil"). Yeni bir emtia eklemek için
+`COMMODITIES`'e Yahoo sembolü ve birimiyle bir satır yazmak yeterli.
+
+Maden ve emtiada **günlük kâr/zarar hesaplanmaz**: günlük yüzde USD fiyatın
+değişimidir, ₺ karşılığı ise ayrıca döviz kurundan etkilenir; ikisini çarpmak
+yanlış sayı üretirdi. Analist kapsamları olmadığı için puanları 60 ile sınırlıdır.
+
 ## Sonraki adımlar (fikirler)
 - Daha zengin göstergeler (RSI, hareketli ortalama kesişimleri, hacim)
 - Temel veriler (F/K, PD/DD) ile değer + momentum harmanı

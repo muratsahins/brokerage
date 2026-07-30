@@ -359,7 +359,7 @@ export default function ChartModal({ item, onClose }) {
                     : (
                       <span
                         className="muted-dash"
-                        title="Günlük yüzde USD/ons değişimi; ₺/gram fiyatı ayrıca döviz kurundan etkilendiği için günlük kâr/zarar hesaplanmıyor."
+                        title="Günlük yüzde USD fiyatın değişimi; ₺ karşılığı ayrıca döviz kurundan etkilendiği için günlük kâr/zarar hesaplanmıyor."
                       >
                         — kur etkisi nedeniyle yok
                       </span>

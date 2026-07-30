@@ -16,10 +16,16 @@ export function vbSave(email, pf) { try { localStorage.setItem('vb_pf_' + email,
 export function vbUnitPrice(it) {
   if (!it) return null;
   if (it.kind === 'metal') return it.tryPerGram;
-  if (it.kind === 'crypto') return it.tryPrice;
+  if (it.kind === 'crypto' || it.kind === 'emtia') return it.tryPrice;
   return it.price;
 }
-export function vbUnitLabel(it) { return it && it.kind === 'metal' ? 'gr' : 'adet'; }
+// İşlem birimi: madende gram, emtiada kendi birimi (Brent = varil), hissede adet.
+export function vbUnitLabel(it) {
+  if (!it) return 'adet';
+  if (it.kind === 'metal') return 'gr';
+  if (it.kind === 'emtia') return it.unit || 'birim';
+  return 'adet';
+}
 
 // Takip dışı bırakılan enstrümanlar (kripto). Sitede artık yoklar; sanal
 // portföyde kalırlarsa fiyatsız görünür ve satılamazlar. Portföy açılırken

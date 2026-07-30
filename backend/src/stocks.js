@@ -130,6 +130,14 @@ export const METALS = [
   { ticker: 'XPD', name: 'Paladyum', symbol: 'PA=F', currency: 'USD', altinInName: null },
 ];
 
+// Emtia: kıymetli madenler gibi USD fiyatlı, ama TROY ONS değil kendi birimi
+// üzerinden (Brent = varil). Bu yüzden ayrı bir `kind`: metal mantığı fiyatı
+// 31,1035'e bölüp ₺/gram üretiyor, varilde bu anlamsız olurdu. Arayüzde
+// Kıymetli Maden sekmesinde birlikte listelenirler.
+export const COMMODITIES = [
+  { ticker: 'BRENT', name: 'Brent Petrol', symbol: 'BZ=F', currency: 'USD', unit: 'varil' },
+];
+
 // Fiyat/gösterge çekimi için birleşik enstrüman listesi. Her enstrümanın açık
 // Yahoo `symbol`'ü, `currency`'si ve `kind`'i (stock/metal) vardır.
 // KRİPTO KAPALI: sitede hiç görünmemesi istendi. Geri açmak için aşağıdaki
@@ -138,6 +146,7 @@ export const INSTRUMENTS = [
   ...BIST_STOCKS.map((s) => ({ ...s, symbol: `${s.ticker}.IS`, currency: 'TRY', kind: 'stock' })),
   ...OTHER_STOCKS.map((s) => ({ ...s, symbol: `${s.ticker}.IS`, currency: 'TRY', bist: null, kind: 'stock' })),
   ...METALS.map((m) => ({ ...m, sector: 'Kıymetli Maden', bist: null, kind: 'metal' })),
+  ...COMMODITIES.map((c) => ({ ...c, sector: 'Emtia', bist: null, kind: 'emtia' })),
   // ...CRYPTOS.map((c) => ({ ...c, sector: 'Kripto', bist: null, currency: 'USD', kind: 'crypto' })),
 ];
 

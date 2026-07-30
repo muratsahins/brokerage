@@ -48,7 +48,7 @@ function mergeLivePrices(data, live) {
     const next = { ...it, price: p.price };
     if (p.changePct != null) next.changePct = p.changePct;
     if (it.kind === 'metal' && it.usdTry) next.tryPerGram = Math.round((p.price / 31.1034768) * it.usdTry * 100) / 100;
-    if (it.kind === 'crypto' && it.usdTry) next.tryPrice = roundPrice(p.price * it.usdTry);
+    if ((it.kind === 'crypto' || it.kind === 'emtia') && it.usdTry) next.tryPrice = roundPrice(p.price * it.usdTry);
     // Göstergeler: backend bar geçmişi + canlı fiyattan yeniden hesapladıysa
     // yayınlanan (3 saatte bir) değerlerin üstüne yazılır. Sinyal yoksa alan
     // boştur — bu da "artık sinyal yok" demektir, o yüzden temizlenir.
@@ -718,13 +718,13 @@ function VirtualTrade({ items, onSelect }) {
               <>
                 <span className="vb-gunluk"><Tutar value={gunlukToplam} /> <Pct value={gunlukPct} /></span>
                 {gunlukDisi > 0 && (
-                  <span className="exp-note" title="Kıymetli madende günlük yüzde USD/ons değişimidir; ₺/gram ayrıca kurdan etkilendiği için hesaba katılmıyor.">
-                    {gunlukDisi} maden pozisyonu hariç
+                  <span className="exp-note" title="Maden ve emtiada günlük yüzde USD fiyatın değişimidir; ₺ karşılığı ayrıca döviz kurundan etkilendiği için hesaba katılmıyor.">
+                    {gunlukDisi} USD fiyatlı pozisyon hariç
                   </span>
                 )}
               </>
             ) : (
-              <span className="muted-dash" title="Yalnızca kıymetli maden pozisyonu var; günlük K/Z kur etkisi nedeniyle hesaplanmıyor.">—</span>
+              <span className="muted-dash" title="Yalnızca USD fiyatlı (maden/emtia) pozisyon var; günlük K/Z kur etkisi nedeniyle hesaplanmıyor.">—</span>
             )}
           </div>
         )}
@@ -926,7 +926,9 @@ export default function App() {
     { key: 'bist30',  label: 'BIST 30',        match: (i) => i.bist != null && i.bist <= 30 },
     { key: 'bist50',  label: 'BIST 50',        match: (i) => i.bist != null && i.bist <= 50 },
     { key: 'bist100', label: 'BIST 100',       match: (i) => i.bist != null && i.bist <= 100 },
-    { key: 'metal',   label: 'Kıymetli Maden', match: (i) => i.kind === 'metal' },
+    // Emtia (Brent) da bu sekmede listelenir: ikisi de USD fiyatlı, analist
+    // kapsamı olmayan, BIST dışı enstrümanlar.
+    { key: 'metal',   label: 'Kıymetli Maden', match: (i) => i.kind === 'metal' || i.kind === 'emtia' },
     // Kripto kaldırıldı (backend'de de takip listesi dışında — stocks.js).
   ];
   // Üst şerit: haberler + UYARI (yeni sinyal taraması; KAP'ın yerini aldı).
@@ -954,7 +956,9 @@ export default function App() {
   const VOL_TAB = {
     key: 'vol',
     label: '📊 Hacim Dönüşü',
-    match: (i) => i.kind !== 'metal' && i.volRev != null,
+    // Yalnızca hisseler: maden ve emtiada hacim verisi bu formasyon için
+    // güvenilir değil (önceki davranışla aynı, emtia da kapsam dışı).
+    match: (i) => i.kind === 'stock' && i.volRev != null,
   };
   const TRADE_TAB = { key: 'trade', label: '💼 Sanal Borsa' };
   const activeTab = [...TABS, FAV_TAB, SMC_TAB, VOL_TAB, TRADE_TAB, ...NEWS_TABS].find((t) => t.key === tab) ?? TABS[0];
