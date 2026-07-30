@@ -920,7 +920,7 @@ export default function App() {
     };
   }, []);
 
-  // Sekmeler: BIST 30/50/100 iç içe (30⊂50⊂100) + ayrı Kıymetli Maden sekmesi.
+  // Sekmeler: BIST 30/50/100 iç içe (30⊂50⊂100) + ayrı Maden & Emtia sekmesi.
   const TABS = [
     { key: 'all',     label: 'BIST',           match: (i) => i.kind === 'stock' },
     { key: 'bist30',  label: 'BIST 30',        match: (i) => i.bist != null && i.bist <= 30 },
@@ -928,7 +928,7 @@ export default function App() {
     { key: 'bist100', label: 'BIST 100',       match: (i) => i.bist != null && i.bist <= 100 },
     // Emtia (Brent) da bu sekmede listelenir: ikisi de USD fiyatlı, analist
     // kapsamı olmayan, BIST dışı enstrümanlar.
-    { key: 'metal',   label: 'Kıymetli Maden', match: (i) => i.kind === 'metal' || i.kind === 'emtia' },
+    { key: 'metal',   label: 'Maden & Emtia', match: (i) => i.kind === 'metal' || i.kind === 'emtia' },
     // Kripto kaldırıldı (backend'de de takip listesi dışında — stocks.js).
   ];
   // Üst şerit: haberler + UYARI (yeni sinyal taraması; KAP'ın yerini aldı).

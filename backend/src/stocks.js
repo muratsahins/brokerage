@@ -133,7 +133,7 @@ export const METALS = [
 // Emtia: kıymetli madenler gibi USD fiyatlı, ama TROY ONS değil kendi birimi
 // üzerinden (Brent = varil). Bu yüzden ayrı bir `kind`: metal mantığı fiyatı
 // 31,1035'e bölüp ₺/gram üretiyor, varilde bu anlamsız olurdu. Arayüzde
-// Kıymetli Maden sekmesinde birlikte listelenirler.
+// Maden & Emtia sekmesinde birlikte listelenirler.
 export const COMMODITIES = [
   { ticker: 'BRENT', name: 'Brent Petrol', symbol: 'BZ=F', currency: 'USD', unit: 'varil' },
 ];

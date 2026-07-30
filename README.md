@@ -136,7 +136,7 @@ da korunur ve React tüm güncellemeyi atlar (yalnızca "Fiyat: …" saati ilerl
 `backend/src/stocks.js` içinde ~30 BIST hissesi (BIST-30 ağırlıklı) tanımlı.
 Yeni hisse eklemek için listeye bir satır eklemek yeterli.
 
-Aynı dosyada iki liste daha var, ikisi de **Kıymetli Maden** sekmesinde görünür:
+Aynı dosyada iki liste daha var, ikisi de **Maden & Emtia** sekmesinde görünür:
 
 | Liste | `kind` | Birim | ₺ karşılığı |
 |-------|--------|-------|-------------|
