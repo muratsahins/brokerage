@@ -1,5 +1,7 @@
 import { BIST_STOCKS, INSTRUMENTS, toSymbol } from './stocks.js';
-import { fetchQuotes, fetchUsdTryRate, fetchAltinInPrices } from './dataSource.js';
+import {
+  fetchQuotes, fetchUsdTryRate, fetchAltinInPrices, fetchSpotMetals, metalTryPerGram,
+} from './dataSource.js';
 import { buildRecommendations, roundPrice } from './recommend.js';
 import {
   isDbAvailable,
@@ -44,9 +46,13 @@ export async function computeRecommendations() {
   // USD fiyatlı enstrümanlar (kıymetli maden, kripto) için TCMB USD/TRY + altin.in.
   const hasMetal = INSTRUMENTS.some((i) => i.kind === 'metal');
   const hasUsd = INSTRUMENTS.some((i) => i.kind === 'metal' || i.kind === 'crypto' || i.kind === 'emtia');
-  const [usdTry, altinIn] = hasUsd
-    ? await Promise.all([fetchUsdTryRate(), hasMetal ? fetchAltinInPrices() : Promise.resolve({})])
-    : [null, {}];
+  const [usdTry, altinIn, spot] = hasUsd
+    ? await Promise.all([
+      fetchUsdTryRate(),
+      hasMetal ? fetchAltinInPrices() : Promise.resolve({}),
+      hasMetal ? fetchSpotMetals() : Promise.resolve({}),
+    ])
+    : [null, {}, {}];
 
   return recos.map((r) => {
     const meta = byTicker.get(r.ticker) ?? { name: r.ticker, sector: null, bist: null, kind: 'stock' };
@@ -60,17 +66,26 @@ export async function computeRecommendations() {
       kind,
     };
     if (kind === 'metal') {
-      // Metal fiyatı USD/ons -> TRY/gram karşılığı.
-      if (item.price != null && usdTry) {
-        item.tryPerGram = Math.round((item.price / TROY_OUNCE_G) * usdTry * 100) / 100;
-        item.usdTry = usdTry;
-      }
       // altin.in alış/satış (o metal orada varsa).
       const ai = meta.altinInName ? altinIn[meta.altinInName] : null;
       if (ai) {
         item.buyPrice = ai.buy ?? null;
         item.sellPrice = ai.sell ?? null;
       }
+      // ₺/gram: Türkiye fiyatına en yakın kaynaktan (zincir dataSource'ta).
+      // Yahoo fiyatı VADELİ kontrat olduğu için doğrudan çevirmek %1,67
+      // sapıyordu; altin.in gerçek gram fiyatını veriyor.
+      const { value, source } = metalTryPerGram({
+        altinInEntry: ai,
+        spotUsd: spot[r.ticker],
+        futuresUsd: item.price,
+        usdTry,
+      });
+      if (value != null) {
+        item.tryPerGram = value;
+        item.tryPerGramSource = source;
+      }
+      if (usdTry) item.usdTry = usdTry;
     }
     if ((kind === 'crypto' || kind === 'emtia') && item.price != null && usdTry) {
       // USD fiyatının doğrudan ₺ karşılığı (sanal borsa ve ₺ gösterimi için).

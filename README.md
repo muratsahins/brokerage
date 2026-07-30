@@ -140,8 +140,37 @@ Aynı dosyada iki liste daha var, ikisi de **Maden & Emtia** sekmesinde görün�
 
 | Liste | `kind` | Birim | ₺ karşılığı |
 |-------|--------|-------|-------------|
-| `METALS` (altın, gümüş, platin, paladyum) | `metal` | troy ons → **gram** | `tryPerGram` = USD/ons ÷ 31,1035 × kur |
+| `METALS` (altın, gümüş, platin, paladyum) | `metal` | troy ons → **gram** | `tryPerGram` (aşağıdaki zincir) |
 | `COMMODITIES` (Brent petrol) | `emtia` | kendi birimi (**varil**) | `tryPrice` = USD × kur |
+
+### ₺/gram nereden geliyor
+
+Yahoo'nun ons fiyatı **vadeli kontrat** (`GC=F` = Gold Aug 26 gibi); spottan
+~%1,4 yüksek işlem görüyor. Doğrudan çevirince Türkiye'deki gram fiyatından
+sapıyordu. `metalTryPerGram()` (dataSource.js) en yakından başlayan bir zincir
+uygular — sapmalar altin.in gram altın ortasına göre ölçüldü:
+
+| Öncelik | Kaynak | Sapma |
+|---------|--------|-------|
+| 1 | **altin.in** alış/satış ortası — Türkiye piyasa fiyatının kendisi | %0,00 |
+| 2 | **spot ons** (`api.gold-api.com`) × TCMB kuru | +%0,24 |
+| 3 | vadeli ons × TCMB kuru (eski davranış, son çare) | +%1,67 |
+
+Serbest piyasa kuru da denendi, **daha kötü** çıktı (+%0,44): sapmanın neredeyse
+tamamı vadeli–spot farkından geliyor, kurdan değil. Paladyum altin.in'de
+yayınlanmadığı için 2. basamağa düşer; bu basamağın doğruluğu platinle
+çapraz doğrulandı (spot × kur = 2.530,42 ₺ · altin.in = 2.531,61 ₺ → %0,05).
+
+Zincir **hem yayınlanan veride hem canlı tazelemede** uygulanır: `/api/prices`
+yanıtı `metals` alanıyla ₺/gram, alış ve satışı taşır, yoksa istemci değeri
+vadeli USD fiyattan yeniden türetip üstüne yazardı. Kaynaklar önbellekli
+(altin.in ve spot 60 sn, TCMB 30 dk). Arayüzde ₺/gram değerinin üstüne
+gelince hangi basamaktan geldiği yazar.
+
+Bu değişiklik **gösterge hattına dokunmaz**: grafik, overzone, WaveTrend ve
+SuperTrend hâlâ Yahoo'nun USD barlarından hesaplanır. ₺/gram ayrı bir gösterim
+alanı olduğu için Brent'teki gibi sinyal bozulması riski yok. Sanal borsada
+işlem fiyatı da ₺/gram olduğundan artık gerçek piyasa fiyatından alıp satarsın.
 
 Emtia ayrı bir `kind`: maden mantığı fiyatı troy onsa bölüp ₺/gram üretiyor,
 varil başına fiyatlanan Brent'te bu anlamsız olurdu. Sanal borsada işlem birimi

@@ -41,13 +41,27 @@ function mergeLivePrices(data, live) {
   if (!live || !live.prices || !data || !data.items) return data;
   const signals = live.signals || {};
   const scores = live.scores || {};
+  const metals = live.metals || {};
   let changed = false;
   const items = data.items.map((it) => {
     const p = live.prices[it.ticker];
     if (!p || p.price == null) return it;
     const next = { ...it, price: p.price };
     if (p.changePct != null) next.changePct = p.changePct;
-    if (it.kind === 'metal' && it.usdTry) next.tryPerGram = Math.round((p.price / 31.1034768) * it.usdTry * 100) / 100;
+    // Madenlerde ₺/gram artık sunucudan geliyor (Türkiye gram fiyatı ->
+    // spot x kur -> vadeli x kur zinciri). Sunucu veremezse eski davranışa
+    // düşülür: vadeli USD fiyatın kurla çevrimi.
+    if (it.kind === 'metal') {
+      const mt = metals[it.ticker];
+      if (mt) {
+        next.tryPerGram = mt.g;
+        next.tryPerGramSource = mt.k;
+        if (mt.a != null) next.buyPrice = mt.a;
+        if (mt.s != null) next.sellPrice = mt.s;
+      } else if (it.usdTry) {
+        next.tryPerGram = Math.round((p.price / 31.1034768) * it.usdTry * 100) / 100;
+      }
+    }
     if ((it.kind === 'crypto' || it.kind === 'emtia') && it.usdTry) next.tryPrice = roundPrice(p.price * it.usdTry);
     // Göstergeler: backend bar geçmişi + canlı fiyattan yeniden hesapladıysa
     // yayınlanan (3 saatte bir) değerlerin üstüne yazılır. Sinyal yoksa alan
@@ -86,6 +100,15 @@ function mergeLivePrices(data, live) {
   // değişmediği için süzme/sıralama useMemo'ları ve tüm satırlar atlanır.
   return { ...data, items: changed ? items : data.items, priceUpdatedAt: live.updatedAt };
 }
+
+// ₺/gram hangi kaynaktan geldi? Yahoo'nun ons fiyatı VADELİ kontrat olduğu için
+// doğrudan çevirmek Türkiye gram fiyatından ~%1,7 sapıyor; zincir en yakından
+// başlar. Fare ile üstüne gelince kaynağı görünür.
+const GRAM_KAYNAK = {
+  'altin.in': 'altin.in gram fiyatı (alış-satış ortası) — Türkiye piyasa fiyatı',
+  spot: 'Spot ons fiyatı × TCMB döviz satış kuru (~%0,2 sapma)',
+  vadeli: 'Vadeli ons fiyatı × TCMB döviz satış kuru — yaklaşık (~%1,7 sapma)',
+};
 
 const SIGNAL_STYLES = {
   AL: { label: 'AL', bg: '#0f5132', fg: '#4ade80' },
@@ -176,7 +199,7 @@ const StockRow = memo(function StockRow({ s, rank, showBuySell, showVolRev, onSe
       <td className="num">
         {fmtNum(s.price)} <span className="cur">{s.currency || 'TRY'}</span>
         {s.tryPerGram != null && (
-          <div className="exp-note">≈ {fmtNum(s.tryPerGram)} ₺/gr</div>
+          <div className="exp-note" title={GRAM_KAYNAK[s.tryPerGramSource]}>≈ {fmtNum(s.tryPerGram)} ₺/gr</div>
         )}
         {s.tryPrice != null && (
           <div className="exp-note">≈ {fmtNum(s.tryPrice)} ₺</div>
@@ -238,7 +261,7 @@ const StockCard = memo(function StockCard({ s, rank, showVolRev, onSelect }) {
         <Pct value={s.changePct} />
       </div>
       {s.tryPerGram != null && (
-        <div className="exp-note">≈ {fmtNum(s.tryPerGram)} ₺/gr</div>
+        <div className="exp-note" title={GRAM_KAYNAK[s.tryPerGramSource]}>≈ {fmtNum(s.tryPerGram)} ₺/gr</div>
       )}
       {s.tryPrice != null && (
         <div className="exp-note">≈ {fmtNum(s.tryPrice)} ₺</div>

@@ -9,7 +9,10 @@
 // gün içi yüksek/düşüğü önbellek tazeliği kadar gecikir).
 
 import { INSTRUMENTS } from './stocks.js';
-import { fetchBars, fetchLivePrices, fetchLiveBars, peekLivePrices, peekLiveBars } from './dataSource.js';
+import {
+  fetchBars, fetchLivePrices, fetchLiveBars, peekLivePrices, peekLiveBars,
+  fetchAltinInPrices, fetchSpotMetals, fetchUsdTryRate, metalTryPerGram,
+} from './dataSource.js';
 import {
   supertrendSignal, wavetrendSignals, smcBullish, volumeReversal,
 } from './indicators.js';
@@ -196,6 +199,36 @@ export function computeLiveScores(items, prices) {
   return out;
 }
 
+// Madenlerin ₺/gram ve alış/satış değerleri. Yayınlanan veri 3 saatte bir
+// tazelendiği için bunlar canlı yolda da hesaplanır — yoksa istemci ₺/gram'ı
+// vadeli USD fiyattan yeniden türetip altin.in değerinin üstüne yazardı.
+// Kaynaklar kendi içinde önbellekli (altin.in ve spot 60 sn, TCMB 30 dk).
+async function metalTryMap(prices) {
+  const metals = INSTRUMENTS.filter((i) => i.kind === 'metal');
+  if (!metals.length) return {};
+  const [altinIn, spot, usdTry] = await Promise.all([
+    fetchAltinInPrices().catch(() => ({})),
+    fetchSpotMetals().catch(() => ({})),
+    fetchUsdTryRate().catch(() => null),
+  ]);
+  const out = {};
+  for (const m of metals) {
+    const ai = m.altinInName ? altinIn[m.altinInName] : null;
+    const { value, source } = metalTryPerGram({
+      altinInEntry: ai,
+      spotUsd: spot[m.ticker],
+      futuresUsd: prices[m.ticker]?.price,
+      usdTry,
+    });
+    if (value == null) continue;
+    const o = { g: value, k: source };        // g = ₺/gram, k = kaynak
+    if (ai?.buy != null) o.a = ai.buy;        // a = alış
+    if (ai?.sell != null) o.s = ai.sell;      // s = satış
+    out[m.ticker] = o;
+  }
+  return out;
+}
+
 // /api/prices yanıtı: fiyat + aynı andaki gösterge sinyalleri + puan/hedef.
 // fetchLivePrices zaten ~15 sn önbellekli; hesaplar da aynı ana bağlanır.
 let sigCache = { key: null, signals: {}, scores: {} };
@@ -216,5 +249,8 @@ export async function getLivePrices(items = []) {
     const ms = Date.now() - t0;
     if (ms > 500) console.log(`[live] ${Object.keys(sigCache.signals).length} enstrüman ${ms} ms'de hesaplandı.`);
   }
-  return { ...live, signals: sigCache.signals, scores: sigCache.scores };
+  // Maden ₺ değerleri fiyat çekiminden bağımsız önbellekli; hata verirse
+  // alan boş kalır ve istemci eski davranışa (USD × kur) düşer.
+  const metals = await metalTryMap(live.prices).catch(() => ({}));
+  return { ...live, signals: sigCache.signals, scores: sigCache.scores, metals };
 }

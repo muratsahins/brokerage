@@ -268,7 +268,13 @@ async function refreshLiveBars() {
 
 // --- TCMB USD/TRY kuru ------------------------------------------------------
 // Kıymetli madenlerin (USD/ons) TRY/gram karşılığı için güncel döviz satış kuru.
+// TCMB kuru iş günü başına bir kez yayınlanır; canlı fiyat yolu bunu 15-18
+// saniyede bir isteyeceği için önbelleklenir.
+let usdTryCache = { at: 0, rate: null };
+const USD_TRY_TTL_MS = 30 * 60 * 1000;
+
 export async function fetchUsdTryRate() {
+  if (usdTryCache.rate != null && Date.now() - usdTryCache.at < USD_TRY_TTL_MS) return usdTryCache.rate;
   try {
     const res = await fetch('https://www.tcmb.gov.tr/kurlar/today.xml', {
       headers: { 'User-Agent': UA },
@@ -279,17 +285,68 @@ export async function fetchUsdTryRate() {
     const m = block?.[0].match(/<ForexSelling>([\d.]+)<\/ForexSelling>/);
     const rate = m ? parseFloat(m[1]) : NaN;
     if (!Number.isFinite(rate) || rate <= 0) throw new Error('geçersiz kur');
+    usdTryCache = { at: Date.now(), rate };
     return rate;
   } catch (err) {
     console.warn(`[data] TCMB USD/TRY alınamadı: ${err.message}`);
-    return null;
+    return usdTryCache.rate; // elde eski kur varsa onunla devam
   }
+}
+
+// --- Spot metal fiyatları (api.gold-api.com) --------------------------------
+// Yahoo'daki GC=F/SI=F/PL=F/PA=F VADELİ kontratlar; ons fiyatı spottan ~%1,4
+// yüksek (contango). Türkiye'deki gram fiyatına yaklaşmak için spot gerekiyor.
+// Ücretsiz, anahtarsız, ~200 baytlık JSON döner.
+let spotCache = { at: 0, data: {} };
+const SPOT_TTL_MS = 60 * 1000;
+const SPOT_SYMBOLS = ['XAU', 'XAG', 'XPT', 'XPD'];
+
+export async function fetchSpotMetals() {
+  if (Date.now() - spotCache.at < SPOT_TTL_MS && Object.keys(spotCache.data).length) return spotCache.data;
+  const out = {};
+  await Promise.all(SPOT_SYMBOLS.map(async (s) => {
+    try {
+      const res = await fetch(`https://api.gold-api.com/price/${s}`, {
+        headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(8000),
+      });
+      if (!res.ok) return;
+      const j = await res.json();
+      if (Number.isFinite(j?.price) && j.price > 0) out[s] = j.price;
+    } catch { /* bu metali atla; zincirde bir alt kaynağa düşer */ }
+  }));
+  if (Object.keys(out).length) spotCache = { at: Date.now(), data: out };
+  return Object.keys(out).length ? out : spotCache.data;
+}
+
+const TROY_OUNCE_G = 31.1034768;
+
+// ₺/gram öncelik zinciri. Ölçüldü (altin.in gram altın ortasına sapma):
+//   1) altin.in alış/satış ortası — Türkiye'deki gerçek gram fiyatı   %0,00
+//   2) spot ons × TCMB kuru                                          +%0,24
+//   3) vadeli ons × TCMB kuru (eski davranış, son çare)              +%1,67
+// Serbest piyasa kuru denendi ve DAHA KÖTÜ çıktı (+%0,44): sapmanın neredeyse
+// tamamı vadeli-spot farkından geliyor, kurdan değil.
+export function metalTryPerGram({ altinInEntry, spotUsd, futuresUsd, usdTry }) {
+  const r2 = (x) => Math.round(x * 100) / 100;
+  if (altinInEntry?.buy != null && altinInEntry?.sell != null) {
+    return { value: r2((altinInEntry.buy + altinInEntry.sell) / 2), source: 'altin.in' };
+  }
+  if (spotUsd != null && usdTry) return { value: r2((spotUsd / TROY_OUNCE_G) * usdTry), source: 'spot' };
+  if (futuresUsd != null && usdTry) return { value: r2((futuresUsd / TROY_OUNCE_G) * usdTry), source: 'vadeli' };
+  return { value: null, source: null };
 }
 
 // --- altin.in alış/satış fiyatları ------------------------------------------
 // Sayfa Windows-1254 (Türkçe) kodlu HTML döndürür. Her metal için alış/satış
 // değerlerini { "Gram Altın": {buy, sell}, ... } biçiminde döner.
+// 112 KB'lık sayfa; canlı fiyat yolu bunu 15-18 saniyede bir isteyeceği için
+// önbelleklenir. Çekim başarısız olursa elde eski veri varsa o kullanılır —
+// böylece geçici bir hata ₺/gram'ı zincirin alt basamağına düşürmez.
+let altinInCache = { at: 0, data: null };
+const ALTIN_IN_TTL_MS = 60 * 1000;
+
 export async function fetchAltinInPrices() {
+  if (altinInCache.data && Date.now() - altinInCache.at < ALTIN_IN_TTL_MS) return altinInCache.data;
   try {
     const res = await fetch('https://altin.in/', { headers: { 'User-Agent': UA } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -304,10 +361,11 @@ export async function fetchAltinInPrices() {
       if (!Number.isFinite(val)) continue;
       (out[name] ??= {})[m[1] === 'alis' ? 'buy' : 'sell'] = Math.round(val * 100) / 100;
     }
+    if (Object.keys(out).length) altinInCache = { at: Date.now(), data: out };
     return out;
   } catch (err) {
     console.warn(`[data] altin.in fiyatları alınamadı: ${err.message}`);
-    return {};
+    return altinInCache.data ?? {};
   }
 }
 
