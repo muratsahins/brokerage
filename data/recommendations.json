@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-02T13:40:04.638Z",
+  "updatedAt": "2026-08-02T16:08:22.272Z",
   "source": "github-actions",
   "count": 624,
   "withAnalyst": 108,
@@ -7954,7 +7954,7 @@
         "barsAgo": 0,
         "reds": 5,
         "volRatio": 1.65,
-        "volAvgRatio": 1.55,
+        "volAvgRatio": 1.56,
         "gainPct": 5.36,
         "dropPct": -9.64
       },
@@ -8544,8 +8544,8 @@
       "volRev": {
         "barsAgo": 0,
         "reds": 5,
-        "volRatio": 1.03,
-        "volAvgRatio": 0.77,
+        "volRatio": 1.05,
+        "volAvgRatio": 0.78,
         "gainPct": 2.86,
         "dropPct": -5.06
       },
@@ -19490,8 +19490,8 @@
       "ticker": "BARMA",
       "price": 25.08,
       "currency": "TRY",
-      "changePct": 0,
-      "momentum1m": -62.65,
+      "changePct": -9.98,
+      "momentum1m": -62.26,
       "pos52w": 0.109,
       "exp1m": null,
       "exp3m": null,
@@ -19505,8 +19505,8 @@
       "revenueGrowth": 231.1,
       "score": 0,
       "signal": "İZLE",
-      "wtSignal": "AL",
-      "wtCrossSignal": "AL",
+      "wtSignal": "SAT",
+      "wtCrossSignal": "SAT",
       "stSignal": "SAT",
       "rsi": 10.2,
       "macdBull": false,
