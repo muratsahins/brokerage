@@ -320,16 +320,22 @@ export async function fetchSpotMetals() {
 
 const TROY_OUNCE_G = 31.1034768;
 
-// ₺/gram öncelik zinciri. Ölçüldü (altin.in gram altın ortasına sapma):
-//   1) altin.in alış/satış ortası — Türkiye'deki gerçek gram fiyatı   %0,00
-//   2) spot ons × TCMB kuru                                          +%0,24
-//   3) vadeli ons × TCMB kuru (eski davranış, son çare)              +%1,67
-// Serbest piyasa kuru denendi ve DAHA KÖTÜ çıktı (+%0,44): sapmanın neredeyse
-// tamamı vadeli-spot farkından geliyor, kurdan değil.
+// ₺/gram öncelik zinciri. Ölçüldü (Türkiye'de manşet gösterilen gram altın
+// fiyatına sapma):
+//   1) altin.in SATIŞ — sitelerin "gram altın" diye gösterdiği sayı    %0,00
+//   2) spot ons × TCMB kuru                                          −%0,20
+//   3) vadeli ons × TCMB kuru (en eski davranış, son çare)           +%1,23
+// Serbest piyasa kuru denendi ve daha kötü çıktı; sapmanın neredeyse tamamı
+// vadeli-spot farkından geliyor, kurdan değil.
+//
+// Neden ORTA değil SATIŞ: alış/satış ortası daha "adil" görünüyordu ama
+// Türkiye'de gram altın fiyatı diye gösterilen sayı satış tarafı — doviz.com
+// 6.206,88 ile altin.in satış 6.206,94 birebir örtüşüyor, orta ise %0,43 altta
+// kalıyordu. Alış zaten kendi sütununda duruyor.
 export function metalTryPerGram({ altinInEntry, spotUsd, futuresUsd, usdTry }) {
   const r2 = (x) => Math.round(x * 100) / 100;
-  if (altinInEntry?.buy != null && altinInEntry?.sell != null) {
-    return { value: r2((altinInEntry.buy + altinInEntry.sell) / 2), source: 'altin.in' };
+  if (altinInEntry?.sell != null) {
+    return { value: r2(altinInEntry.sell), source: 'altin.in' };
   }
   if (spotUsd != null && usdTry) return { value: r2((spotUsd / TROY_OUNCE_G) * usdTry), source: 'spot' };
   if (futuresUsd != null && usdTry) return { value: r2((futuresUsd / TROY_OUNCE_G) * usdTry), source: 'vadeli' };

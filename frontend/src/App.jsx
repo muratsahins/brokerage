@@ -105,9 +105,9 @@ function mergeLivePrices(data, live) {
 // doğrudan çevirmek Türkiye gram fiyatından ~%1,7 sapıyor; zincir en yakından
 // başlar. Fare ile üstüne gelince kaynağı görünür.
 const GRAM_KAYNAK = {
-  'altin.in': 'altin.in gram fiyatı (alış-satış ortası) — Türkiye piyasa fiyatı',
+  'altin.in': 'altin.in satış fiyatı — Türkiye’de gösterilen gram fiyatının kendisi',
   spot: 'Spot ons fiyatı × TCMB döviz satış kuru (~%0,2 sapma)',
-  vadeli: 'Vadeli ons fiyatı × TCMB döviz satış kuru — yaklaşık (~%1,7 sapma)',
+  vadeli: 'Vadeli ons fiyatı × TCMB döviz satış kuru — yaklaşık (~%1,2 sapma)',
 };
 
 const SIGNAL_STYLES = {

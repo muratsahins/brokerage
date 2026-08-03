@@ -152,14 +152,19 @@ uygular — sapmalar altin.in gram altın ortasına göre ölçüldü:
 
 | Öncelik | Kaynak | Sapma |
 |---------|--------|-------|
-| 1 | **altin.in** alış/satış ortası — Türkiye piyasa fiyatının kendisi | %0,00 |
-| 2 | **spot ons** (`api.gold-api.com`) × TCMB kuru | +%0,24 |
-| 3 | vadeli ons × TCMB kuru (eski davranış, son çare) | +%1,67 |
+| 1 | **altin.in SATIŞ** — sitelerin "gram altın" diye gösterdiği sayı | %0,00 |
+| 2 | **spot ons** (`api.gold-api.com`) × TCMB kuru | −%0,20 |
+| 3 | vadeli ons × TCMB kuru (en eski davranış, son çare) | +%1,23 |
 
 Serbest piyasa kuru da denendi, **daha kötü** çıktı (+%0,44): sapmanın neredeyse
 tamamı vadeli–spot farkından geliyor, kurdan değil. Paladyum altin.in'de
 yayınlanmadığı için 2. basamağa düşer; bu basamağın doğruluğu platinle
-çapraz doğrulandı (spot × kur = 2.530,42 ₺ · altin.in = 2.531,61 ₺ → %0,05).
+çapraz doğrulandı (spot × kur = 2.523,75 ₺ · altin.in satış = 2.524,61 ₺ → %0,03).
+
+**Neden orta değil satış:** alış/satış ortası daha adil görünüyordu ama
+Türkiye'de "gram altın fiyatı" diye gösterilen sayı satış tarafı — doviz.com
+6.206,88 ile altin.in satış 6.206,94 birebir örtüşürken, orta %0,43 altta
+kalıyordu. Alış zaten kendi sütununda duruyor.
 
 Zincir **hem yayınlanan veride hem canlı tazelemede** uygulanır: `/api/prices`
 yanıtı `metals` alanıyla ₺/gram, alış ve satışı taşır, yoksa istemci değeri
