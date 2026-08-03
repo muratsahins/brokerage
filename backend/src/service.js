@@ -66,6 +66,26 @@ export async function computeRecommendations() {
       kind,
     };
     if (kind === 'metal') {
+      // ONS fiyatı SPOT'tan. Yahoo'daki GC=F/SI=F/PL=F/PA=F vadeli kontrat;
+      // spottan ~%1,4 yüksek ve kontrat yuvarlandıkça (Aug 26 -> Dec 26)
+      // sıçrıyor. Her kaynağın "altın ons fiyatı" diye gösterdiği sayı spot.
+      // Günlük değişim yüzdesi vadeliden kalır (spot ucu geçmiş vermiyor;
+      // iki serinin günlük yüzdesi yakın seyreder).
+      if (spot[r.ticker] != null) item.price = spot[r.ticker];
+
+      // Grafik ve göstergeler madenlerde YOK: elimizdeki bar geçmişi vadeli
+      // kontrata ait, gösterilen fiyat ise spot — ikisini karıştırmak sahte
+      // sinyal üretirdi. Yayınlanan veride de boş bırakılır.
+      item.wtSignal = null;
+      item.wtCrossSignal = null;
+      item.stSignal = null;
+      item.smc = false;
+      item.volRev = null;
+      item.rsi = null;
+      item.macdBull = false;
+      item.macdCross = false;
+      item.rsiReversal = false;
+
       // altin.in alış/satış (o metal orada varsa).
       const ai = meta.altinInName ? altinIn[meta.altinInName] : null;
       if (ai) {

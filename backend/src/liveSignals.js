@@ -9,6 +9,7 @@
 // gün içi yüksek/düşüğü önbellek tazeliği kadar gecikir).
 
 import { INSTRUMENTS } from './stocks.js';
+
 import {
   fetchBars, fetchLivePrices, fetchLiveBars, peekLivePrices, peekLiveBars,
   fetchAltinInPrices, fetchSpotMetals, fetchUsdTryRate, metalTryPerGram,
@@ -34,8 +35,12 @@ const round = (x, d = 2) => (x == null ? null : Math.round(x * 10 ** d) / 10 ** 
 const cache = new Map();
 let filling = false;
 
+// total: madenler hariç — onların bar geçmişi bilerek tutulmuyor, sayıya
+// katılırsa önbellek hiçbir zaman "tam" görünmezdi.
+const SERIES_TOTAL = INSTRUMENTS.filter((i) => i.kind !== 'metal').length;
+
 export function seriesStats() {
-  return { cached: cache.size, total: INSTRUMENTS.length, filling };
+  return { cached: cache.size, total: SERIES_TOTAL, filling };
 }
 
 // Eksik/bayat bar geçmişlerini arka planda (sırayla, nazikçe) tazeler.
@@ -44,7 +49,12 @@ export async function refreshSeries() {
   filling = true;
   let ok = 0, fail = 0, skip = 0;
   try {
-    for (const inst of INSTRUMENTS) {
+    // Kıymetli madenlerde grafik ve gösterge yok: fiyatları SPOT'tan geliyor,
+    // Yahoo'da ise yalnızca VADELİ kontratın barları var (spottan ~%1,4 yüksek
+    // ve kontrat yuvarlandıkça sıçruyor). İki farklı seriyi karıştırmamak için
+    // bar geçmişi hiç tutulmuyor — bu aynı zamanda göstergeleri ve UYARI
+    // taramasını da madenler için kendiliğinden devre dışı bırakır.
+    for (const inst of INSTRUMENTS.filter((i) => i.kind !== 'metal')) {
       const cur = cache.get(inst.ticker);
       if (cur && Date.now() - cur.at < TTL_MS) { skip++; continue; }
       try {
@@ -252,5 +262,18 @@ export async function getLivePrices(items = []) {
   // Maden ₺ değerleri fiyat çekiminden bağımsız önbellekli; hata verirse
   // alan boş kalır ve istemci eski davranışa (USD × kur) düşer.
   const metals = await metalTryMap(live.prices).catch(() => ({}));
-  return { ...live, signals: sigCache.signals, scores: sigCache.scores, metals };
+
+  // Madenlerin ONS fiyatı Yahoo'nun vadeli kontratından değil SPOT'tan gelir
+  // (vadeli spottan ~%1,4 yüksek ve kontrat yuvarlandıkça sıçrıyor; her
+  // kaynağın gösterdiği sayı spot). Günlük değişim yüzdesi vadeliden kalır:
+  // spot ucu geçmiş vermiyor, iki serinin günlük yüzdesi ise yakın seyrediyor.
+  const prices = { ...live.prices };
+  const spot = await fetchSpotMetals().catch(() => ({}));
+  for (const inst of INSTRUMENTS) {
+    if (inst.kind !== 'metal') continue;
+    const s = spot[inst.ticker];
+    if (s != null && prices[inst.ticker]) prices[inst.ticker] = { ...prices[inst.ticker], price: s };
+  }
+
+  return { ...live, prices, signals: sigCache.signals, scores: sigCache.scores, metals };
 }

@@ -134,6 +134,12 @@ function Expected({ value, note }) {
   );
 }
 
+// Madenlerde gösterge YOK: bar geçmişi vadeli kontrata ait, gösterilen fiyat
+// ise spot. Yayınlanan veride eski sinyaller kalmış olabileceği için (canlı yol
+// artık maden sinyali göndermiyor, dolayısıyla üstüne yazamıyor) okuma burada
+// süzülür — böylece bir sonraki veri turu beklenmeden temiz görünür.
+const sig = (s, alan) => (s.kind === 'metal' ? null : s[alan]);
+
 // WaveTrend / Supertrend gibi teknik göstergelerin AL/SAT sinyali
 function IndicatorBadge({ signal }) {
   if (!signal) return <span className="muted-dash">—</span>;
@@ -191,9 +197,15 @@ const StockRow = memo(function StockRow({ s, rank, showBuySell, showVolRev, onSe
     <tr>
       <td className="rank">{rank}</td>
       <td>
-        <button className="ticker ticker-link" onClick={() => onSelect(s)} title="Grafiği aç">
-          {s.ticker} <span className="chart-ico">📈</span>
-        </button>
+        {/* Madenlerde grafik yok: bar geçmişi vadeli kontrata ait, gösterilen
+            fiyat ise spot. Bağlantı da verilmiyor ki boş grafik açılmasın. */}
+        {s.kind === 'metal' ? (
+          <span className="ticker">{s.ticker}</span>
+        ) : (
+          <button className="ticker ticker-link" onClick={() => onSelect(s)} title="Grafiği aç">
+            {s.ticker} <span className="chart-ico">📈</span>
+          </button>
+        )}
         <div className="name">{s.name}{s.sector ? ` · ${s.sector}` : ''}</div>
       </td>
       <td className="num">
@@ -231,9 +243,9 @@ const StockRow = memo(function StockRow({ s, rank, showBuySell, showVolRev, onSe
       </td>
       <td><ScoreBar score={s.score} /></td>
       <td><SignalBadge signal={s.signal} /></td>
-      <td><IndicatorBadge signal={s.wtSignal} /></td>
-      <td><IndicatorBadge signal={s.wtCrossSignal} /></td>
-      <td><IndicatorBadge signal={s.stSignal} /></td>
+      <td><IndicatorBadge signal={sig(s, 'wtSignal')} /></td>
+      <td><IndicatorBadge signal={sig(s, 'wtCrossSignal')} /></td>
+      <td><IndicatorBadge signal={sig(s, 'stSignal')} /></td>
     </tr>
   );
 });
@@ -245,9 +257,13 @@ const StockCard = memo(function StockCard({ s, rank, showVolRev, onSelect }) {
         <div className="card-id">
           <span className="rank">{rank}</span>
           <div>
-            <button className="ticker ticker-link" onClick={() => onSelect(s)} title="Grafiği aç">
-              {s.ticker} <span className="chart-ico">📈</span>
-            </button>
+            {s.kind === 'metal' ? (
+              <span className="ticker">{s.ticker}</span>
+            ) : (
+              <button className="ticker ticker-link" onClick={() => onSelect(s)} title="Grafiği aç">
+                {s.ticker} <span className="chart-ico">📈</span>
+              </button>
+            )}
             <div className="name">{s.name}{s.sector ? ` · ${s.sector}` : ''}</div>
           </div>
         </div>
@@ -306,9 +322,9 @@ const StockCard = memo(function StockCard({ s, rank, showVolRev, onSelect }) {
       </div>
 
       <div className="card-signals">
-        <div className="sig"><span className="metric-label">overzone</span><IndicatorBadge signal={s.wtSignal} /></div>
-        <div className="sig"><span className="metric-label">WaveTrend</span><IndicatorBadge signal={s.wtCrossSignal} /></div>
-        <div className="sig"><span className="metric-label">SuperTrend</span><IndicatorBadge signal={s.stSignal} /></div>
+        <div className="sig"><span className="metric-label">overzone</span><IndicatorBadge signal={sig(s, 'wtSignal')} /></div>
+        <div className="sig"><span className="metric-label">WaveTrend</span><IndicatorBadge signal={sig(s, 'wtCrossSignal')} /></div>
+        <div className="sig"><span className="metric-label">SuperTrend</span><IndicatorBadge signal={sig(s, 'stSignal')} /></div>
       </div>
     </div>
   );
@@ -791,7 +807,7 @@ function VirtualTrade({ items, onSelect }) {
                   {/* Hisse başlığı grafiği açar; satırın kalanı işlem için seçer.
                       Tıklama yukarı da yayılır, yani grafik açılırken pozisyon
                       alım-satım formunda da seçili olur. */}
-                  {p.it ? (
+                  {p.it && p.it.kind !== 'metal' ? (
                     <button
                       className="ticker ticker-link"
                       onClick={() => onSelect?.(p.it)}

@@ -143,6 +143,28 @@ Aynı dosyada iki liste daha var, ikisi de **Maden & Emtia** sekmesinde görün�
 | `METALS` (altın, gümüş, platin, paladyum) | `metal` | troy ons → **gram** | `tryPerGram` (aşağıdaki zincir) |
 | `COMMODITIES` (Brent petrol) | `emtia` | kendi birimi (**varil**) | `tryPrice` = USD × kur |
 
+### Madenlerde ons fiyatı ve grafik
+
+Ons fiyatı **spot**tan gelir (`api.gold-api.com`). Yahoo'daki `GC=F`/`SI=F`/
+`PL=F`/`PA=F` **vadeli kontrat**: spottan ~%1,4 yüksek işlem görüyor ve Yahoo
+kontratı yuvarladıkça (Aug 26 → Dec 26) gösterilen fiyat sıçrıyor. Her kaynağın
+"altın ons fiyatı" diye gösterdiği sayı spot.
+
+Bunun bedeli olarak **madenlerde grafik ve göstergeler yok**: elimizdeki tek
+geçmiş bar serisi vadeli kontrata ait, gösterilen fiyat ise spot. İkisini
+birleştirmek — son barı spot fiyatla yamalamak — serinin ucunda ~%1,4'lük sahte
+bir sıçrama yaratır ve WaveTrend/SuperTrend'de gerçek olmayan AL/SAT sinyalleri
+üretirdi. Ücretsiz, geçmiş barlı bir spot kaynağı aranıp bulunamadı (Yahoo'da
+spot sembolü yok; gold-api ve Swissquote yalnızca anlık veriyor).
+
+Bu yüzden madenlerde: bar geçmişi tutulmaz (`refreshSeries` atlar), gösterge
+hesaplanmaz, tabloda hisse kodu grafik bağlantısı vermez, gösterge sütunları
+boştur. **Brent bundan etkilenmez** — onun fiyatı da grafiği de Yahoo'nun aynı
+vadeli serisinden geldiği için kendi içinde tutarlı.
+
+Günlük değişim yüzdesi madenlerde vadeli seriden kalır: spot ucu geçmiş
+vermiyor, iki serinin günlük yüzdesi ise yakın seyrediyor.
+
 ### ₺/gram nereden geliyor
 
 Yahoo'nun ons fiyatı **vadeli kontrat** (`GC=F` = Gold Aug 26 gibi); spottan
