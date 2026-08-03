@@ -983,7 +983,8 @@ export default function App() {
       && i.wtSignal === 'AL' && i.wtCrossSignal === 'AL' && i.stSignal === 'AL'
       && (i.recommendationKey === 'buy' || i.recommendationKey === 'strong_buy'),
   };
-  // SMC (Smart Money Concept) yükseliş: likidite süpürme + yapı kırılımı.
+  // SMC (Smart Money Concept) yükseliş: ChoCh/MSB kırılımı (tetik) + POC üstünde
+  // + haftalık SuperTrend AL (süzgeçler).
   const SMC_TAB = {
     key: 'smc',
     label: '🎯 SMC',
@@ -1239,9 +1240,15 @@ export default function App() {
 
       {tab === 'smc' && (
         <div className="fav-note">
-          <strong>SMC (Smart Money Concept) — günlük AL:</strong> önce likidite süpürme (fiyat önceki dibin
-          altına inip döndü), ardından yükseliş yapı kırılımı (kapanış son swing high’ı yukarı kesip üstünde
-          tutuyor = BOS/CHoCH). Günlük grafikte akıllı para birikimi → yükseliş sinyali.
+          <strong>SMC (Smart Money Concept) — günlük AL:</strong> üç koşul birden.
+          <strong> Tetik — ChoCh/MSB:</strong> düşüş trendini sonlandıran en dip seviyeyi yaptıran tepe
+          (düşüşü başlatan swing high) son <code>5</code> barda yukarı kırıldı ve kapanış hâlâ üstünde
+          (Change of Character / Market Structure Break).
+          <strong> Süzgeç — POC:</strong> kapanış, 1 yıllık hacim profilinin Point of Control’ünün üstünde —
+          yani piyasa en çok işlem gördüğü denge bölgesini yukarı kabul etmiş.
+          <strong> Süzgeç — HTF:</strong> haftalık grafikte SuperTrend <code>AL</code>.
+          <span className="muted-dash"> (POC = hacmin en çok biriktiği fiyat; 1 yıllık aralık 50 dilime
+          bölünüp her barın hacmi kendi yüksek-düşük aralığına dağıtılarak bulunur.)</span>
         </div>
       )}
 

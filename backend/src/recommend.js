@@ -131,7 +131,7 @@ export function scoreQuote(q) {
   const macdBull = macdBullish(q.closes);
   const rsiReversal = rsiBullishReversal(q.closes);   // aşırı satımdan yukarı dönüş
   const macdCross = macdBullCross(q.closes);          // MACD pozitif kesişim
-  const smc = smcBullish(q.highs, q.lows, q.closes);  // SMC yükseliş yapı kırılımı
+  const smc = smcBullish(q.highs, q.lows, q.closes, q.volumes);  // SMC yükseliş yapı kırılımı
   // Hacim dönüşü: 2-3 kırmızı mumdan sonra hacmi hepsinden yüksek güçlü yeşil mum.
   const vr = volumeReversal(q.opens, q.highs, q.lows, q.closes, q.volumes);
 

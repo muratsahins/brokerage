@@ -125,21 +125,136 @@ function findPivots(highs, lows, k = 2) {
   return { sh, sl };
 }
 
-// SMC yükseliş: likidite süpürme (son dip önceki dibin altına inip döndü) + yapı
-// kırılımı (kapanış son swing high'ı yukarı kesip üstünde tutuyor = BOS/CHoCH).
-export function smcBullish(highs, lows, closes, recent = 5) {
-  const n = closes?.length ?? 0;
-  if (n < 30) return false;
-  const { sh, sl } = findPivots(highs, lows, 2);
-  if (sh.length < 2 || sl.length < 2) return false;
-  const lastSH = sh[sh.length - 1];
-  let brokeUp = false;
-  for (let i = Math.max(1, n - recent); i < n; i++) {
-    if (closes[i - 1] <= lastSH.p && closes[i] > lastSH.p) brokeUp = true;
+// --- Hacim profili: Point of Control (POC) ----------------------------------
+// Pencerenin fiyat aralığı POC_BINS dilime bölünür; her barın hacmi, o barın
+// yüksek-düşük aralığına düşen dilimlere EŞİT dağıtılır (bar içi dağılımı
+// bilmediğimiz için standart yaklaşım). En çok hacim biriken dilimin orta
+// fiyatı POC: piyasanın en çok işlem gördüğü, yani kabul ettiği denge seviyesi.
+const POC_WINDOW = 250; // ~1 yıl (elimizdeki tüm günlük geçmiş)
+const POC_BINS = 50;
+
+export function pointOfControl(highs, lows, volumes, window = POC_WINDOW, bins = POC_BINS) {
+  const n = highs?.length ?? 0;
+  if (!volumes || volumes.length !== n || n < 20) return null;
+  const from = Math.max(0, n - window);
+  let lo = Infinity, hi = -Infinity;
+  for (let i = from; i < n; i++) {
+    if (lows[i] < lo) lo = lows[i];
+    if (highs[i] > hi) hi = highs[i];
   }
-  const holding = closes[n - 1] > lastSH.p;           // kırılım geçerli (üstünde)
-  const sweep = sl[sl.length - 1].p < sl[sl.length - 2].p; // son dip önceki dibin altına indi
-  return brokeUp && holding && sweep;
+  if (!Number.isFinite(lo) || !Number.isFinite(hi) || !(hi > lo)) return null;
+
+  const w = (hi - lo) / bins;
+  const acc = new Array(bins).fill(0);
+  let toplam = 0;
+  for (let i = from; i < n; i++) {
+    const v = volumes[i];
+    if (!(v > 0)) continue;
+    toplam += v;
+    const a = Math.max(0, Math.min(bins - 1, Math.floor((lows[i] - lo) / w)));
+    const b = Math.max(0, Math.min(bins - 1, Math.floor((highs[i] - lo) / w)));
+    const pay = v / (b - a + 1);
+    for (let k = a; k <= b; k++) acc[k] += pay;
+  }
+  if (!(toplam > 0)) return null;
+
+  let best = 0;
+  for (let k = 1; k < bins; k++) if (acc[k] > acc[best]) best = k;
+  return lo + (best + 0.5) * w;
+}
+
+// --- ChoCh / MSB seviyesi ---------------------------------------------------
+// Düşüş trendini sonlandıran dip = penceredeki EN DÜŞÜK swing low. O dipten
+// ÖNCEKİ son swing high, düşüşü başlatan tepedir; yukarı kırılması karakter
+// değişimi (Change of Character / Market Structure Break) sayılır.
+// Not: "son swing high"dan farklıdır — genelde daha yukarıda ve daha anlamlı.
+export function chochLevel(highs, lows, window = POC_WINDOW, k = 2) {
+  const n = highs?.length ?? 0;
+  if (n < 30) return null;
+  const from = Math.max(0, n - window);
+  const { sh, sl } = findPivots(highs, lows, k);
+  const dipler = sl.filter((x) => x.i >= from);
+  if (!dipler.length) return null;
+
+  let dip = dipler[0];
+  for (const d of dipler) if (d.p < dip.p) dip = d;
+
+  let tepe = null;
+  for (const h of sh) { if (h.i < dip.i) tepe = h; else break; }
+  return tepe ? { seviye: tepe.p, dipIdx: dip.i, tepeIdx: tepe.i } : null;
+}
+
+// --- HTF (üst zaman dilimi) -------------------------------------------------
+// Günlük barlar 5'erli gruplanıp haftalığa toplanır. Gruplama SONDAN hizalanır
+// ki en güncel hafta son barla bitsin. Gerçek takvim haftası değil (bar
+// dizilerinde zaman damgası taşımıyoruz; tatiller bir miktar kaydırır) — trend
+// yönü için kabul edilebilir bir yaklaşım.
+function haftalik(highs, lows, closes, groupSize = 5) {
+  const n = closes?.length ?? 0;
+  const h = [], l = [], c = [];
+  for (let end = n; end - groupSize >= 0; end -= groupSize) {
+    const from = end - groupSize;
+    let hh = -Infinity, ll = Infinity;
+    for (let i = from; i < end; i++) {
+      if (highs[i] > hh) hh = highs[i];
+      if (lows[i] < ll) ll = lows[i];
+    }
+    h.unshift(hh); l.unshift(ll); c.unshift(closes[end - 1]);
+  }
+  return { h, l, c };
+}
+
+// HTF yükseliş — GEVŞEK tanım: haftalık SuperTrend AL.
+// Üç aday 247 hisselik gerçek taramada ölçüldü:
+//   haftalık SuperTrend  %51  <- en gevşek, seçilen
+//   haftalık 20 EMA üstü %26
+//   haftalık HH+HL       %21  <- en sıkı
+// (20 EMA'nın SuperTrend'den gevşek olacağı varsayımı ölçümle çürüdü.)
+// SuperTrend ayrıca uygulamanın günlük grafikte zaten kullandığı gösterge —
+// kullanıcı aynı mantığı tanıyor.
+export function htfBullish(highs, lows, closes) {
+  const { h, l, c } = haftalik(highs, lows, closes);
+  if (c.length < ST_ATR_PERIOD + 5) return false;
+  return supertrendSignal(h, l, c) === 'AL';
+}
+
+// SMC yükseliş:
+//   TETİK  : ChoCh/MSB kırılımı — kapanış, düşüşü başlatan tepeyi son `recent`
+//            barda yukarı kesti ve hâlâ üstünde.
+//   SÜZGEÇ : kapanış POC'un üstünde (piyasa değer bölgesini kabul etmiş)
+//   SÜZGEÇ : HTF (haftalık) yükseliş
+// Eski "likidite süpürme + son swing high kırılımı" yerini ChoCh'a bıraktı:
+// aynı fikrin daha doğru tanımlanmış hali.
+export function smcBullish(highs, lows, closes, volumes, recent = 5) {
+  const d = smcDetay(highs, lows, closes, volumes, recent);
+  return !!d && d.choch && d.pocUstunde && d.htf;
+}
+
+// Koşulların tek tek sonucu (ayar/ölçüm için).
+export function smcDetay(highs, lows, closes, volumes, recent = 5) {
+  const n = closes?.length ?? 0;
+  if (n < 30) return null;
+  const son = closes[n - 1];
+
+  const ch = chochLevel(highs, lows);
+  const poc = pointOfControl(highs, lows, volumes);
+
+  // Seviyeyi son `recent` barda aşağıdan yukarı kesip üstünde kaldı mı?
+  let choch = false;
+  if (ch?.seviye != null) {
+    for (let i = Math.max(1, n - recent); i < n; i++) {
+      if (closes[i - 1] <= ch.seviye && closes[i] > ch.seviye) choch = true;
+    }
+    choch = choch && son > ch.seviye;
+  }
+
+  return {
+    choch,
+    pocUstunde: poc != null && son > poc,
+    htf: htfBullish(highs, lows, closes),
+    pocSeviye: poc,
+    chochSeviye: ch?.seviye ?? null,
+  };
 }
 
 // --- Hacim dönüşü: kırmızı mumların ardından güçlü yeşil mum ----------------

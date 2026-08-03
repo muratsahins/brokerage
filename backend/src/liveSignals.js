@@ -164,7 +164,7 @@ export function computeLiveSignals(prices, bars = {}) {
     const { cross, overzone } = wavetrendSignals(s.highs, s.lows, s.closes);
     if (cross) sig.wt = cross;
     if (overzone) sig.wo = overzone;
-    if (smcBullish(s.highs, s.lows, s.closes)) sig.smc = 1;
+    if (smcBullish(s.highs, s.lows, s.closes, s.volumes)) sig.smc = 1;
     const vr = volumeReversal(s.opens, s.highs, s.lows, s.closes, s.volumes);
     if (vr) {
       sig.vr = {
