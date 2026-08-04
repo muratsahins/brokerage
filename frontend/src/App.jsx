@@ -156,24 +156,6 @@ function IndicatorBadge({ signal }) {
   );
 }
 
-// Hacim dönüşü formasyonu: kaç kırmızı mumdan sonra geldi, yeşil mumun hacmi
-// kırmızıların en yükseğinin kaç katı, mum ne kadar kazandırdı, kaç bar önce oldu.
-function VolRevCell({ v }) {
-  if (!v) return <span className="muted-dash">—</span>;
-  return (
-    <div className="exp">
-      <span className="volrev-main">
-        {v.reds} kırmızı → yeşil <strong>×{fmtNum(v.volRatio)}</strong>
-      </span>
-      <div className="exp-note">
-        {v.volAvgRatio != null && <>ort. hacmin ×{fmtNum(v.volAvgRatio)}’ı · </>}
-        mum %{fmtNum(v.gainPct)} · öncesi %{fmtNum(v.dropPct)} ·{' '}
-        {v.barsAgo === 0 ? 'son bar' : `${v.barsAgo} bar önce`}
-      </div>
-    </div>
-  );
-}
-
 function SignalBadge({ signal }) {
   const s = SIGNAL_STYLES[signal] ?? SIGNAL_STYLES['İZLE'];
   return (
@@ -192,7 +174,7 @@ function SignalBadge({ signal }) {
 // referans karşılaştırması tutuyor ve o satır hiç yeniden render edilmiyor.
 // onSelect olarak setChartItem geçiliyor; useState kurucusunun kimliği sabit
 // olduğu için memo bozulmuyor (satır içi ok fonksiyonu geçilseydi bozulurdu).
-const StockRow = memo(function StockRow({ s, rank, showBuySell, showVolRev, onSelect }) {
+const StockRow = memo(function StockRow({ s, rank, showBuySell, onSelect }) {
   return (
     <tr>
       <td className="rank">{rank}</td>
@@ -232,7 +214,6 @@ const StockRow = memo(function StockRow({ s, rank, showBuySell, showVolRev, onSe
         </td>
       )}
       <td className="num"><Pct value={s.changePct} /></td>
-      {showVolRev && <td><VolRevCell v={s.volRev} /></td>}
       <td className="num">
         <Expected
           value={s.upside12m}
@@ -250,7 +231,7 @@ const StockRow = memo(function StockRow({ s, rank, showBuySell, showVolRev, onSe
   );
 });
 
-const StockCard = memo(function StockCard({ s, rank, showVolRev, onSelect }) {
+const StockCard = memo(function StockCard({ s, rank, onSelect }) {
   return (
     <div className="card">
       <div className="card-top">
@@ -281,15 +262,6 @@ const StockCard = memo(function StockCard({ s, rank, showVolRev, onSelect }) {
       )}
       {s.tryPrice != null && (
         <div className="exp-note">≈ {fmtNum(s.tryPrice)} ₺</div>
-      )}
-
-      {showVolRev && (
-        <div className="card-metrics">
-          <div className="metric">
-            <span className="metric-label">Hacim Dönüşü</span>
-            <VolRevCell v={s.volRev} />
-          </div>
-        </div>
       )}
 
       {s.kind === 'metal' && (
@@ -866,10 +838,15 @@ export default function App() {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('ALL');
   const [tab, setTab] = useState('all'); // açılış: BIST (tüm hisseler)
-  // Sıralama: 'ticker' (alfabetik, varsayılan) | 'score' (puan) | 'fresh'
-  // (yalnızca Hacim Dönüşü sekmesinde: formasyon tazeliği). Tercih saklanır.
+  // Sıralama: 'ticker' (alfabetik, varsayılan) | 'score' (puan). Tercih saklanır.
+  // Hacim Dönüşü sekmesiyle birlikte kaldırılan 'fresh' seçeneği bazı
+  // tarayıcılarda kayıtlı kalmış olabilir; düğmesi artık yok, o yüzden
+  // varsayılana çevriliyor (yoksa hiçbir düğme seçili görünmezdi).
   const [sort, setSort] = useState(() => {
-    try { return localStorage.getItem('sortMode') || 'ticker'; } catch { return 'ticker'; }
+    try {
+      const k = localStorage.getItem('sortMode');
+      return k === 'ticker' || k === 'score' ? k : 'ticker';
+    } catch { return 'ticker'; }
   });
   const [query, setQuery] = useState('');
   const [chartItem, setChartItem] = useState(null); // grafik pop-up'ı için seçili enstrüman
@@ -995,18 +972,11 @@ export default function App() {
     label: '🎯 SMC',
     match: (i) => i.kind === 'stock' && i.smc === true,
   };
-  // Hacim dönüşü: 2-3 (en çok 5) kırmızı mumun ardından, hacmi o kırmızıların
-  // HEPSİNDEN yüksek olan güçlü bir yeşil mum — satıcı tükendi, alıcı hacimle döndü.
-  // Kıymetli madenlerde hacim verisi güvenilir olmadığı için onlar hariç.
-  const VOL_TAB = {
-    key: 'vol',
-    label: '📊 Hacim Dönüşü',
-    // Yalnızca hisseler: maden ve emtiada hacim verisi bu formasyon için
-    // güvenilir değil (önceki davranışla aynı, emtia da kapsam dışı).
-    match: (i) => i.kind === 'stock' && i.volRev != null,
-  };
+  // Hacim Dönüşü sekmesi kaldırıldı. Formasyonun kendisi duruyor: UYARI
+  // taraması (backend/src/alerts.js) alım adaylarını belirlerken hâlâ
+  // kullanıyor ve orada gösteriyor.
   const TRADE_TAB = { key: 'trade', label: '💼 Sanal Borsa' };
-  const activeTab = [...TABS, FAV_TAB, SMC_TAB, VOL_TAB, TRADE_TAB, ...NEWS_TABS].find((t) => t.key === tab) ?? TABS[0];
+  const activeTab = [...TABS, FAV_TAB, SMC_TAB, TRADE_TAB, ...NEWS_TABS].find((t) => t.key === tab) ?? TABS[0];
   const isNews = !!activeTab.news;
 
   // UYARI taraması sekme kapalıyken de sürer; görülmemiş yeni sinyal varsa
@@ -1041,14 +1011,9 @@ export default function App() {
       : inTab;
     if (filter !== 'ALL') list = list.filter((i) => i.signal === filter);
     // Sıralama kullanıcının seçimine göre: varsayılan alfabetik (hisse kodu),
-    // 'score' seçilirse puana göre. Hacim dönüşü sekmesinde ek olarak formasyon
-    // tazeliği ('fresh') seçilebilir; puan canlı fiyatla değiştiği için sıralama
+    // 'score' seçilirse puana göre. Puan canlı fiyatla değiştiği için sıralama
     // her tazelemede yeniden yapılır (yayınlanan sıra bayatlamasın).
-    const freshOk = tab === 'vol' && !nq;
-    if (sort === 'fresh' && freshOk) {
-      list = [...list].sort((a, b) =>
-        (a.volRev.barsAgo - b.volRev.barsAgo) || (b.volRev.volRatio - a.volRev.volRatio));
-    } else if (sort === 'score') {
+    if (sort === 'score') {
       list = [...list].sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
     } else {
       list = [...list].sort((a, b) => a.ticker.localeCompare(b.ticker, 'tr'));
@@ -1059,7 +1024,6 @@ export default function App() {
   // Alış/Satış sütunları: görünen listede kıymetli maden varsa göster.
   const showBuySell = items.some((s) => s.kind === 'metal');
   // Hacim dönüşü sütunu yalnızca kendi sekmesinde.
-  const showVolRev = tab === 'vol' && !searching;
 
   // Fiyat akışı durursa kullanıcı bilsin. Sunucu, çekim toptan başarısız
   // olduğunda son sağlam veriyi ESKİ zaman damgasıyla döndürüyor (dataSource.js);
@@ -1159,12 +1123,6 @@ export default function App() {
           {SMC_TAB.label}
         </button>
         <button
-          className={`news-tab vol-tab ${tab === 'vol' ? 'active' : ''}`}
-          onClick={() => setTab('vol')}
-        >
-          {VOL_TAB.label}
-        </button>
-        <button
           className={`news-tab trade-tab ${tab === 'trade' ? 'active' : ''}`}
           onClick={() => setTab('trade')}
         >
@@ -1226,11 +1184,10 @@ export default function App() {
         ))}
         <span className="filter-sep" aria-hidden="true" />
         {/* Sıralama: varsayılan alfabetik; puana göre sıralamak isteyene düğme.
-            Tazelik yalnızca Hacim Dönüşü sekmesinde anlamlı. */}
+*/}
         {[
           { key: 'ticker', label: 'A→Z', title: 'Hisse koduna göre alfabetik' },
           { key: 'score', label: 'Puan', title: 'Puana göre (yüksekten düşüğe)' },
-          ...(tab === 'vol' ? [{ key: 'fresh', label: 'Tazelik', title: 'Formasyonun tazeliğine göre' }] : []),
         ].map((s) => (
           <button
             key={s.key}
@@ -1281,16 +1238,6 @@ export default function App() {
         </div>
       )}
 
-      {tab === 'vol' && (
-        <div className="fav-note">
-          <strong>Hacim Dönüşü — günlük:</strong> arka arkaya <code>2-5</code> kırmızı mumun ardından gelen
-          <code>yeşil</code> mumun hacmi, o kırmızı mumların <strong>hepsinden yüksek</strong>; ayrıca mum
-          “güçlü”: gövdesi mum boyunun en az yarısı ve kırmızıların gövdesinden büyük. Satıcı tükenip alıcının
-          hacimle döndüğü noktalar. Son <code>3</code> barda oluşan formasyonlar listelenir; en tazesi üstte.
-          <span className="muted-dash"> (Hacim verisi güvenilir olmadığından kıymetli madenler hariçtir.)</span>
-        </div>
-      )}
-
       {!loading && !error && items.length === 0 && (
         <div className="state">
           {searching
@@ -1299,8 +1246,6 @@ export default function App() {
               ? 'Şu an üç sinyali (overzone + WaveTrend + SuperTrend) birden AL olan ve analist AL tavsiyesi bulunan hisse yok.'
             : tab === 'smc'
               ? 'Şu an SMC yükseliş sinyali (likidite süpürme + yapı kırılımı) veren hisse yok.'
-            : tab === 'vol'
-              ? 'Son 3 barda hacim dönüşü formasyonu (2-5 kırmızı mum → hacmi hepsinden yüksek güçlü yeşil mum) veren enstrüman yok.'
               : data.items.length > 0
                 ? 'Bu sekme/filtrede gösterilecek hisse yok.'
                 : 'Henüz veri yok. “Yenile”ye basın veya backend’in çalıştığından emin olun.'}
@@ -1318,7 +1263,6 @@ export default function App() {
                 {showBuySell && <th className="num">Alış</th>}
                 {showBuySell && <th className="num">Satış</th>}
                 <th className="num">Günlük</th>
-                {showVolRev && <th style={{ minWidth: 190 }}>Hacim Dönüşü</th>}
                 <th className="num">Hedef</th>
                 <th style={{ minWidth: 110 }}>Puan</th>
                 <th>Sinyal</th>
@@ -1334,7 +1278,6 @@ export default function App() {
                   s={s}
                   rank={i + 1}
                   showBuySell={showBuySell}
-                  showVolRev={showVolRev}
                   onSelect={setChartItem}
                 />
               ))}
@@ -1356,7 +1299,6 @@ export default function App() {
               key={s.ticker}
               s={s}
               rank={i + 1}
-              showVolRev={showVolRev}
               onSelect={setChartItem}
             />
           ))}
