@@ -201,24 +201,56 @@ export function chochLevel(highs, lows, window = CHOCH_WINDOW, k = 2) {
 // ki en güncel hafta son barla bitsin. Gerçek takvim haftası değil (bar
 // dizilerinde zaman damgası taşımıyoruz; tatiller bir miktar kaydırır) — trend
 // yönü için kabul edilebilir bir yaklaşım.
-function haftalik(highs, lows, closes, groupSize = 5) {
+// Pazartesi başlangıçlı hafta indeksi. Unix gün 0 = Perşembe olduğu için +3
+// kaydırınca hafta sınırı pazartesiye oturur.
+const haftaNo = (ts, off) => Math.floor((Math.floor((ts + off) / 86400) + 3) / 7);
+
+// Günlük barları GERÇEK TAKVİM HAFTALARINA toplar ve İÇİNDE BULUNULAN HAFTAYI
+// dışarıda bırakır.
+//
+// Neden: eskiden barlar 5'erli gruplanıyordu, sondan hizalı. İki sorun vardı —
+//   (1) son grup her zaman bugünün canlı barını içeriyordu, dolayısıyla en
+//       güncel "haftalık" mum gün içinde oynuyor ve SuperTrend yanıp sönüyordu;
+//   (2) hizalama sondan yapıldığı için her yeni günde bütün gruplar bir kayıyor,
+//       yani geçmiş "haftalar" da her gün yeniden şekilleniyordu.
+// Gerçek hafta sınırı kullanılınca ikisi de kalkıyor: tamamlanmış haftalar sabit
+// kalır ve sinyal ancak hafta kapandığında değişir.
+//
+// Zaman damgası verilmezse (eski çağrı biçimi) 5'erli gruplamaya düşülür.
+function haftalik(highs, lows, closes, times, off = 0, simdi = Date.now() / 1000) {
   const n = closes?.length ?? 0;
-  const adet = Math.floor(n / groupSize);
-  const h = new Array(adet), l = new Array(adet), c = new Array(adet);
-  // Sondan hizalama: baştaki artık barlar (n % groupSize) atılır, böylece en
-  // güncel hafta son barla biter. Önceden `unshift` ile geriye doğru
-  // kuruluyordu; her ekleme diziyi kaydırdığı için gereksiz maliyetliydi.
-  // Sonuç birebir aynı, yalnızca ileriye doğru ve indeksle yazılıyor.
-  const bas = n - adet * groupSize;
-  for (let g = 0; g < adet; g++) {
-    const from = bas + g * groupSize, end = from + groupSize;
-    let hh = -Infinity, ll = Infinity;
-    for (let i = from; i < end; i++) {
-      if (highs[i] > hh) hh = highs[i];
-      if (lows[i] < ll) ll = lows[i];
+  if (!times || times.length !== n) {
+    const groupSize = 5;
+    const adet = Math.floor(n / groupSize);
+    const h = new Array(adet), l = new Array(adet), c = new Array(adet);
+    const bas = n - adet * groupSize;
+    for (let g = 0; g < adet; g++) {
+      const from = bas + g * groupSize, end = from + groupSize;
+      let hh = -Infinity, ll = Infinity;
+      for (let i = from; i < end; i++) {
+        if (highs[i] > hh) hh = highs[i];
+        if (lows[i] < ll) ll = lows[i];
+      }
+      h[g] = hh; l[g] = ll; c[g] = closes[end - 1];
     }
-    h[g] = hh; l[g] = ll; c[g] = closes[end - 1];
+    return { h, l, c };
   }
+
+  const buHafta = haftaNo(simdi, off);
+  const h = [], l = [], c = [];
+  let aktif = null, hh = -Infinity, ll = Infinity, kapanis = null;
+  const yaz = () => {
+    if (aktif == null || aktif === buHafta) return; // devam eden haftayı alma
+    h.push(hh); l.push(ll); c.push(kapanis);
+  };
+  for (let i = 0; i < n; i++) {
+    const w = haftaNo(times[i], off);
+    if (w !== aktif) { yaz(); aktif = w; hh = -Infinity; ll = Infinity; }
+    if (highs[i] > hh) hh = highs[i];
+    if (lows[i] < ll) ll = lows[i];
+    kapanis = closes[i];
+  }
+  yaz();
   return { h, l, c };
 }
 
@@ -230,8 +262,8 @@ function haftalik(highs, lows, closes, groupSize = 5) {
 // (20 EMA'nın SuperTrend'den gevşek olacağı varsayımı ölçümle çürüdü.)
 // SuperTrend ayrıca uygulamanın günlük grafikte zaten kullandığı gösterge —
 // kullanıcı aynı mantığı tanıyor.
-export function htfBullish(highs, lows, closes) {
-  const { h, l, c } = haftalik(highs, lows, closes);
+export function htfBullish(highs, lows, closes, times, gmtoffset) {
+  const { h, l, c } = haftalik(highs, lows, closes, times, gmtoffset);
   if (c.length < ST_ATR_PERIOD + 5) return false;
   return supertrendSignal(h, l, c) === 'AL';
 }
@@ -243,13 +275,14 @@ export function htfBullish(highs, lows, closes) {
 //   SÜZGEÇ : HTF (haftalık) yükseliş
 // Eski "likidite süpürme + son swing high kırılımı" yerini ChoCh'a bıraktı:
 // aynı fikrin daha doğru tanımlanmış hali.
-export function smcBullish(highs, lows, closes, volumes, recent = 5) {
-  const d = smcDetay(highs, lows, closes, volumes, recent);
+export function smcBullish(highs, lows, closes, volumes, sec = {}) {
+  const d = smcDetay(highs, lows, closes, volumes, sec);
   return !!d && d.choch && d.pocUstunde && d.htf;
 }
 
 // Koşulların tek tek sonucu (ayar/ölçüm için).
-export function smcDetay(highs, lows, closes, volumes, recent = 5) {
+export function smcDetay(highs, lows, closes, volumes, sec = {}) {
+  const { times, gmtoffset, recent = 5 } = sec;
   const n = closes?.length ?? 0;
   if (n < 30) return null;
   const son = closes[n - 1];
@@ -271,7 +304,7 @@ export function smcDetay(highs, lows, closes, volumes, recent = 5) {
     // "Üstünde" değil "belirgin biçimde üstünde": POC'a yapışık fiyat, değer
     // bölgesinin kabul edildiği anlamına gelmiyor.
     pocUstunde: poc != null && son > poc * (1 + POC_PAY),
-    htf: htfBullish(highs, lows, closes),
+    htf: htfBullish(highs, lows, closes, times, gmtoffset),
     pocSeviye: poc,
     chochSeviye: ch?.seviye ?? null,
   };

@@ -498,6 +498,9 @@ async function fetchChart(symbol) {
     fiftyTwoWeekLow: meta.fiftyTwoWeekLow ?? Math.min(...closes),
     firstClose: monthAgoClose,
     highs, lows, closes, opens, volumes,
+    // Haftalık toplama gerçek takvim haftasına göre yapılıyor (indicators.js).
+    times: bars.map((b) => b.ts),
+    gmtoffset: meta.gmtoffset ?? 0,
   };
 }
 

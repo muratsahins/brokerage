@@ -66,6 +66,7 @@ export async function refreshSeries() {
             low: bars.map((b) => b.low),
             close: bars.map((b) => b.close),
             volume: bars.map((b) => b.volume),
+            time: bars.map((b) => b.ts),
             lastTs: bars[bars.length - 1].ts,
             gmtoffset: meta.gmtoffset ?? 0,
             at: Date.now(),
@@ -107,6 +108,7 @@ function seriesWithLive(entry, price, priceTs, bar) {
       lows: [...entry.low, Math.min(b?.low ?? price, price)],
       closes: [...entry.close, price],
       volumes: [...entry.volume, b?.volume ?? 0],
+      times: [...(entry.time ?? []), priceTs ?? bar?.ts ?? entry.lastTs],
       lastTs: priceTs ?? bar?.ts ?? entry.lastTs, // eklenen barın anı
     };
   }
@@ -124,7 +126,7 @@ function seriesWithLive(entry, price, priceTs, bar) {
     volumes = entry.volume.slice();
     volumes[i] = b.volume; // gün içi hacim (önbellektekinin yerine)
   }
-  return { opens, highs, lows, closes, volumes, lastTs: entry.lastTs };
+  return { opens, highs, lows, closes, volumes, times: entry.time, lastTs: entry.lastTs };
 }
 
 // Bir enstrümanın CANLI yamalı günlük serisi (UYARI taraması için).
@@ -163,7 +165,7 @@ export function computeLiveSignals(prices, bars = {}) {
     const { cross, overzone } = wavetrendSignals(s.highs, s.lows, s.closes);
     if (cross) sig.wt = cross;
     if (overzone) sig.wo = overzone;
-    if (smcBullish(s.highs, s.lows, s.closes, s.volumes)) sig.smc = 1;
+    if (smcBullish(s.highs, s.lows, s.closes, s.volumes, { times: s.times, gmtoffset: entry.gmtoffset })) sig.smc = 1;
     out[ticker] = sig; // boş nesne de anlamlı: "hesaplandı, sinyal yok"
   }
   return out;

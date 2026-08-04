@@ -1225,7 +1225,9 @@ export default function App() {
           (Change of Character / Market Structure Break).
           <strong> Süzgeç — POC:</strong> kapanış, 1 yıllık hacim profilinin Point of Control’ünden
           en az <code>%3</code> yukarıda — piyasa en çok işlem gördüğü denge bölgesini yukarı kabul etmiş.
-          <strong> Süzgeç — HTF:</strong> haftalık grafikte SuperTrend <code>AL</code>.
+          <strong> Süzgeç — HTF:</strong> haftalık grafikte SuperTrend <code>AL</code> —
+          gerçek takvim haftaları, <strong>devam eden hafta hariç</strong>, yani sinyal ancak hafta
+          kapandığında değişir.
           <span className="muted-dash"> (POC = hacmin en çok biriktiği fiyat; 1 yıllık aralık 50 dilime
           bölünüp her barın hacmi kendi yüksek-düşük aralığına dağıtılarak bulunur. ChoCh penceresi
           bilerek kısa: 1 yıl alınınca “dip” pratikte yılın dibi oluyor ve kırılan tepe aylar öncesinden
