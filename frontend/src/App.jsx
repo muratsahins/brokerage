@@ -549,14 +549,13 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
   return (
     <>
       <div className="fav-note">
-        <strong>UYARI</strong> — günlük grafikte{' '}
+        <strong>Dikkat Çekenler</strong> — günlük grafikte{' '}
         <strong>
           {trDate(state.sessionDate) ? `bugünün (${trDate(state.sessionDate)})` : 'bugünün'}
         </strong>{' '}
         barı taranır, iki grup:{' '}
         <strong>Alım adayları</strong> = <code>overzone</code> <strong>AL</strong> (aşırı satım bölgesinde,
-        −53/−60, kurulan yukarı kesişim) <em>ve</em> <code>hacim dönüşü</code> (kırmızı mumların ardından
-        hepsinden yüksek hacimli güçlü yeşil mum) — tüm BIST'te;{' '}
+        −53/−60, kurulan yukarı kesişim) — tüm BIST'te;{' '}
         <strong>Kendi hisselerim</strong> = <code>SuperTrend</code> <strong>SAT</strong>'a dönenlerden Sanal
         Borsa portföyünde olanlar. Önceki günlerde üretilmiş sinyaller listeye girmez; son bar canlı fiyatla
         güncellendiği için sinyal, kapanış beklenmeden gün içinde görünür.
@@ -578,10 +577,10 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
         </div>
       ) : (
         <>
-          <div className="alert-group">Alım adayları — overzone AL + hacim dönüşü (tüm BIST)</div>
+          <div className="alert-group">Alım adayları — overzone AL (tüm BIST)</div>
           {list.length === 0 ? (
             <div className="state">
-              Bugün overzone AL verip aynı zamanda hacim dönüşü yapan hisse yok.
+              Bugün overzone AL sinyali veren hisse yok.
               {warming && ' Bar geçmişi hâlâ hazırlanıyor, birazdan tekrar bakın.'}
             </div>
           ) : (
@@ -937,9 +936,13 @@ export default function App() {
     // Kripto kaldırıldı (backend'de de takip listesi dışında — stocks.js).
   ];
   // Üst şerit: haberler + UYARI (yeni sinyal taraması; KAP'ın yerini aldı).
+  // Anahtar 'uyari' olarak kaldı: localStorage'daki görülmüş sinyal kaydı
+  // (alertsSeen) ve blink mantığı buna bağlı, etiket değişikliği onları
+  // etkilemesin.
+  const UYARI_TAB = { key: 'uyari', label: '⚠️ Dikkat Çekenler' };
   const NEWS_TABS = [
     { key: 'news',  label: '📰 Haberler', news: 'news' },
-    { key: 'uyari', label: '⚠️ UYARI' },
+    UYARI_TAB,
   ];
   // Favori listesi: 5 teknik koşulu birden sağlayan hisseler.
   const FAV_TAB = {
@@ -1073,20 +1076,15 @@ export default function App() {
       </header>
 
       <div className="news-nav">
-        {NEWS_TABS.map((t) => {
-          const blink = t.key === 'uyari' && newCount > 0 && tab !== 'uyari';
-          return (
-            <button
-              key={t.key}
-              className={`news-tab ${t.key === 'uyari' ? 'uyari-tab' : ''} ${blink ? 'blink' : ''} ${tab === t.key ? 'active' : ''}`}
-              onClick={() => setTab(t.key)}
-              title={blink ? `${newCount} yeni sinyal — görmek için aç` : undefined}
-            >
-              {t.label}
-              {blink && <span className="tab-badge">{newCount}</span>}
-            </button>
-          );
-        })}
+        {NEWS_TABS.filter((t) => t.news).map((t) => (
+          <button
+            key={t.key}
+            className={`news-tab ${tab === t.key ? 'active' : ''}`}
+            onClick={() => setTab(t.key)}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
 
       <div className="news-nav">
@@ -1108,6 +1106,21 @@ export default function App() {
         >
           {TRADE_TAB.label}
         </button>
+        {/* Dikkat Çekenler, Sanal Borsa'nın yanına alındı. Görülmemiş yeni
+            sinyal varsa yanıp söner ve rozette sayısı görünür. */}
+        {(() => {
+          const blink = newCount > 0 && tab !== 'uyari';
+          return (
+            <button
+              className={`news-tab uyari-tab ${blink ? 'blink' : ''} ${tab === 'uyari' ? 'active' : ''}`}
+              onClick={() => setTab('uyari')}
+              title={blink ? `${newCount} yeni sinyal — görmek için aç` : undefined}
+            >
+              {UYARI_TAB.label}
+              {blink && <span className="tab-badge">{newCount}</span>}
+            </button>
+          );
+        })()}
       </div>
 
       <div className="tabs">

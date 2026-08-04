@@ -131,7 +131,6 @@ function seriesWithLive(entry, price, priceTs, bar) {
 // Fiyat/gün içi bar önbellekleri beklenmez; yoksa ham önbellek serisi döner.
 // lastTs/gmtoffset: son barın hangi SEANSA ait olduğunu çağıran taraf bilsin
 // diye — bugün işlem görmeyen hissede son bar eski bir güne aittir.
-// open/volume de döner: UYARI'daki hacim dönüşü şartı mum gövdesi ve hacim ister.
 export function liveDailySeries(ticker) {
   const entry = cache.get(ticker);
   if (!entry) return null;
@@ -151,7 +150,7 @@ export function liveDailySeries(ticker) {
 
 // Canlı fiyatlardan gösterge sinyallerini üretir. Yanıt küçük kalsın diye kısa
 // anahtar + yalnızca dolu alanlar: st=SuperTrend, wt=WaveTrend kesişimi,
-// wo=overzone (53-60), smc=SMC yükseliş, vr=hacim dönüşü.
+// wo=overzone (53-60), smc=SMC yükseliş.
 export function computeLiveSignals(prices, bars = {}) {
   const out = {};
   for (const [ticker, p] of Object.entries(prices)) {
