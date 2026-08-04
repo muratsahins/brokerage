@@ -80,7 +80,6 @@ export async function computeRecommendations() {
       item.wtCrossSignal = null;
       item.stSignal = null;
       item.smc = false;
-      item.volRev = null;
       item.rsi = null;
       item.macdBull = false;
       item.macdCross = false;

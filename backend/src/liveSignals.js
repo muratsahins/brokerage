@@ -15,7 +15,7 @@ import {
   fetchAltinInPrices, fetchSpotMetals, fetchUsdTryRate, metalTryPerGram,
 } from './dataSource.js';
 import {
-  supertrendSignal, wavetrendSignals, smcBullish, volumeReversal,
+  supertrendSignal, wavetrendSignals, smcBullish,
 } from './indicators.js';
 import { priceDerived } from './recommend.js';
 
@@ -165,17 +165,6 @@ export function computeLiveSignals(prices, bars = {}) {
     if (cross) sig.wt = cross;
     if (overzone) sig.wo = overzone;
     if (smcBullish(s.highs, s.lows, s.closes, s.volumes)) sig.smc = 1;
-    const vr = volumeReversal(s.opens, s.highs, s.lows, s.closes, s.volumes);
-    if (vr) {
-      sig.vr = {
-        barsAgo: vr.barsAgo,
-        reds: vr.reds,
-        volRatio: round(vr.volRatio),
-        volAvgRatio: round(vr.volAvgRatio),
-        gainPct: round(vr.gainPct),
-        dropPct: round(vr.dropPct),
-      };
-    }
     out[ticker] = sig; // boş nesne de anlamlı: "hesaplandı, sinyal yok"
   }
   return out;

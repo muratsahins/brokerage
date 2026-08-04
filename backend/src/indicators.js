@@ -191,15 +191,21 @@ export function chochLevel(highs, lows, window = POC_WINDOW, k = 2) {
 // yönü için kabul edilebilir bir yaklaşım.
 function haftalik(highs, lows, closes, groupSize = 5) {
   const n = closes?.length ?? 0;
-  const h = [], l = [], c = [];
-  for (let end = n; end - groupSize >= 0; end -= groupSize) {
-    const from = end - groupSize;
+  const adet = Math.floor(n / groupSize);
+  const h = new Array(adet), l = new Array(adet), c = new Array(adet);
+  // Sondan hizalama: baştaki artık barlar (n % groupSize) atılır, böylece en
+  // güncel hafta son barla biter. Önceden `unshift` ile geriye doğru
+  // kuruluyordu; her ekleme diziyi kaydırdığı için gereksiz maliyetliydi.
+  // Sonuç birebir aynı, yalnızca ileriye doğru ve indeksle yazılıyor.
+  const bas = n - adet * groupSize;
+  for (let g = 0; g < adet; g++) {
+    const from = bas + g * groupSize, end = from + groupSize;
     let hh = -Infinity, ll = Infinity;
     for (let i = from; i < end; i++) {
       if (highs[i] > hh) hh = highs[i];
       if (lows[i] < ll) ll = lows[i];
     }
-    h.unshift(hh); l.unshift(ll); c.unshift(closes[end - 1]);
+    h[g] = hh; l[g] = ll; c[g] = closes[end - 1];
   }
   return { h, l, c };
 }
@@ -255,63 +261,6 @@ export function smcDetay(highs, lows, closes, volumes, recent = 5) {
     pocSeviye: poc,
     chochSeviye: ch?.seviye ?? null,
   };
-}
-
-// --- Hacim dönüşü: kırmızı mumların ardından güçlü yeşil mum ----------------
-// Hacim grafiğinde arka arkaya gelen 2-3 (en çok 5) KIRMIZI mumun ardından bir
-// YEŞİL mum gelir ve bu yeşil mumun hacmi kırmızıların HEPSİNDEN yüksekse:
-// satıcı tükenmiş, alıcı hacimle dönmüş demektir. Yeşil mumun ayrıca "güçlü"
-// olması aranır: gövdesi mumun boyuna hâkim ve kırmızıların gövdesinden büyük.
-const VR_MIN_REDS = 2;      // en az 2 ardışık kırmızı mum
-const VR_MAX_REDS = 5;      // en çok bu kadar geriye ardışık kırmızı say
-const VR_BODY_RATIO = 0.5;  // güçlü mum: gövde / (yüksek-düşük)
-const VR_AVG_WINDOW = 20;   // hacim ortalaması penceresi (bilgi amaçlı)
-
-export function volumeReversal(opens, highs, lows, closes, volumes, lookback = 3) {
-  const n = closes?.length ?? 0;
-  if (!opens || !volumes || opens.length !== n || volumes.length !== n) return null;
-  if (n < VR_MIN_REDS + 2) return null;
-
-  const body = (i) => Math.abs(closes[i] - opens[i]);
-  const isRed = (i) => closes[i] < opens[i];
-  const isGreen = (i) => closes[i] > opens[i];
-
-  // Son `lookback` bar içinde EN YENİ formasyonu ara (en yeniden geriye doğru).
-  for (let g = n - 1; g >= n - lookback && g >= VR_MIN_REDS; g--) {
-    if (!isGreen(g) || !(volumes[g] > 0)) continue;
-
-    // g'den geriye ardışık kırmızı mumlar (reds[0] = yeşile en yakın olan).
-    const reds = [];
-    for (let j = g - 1; j >= 0 && reds.length < VR_MAX_REDS && isRed(j); j--) reds.push(j);
-    if (reds.length < VR_MIN_REDS) continue;
-
-    // Yeşil mumun hacmi kırmızıların hepsinden yüksek olmalı.
-    const maxRedVol = Math.max(...reds.map((i) => volumes[i]));
-    if (!(volumes[g] > maxRedVol)) continue;
-
-    // "Güçlü" yeşil mum: gövde baskın + kırmızıların en büyük gövdesinden büyük.
-    const range = highs[g] - lows[g];
-    if (range > 0 && body(g) / range < VR_BODY_RATIO) continue;
-    if (body(g) < Math.max(...reds.map(body))) continue;
-
-    // Bilgi: hacim, formasyon öncesi ortalamaya göre kaç kat?
-    const from = Math.max(0, g - VR_AVG_WINDOW);
-    const prevVols = volumes.slice(from, g).filter((v) => v > 0);
-    const avgVol = prevVols.length
-      ? prevVols.reduce((s, v) => s + v, 0) / prevVols.length
-      : null;
-
-    const firstRed = reds[reds.length - 1]; // en eski kırmızı
-    return {
-      barsAgo: n - 1 - g,                                 // kaç bar önce oluştu (0 = son bar)
-      reds: reds.length,                                  // kaç kırmızı mumdan sonra
-      volRatio: volumes[g] / maxRedVol,                   // yeşil hacim / en yüksek kırmızı hacim
-      volAvgRatio: avgVol ? volumes[g] / avgVol : null,   // yeşil hacim / 20 bar ortalaması
-      gainPct: ((closes[g] - opens[g]) / opens[g]) * 100, // yeşil mumun gövde kazancı
-      dropPct: ((closes[reds[0]] - opens[firstRed]) / opens[firstRed]) * 100, // öncesindeki düşüş
-    };
-  }
-  return null;
 }
 
 // Wilder ATR (RMA yumuşatması) — Pine'daki ta.atr ile aynı.

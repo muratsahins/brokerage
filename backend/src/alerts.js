@@ -1,12 +1,10 @@
 // UYARI taraması — GÜNLÜK grafikte, İKİ AYRI grup:
 //
-//   items  (ALIM ADAYLARI, tüm enstrümanlar): İKİ koşul birden —
-//          (1) overzone AL: aşırı satım bölgesinde (wt2 <= -53) kurulan YUKARI
-//              kesişim, SON BARDA oluşmuş olacak;
-//          (2) hacim dönüşü: 2-5 kırmızı mumun ardından hepsinden yüksek hacimli
-//              güçlü yeşil mum — son VR_LOOKBACK bar içinde (Hacim Dönüşü
-//              sekmesiyle aynı tanım).
-//          Bilgi olarak SuperTrend'in o anki durumu da eklenir.
+//   items  (ALIM ADAYLARI, tüm enstrümanlar): overzone AL — aşırı satım
+//          bölgesinde (wt2 <= -53) kurulan YUKARI kesişim, SON BARDA oluşmuş
+//          olacak. Bilgi olarak SuperTrend'in o anki durumu da eklenir.
+//          Not: eskiden ayrıca hacim dönüşü teyidi de aranıyordu; o formasyon
+//          tümden kaldırıldı, dolayısıyla liste eskisinden geniş.
 //   stSell (SATIŞ UYARISI adayları): SuperTrend'in SON BARDA SAT'a döndüğü
 //          hisseler. Arayüz bunu kullanıcının Sanal Borsa portföyüyle kesiştirir
 //          ("kendi hisselerim"); portföy tarayıcıda durduğu için sunucuya
@@ -20,7 +18,7 @@
 // günlük bar kapanışını beklemeden gün içinde yakalanır.
 
 import { INSTRUMENTS } from './stocks.js';
-import { recentSignals, supertrendSignal, volumeReversal } from './indicators.js';
+import { recentSignals, supertrendSignal } from './indicators.js';
 import { liveDailySeries } from './liveSignals.js';
 
 // Kaç bar geriye kadar "yeni" sayılır (1 = yalnızca bugünün günlük barı).
@@ -29,12 +27,8 @@ const MAX_ITEMS = Number(process.env.ALERT_MAX_ITEMS ?? 600);
 // "Bugün" hangi saate göre: enstrümanın kendi borsa saati (Yahoo meta.gmtoffset).
 // Bilinmiyorsa BIST varsayılır (UTC+3).
 const DEFAULT_OFF = Number(process.env.EXCHANGE_GMT_OFFSET ?? 10800);
-// Hacim dönüşü formasyonu kaç bar geriye kadar sayılır. Hacim Dönüşü sekmesi 3
-// bar bakar; UYARI'da şart overzone AL ile kesiştiği için daha geniş tutuldu (5)
-// — dip formasyonu birkaç gün önce kurulmuş, kesişim bugün gelmiş olabilir.
-const VR_LOOKBACK = Number(process.env.ALERT_VR_LOOKBACK_BARS ?? 5);
 
-const IND_LABEL = { oz: 'overzone', wt: 'WaveTrend', st: 'SuperTrend', vr: 'Hacim dönüşü' };
+const IND_LABEL = { oz: 'overzone', wt: 'WaveTrend', st: 'SuperTrend' };
 
 // Tüm enstrümanları tarar; hisse başına tek kayıt döner.
 //
@@ -73,31 +67,21 @@ function scan() {
     if (s.lastTs == null || day(s.lastTs, off) !== day(now, off)) continue;
     const r = recentSignals(s.high, s.low, s.close, LOOKBACK);
 
-    // ALIM ADAYI: overzone AL (son bar) + HACİM DÖNÜŞÜ (son VR_LOOKBACK bar).
+    // ALIM ADAYI: overzone AL (son bar). Eskiden ayrıca HACİM DÖNÜŞÜ de
+    // aranıyordu; formasyon tümden kaldırıldığı için koşul tek başına kaldı —
+    // liste bu yüzden eskisinden geniş ve daha gürültülü.
     if (r.oz && r.oz.dir === 'AL') {
-      const vr = volumeReversal(s.open, s.high, s.low, s.close, s.volume, VR_LOOKBACK);
-      if (vr) {
-        const stState = supertrendSignal(s.high, s.low, s.close); // bilgi amaçlı trend
-        items.push({
-          ticker: inst.ticker,
-          grup: 'al',
-          dir: 'AL',
-          barsAgo: r.oz.barsAgo,
-          signals: [
-            { ind: 'oz', indLabel: IND_LABEL.oz, dir: 'AL', barsAgo: r.oz.barsAgo },
-            {
-              ind: 'vr',
-              indLabel: IND_LABEL.vr,
-              dir: 'AL',
-              barsAgo: vr.barsAgo,
-              // bilgi: yeşil mumun hacmi kırmızıların en yükseğinin kaç katı
-              volRatio: Math.round(vr.volRatio * 100) / 100,
-              reds: vr.reds,
-            },
-            ...(stState ? [{ ind: 'st', indLabel: IND_LABEL.st, dir: stState, state: true }] : []),
-          ],
-        });
-      }
+      const stState = supertrendSignal(s.high, s.low, s.close); // bilgi amaçlı trend
+      items.push({
+        ticker: inst.ticker,
+        grup: 'al',
+        dir: 'AL',
+        barsAgo: r.oz.barsAgo,
+        signals: [
+          { ind: 'oz', indLabel: IND_LABEL.oz, dir: 'AL', barsAgo: r.oz.barsAgo },
+          ...(stState ? [{ ind: 'st', indLabel: IND_LABEL.st, dir: stState, state: true }] : []),
+        ],
+      });
     }
 
     // SATIŞ UYARISI adayı: SuperTrend son barda SAT'a döndü. (Arayüz portföyle

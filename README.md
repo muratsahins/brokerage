@@ -55,12 +55,9 @@ npm start                 # http://localhost:4000
 - **UYARI taraması** (`/api/alerts`): günlük grafikte **iki grup** döner —
   `items` = **alım adayları**: `overzone` **AL** (aşırı satımda, −53/−60,
   kurulan yukarı kesişim) son barda oluşanlar (`ALERT_LOOKBACK_BARS`,
-  varsayılan 1) **ve** aynı hissede **hacim dönüşü** olanlar (2-5 kırmızı mumun
-  ardından, hacmi hepsinden yüksek güçlü bir yeşil mum — `volumeReversal`,
-  indicators.js; kaç bar geriye bakılacağı `ALERT_VR_LOOKBACK_BARS`,
-  varsayılan 5 — formasyon birkaç gün önce kurulup kesişim bugün gelebilir.
-  Ayrı bir "Hacim Dönüşü" sekmesi vardı, kaldırıldı; formasyon yalnızca burada
-  kullanılıyor);
+  varsayılan 1). Eskiden ayrıca **hacim dönüşü** teyidi de aranıyordu; o
+  formasyon tümden kaldırıldı, dolayısıyla liste artık daha geniş ve daha
+  gürültülü (ölçüldü: 3 → 18 uyarı).
   `stSell` = `SuperTrend`in **son barda SAT'a döndüğü** hisseler.
   Arayüz `stSell`i kullanıcının **Sanal Borsa portföyüyle kesiştirir** ("kendi
   hisselerim" — satış uyarısı); portföy tarayıcıda durduğu için sunucuya

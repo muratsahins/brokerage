@@ -15,25 +15,14 @@ const ChartModal = lazy(() => import('./ChartModal.jsx'));
 // (+ metal ₺/gram), AYNI ANDA hesaplanan teknik göstergeler ve canlı fiyattan
 // yeniden hesaplanan analist potansiyeli / momentum / puan / sinyal.
 // Analist hedefi ve temel veriler yayınlanan veriden gelir (3 saatte bir).
-// volRev her yanıtta yeni bir nesne olarak geldiği için referansla değil
-// değerle karşılaştırılır; yoksa formasyon hiç değişmese de satır "değişti"
-// sayılırdı.
-function sameVolRev(a, b) {
-  if (a === b) return true;
-  if (!a || !b) return false;
-  return a.barsAgo === b.barsAgo && a.reds === b.reds && a.volRatio === b.volRatio
-    && a.volAvgRatio === b.volAvgRatio && a.gainPct === b.gainPct && a.dropPct === b.dropPct;
-}
-
 // next, it'in kopyası üzerine kurulduğu için anahtar kümesi it'i kapsar;
 // sayıları eşitse alan alan karşılaştırmak yeterli.
 function sameItem(it, next) {
   const kn = Object.keys(next);
   if (kn.length !== Object.keys(it).length) return false;
-  for (const k of kn) {
-    if (k === 'volRev') { if (!sameVolRev(it[k], next[k])) return false; continue; }
-    if (it[k] !== next[k]) return false;
-  }
+  // Tüm alanlar artık ilkel (sayı/metin/boolean); iç içe nesne kalmadığı için
+  // referans karşılaştırması yeterli.
+  for (const k of kn) if (it[k] !== next[k]) return false;
   return true;
 }
 
@@ -72,7 +61,6 @@ function mergeLivePrices(data, live) {
       next.wtCrossSignal = s.wt ?? null;
       next.wtSignal = s.wo ?? null;
       next.smc = !!s.smc;
-      next.volRev = s.vr ?? null;
       next.signalsLive = true;
     }
     // Analist potansiyeli, momentum, puan ve AL/TUT/İZLE sinyali de canlı
@@ -546,13 +534,9 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
             <span
               key={s.ind}
               className={`alert-sig ${s.dir === 'AL' ? 'al' : 'sat'}`}
-              title={s.state
-                ? 'Gösterge durumu (dönüş barı değil)'
-                : s.ind === 'vr'
-                  ? `${s.reds} kırmızı mumun ardından hacmi ${s.volRatio}× güçlü yeşil mum${s.barsAgo ? ` — ${s.barsAgo} bar önce` : ''}`
-                  : 'Sinyalin oluştuğu bar'}
+              title={s.state ? 'Gösterge durumu (dönüş barı değil)' : 'Sinyalin oluştuğu bar'}
             >
-              {s.indLabel} {s.ind === 'vr' ? <strong>{s.volRatio}×</strong> : <strong>{s.dir}</strong>}
+              {s.indLabel} <strong>{s.dir}</strong>
               {s.state ? ' (trend)' : ''}
             </span>
           ))}
@@ -839,7 +823,7 @@ export default function App() {
   const [filter, setFilter] = useState('ALL');
   const [tab, setTab] = useState('all'); // açılış: BIST (tüm hisseler)
   // Sıralama: 'ticker' (alfabetik, varsayılan) | 'score' (puan). Tercih saklanır.
-  // Hacim Dönüşü sekmesiyle birlikte kaldırılan 'fresh' seçeneği bazı
+  // Kaldırılan 'fresh' (tazelik) seçeneği bazı
   // tarayıcılarda kayıtlı kalmış olabilir; düğmesi artık yok, o yüzden
   // varsayılana çevriliyor (yoksa hiçbir düğme seçili görünmezdi).
   const [sort, setSort] = useState(() => {
@@ -972,9 +956,6 @@ export default function App() {
     label: '🎯 SMC',
     match: (i) => i.kind === 'stock' && i.smc === true,
   };
-  // Hacim Dönüşü sekmesi kaldırıldı. Formasyonun kendisi duruyor: UYARI
-  // taraması (backend/src/alerts.js) alım adaylarını belirlerken hâlâ
-  // kullanıyor ve orada gösteriyor.
   const TRADE_TAB = { key: 'trade', label: '💼 Sanal Borsa' };
   const activeTab = [...TABS, FAV_TAB, SMC_TAB, TRADE_TAB, ...NEWS_TABS].find((t) => t.key === tab) ?? TABS[0];
   const isNews = !!activeTab.news;
@@ -1023,7 +1004,6 @@ export default function App() {
 
   // Alış/Satış sütunları: görünen listede kıymetli maden varsa göster.
   const showBuySell = items.some((s) => s.kind === 'metal');
-  // Hacim dönüşü sütunu yalnızca kendi sekmesinde.
 
   // Fiyat akışı durursa kullanıcı bilsin. Sunucu, çekim toptan başarısız
   // olduğunda son sağlam veriyi ESKİ zaman damgasıyla döndürüyor (dataSource.js);
