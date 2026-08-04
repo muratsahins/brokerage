@@ -128,6 +128,10 @@ let livePriceInflight = null;
 const LIVE_TTL_MS = 15000;
 // Bayat veri en fazla bu kadar servis edilir; daha eskiyse istek çekimi bekler.
 const LIVE_STALE_MS = Number(process.env.LIVE_PRICE_STALE_MS ?? 120000);
+// Bir tur, önceki turun bu oranından az fiyat getirdiyse başarısız sayılır ve
+// önbellek korunur. Normalde ~621 fiyat döner; tek tük sembol düşmesi olağan,
+// yarıya inmesi değil.
+const LIVE_MIN_ORAN = Number(process.env.LIVE_PRICE_MIN_RATIO ?? 0.5);
 
 // Önbellek tazeyse onu döner. Bayatsa TAZELEMEYİ ARKA PLANDA başlatır ve elde
 // olan veriyi HEMEN döner — istemci Yahoo turunu beklemez (ölçüldü: bekleyen
@@ -180,6 +184,25 @@ async function refreshLivePrices() {
   for (let i = 0; i < chunks.length; i += CONC) {
     await Promise.all(chunks.slice(i, i + CONC).map(doChunk));
   }
+
+  // Parça hataları yukarıda yutuluyor (bir parça düşerse tur devam etsin diye).
+  // Ama TOPTAN başarısız bir tur da buraya boş `prices` ile geliyordu ve sağlam
+  // veriyi eziyordu: ekranda fiyatlar yayınlanan (3 saatlik) değerlerde donuyor,
+  // buna karşılık `updatedAt` taze damgalandığı için her şey yolundaymış gibi
+  // görünüyordu — sessizce bayat veri. Yahoo'nun veri merkezi IP'lerini throttle
+  // ettiği dönemlerde yaşanan tam olarak buydu.
+  // Çözüm: eksik turu tur sayma. Eldeki veri ve ESKİ zaman damgası korunur,
+  // böylece saat dürüstçe donar ve arayüz "gecikiyor" rozetini gösterebilir.
+  const yeniSayi = Object.keys(prices).length;
+  const oncekiSayi = Object.keys(livePriceCache.data?.prices ?? {}).length;
+  if (oncekiSayi > 0 && yeniSayi < oncekiSayi * LIVE_MIN_ORAN) {
+    console.warn(`[live] Fiyat turu eksik geldi (${yeniSayi}/${oncekiSayi}); önbellek korunuyor.`);
+    // `at` yine de ilerletilir: bir sonraki denemeye kadar normal aralık (15 sn)
+    // beklensin, her istek Yahoo turunu beklemek zorunda kalmasın.
+    livePriceCache = { at: Date.now(), data: livePriceCache.data };
+    return livePriceCache.data;
+  }
+
   livePriceCache = { at: Date.now(), data: { updatedAt: new Date().toISOString(), prices } };
   return livePriceCache.data;
 }

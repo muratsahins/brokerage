@@ -339,6 +339,10 @@ const StockCard = memo(function StockCard({ s, rank, showVolRev, onSelect }) {
 // basılmamış satırlar arama sonuçlarından düşmez.
 const SAYFA = 120;
 
+// Fiyat damgası bu kadar geri kalırsa 'gecikiyor' rozeti çıkar. Anket 18 sn,
+// sunucu önbelleği 15 sn: 2 dakika ≈ arka arkaya 8 başarısız tur demek.
+const GECIKME_ESIGI_MS = 2 * 60 * 1000;
+
 function useKademeliListe(items, sifirlaAnahtari) {
   const [n, setN] = useState(SAYFA);
   const nobetciRef = useRef(null);
@@ -869,6 +873,7 @@ export default function App() {
   });
   const [query, setQuery] = useState('');
   const [chartItem, setChartItem] = useState(null); // grafik pop-up'ı için seçili enstrüman
+  const [gecikti, setGecikti] = useState(false); // fiyat akışı duraklamış mı
   // Görünüm: 'mobile' (kart, yatay scroll yok) | 'web' (tam tablo).
   const [view, setView] = useState(() => {
     try { return localStorage.getItem('viewMode') || (window.innerWidth <= 640 ? 'mobile' : 'web'); }
@@ -1056,6 +1061,22 @@ export default function App() {
   // Hacim dönüşü sütunu yalnızca kendi sekmesinde.
   const showVolRev = tab === 'vol' && !searching;
 
+  // Fiyat akışı durursa kullanıcı bilsin. Sunucu, çekim toptan başarısız
+  // olduğunda son sağlam veriyi ESKİ zaman damgasıyla döndürüyor (dataSource.js);
+  // damga bu eşikten geri kalınca rozet çıkar.
+  // Ayrı sayaç gerekiyor: çekim hata verdiğinde setData hiç çağrılmıyor, yani
+  // sadece verinin değişmesine bakarsak rozet hiç görünmez.
+  useEffect(() => {
+    const kontrol = () => {
+      const t = data.priceUpdatedAt || data.updatedAt;
+      const eski = t ? Date.now() - new Date(t).getTime() > GECIKME_ESIGI_MS : false;
+      setGecikti((o) => (o === eski ? o : eski)); // aynıysa React render'ı atlar
+    };
+    kontrol();
+    const id = setInterval(kontrol, 20000);
+    return () => clearInterval(id);
+  }, [data.priceUpdatedAt, data.updatedAt]);
+
   // Grafik pop-up'ındaki kalemin canlı karşılığı (fiyat/değişim tazelendikçe
   // pop-up da tazelensin). data.items içinde yoksa açılış kopyası kullanılır.
   const chartLive = useMemo(
@@ -1221,7 +1242,15 @@ export default function App() {
           </button>
         ))}
         {(data.priceUpdatedAt || data.updatedAt) && (
-          <span className="updated">
+          <span className={`updated ${gecikti ? 'gecikti' : ''}`}>
+            {gecikti && (
+              <span
+                className="gecikti-rozet"
+                title="Fiyat akışı duraklamış görünüyor: sunucu yeni fiyat alamıyor ve son sağlam veriyi göstermeye devam ediyor. Ekrandaki fiyatlar ve günlük değişim bu saatten kalma."
+              >
+                ⚠ gecikiyor
+              </span>
+            )}
             {items.some((i) => i.signalsLive) ? 'Fiyat + göstergeler' : 'Fiyat'}:{' '}
             {new Date(data.priceUpdatedAt || data.updatedAt).toLocaleTimeString('tr-TR')}
           </span>

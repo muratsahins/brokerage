@@ -372,6 +372,19 @@ h1 { font-size: 26px; margin: 0 0 6px; }
 /* Sıralama düğmeleri sinyal süzgeçlerinden ayrışsın (mavi değil, nötr). */
 .filter.sort.active { background: #334155; color: #e2e8f0; border-color: #475569; }
 .updated { margin-left: auto; color: var(--muted); font-size: 12px; }
+/* Fiyat akışı duraklamışsa: saat donar ve yanında uyarı rozeti çıkar. */
+.updated.gecikti { color: #fbbf24; }
+.gecikti-rozet {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #3a2f05;
+  border: 1px solid #4a3a0e;
+  color: #fbbf24;
+  font-weight: 700;
+  cursor: help;
+}
 
 .news-list { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
 .news-item {
