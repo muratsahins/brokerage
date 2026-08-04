@@ -1220,14 +1220,16 @@ export default function App() {
       {tab === 'smc' && (
         <div className="fav-note">
           <strong>SMC (Smart Money Concept) — günlük AL:</strong> üç koşul birden.
-          <strong> Tetik — ChoCh/MSB:</strong> düşüş trendini sonlandıran en dip seviyeyi yaptıran tepe
-          (düşüşü başlatan swing high) son <code>5</code> barda yukarı kırıldı ve kapanış hâlâ üstünde
+          <strong> Tetik — ChoCh/MSB:</strong> son <code>90</code> bardaki düşüşü sonlandıran dibi yaptıran
+          tepe (düşüşü başlatan swing high) son <code>5</code> barda yukarı kırıldı ve kapanış hâlâ üstünde
           (Change of Character / Market Structure Break).
-          <strong> Süzgeç — POC:</strong> kapanış, 1 yıllık hacim profilinin Point of Control’ünün üstünde —
-          yani piyasa en çok işlem gördüğü denge bölgesini yukarı kabul etmiş.
+          <strong> Süzgeç — POC:</strong> kapanış, 1 yıllık hacim profilinin Point of Control’ünden
+          en az <code>%3</code> yukarıda — piyasa en çok işlem gördüğü denge bölgesini yukarı kabul etmiş.
           <strong> Süzgeç — HTF:</strong> haftalık grafikte SuperTrend <code>AL</code>.
           <span className="muted-dash"> (POC = hacmin en çok biriktiği fiyat; 1 yıllık aralık 50 dilime
-          bölünüp her barın hacmi kendi yüksek-düşük aralığına dağıtılarak bulunur.)</span>
+          bölünüp her barın hacmi kendi yüksek-düşük aralığına dağıtılarak bulunur. ChoCh penceresi
+          bilerek kısa: 1 yıl alınınca “dip” pratikte yılın dibi oluyor ve kırılan tepe aylar öncesinden
+          kalıyordu — o bir karakter değişimi değil, sadece yeni zirveye çıkış olurdu.)</span>
         </div>
       )}
 

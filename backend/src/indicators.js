@@ -132,6 +132,18 @@ function findPivots(highs, lows, k = 2) {
 // fiyatı POC: piyasanın en çok işlem gördüğü, yani kabul ettiği denge seviyesi.
 const POC_WINDOW = 250; // ~1 yıl (elimizdeki tüm günlük geçmiş)
 const POC_BINS = 50;
+// Fiyatın POC'u geçmiş sayılması için gereken pay. Payszken sinyallerin yarısı
+// POC'un %1-2 üstünde duruyordu — o kadarlık bir hareket koşulu ters çevirir,
+// yani süzgeç iş görmüyordu. Ölçüldü: canlı listede ALBRK %2, EDIP %1,
+// NUGYO %2, ISFIN %4, BINHO %4.
+const POC_PAY = 0.03;
+// ChoCh için ayrı ve KISA pencere. 250 barla "düşüşü sonlandıran dip" pratikte
+// YILIN DİBİ oluyordu: canlı listede dipin yaşı ortanca 168 bar (~8 ay), 10
+// sinyalin 7'sinde 90 bardan eski. Aylardır yükselen bir hissede yılın dibini
+// referans almak karakter değişimi değil, sadece yeni zirveye çıkış demek.
+// 90 bara çekilince kurulum tazeleşiyor (dip yaşı ortancası 99 -> 14 bar) ve
+// sinyal sayısı düşmüyor.
+const CHOCH_WINDOW = 90;
 
 export function pointOfControl(highs, lows, volumes, window = POC_WINDOW, bins = POC_BINS) {
   const n = highs?.length ?? 0;
@@ -168,7 +180,7 @@ export function pointOfControl(highs, lows, volumes, window = POC_WINDOW, bins =
 // ÖNCEKİ son swing high, düşüşü başlatan tepedir; yukarı kırılması karakter
 // değişimi (Change of Character / Market Structure Break) sayılır.
 // Not: "son swing high"dan farklıdır — genelde daha yukarıda ve daha anlamlı.
-export function chochLevel(highs, lows, window = POC_WINDOW, k = 2) {
+export function chochLevel(highs, lows, window = CHOCH_WINDOW, k = 2) {
   const n = highs?.length ?? 0;
   if (n < 30) return null;
   const from = Math.max(0, n - window);
@@ -256,7 +268,9 @@ export function smcDetay(highs, lows, closes, volumes, recent = 5) {
 
   return {
     choch,
-    pocUstunde: poc != null && son > poc,
+    // "Üstünde" değil "belirgin biçimde üstünde": POC'a yapışık fiyat, değer
+    // bölgesinin kabul edildiği anlamına gelmiyor.
+    pocUstunde: poc != null && son > poc * (1 + POC_PAY),
     htf: htfBullish(highs, lows, closes),
     pocSeviye: poc,
     chochSeviye: ch?.seviye ?? null,
