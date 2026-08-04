@@ -11,7 +11,7 @@ import {
   rsiValue, macdBullish, rsiBullishReversal, macdBullCross, smcBullish,
 } from './indicators.js';
 
-function clamp01(x) {
+export function clamp01(x) {
   return Math.max(0, Math.min(1, x));
 }
 // Fiyat için uyarlamalı yuvarlama: küçük fiyatlarda (kripto) daha çok ondalık.
@@ -22,7 +22,7 @@ export function roundPrice(x) {
   const f = 10 ** d;
   return Math.round(x * f) / f;
 }
-function round(x, digits = 2) {
+export function round(x, digits = 2) {
   if (x == null || Number.isNaN(x)) return null;
   const f = 10 ** digits;
   return Math.round(x * f) / f;

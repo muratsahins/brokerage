@@ -3,7 +3,9 @@ import express from 'express';
 import cors from 'cors';
 import compression from 'compression';
 import { initDb } from './db.js';
-import { syncData, getRecommendations, getCachedItems } from './service.js';
+import {
+  syncData, getRecommendations, getCachedItems, getUsRecommendations, refreshUs,
+} from './service.js';
 import { diagnose, fetchOhlc, peekLivePrices } from './dataSource.js';
 import { getLivePrices, refreshSeries, seriesStats } from './liveSignals.js';
 import { fetchNews } from './newsSource.js';
@@ -107,6 +109,28 @@ app.get('/api/recommendations', async (req, res) => {
 app.post('/api/refresh', async (req, res) => {
   try {
     const data = await (async () => { await syncData(); return getRecommendations(); })();
+    res.json({ ok: true, count: data.items.length, source: data.source });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ABD büyük şirketler (NASDAQ100+S&P100) — temel analiz ağırlıklı öneri listesi.
+// BIST hattından bağımsız: günlük yayınlanan ayrı bir JSON'dan okunur.
+app.get('/api/us-recommendations', async (req, res) => {
+  try {
+    const data = await getUsRecommendations();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Manuel yenileme (ABD): canlı çekime düşer (published JSON'u değil, belleği günceller).
+app.post('/api/us-refresh', async (req, res) => {
+  try {
+    await refreshUs();
+    const data = await getUsRecommendations();
     res.json({ ok: true, count: data.items.length, source: data.source });
   } catch (err) {
     res.status(500).json({ error: err.message });

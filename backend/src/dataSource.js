@@ -550,6 +550,89 @@ async function fetchFundamentals(symbol, attempt = 0) {
   };
 }
 
+// --- ABD hisseleri: tek istekte fiyat + temel veri (quoteSummary) ----------
+// BIST akışından farklı olarak ayrı bir chart isteğine gerek yok: `price`
+// modülü güncel fiyat + günlük değişimi de veriyor, tek HTTP isteği yeterli.
+// `incomeStatementHistory` "bonus" modül — dönmezse/boşsa sessizce null kalır,
+// ek istek maliyeti yok. Aynı retry/backoff iskeleti fetchFundamentals ile aynı.
+const US_MODULES = 'price,summaryDetail,financialData,defaultKeyStatistics,assetProfile,incomeStatementHistory';
+
+export async function fetchUsFundamentals(symbol, attempt = 0) {
+  const { cookie, crumb } = await ensureSession();
+  if (!crumb) return null; // oturum kurulamadı; sessizce atla
+  const url = `${SUMMARY_URL}/${encodeURIComponent(symbol)}?modules=${US_MODULES}&crumb=${encodeURIComponent(crumb)}`;
+
+  let res;
+  try {
+    res = await fetch(url, { headers: { ...BROWSER_HEADERS, Cookie: cookie } });
+  } catch (e) {
+    if (attempt < 3) { await sleep(700 * (attempt + 1)); return fetchUsFundamentals(symbol, attempt + 1); }
+    return null;
+  }
+
+  if (!res.ok) {
+    if (attempt < 1) {
+      if (res.status === 401 || res.status === 403) await ensureSession(true);
+      else await sleep(600 + Math.random() * 400);
+      return fetchUsFundamentals(symbol, attempt + 1);
+    }
+    return null;
+  }
+
+  const json = await res.json();
+  const r = json?.quoteSummary?.result?.[0];
+  if (!r) return null;
+  const price = r.price ?? {};
+  const sd = r.summaryDetail ?? {};
+  const fd = r.financialData ?? {};
+  const ks = r.defaultKeyStatistics ?? {};
+  const ap = r.assetProfile ?? {};
+
+  // 3 yıllık gelir CAGR'ı — bonus modül mevcutsa (en eski/en yeni yıllık gelir).
+  // Yahoo genelde son 4 mali yılı döner; ilkiyle sonuncusu arasındaki yıl
+  // sayısı kadar kök alınır. Modül yoksa/tek yıl varsa null (uydurulmaz).
+  let revenue3yCagr = null;
+  const stmts = r.incomeStatementHistory?.incomeStatementHistory;
+  if (Array.isArray(stmts) && stmts.length >= 2) {
+    const sorted = [...stmts].sort((a, b) => (a.endDate?.raw ?? 0) - (b.endDate?.raw ?? 0));
+    const first = sorted[0]?.totalRevenue?.raw;
+    const last = sorted[sorted.length - 1]?.totalRevenue?.raw;
+    const years = sorted.length - 1;
+    if (first > 0 && last > 0 && years > 0) {
+      revenue3yCagr = Math.pow(last / first, 1 / years) - 1;
+    }
+  }
+
+  return {
+    price: price.regularMarketPrice?.raw ?? null,
+    changePct: price.regularMarketChangePercent?.raw != null ? price.regularMarketChangePercent.raw * 100 : null,
+    currency: price.currency ?? 'USD',
+    marketCap: price.marketCap?.raw ?? null,
+    sector: ap.sector ?? null,
+    industry: ap.industry ?? null,
+    fiftyTwoWeekHigh: sd.fiftyTwoWeekHigh?.raw ?? null,
+    fiftyTwoWeekLow: sd.fiftyTwoWeekLow?.raw ?? null,
+    dividendYield: sd.dividendYield?.raw ?? null,
+    targetMean: fd.targetMeanPrice?.raw ?? null,
+    targetHigh: fd.targetHighPrice?.raw ?? null,
+    targetLow: fd.targetLowPrice?.raw ?? null,
+    recommendationKey: fd.recommendationKey ?? null,
+    numAnalysts: fd.numberOfAnalystOpinions?.raw ?? null,
+    revenueGrowth: fd.revenueGrowth?.raw ?? null, // YoY, çeyreklik bazlı (Yahoo)
+    revenue3yCagr,
+    profitMargins: fd.profitMargins?.raw ?? null,
+    totalRevenue: fd.totalRevenue?.raw ?? null,
+    totalCash: fd.totalCash?.raw ?? null,
+    totalDebt: fd.totalDebt?.raw ?? null,
+    ebitda: fd.ebitda?.raw ?? null,
+    freeCashflow: fd.freeCashflow?.raw ?? null,
+    operatingCashflow: fd.operatingCashflow?.raw ?? null,
+    forwardPE: ks.forwardPE?.raw ?? null,
+    trailingPE: sd.trailingPE?.raw ?? null,
+    priceToBook: ks.priceToBook?.raw ?? null,
+  };
+}
+
 // Tüm enstrümanları sırayla (nazikçe) çeker; başarısız olanları atlar.
 // instruments: { ticker, symbol, currency, kind } nesneleri.
 export async function fetchQuotes(instruments) {
@@ -571,6 +654,23 @@ export async function fetchQuotes(instruments) {
       console.warn(`[data] ${inst.ticker} atlandı: ${err.message}`);
     }
     await sleep(350); // rate-limit'e takılmamak için enstrümanlar arası bekleme
+  }
+  return out;
+}
+
+// ABD hisseleri için: tek istekte fiyat+temel veri (fetchQuotes'tan farklı
+// olarak ayrı bir chart isteği yok — bkz. fetchUsFundamentals üstündeki not).
+export async function fetchUsQuotes(instruments) {
+  const out = [];
+  for (const inst of instruments) {
+    try {
+      const data = await fetchUsFundamentals(inst.symbol);
+      if (data) out.push({ ticker: inst.ticker, ...data });
+      else console.warn(`[data] ${inst.ticker} (ABD) veri alınamadı`);
+    } catch (err) {
+      console.warn(`[data] ${inst.ticker} (ABD) atlandı: ${err.message}`);
+    }
+    await sleep(350);
   }
   return out;
 }

@@ -10,6 +10,11 @@ import {
 // tembel yükleniyor — ilk açılışta inen JS neredeyse yarıya iniyor.
 const ChartModal = lazy(() => import('./ChartModal.jsx'));
 
+// ABD Büyük Şirketler sekmesi (NASDAQ100+S&P100) BIST'ten tamamen izole bir
+// veri kaynağı ve arayüz kullanıyor; kendi bundle'ı yalnızca sekmeye
+// tıklanınca iner (ChartModal ile aynı tembel yükleme gerekçesi).
+const UsStocksTab = lazy(() => import('./UsStocksTab.jsx'));
+
 
 // Güncel fiyatları (/api/prices) mevcut veriye işler: fiyat + günlük değişim
 // (+ metal ₺/gram), AYNI ANDA hesaplanan teknik göstergeler ve canlı fiyattan
@@ -934,6 +939,9 @@ export default function App() {
     // kapsamı olmayan, BIST dışı enstrümanlar.
     { key: 'metal',   label: 'Maden & Emtia', match: (i) => i.kind === 'metal' || i.kind === 'emtia' },
     // Kripto kaldırıldı (backend'de de takip listesi dışında — stocks.js).
+    // ABD Büyük Şirketler: BIST'ten ayrı bir veri kaynağı (data.items içinde
+    // değil), o yüzden match yok — UsStocksTab kendi verisini kendi çeker.
+    { key: 'us',      label: '🇺🇸 ABD Hisseleri' },
   ];
   // Üst şerit: haberler + UYARI (yeni sinyal taraması; KAP'ın yerini aldı).
   // Anahtar 'uyari' olarak kaldı: localStorage'daki görülmüş sinyal kaydı
@@ -1048,6 +1056,8 @@ export default function App() {
               ? 'Sanal borsa · e-posta ile giriş, sanal alım-satım (gerçek para değildir)'
               : tab === 'uyari'
               ? 'Bugün yeni sinyal veren hisseler · günlük grafik taraması'
+              : tab === 'us'
+              ? 'NASDAQ-100 + S&P 100 · temel analiz ağırlıklı puan + seçili hisselerde tam analist raporu'
               : isNews
               ? 'Piyasa, kıymetli maden ve analist önerisi haberleri'
               : <>Analist hedef fiyatı + temel verilere dayalı beklenen getiri · {searching ? `“${query.trim()}” için ${items.length} sonuç` : `${inTab.length} kayıt`}
@@ -1148,6 +1158,10 @@ export default function App() {
         />
       ) : tab === 'trade' ? (
         <VirtualTrade items={data.items} onSelect={setChartItem} />
+      ) : tab === 'us' ? (
+        <Suspense fallback={<div className="state">Yükleniyor…</div>}>
+          <UsStocksTab />
+        </Suspense>
       ) : (
       <>
       <div className="search">
@@ -1310,6 +1324,7 @@ export default function App() {
       </>
       )}
 
+      {tab !== 'us' && (
       <footer className="disclaimer">
         <p>
           <strong>Beklenen getiri</strong> tahminleri, hisseyi izleyen analistlerin <strong>ortalama 12 aylık hedef
@@ -1344,6 +1359,7 @@ export default function App() {
           Veriler Yahoo Finance / analist konsensüsü kaynaklıdır, gecikmeli olabilir.
         </p>
       </footer>
+      )}
 
       {/* Grafik yığını (lightweight-charts) ilk tıklamada indirilir; inerken
           pop-up boş açılmasın diye aynı kılıkta bir bekleme katmanı gösterilir. */}

@@ -1,6 +1,7 @@
 import { BIST_STOCKS, INSTRUMENTS, toSymbol } from './stocks.js';
 import {
   fetchQuotes, fetchUsdTryRate, fetchAltinInPrices, fetchSpotMetals, metalTryPerGram,
+  fetchUsQuotes,
 } from './dataSource.js';
 import { buildRecommendations, roundPrice } from './recommend.js';
 import {
@@ -9,6 +10,9 @@ import {
   upsertRecommendation,
   getRecommendations as dbGetRecommendations,
 } from './db.js';
+import { US_STOCKS } from './usStocks.js';
+import { buildUsRecommendations } from './recommendUs.js';
+import { US_ANALYSIS } from './usAnalysis.js';
 
 // Analist verisi Render'ın datacenter IP'sinde throttle olduğu için,
 // asıl veri GitHub Actions'ta (taze runner IP) çekilip repoya yayınlanır.
@@ -219,4 +223,104 @@ export async function getRecommendations() {
   }
 
   return { source: memory.source ?? 'memory', updatedAt: memory.updatedAt, items: memory.recommendations };
+}
+
+// --- ABD büyük şirketler (NASDAQ100 + S&P100) --------------------------------
+// BIST hattından tamamen izole: kendi ticker evreni (usStocks.js), kendi
+// puanlama mantığı (recommendUs.js — momentum değil temel analiz ağırlıklı),
+// kendi published-JSON dosyası. Teknik gösterge/canlı fiyat altyapısına
+// (liveSignals.js) dokunmaz — bu sekme günlük yayınlanan veriyle çalışır.
+const usByTicker = new Map(US_STOCKS.map((s) => [s.ticker, s]));
+
+const memoryUs = { recommendations: [], updatedAt: null, source: null };
+
+const US_DATA_PATH = process.env.US_PUBLISHED_DATA_PATH || 'data/us-recommendations.json';
+const US_PUBLISHED_DATA_URL =
+  process.env.US_PUBLISHED_DATA_URL ||
+  `https://raw.githubusercontent.com/${GITHUB_REPO}/${GITHUB_BRANCH}/${US_DATA_PATH}`;
+const US_GITHUB_API_URL =
+  `https://api.github.com/repos/${GITHUB_REPO}/contents/${US_DATA_PATH}?ref=${GITHUB_BRANCH}`;
+
+// Yahoo'dan çeker, puanlar, isim/endeks/curated rapor ile zenginleştirir.
+export async function computeUsRecommendations() {
+  const instruments = US_STOCKS.map((s) => ({ ticker: s.ticker, symbol: s.symbol || s.ticker }));
+  const quotes = await fetchUsQuotes(instruments);
+  const recos = buildUsRecommendations(quotes);
+
+  return recos.map((r) => {
+    const meta = usByTicker.get(r.ticker);
+    const report = US_ANALYSIS[r.ticker] ?? null;
+    return {
+      ...r,
+      name: meta?.name ?? r.ticker,
+      // Türkçe küratörlü sektör etiketi (usStocks.js) önce; Yahoo'nun İngilizce
+      // assetProfile.sector'ü yalnızca eşleşme yoksa yedek olarak kullanılır.
+      sector: meta?.sector ?? r.sector ?? null,
+      industry: r.industry ?? null,
+      indices: meta?.indices ?? [],
+      hasReport: !!report,
+      report,
+    };
+  });
+}
+
+export async function loadPublishedUs() {
+  try {
+    const url = GITHUB_TOKEN
+      ? `${US_GITHUB_API_URL}&t=${Date.now()}`
+      : `${US_PUBLISHED_DATA_URL}?t=${Date.now()}`;
+    const headers = { 'Cache-Control': 'no-cache' };
+    if (GITHUB_TOKEN) {
+      headers.Authorization = `Bearer ${GITHUB_TOKEN}`;
+      headers.Accept = 'application/vnd.github.raw';
+    }
+    const res = await fetch(url, { headers });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (!Array.isArray(data.items) || data.items.length === 0) throw new Error('boş veri');
+    // Yayınlanan veri, takip listesinden çıkarılmış ticker'ları taşıyor olabilir.
+    const items = data.items.filter((it) => usByTicker.has(it.ticker));
+    memoryUs.recommendations = items;
+    memoryUs.updatedAt = data.updatedAt ?? new Date().toISOString();
+    memoryUs.source = 'github';
+    console.log(`[service] ABD verisi yüklendi — ${items.length} hisse (${memoryUs.updatedAt}).`);
+    return true;
+  } catch (err) {
+    console.warn(`[service] ABD verisi yüklenemedi: ${err.message}`);
+    return false;
+  }
+}
+
+let inflightUs = null;
+export function refreshUs() {
+  if (inflightUs) return inflightUs;
+  inflightUs = doRefreshUs().finally(() => { inflightUs = null; });
+  return inflightUs;
+}
+
+async function doRefreshUs() {
+  console.log('[service] ABD verisi canlı yenileniyor...');
+  const enriched = await computeUsRecommendations();
+  memoryUs.recommendations = enriched;
+  memoryUs.updatedAt = new Date().toISOString();
+  memoryUs.source = 'memory';
+  console.log(`[service] ABD canlı yenileme tamam — ${enriched.length} hisse.`);
+  return enriched;
+}
+
+export async function syncUsData() {
+  if (await loadPublishedUs()) return;
+  await refreshUs();
+}
+
+export async function getUsRecommendations() {
+  if (memoryUs.recommendations.length === 0) {
+    const timeout = new Promise((r) => setTimeout(r, 8000));
+    try {
+      await Promise.race([syncUsData(), timeout]);
+    } catch (err) {
+      console.warn(`[service] ABD ilk veri yüklemesi başarısız: ${err.message}`);
+    }
+  }
+  return { source: memoryUs.source ?? 'memory', updatedAt: memoryUs.updatedAt, items: memoryUs.recommendations };
 }

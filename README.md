@@ -130,6 +130,8 @@ da korunur ve React tüm güncellemeyi atlar (yalnızca "Fiyat: …" saati ilerl
 | GET   | `/api/chart`            | Grafik için günlük OHLC serisi            |
 | GET   | `/api/alerts`           | UYARI: yeni sinyal veren hisseler (1s/4s/günlük) |
 | POST  | `/api/refresh`          | Veriyi Yahoo'dan yeniden çeker ve puanlar |
+| GET   | `/api/us-recommendations` | ABD (NASDAQ100+S&P100) temel analiz ağırlıklı öneri listesi |
+| POST  | `/api/us-refresh`       | ABD verisini canlı yeniden çeker (belleği günceller) |
 
 ## Takip edilen hisseler
 
@@ -207,6 +209,38 @@ varil başına fiyatlanan Brent'te bu anlamsız olurdu. Sanal borsada işlem bir
 Maden ve emtiada **günlük kâr/zarar hesaplanmaz**: günlük yüzde USD fiyatın
 değişimidir, ₺ karşılığı ise ayrıca döviz kurundan etkilenir; ikisini çarpmak
 yanlış sayı üretirdi. Analist kapsamları olmadığı için puanları 60 ile sınırlıdır.
+
+## ABD Büyük Şirketler (NASDAQ100 + S&P100)
+
+BIST'ten tamamen izole, ayrı bir sekme: **🇺🇸 ABD Hisseleri**. Teknik gösterge
+(overzone/WaveTrend/SuperTrend) veya canlı fiyat akışı yok — bu sekme
+**temel analiz** odaklı.
+
+- **Ticker evreni**: `backend/src/usStocks.js` — NASDAQ-100 ∪ S&P 100 birleşimi
+  (~170 hisse), BIST_STOCKS gibi statik/elle bakımlı bir liste.
+- **Veri**: `backend/src/dataSource.js`'teki `fetchUsFundamentals` tek bir
+  Yahoo `quoteSummary` isteğinde fiyat + temel veriyi (gelir büyümesi, net
+  marj, nakit/borç/EBITDA, FCF, analist hedefi, çok yıllık gelir CAGR'ı)
+  çeker. `.github/workflows/refresh-us-data.yml` günde 1 kez (BIST'e göre
+  daha seyrek — bu veriler o kadar hızlı değişmiyor) taze bir GitHub runner
+  IP'sinde çekip `data/us-recommendations.json`'a yayınlar; backend bunu
+  runtime'da okur (BIST'in `refresh-data.yml` deseniyle birebir aynı,
+  Render'ın datacenter IP throttle sorunundan kaçınmak için).
+- **Puan** (`backend/src/recommendUs.js`): momentum yerine analist 12 aylık
+  hedef potansiyeli (%35), yıllık (YoY) gelir büyümesi (%20), net kâr marjı
+  (%15), kaldıraç/`Net Debt-EBITDA` (%15) ve FCF marjı (%15). Eşikler BIST
+  ile aynı: `≥65 AL`, `45–64 TUT`, `<45 İZLE`.
+- **Analist raporu** (`backend/src/usAnalysis.js`): Yahoo'nun API'si
+  segment/rakip/moat gibi nitel veri vermediği için ~48 mega-cap'te elle
+  yazılmış, yapılandırılmış bir rapor var — gelir modeli/segmentler, bilanço
+  sağlığı, rekabet avantajı (moat), 3 güçlü/3 zayıf yön, gerekçeli değerleme
+  özeti. **AL/TUT/İZLE rozeti bu metinden gelmez** — her zaman yukarıdaki
+  hesaplanan puandan gelir, tutarlılık için tek kaynak budur. Rapor kapsamı
+  dışındaki hisselerde yalnızca otomatik sayısal özet gösterilir, uydurma
+  anlatı eklenmez.
+
+⚠️ Nitel rapor içeriği en son bilinen yıllık verilere dayalı **yaklaşık**
+değerlerdir, gerçek zamanlı değildir ve **yatırım tavsiyesi değildir**.
 
 ## Sonraki adımlar (fikirler)
 - Daha zengin göstergeler (RSI, hareketli ortalama kesişimleri, hacim)
