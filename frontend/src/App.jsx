@@ -1140,7 +1140,7 @@ export default function App() {
         <VirtualTrade items={data.items} onSelect={setChartItem} />
       ) : tab === 'us' ? (
         <Suspense fallback={<div className="state">Yükleniyor…</div>}>
-          <UsStocksTab />
+          <UsStocksTab view={view} />
         </Suspense>
       ) : (
       <>

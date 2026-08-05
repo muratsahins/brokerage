@@ -157,7 +157,78 @@ function ReportPanel({ item, onClose }) {
   );
 }
 
-export default function UsStocksTab() {
+// Mobil kart — BIST kartıyla aynı iskelet (card-top / card-price /
+// card-metrics), yalnızca gösterge şeridi yerine temel analiz metrikleri.
+function UsCard({ s, rank, onSelect }) {
+  return (
+    <div className="card">
+      <div className="card-top">
+        <div className="card-id">
+          <span className="rank">{rank}</span>
+          <div>
+            <button className="ticker ticker-link" onClick={() => onSelect(s)} title="Detay/rapor aç">
+              {s.ticker} <span className="chart-ico">📄</span>
+            </button>
+            <div className="name">{s.name}{s.sector ? ` · ${s.sector}` : ''}</div>
+          </div>
+        </div>
+        <SignalBadge signal={s.signal} />
+      </div>
+
+      <div className="card-price">
+        <span className="card-price-val">
+          {fmtNum(s.price)} <span className="cur">{s.currency || 'USD'}</span>
+        </span>
+        <Pct value={s.changePct} />
+      </div>
+
+      <div className="card-metrics">
+        <div className="metric">
+          <span className="metric-label">Hedef</span>
+          <Expected
+            value={s.upside12m}
+            note={s.upside12m != null
+              ? `${s.numAnalysts ?? '?'} analist · hedef $${fmtNum(s.targetMean)}`
+              : null}
+          />
+        </div>
+        <div className="metric">
+          <span className="metric-label">Puan</span>
+          <ScoreBar score={s.score} />
+        </div>
+      </div>
+
+      <div className="card-metrics">
+        <div className="metric">
+          <span className="metric-label">Gelir Büyümesi</span>
+          <span>{pctCell(s.revenueGrowth)}</span>
+        </div>
+        <div className="metric">
+          <span className="metric-label">Net Marj</span>
+          <span>{pctCell(s.profitMargins)}</span>
+        </div>
+        <div className="metric">
+          <span className="metric-label">Net Borç/FAVÖK</span>
+          <span>{s.netDebtToEbitda != null ? `${fmtNum(s.netDebtToEbitda)}x` : <span className="muted-dash">—</span>}</span>
+        </div>
+        <div className="metric">
+          <span className="metric-label">FCF Marjı</span>
+          <span>{pctCell(s.fcfMargin)}</span>
+        </div>
+        <div className="metric">
+          <span className="metric-label">İleri F/K</span>
+          <span>{s.forwardPE != null ? fmtNum(s.forwardPE) : <span className="muted-dash">—</span>}</span>
+        </div>
+        <div className="metric">
+          <span className="metric-label">Rapor</span>
+          <span>{s.hasReport ? '📄 var' : <span className="muted-dash">—</span>}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function UsStocksTab({ view = 'web' }) {
   const { loading, items, updatedAt, ok } = useUsRecommendations();
   const [query, setQuery] = useState('');
   const [idx, setIdx] = useState('ALL'); // ALL | NDX | SPX
@@ -236,7 +307,7 @@ export default function UsStocksTab() {
         <div className="state">{query.trim() ? `“${query.trim()}” ile eşleşen kayıt bulunamadı.` : 'Henüz veri yok.'}</div>
       )}
 
-      {filtered.length > 0 && (
+      {filtered.length > 0 && view === 'web' && (
         <div className="table-wrap">
           <table>
             <thead>
@@ -288,6 +359,14 @@ export default function UsStocksTab() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {filtered.length > 0 && view === 'mobile' && (
+        <div className="cards">
+          {filtered.map((s, i) => (
+            <UsCard key={s.ticker} s={s} rank={i + 1} onSelect={setSelected} />
+          ))}
         </div>
       )}
 
