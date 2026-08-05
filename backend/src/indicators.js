@@ -141,9 +141,11 @@ const POC_PAY = 0.03;
 // YILIN DİBİ oluyordu: canlı listede dipin yaşı ortanca 168 bar (~8 ay), 10
 // sinyalin 7'sinde 90 bardan eski. Aylardır yükselen bir hissede yılın dibini
 // referans almak karakter değişimi değil, sadece yeni zirveye çıkış demek.
-// 90 bara çekilince kurulum tazeleşiyor (dip yaşı ortancası 99 -> 14 bar) ve
-// sinyal sayısı düşmüyor.
-const CHOCH_WINDOW = 90;
+// 90 bara çekilince kurulum tazeleşti (dip yaşı ortancası 99 -> 14 bar) ama
+// sinyal sayısı 10'dan 18'e çıktı: pencere daraldıkça "en düşük dip" yakınlaşıp
+// kırılması gereken tepe alçalıyor, dolayısıyla daha çok hisse eşiği geçiyor.
+// Seçiciliği geri almak için 60'a indirildi.
+const CHOCH_WINDOW = 60;
 
 export function pointOfControl(highs, lows, volumes, window = POC_WINDOW, bins = POC_BINS) {
   const n = highs?.length ?? 0;
