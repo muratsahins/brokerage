@@ -122,7 +122,7 @@ export function scoreQuote(q) {
   });
 
   // --- TradingView teknik gösterge sinyalleri (AL/SAT) -----------------------
-  // WaveTrend Oscillator (LazyBear): standart kesişim + 53-60 aşırı bölge sürümü.
+  // WaveTrend Oscillator (LazyBear): standart kesişim + 50-60 aşırı bölge sürümü.
   const wtCrossSignal = wavetrendCrossSignal(q.highs, q.lows, q.closes);
   const wtSignal = wavetrendSignal(q.highs, q.lows, q.closes);
   const stSignal = supertrendSignal(q.highs, q.lows, q.closes);
@@ -153,7 +153,7 @@ export function scoreQuote(q) {
     revenueGrowth: f.revenueGrowth != null ? round(f.revenueGrowth * 100) : null,
     score: d.score,
     signal: d.signal,
-    wtSignal,      // 53-60 WaveTrend (aşırı bölge kesişimi): 'AL' | 'SAT' | null
+    wtSignal,      // 50-60 WaveTrend (aşırı bölge kesişimi): 'AL' | 'SAT' | null
     wtCrossSignal, // WaveTrend standart kesişim (LazyBear): 'AL' | 'SAT' | null
     stSignal,      // SuperTrend (Kıvanç Özbilgiç): 'AL' | 'SAT' | null
     rsi: rsi != null ? round(rsi, 1) : null, // RSI 14 (son)

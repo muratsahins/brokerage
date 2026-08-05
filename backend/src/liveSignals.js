@@ -160,7 +160,7 @@ export function liveDailySeries(ticker) {
 
 // Canlı fiyatlardan gösterge sinyallerini üretir. Yanıt küçük kalsın diye kısa
 // anahtar + yalnızca dolu alanlar: st=SuperTrend, wt=WaveTrend kesişimi,
-// wo=overzone (53-60), smc=SMC yükseliş.
+// wo=overzone (50-60), smc=SMC yükseliş.
 export function computeLiveSignals(prices, bars = {}) {
   const out = {};
   for (const [ticker, p] of Object.entries(prices)) {

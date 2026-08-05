@@ -12,10 +12,10 @@ const ST_MULTIPLIER = 3;
 const WT_CHANNEL_LEN = 10;
 const WT_AVERAGE_LEN = 21;
 const WT_SIGNAL_LEN = 4;
-// Aşırı bölge seviyeleri (LazyBear -53/-60 ve +53/+60). Sinyal yalnızca bu
+// Aşırı bölge seviyeleri (LazyBear -50/-60 ve +50/+60). Sinyal yalnızca bu
 // bölgelerdeki kesişimlerde üretilir.
-const WT_OS_LEVEL = -53; // aşırı satım eşiği (bu değer ve altı)
-const WT_OB_LEVEL = 53;  // aşırı alım eşiği (bu değer ve üstü)
+const WT_OS_LEVEL = -50; // aşırı satım eşiği (bu değer ve altı)
+const WT_OB_LEVEL = 50;  // aşırı alım eşiği (bu değer ve üstü)
 
 // Üstel hareketli ortalama (ilk değerle tohumlanır).
 function ema(values, period) {
@@ -419,7 +419,7 @@ function crossFrom(w) {
 
 // --- YENİ sinyal tespiti (UYARI taraması) -----------------------------------
 // Kalıcı durumu değil, sinyalin OLUŞTUĞU BARI arar: son `lookback` bar içinde
-// SuperTrend trend dönüşü, WaveTrend kesişimi ve overzone (53-60) sinyalinin
+// SuperTrend trend dönüşü, WaveTrend kesişimi ve overzone (50-60) sinyalinin
 // kurulması. Her biri için en yeni olay { dir, barsAgo } olarak döner (yoksa null).
 export function recentSignals(highs, lows, closes, lookback = 6) {
   const n = closes?.length ?? 0;
@@ -452,10 +452,10 @@ export function recentSignals(highs, lows, closes, lookback = 6) {
   return out;
 }
 
-// 53-60 WaveTrend: sinyal TERS kesişime kadar kalıcıdır, sonra boşalır (null).
-//   AL  : aşırı satımda (wt2 <= -53) YUKARI kesişimle kurulur;
+// 50-60 WaveTrend: sinyal TERS kesişime kadar kalıcıdır, sonra boşalır (null).
+//   AL  : aşırı satımda (wt2 <= -50) YUKARI kesişimle kurulur;
 //         sonraki AŞAĞI kesişim (tersi) olunca boşalır.
-//   SAT : aşırı alımda  (wt2 >= +53) AŞAĞI kesişimle kurulur;
+//   SAT : aşırı alımda  (wt2 >= +50) AŞAĞI kesişimle kurulur;
 //         sonraki YUKARI kesişim (tersi) olunca boşalır.
 export function wavetrendSignal(highs, lows, closes) {
   const w = computeWaveTrend(highs, lows, closes);

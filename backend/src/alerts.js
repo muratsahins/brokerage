@@ -1,7 +1,7 @@
 // UYARI taraması — GÜNLÜK grafikte, İKİ AYRI grup:
 //
 //   items  (ALIM ADAYLARI, tüm enstrümanlar): overzone AL — aşırı satım
-//          bölgesinde (wt2 <= -53) kurulan YUKARI kesişim, SON BARDA oluşmuş
+//          bölgesinde (wt2 <= -50) kurulan YUKARI kesişim, SON BARDA oluşmuş
 //          olacak. Bilgi olarak SuperTrend'in o anki durumu da eklenir.
 //          Not: eskiden ayrıca hacim dönüşü teyidi de aranıyordu; o formasyon
 //          tümden kaldırıldı, dolayısıyla liste eskisinden geniş.

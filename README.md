@@ -53,7 +53,7 @@ npm start                 # http://localhost:4000
   `SERIES_CHECK_MINUTES` (15) kontrol aralığı, `SERIES_FETCH_GAP_MS` (350)
   Yahoo istekleri arası bekleme. Önbellek durumu: `GET /api/health`.
 - **UYARI taraması** (`/api/alerts`): günlük grafikte **iki grup** döner —
-  `items` = **alım adayları**: `overzone` **AL** (aşırı satımda, −53/−60,
+  `items` = **alım adayları**: `overzone` **AL** (aşırı satımda, −50/−60,
   kurulan yukarı kesişim) son barda oluşanlar (`ALERT_LOOKBACK_BARS`,
   varsayılan 1). Eskiden ayrıca **hacim dönüşü** teyidi de aranıyordu; o
   formasyon tümden kaldırıldı, dolayısıyla liste artık daha geniş ve daha
