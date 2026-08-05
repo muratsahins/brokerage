@@ -54,10 +54,11 @@ npm start                 # http://localhost:4000
   Yahoo istekleri arası bekleme. Önbellek durumu: `GET /api/health`.
 - **UYARI taraması** (`/api/alerts`): günlük grafikte **iki grup** döner —
   `items` = **alım adayları**: `overzone` **AL** (aşırı satımda, −50/−60,
-  kurulan yukarı kesişim) son barda oluşanlar (`ALERT_LOOKBACK_BARS`,
-  varsayılan 1). Eskiden ayrıca **hacim dönüşü** teyidi de aranıyordu; o
-  formasyon tümden kaldırıldı, dolayısıyla liste artık daha geniş ve daha
-  gürültülü (ölçüldü: 3 → 18 uyarı).
+  kurulan yukarı kesişim, TETİK) son barda oluşanlar (`ALERT_LOOKBACK_BARS`,
+  varsayılan 1) **+** `MACD` **AL** **+** `RSI` **0-`ALERT_RSI_MAX`** (varsayılan
+  40) arası (o anki durum, SÜZGEÇ) — üçü birden sağlanmayınca liste dışı kalır.
+  Eskiden ayrıca **hacim dönüşü** teyidi de aranıyordu; o formasyon tümden
+  kaldırıldı, MACD+RSI süzgeçleri onun yerini alıyor.
   `stSell` = `SuperTrend`in **son barda SAT'a döndüğü** hisseler.
   Arayüz `stSell`i kullanıcının **Sanal Borsa portföyüyle kesiştirir** ("kendi
   hisselerim" — satış uyarısı); portföy tarayıcıda durduğu için sunucuya

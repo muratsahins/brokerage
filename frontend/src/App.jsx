@@ -396,7 +396,8 @@ function NewsList({ kind }) {
 }
 
 // UYARI sekmesi iki grup gösterir (Backend /api/alerts tarar):
-//   • ALIM ADAYLARI (tüm BIST): son barda overzone AL.
+//   • ALIM ADAYLARI (tüm BIST): son barda overzone AL (tetik) + MACD AL +
+//     RSI 0-40 arası (o anki durum, süzgeç).
 //   • KENDİ HİSSELERİM: SuperTrend son barda SAT'a dönen hisselerden Sanal
 //     Borsa portföyünde olanlar. Portföy tarayıcıda durur, sunucuya gitmez —
 //     kesişim burada yapılır.
@@ -546,7 +547,9 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
         </strong>{' '}
         barı taranır, iki grup:{' '}
         <strong>Alım adayları</strong> = <code>overzone</code> <strong>AL</strong> (aşırı satım bölgesinde,
-        −50/−60, kurulan yukarı kesişim) — tüm BIST'te;{' '}
+        −50/−60, kurulan yukarı kesişim, tetik) <strong>+</strong> <code>MACD</code> <strong>AL</strong>
+        (mavi çizgi sinyalin üstünde) <strong>+</strong> <code>RSI</code> <strong>0-40 arası</strong>
+        (o anki durum, süzgeç) — tüm BIST'te;{' '}
         <strong>Kendi hisselerim</strong> = <code>SuperTrend</code> <strong>SAT</strong>'a dönenlerden Sanal
         Borsa portföyünde olanlar. Önceki günlerde üretilmiş sinyaller listeye girmez; son bar canlı fiyatla
         güncellendiği için sinyal, kapanış beklenmeden gün içinde görünür.
@@ -568,10 +571,10 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
         </div>
       ) : (
         <>
-          <div className="alert-group">Alım adayları — overzone AL (tüm BIST)</div>
+          <div className="alert-group">Alım adayları — overzone AL + MACD AL + RSI 0-40 (tüm BIST)</div>
           {list.length === 0 ? (
             <div className="state">
-              Bugün overzone AL sinyali veren hisse yok.
+              Bugün üç koşulu (overzone AL + MACD AL + RSI 0-40 arası) birden sağlayan hisse yok.
               {warming && ' Bar geçmişi hâlâ hazırlanıyor, birazdan tekrar bakın.'}
             </div>
           ) : (
