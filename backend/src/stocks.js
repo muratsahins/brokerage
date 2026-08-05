@@ -140,11 +140,14 @@ export const COMMODITIES = [
 
 // Fiyat/gösterge çekimi için birleşik enstrüman listesi. Her enstrümanın açık
 // Yahoo `symbol`'ü, `currency`'si ve `kind`'i (stock/metal) vardır.
+// TARAMA KAPSAMI: BIST 100 + Maden & Emtia + (ayrı hatta) ABD hisseleri.
 // KRİPTO KAPALI: sitede hiç görünmemesi istendi. Geri açmak için aşağıdaki
 // satırın yorumunu kaldırmak yeterli (crypto.js ve kind:'crypto' desteği duruyor).
+// DİĞER BIST (endeks dışı ~490 hisse) KAPALI: yalnızca BIST 100 taranır. Geri
+// açmak için aşağıdaki satırın yorumunu kaldırmak yeterli (other-stocks.js duruyor).
 export const INSTRUMENTS = [
   ...BIST_STOCKS.map((s) => ({ ...s, symbol: `${s.ticker}.IS`, currency: 'TRY', kind: 'stock' })),
-  ...OTHER_STOCKS.map((s) => ({ ...s, symbol: `${s.ticker}.IS`, currency: 'TRY', bist: null, kind: 'stock' })),
+  // ...OTHER_STOCKS.map((s) => ({ ...s, symbol: `${s.ticker}.IS`, currency: 'TRY', bist: null, kind: 'stock' })),
   ...METALS.map((m) => ({ ...m, sector: 'Kıymetli Maden', bist: null, kind: 'metal' })),
   ...COMMODITIES.map((c) => ({ ...c, sector: 'Emtia', bist: null, kind: 'emtia' })),
   // ...CRYPTOS.map((c) => ({ ...c, sector: 'Kripto', bist: null, currency: 'USD', kind: 'crypto' })),
