@@ -51,15 +51,24 @@ jobs:
             echo "Değişiklik yok."
           else
             git commit -m "chore: ABD verisi güncellendi [skip ci]"
-            # BIST veri turu (refresh-data.yml) da main'e push ediyor ve ayrı
-            # bir concurrency grubunda olduğu için aynı anda çalışabiliyor.
-            # Araya girip push'u reddettirirse rebase edip tekrar deniyoruz.
-            # (İki iş akışı farklı dosyalara dokunduğu için rebase çakışmaz.)
+            # main'e push eden başka turlar var (BIST veri turu, ayrıca elle
+            # tetiklemeler ve başka dallardan gelen işler). Araya girip push'u
+            # reddettirirlerse aşağıdaki döngü toparlıyor.
             for deneme in 1 2 3; do
               git push && exit 0
-              echo "Push reddedildi (deneme $deneme); rebase edilip tekrar denenecek."
-              git pull --rebase --autostash
-              sleep 5
+              echo "Push reddedildi (deneme $deneme); uzak alınıp veri yeniden yazılacak."
+              # ÖNEMLİ: rebase DENENMİYOR. Bu dosya üretilen bir çıktı; aynı
+              # dosyayı yazan başka bir tur araya girdiyse rebase içerik
+              # çakışması verip duruyordu (yaşandı). Birleştirmenin anlamı da
+              # yok — iki taraf da tam anlık görüntü. Uzağın üstüne BİZİM taze
+              # sürümü yazıp yeniden commit'liyoruz.
+              cp data/us-recommendations.json /tmp/veri-yeni.json
+              git fetch origin main
+              git reset --hard origin/main
+              cp /tmp/veri-yeni.json data/us-recommendations.json
+              git add data/us-recommendations.json
+              git diff --staged --quiet || git commit -m "chore: ABD verisi güncellendi [skip ci]"
+              sleep 3
             done
             echo "::error::Push 3 denemede de başarısız oldu."
             exit 1
