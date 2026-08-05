@@ -6,7 +6,7 @@
 // aynı desen), böylece BIST kullanıcıları bu bundle'ı hiç indirmez.
 import { useEffect, useMemo, useState } from 'react';
 import { API_BASE, fmtNum, norm } from './lib/common.js';
-import { Pct } from './lib/ui.jsx';
+import { Expected, Pct } from './lib/ui.jsx';
 
 const SIGNAL_STYLES = {
   AL: { label: 'AL', bg: '#0f5132', fg: '#4ade80' },
@@ -245,13 +245,14 @@ export default function UsStocksTab() {
                 <th>Hisse</th>
                 <th className="num">Fiyat</th>
                 <th className="num">Günlük</th>
+                <th className="num">Hedef</th>
+                <th style={{ minWidth: 110 }}>Puan</th>
+                <th>Sinyal</th>
                 <th className="num">Gelir Büyümesi</th>
                 <th className="num">Net Marj</th>
                 <th className="num">Net Borç/FAVÖK</th>
                 <th className="num">FCF Marjı</th>
                 <th className="num">İleri F/K</th>
-                <th style={{ minWidth: 110 }}>Puan</th>
-                <th>Sinyal</th>
                 <th>Rapor</th>
               </tr>
             </thead>
@@ -267,13 +268,21 @@ export default function UsStocksTab() {
                   </td>
                   <td className="num">{fmtNum(s.price)} <span className="cur">{s.currency || 'USD'}</span></td>
                   <td className="num"><Pct value={s.changePct} /></td>
+                  <td className="num">
+                    <Expected
+                      value={s.upside12m}
+                      note={s.upside12m != null
+                        ? `${s.numAnalysts ?? '?'} analist · hedef $${fmtNum(s.targetMean)}`
+                        : null}
+                    />
+                  </td>
+                  <td><ScoreBar score={s.score} /></td>
+                  <td><SignalBadge signal={s.signal} /></td>
                   <td className="num">{pctCell(s.revenueGrowth)}</td>
                   <td className="num">{pctCell(s.profitMargins)}</td>
                   <td className="num">{s.netDebtToEbitda != null ? `${fmtNum(s.netDebtToEbitda)}x` : <span className="muted-dash">—</span>}</td>
                   <td className="num">{pctCell(s.fcfMargin)}</td>
                   <td className="num">{s.forwardPE != null ? fmtNum(s.forwardPE) : <span className="muted-dash">—</span>}</td>
-                  <td><ScoreBar score={s.score} /></td>
-                  <td><SignalBadge signal={s.signal} /></td>
                   <td>{s.hasReport ? <span title="Tam analist raporu mevcut">📄 var</span> : <span className="muted-dash">—</span>}</td>
                 </tr>
               ))}

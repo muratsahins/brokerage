@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, lazy, memo, Suspense } from 'react';
 import { API_BASE, fmtNum, norm, roundPrice } from './lib/common.js';
-import { Pct, Tutar } from './lib/ui.jsx';
+import { Expected, Pct, Tutar } from './lib/ui.jsx';
 import {
   VB_START, vbCleanRetired, vbEmail, vbLoad, vbSave, vbTrade, vbUnitLabel, vbUnitPrice,
 } from './lib/vb.js';
@@ -108,24 +108,6 @@ const SIGNAL_STYLES = {
   TUT: { label: 'TUT', bg: '#665200', fg: '#fbbf24' },
   'İZLE': { label: 'İZLE', bg: '#3a3a3a', fg: '#cbd5e1' },
 };
-
-// Analist beklentisine dayalı ileriye dönük getiri hücresi
-function Expected({ value, note }) {
-  if (value == null) {
-    return (
-      <div className="exp">
-        <span className="muted-dash">—</span>
-        <div className="exp-note">analist yok</div>
-      </div>
-    );
-  }
-  return (
-    <div className="exp">
-      <Pct value={value} strong />
-      {note && <div className="exp-note">{note}</div>}
-    </div>
-  );
-}
 
 // Madenlerde gösterge YOK: bar geçmişi vadeli kontrata ait, gösterilen fiyat
 // ise spot. Yayınlanan veride eski sinyaller kalmış olabileceği için (canlı yol
