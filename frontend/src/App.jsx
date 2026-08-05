@@ -395,9 +395,10 @@ function NewsList({ kind }) {
   );
 }
 
-// UYARI sekmesi iki grup gösterir (Backend /api/alerts tarar):
-//   • ALIM ADAYLARI (BIST 100 + ABD hisseleri): son barda overzone AL (tetik) + MACD AL +
-//     RSI 0-40 arası (o anki durum, süzgeç).
+// TARAMA sekmesi iki grup gösterir (Backend /api/alerts tarar):
+//   • ALIM ADAYLARI (BIST 100 + ABD hisseleri): 4 Faktörlü Profesyonel Tarama
+//     Sistemi — Ana Trend + Göreceli Güç + Pullback + Tetik hepsi birden
+//     (bkz. backend/src/indicators.js taramaDetay).
 //   • KENDİ HİSSELERİM: SuperTrend son barda SAT'a dönen hisselerden Sanal
 //     Borsa portföyünde olanlar. Portföy tarayıcıda durur, sunucuya gitmez —
 //     kesişim burada yapılır.
@@ -541,19 +542,23 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
   return (
     <>
       <div className="fav-note">
-        <strong>Dikkat Çekenler</strong> — günlük grafikte{' '}
+        <strong>Tarama</strong> — günlük grafikte{' '}
         <strong>
           {trDate(state.sessionDate) ? `bugünün (${trDate(state.sessionDate)})` : 'bugünün'}
         </strong>{' '}
         barı taranır, iki grup:{' '}
-        <strong>Alım adayları</strong> = <code>overzone</code> <strong>AL</strong> (aşırı satım bölgesinde,
-        −50/−60, kurulan yukarı kesişim, tetik) <strong>+</strong> <code>MACD</code> <strong>AL</strong>
-        (mavi çizgi sinyalin üstünde) <strong>+</strong> <code>RSI</code> <strong>0-40 arası</strong>
-        (o anki durum, süzgeç) — BIST 100 + ABD hisselerinde (NASDAQ-100 + S&P 100);{' '}
+        <strong>Alım adayları</strong> = <strong>4 Faktörlü Profesyonel Tarama Sistemi</strong> — hepsi birden:
+        {' '}<strong>1) Ana Trend</strong> (haftalık kapanış &gt; haftalık EMA 30, günlük kapanış &gt; SMA 200,
+        EMA 50 &gt; SMA 200, SMA 200 yatay/yükseliş eğiminde) <strong>+</strong>{' '}
+        <strong>2) Göreceli Güç</strong> (endeksten — BIST'te XU100, ABD'de S&P 500 — güçlü ayrışma)
+        <strong> +</strong> <strong>3) Pullback</strong> (sağlıklı düzeltme, referans EMA'ya yakın/destekli,
+        aşırı uzamamış) <strong>+</strong> <strong>4) Tetik</strong> (hacim patlaması <strong>+</strong> MACD
+        yukarı kesişimi) — BIST 100 + ABD hisselerinde (NASDAQ-100 + S&P 100);{' '}
         <strong>Kendi hisselerim</strong> = <code>SuperTrend</code> <strong>SAT</strong>'a dönenlerden Sanal
-        Borsa portföyünde olanlar. Önceki günlerde üretilmiş sinyaller listeye girmez; son bar canlı fiyatla
-        güncellendiği için sinyal, kapanış beklenmeden gün içinde görünür.
+        Borsa portföyünde olanlar. Son bar canlı fiyatla güncellendiği için sonuç, kapanış beklenmeden gün
+        içinde görünür.
         {state.stats && ` (${state.stats.scanned} hisse bugün işlem gördü.)`}
+        <span className="muted-dash"> Yatırım tavsiyesi değildir.</span>
       </div>
 
       <div className="filters">
@@ -571,10 +576,10 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
         </div>
       ) : (
         <>
-          <div className="alert-group">Alım adayları — overzone AL + MACD AL + RSI 0-40 (BIST 100 + ABD)</div>
+          <div className="alert-group">Alım adayları — 4 Faktörlü Profesyonel Tarama (BIST 100 + ABD)</div>
           {list.length === 0 ? (
             <div className="state">
-              Bugün üç koşulu (overzone AL + MACD AL + RSI 0-40 arası) birden sağlayan hisse yok.
+              Bugün dört faktörü (Ana Trend + Göreceli Güç + Pullback + Tetik) birden sağlayan hisse yok.
               {warming && ' Bar geçmişi hâlâ hazırlanıyor, birazdan tekrar bakın.'}
             </div>
           ) : (
@@ -976,11 +981,12 @@ export default function App() {
     // değil), o yüzden match yok — UsStocksTab kendi verisini kendi çeker.
     { key: 'us',      label: '🇺🇸 ABD Hisseleri' },
   ];
-  // Üst şerit: haberler + UYARI (yeni sinyal taraması; KAP'ın yerini aldı).
+  // Üst şerit: haberler + TARAMA (4 Faktörlü Profesyonel Tarama Sistemi;
+  // eskiden "Dikkat Çekenler", öncesinde KAP'ın yerini almıştı).
   // Anahtar 'uyari' olarak kaldı: localStorage'daki görülmüş sinyal kaydı
   // (alertsSeen) ve blink mantığı buna bağlı, etiket değişikliği onları
   // etkilemesin.
-  const UYARI_TAB = { key: 'uyari', label: '⚠️ Dikkat Çekenler' };
+  const UYARI_TAB = { key: 'uyari', label: '🔍 Tarama' };
   const NEWS_TABS = [
     { key: 'news',  label: '📰 Haberler', news: 'news' },
     UYARI_TAB,
@@ -1183,7 +1189,7 @@ export default function App() {
         >
           {TRADE_TAB.label}
         </button>
-        {/* Dikkat Çekenler, Sanal Borsa'nın yanına alındı. Görülmemiş yeni
+        {/* Tarama, Sanal Borsa'nın yanına alındı. Görülmemiş yeni
             sinyal varsa yanıp söner ve rozette sayısı görünür. */}
         {(() => {
           const blink = newCount > 0 && tab !== 'uyari';

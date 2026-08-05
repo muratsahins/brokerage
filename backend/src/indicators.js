@@ -488,3 +488,99 @@ function overzoneFrom(w) {
   }
   return signal;
 }
+
+// --- Profesyonel 4 Faktörlü Tarama (Tarama sekmesi) -------------------------
+// Weinstein Stage Analysis (ana trend) + IBD RS Line (göreceli güç) +
+// Minervini VCP tarzı pullback konumu + hacim/MACD tetikleyicisi. KATI VE:
+// dördü birden sağlanmadıkça tarama sonucu false'tur.
+//   1) Ana Trend : haftalık kapanış > haftalık EMA(30), günlük kapanış >
+//                  SMA(200), EMA(50) > SMA(200), SMA(200) yatay/yükseliş
+//                  eğiminde (düşen bıçak filtresi).
+//   2) Göreceli Güç: hissenin N-bar getirisi karşılaştırma endeksinden
+//                  (XU100/S&P 500) yüksek VE Fiyat/Endeks oranı (RS çizgisi)
+//                  kendi ortalamasının üstünde ve yükselişte.
+//   3) Pullback  : referans EMA'ya (21) yakın VEYA ATR cinsinden aşırı
+//                  uzamamış, 52 haftalık zirveden çok uzak değil (ölü hisse
+//                  değil), referans EMA yükselişte (destek geçerli).
+//   4) Tetik     : hacim ortalamasının X katı VE yükselen gün VE MACD son
+//                  birkaç barda sinyal çizgisini yukarı kesmiş.
+const TARAMA_VARSAYILAN = {
+  weeklyEmaLen: 30, dailySmaLen: 200, fastEmaLen: 50, slopeLookback: 20,
+  rsLookback: 63, rsMaLen: 20,
+  pullbackEmaLen: 21, maxDistancePct: 5, maxExtensionAtr: 2.5, maxDistFromHighPct: 35, highWindow: 252,
+  volMaLen: 20, volMultiplier: 1.5, macdFast: 12, macdSlow: 26, macdSignalLen: 9, macdLookback: 3,
+};
+
+// series: liveDailySeries() çıktısıyla AYNI şekil — { open, high, low, close,
+// volume, time, gmtoffset } (tekil isimler, diziler). benchCloses: karşılaştırma
+// endeksinin (XU100/S&P 500) günlük kapanış dizisi — yoksa RS filtresi geçilmiş
+// sayılmaz (rs=false), diğer üç filtre yine değerlendirilir.
+export function taramaDetay(series, benchCloses, opts = {}) {
+  const o = { ...TARAMA_VARSAYILAN, ...opts };
+  const { open: opens, high: highs, low: lows, close: closes, volume: volumes, time: times, gmtoffset } = series || {};
+  const n = closes?.length ?? 0;
+  if (n < o.dailySmaLen + o.slopeLookback + 5) return null; // yetersiz geçmiş (ör. yeni IPO)
+
+  // 1) ANA TREND ------------------------------------------------------------
+  const sma200 = sma(closes, o.dailySmaLen);
+  const ema50 = ema(closes, o.fastEmaLen);
+  const { c: haftalikKapanis } = haftalik(highs, lows, closes, times, gmtoffset);
+  const haftalikEma = ema(haftalikKapanis, o.weeklyEmaLen);
+  const trendWeekly = haftalikKapanis.length > 0
+    && haftalikKapanis[haftalikKapanis.length - 1] > haftalikEma[haftalikEma.length - 1];
+  const trendDaily = closes[n - 1] > sma200[n - 1];
+  const trendYapi = ema50[n - 1] > sma200[n - 1];
+  const trendEgim = sma200[n - 1] > sma200[n - 1 - o.slopeLookback];
+  const trend = trendWeekly && trendDaily && trendYapi && trendEgim;
+
+  // 2) GÖRECELİ GÜÇ (RS) -----------------------------------------------------
+  let rsUst = false, rsCizgi = false;
+  if (benchCloses && benchCloses.length >= o.rsLookback + o.rsMaLen + 2) {
+    const m = Math.min(n, benchCloses.length);
+    const stokGetiri = (closes[m - 1] - closes[m - 1 - o.rsLookback]) / closes[m - 1 - o.rsLookback] * 100;
+    const endeksGetiri = (benchCloses[m - 1] - benchCloses[m - 1 - o.rsLookback]) / benchCloses[m - 1 - o.rsLookback] * 100;
+    const rsSeries = new Array(m);
+    for (let i = 0; i < m; i++) rsSeries[i] = closes[i] / benchCloses[i];
+    const rsOrt = sma(rsSeries, o.rsMaLen);
+    rsUst = stokGetiri > endeksGetiri;
+    rsCizgi = rsSeries[m - 1] > rsOrt[m - 1] && rsSeries[m - 1] > rsSeries[m - 1 - o.rsMaLen];
+  }
+  const rs = rsUst && rsCizgi;
+
+  // 3) PULLBACK / FİYAT BÖLGESİ ----------------------------------------------
+  const emaPb = ema(closes, o.pullbackEmaLen);
+  const atrArr = atr(highs, lows, closes, 14);
+  const uzaklikYuzde = (closes[n - 1] - emaPb[n - 1]) / emaPb[n - 1] * 100;
+  const genislemeAtr = atrArr[n - 1] ? (closes[n - 1] - emaPb[n - 1]) / atrArr[n - 1] : null;
+  const pencereBas = Math.max(0, n - o.highWindow);
+  let zirve = -Infinity;
+  for (let i = pencereBas; i < n; i++) if (highs[i] > zirve) zirve = highs[i];
+  const zirveUzaklikYuzde = (zirve - closes[n - 1]) / zirve * 100;
+  const destekYakin = Math.abs(uzaklikYuzde) <= o.maxDistancePct
+    || (genislemeAtr != null && closes[n - 1] > emaPb[n - 1] && genislemeAtr <= o.maxExtensionAtr);
+  const kovalamiyor = genislemeAtr == null || genislemeAtr <= o.maxExtensionAtr;
+  const canli = zirveUzaklikYuzde <= o.maxDistFromHighPct;
+  const emaYukselis = emaPb[n - 1] > emaPb[n - 6];
+  const pullback = destekYakin && kovalamiyor && canli && emaYukselis;
+
+  // 4) HACİM VE MOMENTUM TETİKLEYİCİSİ ----------------------------------------
+  const volOrt = sma(volumes, o.volMaLen);
+  const hacimPatlamasi = volumes[n - 1] > volOrt[n - 1] * o.volMultiplier && closes[n - 1] > opens[n - 1];
+  const ef = ema(closes, o.macdFast), es = ema(closes, o.macdSlow);
+  const macdLine = closes.map((_, i) => ef[i] - es[i]);
+  const macdSinyal = ema(macdLine, o.macdSignalLen);
+  let macdKesisim = false;
+  for (let i = Math.max(1, n - o.macdLookback); i < n; i++) {
+    if (macdLine[i - 1] <= macdSinyal[i - 1] && macdLine[i] > macdSinyal[i]) macdKesisim = true;
+  }
+  const tetik = hacimPatlamasi && macdKesisim;
+
+  return {
+    pass: trend && rs && pullback && tetik,
+    trend, rs, pullback, tetik,
+  };
+}
+
+export function taramaGecti(series, benchCloses, opts) {
+  return !!taramaDetay(series, benchCloses, opts)?.pass;
+}

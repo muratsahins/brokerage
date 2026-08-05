@@ -41,9 +41,21 @@ let filling = false;
 // ABD tarafında Yahoo sembolü ticker'ın kendisi (AAPL). Ticker çakışması yok
 // (kontrol edildi: 627 BIST / 172 ABD, kesişim boş) — önbellek düz bir Map
 // olduğu için liste büyürse bu yeniden doğrulanmalı.
+// Tarama sekmesinin Göreceli Güç (RS) filtresi için karşılaştırma endeksleri.
+// Aynı önbellek/canlı-yama altyapısını paylaşsınlar diye normal birer "enstrüman"
+// gibi eklendi — ayrı bir çekim/önbellek mekanizması gerekmedi. Ticker'lar "__"
+// ile sarılı ki gerçek bir hisse koduyla asla çakışmasın.
+const BENCHMARKS = [
+  { ticker: '__XU100__', symbol: 'XU100.IS', kind: 'benchmark' }, // BIST 100 endeksi
+  { ticker: '__SPX__', symbol: '^GSPC', kind: 'benchmark' },      // S&P 500 (ABD hisseleri için)
+];
+export const XU100_TICKER = '__XU100__';
+export const SPX_TICKER = '__SPX__';
+
 const SERIES_INSTRUMENTS = [
   ...INSTRUMENTS.filter((i) => i.kind !== 'metal'),
   ...US_STOCKS.map((u) => ({ ticker: u.ticker, symbol: u.ticker, kind: 'us' })),
+  ...BENCHMARKS,
 ];
 const SERIES_TOTAL = SERIES_INSTRUMENTS.length;
 
@@ -148,13 +160,13 @@ export function liveDailySeries(ticker) {
   if (p?.price == null) {
     return {
       open: entry.open, high: entry.high, low: entry.low, close: entry.close, volume: entry.volume,
-      lastTs: entry.lastTs, gmtoffset: entry.gmtoffset,
+      time: entry.time, lastTs: entry.lastTs, gmtoffset: entry.gmtoffset,
     };
   }
   const s = seriesWithLive(entry, p.price, p.ts, peekLiveBars()?.[ticker]);
   return {
     open: s.opens, high: s.highs, low: s.lows, close: s.closes, volume: s.volumes,
-    lastTs: s.lastTs, gmtoffset: entry.gmtoffset,
+    time: s.times, lastTs: s.lastTs, gmtoffset: entry.gmtoffset,
   };
 }
 

@@ -52,15 +52,26 @@ npm start                 # http://localhost:4000
   `SERIES_TTL_MINUTES` (varsayılan 30) bar geçmişinin tazelenme sıklığı,
   `SERIES_CHECK_MINUTES` (15) kontrol aralığı, `SERIES_FETCH_GAP_MS` (350)
   Yahoo istekleri arası bekleme. Önbellek durumu: `GET /api/health`.
-- **UYARI taraması** (`/api/alerts`): taranan evren **BIST 100 + Maden & Emtia +
+- **Tarama** (`/api/alerts`): taranan evren **BIST 100 + Maden & Emtia +
   ABD hisseleri** (NASDAQ-100 + S&P 100) — bar geçmişi üçü için de aynı
   önbellekte tutulur, ek istek gerekmez. Günlük grafikte **iki grup** döner —
-  `items` = **alım adayları**: `overzone` **AL** (aşırı satımda, −50/−60,
-  kurulan yukarı kesişim, TETİK) son barda oluşanlar (`ALERT_LOOKBACK_BARS`,
-  varsayılan 1) **+** `MACD` **AL** **+** `RSI` **0-`ALERT_RSI_MAX`** (varsayılan
-  40) arası (o anki durum, SÜZGEÇ) — üçü birden sağlanmayınca liste dışı kalır.
-  Eskiden ayrıca **hacim dönüşü** teyidi de aranıyordu; o formasyon tümden
-  kaldırıldı, MACD+RSI süzgeçleri onun yerini alıyor.
+  `items` = **alım adayları**: **4 Faktörlü Profesyonel Tarama Sistemi**
+  (`backend/src/indicators.js` → `taramaDetay`), KATI VE — dördü birden
+  sağlanmayınca liste dışı kalır:
+  1. **Ana Trend** (Weinstein Stage Analysis) — haftalık kapanış > haftalık
+     EMA(30), günlük kapanış > SMA(200), EMA(50) > SMA(200), SMA(200)
+     yatay/yükseliş eğiminde (düşen bıçak filtresi).
+  2. **Göreceli Güç** (IBD RS Line) — hissenin getirisi karşılaştırma
+     endeksinden (BIST'te `XU100.IS`, ABD'de `^GSPC`) yüksek VE Fiyat/Endeks
+     oranı kendi ortalamasının üstünde ve yükselişte.
+  3. **Pullback** (Minervini VCP) — referans EMA'ya (21) yakın veya ATR
+     cinsinden aşırı uzamamış, 52 haftalık zirveden çok uzak değil, referans
+     EMA yükselişte.
+  4. **Tetik** — hacim ortalamasının 1.5 katı + yükselen gün + MACD son
+     birkaç barda sinyal çizgisini yukarı kesmiş.
+
+  Karşılaştırma endeksleri normal birer enstrüman gibi `liveSignals.js`'in
+  ortak bar önbelleğinde tutulur (`__XU100__`/`__SPX__`), ek çekim gerekmez.
   `stSell` = `SuperTrend`in **son barda SAT'a döndüğü** hisseler.
   Arayüz `stSell`i kullanıcının **Sanal Borsa portföyüyle kesiştirir** ("kendi
   hisselerim" — satış uyarısı); portföy tarayıcıda durduğu için sunucuya
