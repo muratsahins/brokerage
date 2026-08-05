@@ -844,7 +844,39 @@ export default function App() {
     setUsFav((s) => ({ ...s, loading: true }));
     fetch(`${API_BASE}/api/us-recommendations`)
       .then((r) => r.json())
-      .then((d) => setUsFav({ items: d.items || [], loading: false, fetched: true }))
+      .then((d) => {
+        setUsFav({ items: d.items || [], loading: false, fetched: true });
+        // Yayınlanan veri günde bir yenilenir ve bazı ticker'larda gösterge
+        // eksik kalabilir (Yahoo'nun tek tük başarısız olduğu barlar). ABD
+        // sekmesiyle (UsStocksTab) AYNI canlı uçtan (bar geçmişinden anlık
+        // hesaplanan) TEK SEFERLİK üstüne yazılır — bu yüzden Favori Listesi
+        // artık sekme açılır açılmaz güncel, ayrıca canlı yenileme gerekmez.
+        fetch(`${API_BASE}/api/us-prices`)
+          .then((r) => (r.ok ? r.json() : null))
+          .then((live) => {
+            if (!live?.prices && !live?.signals) return;
+            setUsFav((s) => ({
+              ...s,
+              items: s.items.map((it) => {
+                const p = live.prices?.[it.ticker];
+                const sig = live.signals?.[it.ticker];
+                if (!p && !sig) return it;
+                const next = { ...it };
+                if (p?.price != null) {
+                  next.price = p.price;
+                  if (p.changePct != null) next.changePct = p.changePct;
+                }
+                if (sig) {
+                  next.wtSignal = sig.wo ?? null;
+                  next.wtCrossSignal = sig.wt ?? null;
+                  next.stSignal = sig.st ?? null;
+                }
+                return next;
+              }),
+            }));
+          })
+          .catch(() => { /* yoksay — yayınlanan veriyle devam */ });
+      })
       .catch(() => setUsFav({ items: [], loading: false, fetched: true }));
   }, [tab, usFav.fetched]);
 
