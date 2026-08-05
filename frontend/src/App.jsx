@@ -825,7 +825,7 @@ export default function App() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('ALL');
-  const [tab, setTab] = useState('all'); // açılış: BIST (tüm hisseler)
+  const [tab, setTab] = useState('bist100'); // açılış: BIST 100
   // Sıralama: 'ticker' (alfabetik, varsayılan) | 'score' (puan). Tercih saklanır.
   // Kaldırılan 'fresh' (tazelik) seçeneği bazı
   // tarayıcılarda kayıtlı kalmış olabilir; düğmesi artık yok, o yüzden
@@ -931,9 +931,7 @@ export default function App() {
 
   // Sekmeler: BIST 30/50/100 iç içe (30⊂50⊂100) + ayrı Maden & Emtia sekmesi.
   const TABS = [
-    { key: 'all',     label: 'BIST',           match: (i) => i.kind === 'stock' },
-    { key: 'bist30',  label: 'BIST 30',        match: (i) => i.bist != null && i.bist <= 30 },
-    { key: 'bist50',  label: 'BIST 50',        match: (i) => i.bist != null && i.bist <= 50 },
+    // BIST (tümü), BIST 30 ve BIST 50 sekmeleri kaldırıldı; açılış BIST 100.
     { key: 'bist100', label: 'BIST 100',       match: (i) => i.bist != null && i.bist <= 100 },
     // Emtia (Brent) da bu sekmede listelenir: ikisi de USD fiyatlı, analist
     // kapsamı olmayan, BIST dışı enstrümanlar.
