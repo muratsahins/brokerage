@@ -9,6 +9,7 @@
 // priceDerived ile aynı desen.
 
 import { clamp01, round, roundPrice } from './recommend.js';
+import { wavetrendSignals, supertrendSignal } from './indicators.js';
 
 export function scoreUsQuote(q) {
   const price = q.price;
@@ -61,6 +62,13 @@ export function scoreUsQuote(q) {
     : null;
   const pos52w = band != null && band > 0 ? clamp01((price - q.fiftyTwoWeekLow) / band) : null;
 
+  // BIST tarafıyla (recommend.js) BİREBİR aynı gösterge tanımları — Favori
+  // Listesi'nin ABD hisselerini de aynı 4 koşulla (overzone + WaveTrend +
+  // SuperTrend + analist AL) değerlendirebilmesi için. q.highs/lows/closes
+  // dataSource.fetchUsQuotes'ta 1 yıllık günlük bardan geliyor.
+  const wt = wavetrendSignals(q.highs, q.lows, q.closes);
+  const stSignal = supertrendSignal(q.highs, q.lows, q.closes);
+
   return {
     ticker: q.ticker,
     price: roundPrice(price),
@@ -88,6 +96,10 @@ export function scoreUsQuote(q) {
 
     score,
     signal,
+
+    wtSignal: wt.overzone,   // 53-60 WaveTrend (aşırı bölge kesişimi): 'AL' | 'SAT' | null
+    wtCrossSignal: wt.cross, // WaveTrend standart kesişim (LazyBear): 'AL' | 'SAT' | null
+    stSignal,                // SuperTrend (Kıvanç Özbilgiç): 'AL' | 'SAT' | null
   };
 }
 

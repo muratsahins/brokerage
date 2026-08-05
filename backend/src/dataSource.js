@@ -679,15 +679,35 @@ export async function fetchQuotes(instruments) {
   return out;
 }
 
-// ABD hisseleri için: tek istekte fiyat+temel veri (fetchQuotes'tan farklı
-// olarak ayrı bir chart isteği yok — bkz. fetchUsFundamentals üstündeki not).
+// ABD hisseleri için: fiyat+temel veri (quoteSummary) + 1 yıllık günlük bar
+// geçmişi (chart). İkisi PARALEL çekilir (tek sleep, iki istek) — Favori
+// Listesi'nin ABD hisselerini de BIST'teki 4 koşulla (overzone/WaveTrend/
+// SuperTrend + analist AL) değerlendirebilmesi için highs/lows/closes
+// recommendUs.js'e taşınıyor. Chart isteği crumb/cookie gerektirmez, bu
+// yüzden fundamentals'tan bağımsız başarısız/başarılı olabilir.
 export async function fetchUsQuotes(instruments) {
   const out = [];
   for (const inst of instruments) {
     try {
-      const data = await fetchUsFundamentals(inst.symbol);
-      if (data) out.push({ ticker: inst.ticker, ...data });
-      else console.warn(`[data] ${inst.ticker} (ABD) veri alınamadı`);
+      const [data, chart] = await Promise.all([
+        fetchUsFundamentals(inst.symbol),
+        fetchBars(inst.symbol, '1y').catch((e) => {
+          console.warn(`[data] ${inst.ticker} (ABD) grafik verisi alınamadı: ${e.message}`);
+          return null;
+        }),
+      ]);
+      if (data) {
+        const bars = chart?.bars ?? [];
+        out.push({
+          ticker: inst.ticker,
+          ...data,
+          highs: bars.map((b) => b.high),
+          lows: bars.map((b) => b.low),
+          closes: bars.map((b) => b.close),
+        });
+      } else {
+        console.warn(`[data] ${inst.ticker} (ABD) veri alınamadı`);
+      }
     } catch (err) {
       console.warn(`[data] ${inst.ticker} (ABD) atlandı: ${err.message}`);
     }

@@ -109,6 +109,9 @@ const SIGNAL_STYLES = {
   'İZLE': { label: 'İZLE', bg: '#3a3a3a', fg: '#cbd5e1' },
 };
 
+// Hedef fiyat notu para birimine göre: ABD hisseleri USD, BIST/maden ₺.
+const curSym = (s) => (s.currency === 'USD' ? '$' : '₺');
+
 // Madenlerde gösterge YOK: bar geçmişi vadeli kontrata ait, gösterilen fiyat
 // ise spot. Yayınlanan veride eski sinyaller kalmış olabileceği için (canlı yol
 // artık maden sinyali göndermiyor, dolayısıyla üstüne yazamıyor) okuma burada
@@ -155,8 +158,9 @@ const StockRow = memo(function StockRow({ s, rank, showBuySell, onSelect }) {
       <td className="rank">{rank}</td>
       <td>
         {/* Madenlerde grafik yok: bar geçmişi vadeli kontrata ait, gösterilen
-            fiyat ise spot. Bağlantı da verilmiyor ki boş grafik açılmasın. */}
-        {s.kind === 'metal' ? (
+            fiyat ise spot. ABD hisselerinde de kapalı: grafik ucu ve sanal
+            borsa paneli ₺ fiyatlamaya göre kurulu, USD kalemler için değil. */}
+        {s.kind === 'metal' || s.kind === 'us-stock' ? (
           <span className="ticker">{s.ticker}</span>
         ) : (
           <button className="ticker ticker-link" onClick={() => onSelect(s)} title="Grafiği aç">
@@ -193,7 +197,7 @@ const StockRow = memo(function StockRow({ s, rank, showBuySell, onSelect }) {
         <Expected
           value={s.upside12m}
           note={s.upside12m != null
-            ? `${s.numAnalysts ?? '?'} analist · hedef ${fmtNum(s.targetMean)}₺`
+            ? `${s.numAnalysts ?? '?'} analist · hedef ${fmtNum(s.targetMean)}${curSym(s)}`
             : null}
         />
       </td>
@@ -213,7 +217,7 @@ const StockCard = memo(function StockCard({ s, rank, onSelect }) {
         <div className="card-id">
           <span className="rank">{rank}</span>
           <div>
-            {s.kind === 'metal' ? (
+            {s.kind === 'metal' || s.kind === 'us-stock' ? (
               <span className="ticker">{s.ticker}</span>
             ) : (
               <button className="ticker ticker-link" onClick={() => onSelect(s)} title="Grafiği aç">
@@ -258,7 +262,7 @@ const StockCard = memo(function StockCard({ s, rank, onSelect }) {
           <Expected
             value={s.upside12m}
             note={s.upside12m != null
-              ? `${s.numAnalysts ?? '?'} analist · hedef ${fmtNum(s.targetMean)}₺`
+              ? `${s.numAnalysts ?? '?'} analist · hedef ${fmtNum(s.targetMean)}${curSym(s)}`
               : null}
           />
         </div>
@@ -827,6 +831,19 @@ export default function App() {
     catch { return 'web'; }
   });
 
+  // Favori Listesi ABD hisselerini de içerir (aynı 4 koşulla — bkz. FAV_TAB).
+  // ABD verisi BIST'ten ayrı bir uçtan geldiği için (UsStocksTab ile aynı kaynak)
+  // yalnızca Favori sekmesi ilk açıldığında, tembel olarak çekilir.
+  const [usFav, setUsFav] = useState({ items: [], loading: false, fetched: false });
+  useEffect(() => {
+    if (tab !== 'fav' || usFav.fetched) return;
+    setUsFav((s) => ({ ...s, loading: true }));
+    fetch(`${API_BASE}/api/us-recommendations`)
+      .then((r) => r.json())
+      .then((d) => setUsFav({ items: d.items || [], loading: false, fetched: true }))
+      .catch(() => setUsFav({ items: [], loading: false, fetched: true }));
+  }, [tab, usFav.fetched]);
+
   // İlk boyama için statik tohum: build anındaki data/recommendations.json,
   // Vercel'in CDN'inden (~50 ms) gelir. Render uykudaysa /api/recommendations
   // 30-60 sn sürebiliyor; tablo o süre boyunca boş kalmasın diye tohumla
@@ -932,7 +949,8 @@ export default function App() {
     { key: 'news',  label: '📰 Haberler', news: 'news' },
     UYARI_TAB,
   ];
-  // Favori listesi: 5 teknik koşulu birden sağlayan hisseler.
+  // Favori listesi: 4 teknik+analist koşulunu birden sağlayan hisseler
+  // (BIST + ABD — aynı koşullar, ayrı veri kaynaklarından gelir).
   const FAV_TAB = {
     key: 'fav',
     label: '⭐ Favori Listesi',
@@ -940,6 +958,16 @@ export default function App() {
       && i.wtSignal === 'AL' && i.wtCrossSignal === 'AL' && i.stSignal === 'AL'
       && (i.recommendationKey === 'buy' || i.recommendationKey === 'strong_buy'),
   };
+  // ABD hisseleri BIST'ten ayrı bir uçtan gelir (usFav) ama AYNI 4 koşulla
+  // süzülür. kind: 'us-stock' işaretlenir; grafik/sanal borsa BIST'e özgü
+  // olduğu için bu kalemlerde kapalı kalır (bkz. StockRow/StockCard).
+  const usFavItems = useMemo(
+    () => usFav.items
+      .filter((i) => i.wtSignal === 'AL' && i.wtCrossSignal === 'AL' && i.stSignal === 'AL'
+        && (i.recommendationKey === 'buy' || i.recommendationKey === 'strong_buy'))
+      .map((i) => ({ ...i, kind: 'us-stock', bist: null })),
+    [usFav.items],
+  );
   // SMC (Smart Money Concept) yükseliş: ChoCh/MSB kırılımı (tetik) + POC üstünde
   // + haftalık SuperTrend AL (süzgeçler).
   const SMC_TAB = {
@@ -967,11 +995,12 @@ export default function App() {
   );
   const { newCount, highlight } = useNewAlerts(alertsAll, tab === 'uyari');
 
-  // Önce aktif sekmeye göre, sonra sinyale göre süz.
-  const inTab = useMemo(
-    () => (activeTab.match ? data.items.filter(activeTab.match) : []),
-    [data.items, tab],
-  );
+  // Önce aktif sekmeye göre, sonra sinyale göre süz. Favori sekmesinde BIST
+  // eşleşmelerinin üstüne aynı koşulu sağlayan ABD hisseleri de eklenir.
+  const inTab = useMemo(() => {
+    const base = activeTab.match ? data.items.filter(activeTab.match) : [];
+    return tab === 'fav' ? [...base, ...usFavItems] : base;
+  }, [data.items, usFavItems, tab]);
 
   // Arama varsa TÜM enstrümanlarda (sekmeden bağımsız), yoksa aktif sekmede süz.
   const searching = query.trim().length > 0;
@@ -1207,7 +1236,9 @@ export default function App() {
         <div className="fav-note">
           <strong>Favori kriterleri (hepsi birden):</strong> overzone <code>AL</code> · WaveTrend <code>AL</code> ·
           SuperTrend <code>AL</code> · analist tavsiyesi <code>AL / Güçlü AL</code>.
-          <span className="muted-dash"> (Analist verisi BIST 30/50/100 hisselerinde bulunur.)</span>
+          <span className="muted-dash"> (Analist verisi BIST 30/50/100 hisselerinde bulunur. Aynı 4 koşul
+          NASDAQ-100 + S&P 100 evrenindeki ABD hisselerinde de aranır — grafik/sanal borsa bu kalemlerde
+          kapalıdır.{usFav.loading ? ' ABD verisi yükleniyor…' : ''})</span>
         </div>
       )}
 
@@ -1234,7 +1265,7 @@ export default function App() {
           {searching
             ? `“${query.trim()}” ile eşleşen kayıt bulunamadı.`
             : tab === 'fav'
-              ? 'Şu an üç sinyali (overzone + WaveTrend + SuperTrend) birden AL olan ve analist AL tavsiyesi bulunan hisse yok.'
+              ? 'Şu an üç sinyali (overzone + WaveTrend + SuperTrend) birden AL olan ve analist AL tavsiyesi bulunan BIST veya ABD hissesi yok.'
             : tab === 'smc'
               ? 'Şu an SMC yükseliş sinyali (likidite süpürme + yapı kırılımı) veren hisse yok.'
               : data.items.length > 0
