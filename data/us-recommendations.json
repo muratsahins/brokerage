@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-08-05T00:07:04.147Z",
+  "updatedAt": "2026-08-05T01:09:03.005Z",
   "source": "github-actions",
-  "count": 153,
-  "withReport": 34,
+  "count": 169,
+  "withReport": 48,
   "items": [
     {
       "ticker": "APP",
@@ -67,6 +67,166 @@
       "report": null
     },
     {
+      "ticker": "NVDA",
+      "price": 211.94,
+      "currency": "USD",
+      "changePct": 2.56,
+      "marketCap": 5133398704128,
+      "sector": "Yarı İletken",
+      "industry": "Semiconductors",
+      "pos52w": 0.661,
+      "upside12m": 42.88,
+      "targetMean": 302.83,
+      "recommendationKey": "strong_buy",
+      "numAnalysts": 58,
+      "revenueGrowth": 85.2,
+      "revenue3yCagr": 100.05,
+      "profitMargins": 62.97,
+      "netDebtToEbitda": -0.24,
+      "fcfMargin": 18.28,
+      "dividendYield": 0.5,
+      "forwardPE": 16.44,
+      "trailingPE": 32.51,
+      "priceToBook": 26.26,
+      "score": 84,
+      "signal": "AL",
+      "name": "NVIDIA",
+      "indices": [
+        "NDX",
+        "SPX"
+      ],
+      "hasReport": true,
+      "report": {
+        "asOf": "FY2025 (Ocak sonu biten mali yıl) verilerine dayalı, yaklaşık",
+        "segments": [
+          {
+            "name": "Veri Merkezi (AI hızlandırıcılar — H100/H200/Blackwell)",
+            "sharePct": 88,
+            "note": "Gelirin ezici çoğunluğu; hiper-ölçekli bulut şirketlerine yoğunlaşmış"
+          },
+          {
+            "name": "Oyun (GeForce)",
+            "sharePct": 8,
+            "note": "Eski ana iş, artık ikincil"
+          },
+          {
+            "name": "Profesyonel görselleştirme + otomotiv",
+            "sharePct": 4,
+            "note": "Küçük ama stratejik (robotik/otonom)"
+          }
+        ],
+        "revenue3yNote": "Gelir son 3 yılda birkaç katına çıktı (AI hızlandırıcı talebi patlaması); büyüme oranı çok yüksek ama karşılaştırma tabanı büyüdükçe normalize olması bekleniyor.",
+        "marginNote": "Net kâr marjı %50'nin üzerinde — yarı iletken sektöründe görülmemiş bir seviye; fiyatlama gücü ve talep/arz dengesizliğinden kaynaklanıyor.",
+        "balanceNote": "Net nakit pozisyonu güçlü, pratikte borç yükü yok; bilanço riski minimal.",
+        "fcfNote": "FCF çok yüksek ve hızla büyüyor; ana kısıt kapasite (TSMC üretim ayırma) — nakit sorunu değil.",
+        "competitors": [
+          "AMD",
+          "Intel",
+          "Google (özel TPU çipleri)",
+          "Amazon (Trainium/Inferentia)",
+          "Broadcom (özel AI çipleri)"
+        ],
+        "moat": [
+          {
+            "title": "CUDA yazılım ekosistemi",
+            "desc": "On yıllardır geliştirilen CUDA yazılım/kütüphane ekosistemi, geliştiricileri ve kurumsal iş yüklerini NVIDIA donanımına kilitliyor; rakiplerin salt donanımla eşleşmesi yetmiyor."
+          },
+          {
+            "title": "Ürün/kapasite liderliği döngüsü",
+            "desc": "Yıllık yenilenen çip mimarisi (Blackwell, Rubin) + TSMC'nin en gelişmiş üretim kapasitesine öncelikli erişim, rakiplere karşı sürekli bir nesil öndelik sağlıyor."
+          }
+        ],
+        "strengths": [
+          "AI eğitim/çıkarım altyapısında fiili endüstri standardı konumunda",
+          "CUDA ekosistemi donanım değiştirme maliyetini müşteriler için çok yüksek tutuyor",
+          "Marj ve nakit üretimi sektörde emsalsiz; Ar-Ge'yi kendi nakit akışıyla finanse ediyor"
+        ],
+        "risks": [
+          "Gelirin küçük sayıda hiper-ölçekli müşteriye yoğunlaşması (Microsoft, Meta, Google, Amazon) — kendi çip geliştirme yatırımları talebi aşındırabilir",
+          "Değerleme, AI capex döngüsünün süreceği varsayımına son derece duyarlı; döngü yavaşlarsa çarpan daralması sert olur",
+          "Jeopolitik risk: Çin'e ihracat kısıtlamaları gelirin önemli bir dilimini doğrudan etkiliyor"
+        ],
+        "verdict": "Kâr büyümesi şu ana kadar değerlemeyi haklı çıkardı, ama fiyatlama AI altyapı harcamalarının çok yıllı sürmesini varsayıyor; bu varsayımda bir kırılma (hiper-ölçeklilerin capex'i yavaşlatması veya kendi çiplerine geçişi) çarpanlarda hızlı bir yeniden fiyatlamaya yol açabilir."
+      }
+    },
+    {
+      "ticker": "AVGO",
+      "price": 418.16,
+      "currency": "USD",
+      "changePct": 6.61,
+      "marketCap": 1989429821440,
+      "sector": "Yarı İletken",
+      "industry": "Semiconductors",
+      "pos52w": 0.639,
+      "upside12m": 26.24,
+      "targetMean": 527.88,
+      "recommendationKey": "strong_buy",
+      "numAnalysts": 45,
+      "revenueGrowth": 47.9,
+      "revenue3yCagr": 24.38,
+      "profitMargins": 38.85,
+      "netDebtToEbitda": 1.08,
+      "fcfMargin": 36.06,
+      "dividendYield": 0.67,
+      "forwardPE": 21.45,
+      "trailingPE": 69.81,
+      "priceToBook": 22.69,
+      "score": 78,
+      "signal": "AL",
+      "name": "Broadcom",
+      "indices": [
+        "NDX",
+        "SPX"
+      ],
+      "hasReport": true,
+      "report": {
+        "asOf": "FY2024 yıllık rapor verilerine dayalı, yaklaşık",
+        "segments": [
+          {
+            "name": "Yarı iletken çözümleri (ağ, özel AI çipleri/ASIC, kablosuz)",
+            "sharePct": 58,
+            "note": "Hiper-ölçekli AI özel çip (ASIC) talebiyle hızlanıyor"
+          },
+          {
+            "name": "Altyapı yazılımı (VMware dahil)",
+            "sharePct": 42,
+            "note": "VMware satın alması sonrası payı büyük ölçüde arttı"
+          }
+        ],
+        "revenue3yNote": "3 yıllık gelir CAGR ~%20+ — organik yarı iletken büyümesi + VMware satın almasının konsolidasyonu birlikte etkili.",
+        "marginNote": "Net kâr marjı VMware entegrasyon giderleri nedeniyle dönemsel dalgalandı, ama operasyonel/düzeltilmiş marj sektörün en yükseklerinden (~%40+).",
+        "balanceNote": "VMware satın alması sonrası borç belirgin arttı; Net Debt/EBITDA orta-yüksek bandda ama güçlü FCF ile hızla düşürülüyor.",
+        "fcfNote": "FCF çok güçlü ve büyüyor; borç azaltımının ana kaynağı.",
+        "competitors": [
+          "Marvell Technology",
+          "Cisco",
+          "Qualcomm",
+          "NVIDIA (AI hızlandırıcılarda dolaylı)"
+        ],
+        "moat": [
+          {
+            "title": "Özel ASIC ortaklıkları",
+            "desc": "Google (TPU) gibi hiper-ölçekli müşterilerle uzun vadeli özel çip tasarım ortaklıkları, yüksek geçiş maliyeti ve tekrarlayan gelir yaratıyor."
+          },
+          {
+            "title": "Satın alma + çapraz satış disiplini",
+            "desc": "CA Technologies, Symantec, VMware gibi olgun yazılım varlıklarını satın alıp marjı disiplinli biçimde artırma konusunda kanıtlanmış bir oyun kitabı var."
+          }
+        ],
+        "strengths": [
+          "Hiper-ölçekli bulut şirketleriyle özel AI çip (ASIC) iş kolu hızlı büyüyor",
+          "VMware entegrasyonu marj genişlemesi ve tekrarlayan yazılım geliri sağladı",
+          "Güçlü FCF, hem borç azaltımını hem hissedar getirisini finanse ediyor"
+        ],
+        "risks": [
+          "VMware satın alması sonrası borç yükü, faiz oranı riskine duyarlılığı artırıyor",
+          "Gelirin küçük sayıda büyük müşteriye (Apple, hiper-ölçekliler) yoğunlaşması",
+          "Yazılım tarafında agresif fiyatlama/lisans değişiklikleri müşteri memnuniyetsizliği riski taşıyor"
+        ],
+        "verdict": "AI özel çip talebi ve VMware'in marj katkısı değerlemeyi büyük ölçüde destekliyor; borcun hızla azaltılması tezin sürdürülebilirliği için kilit — bu devam ettiği sürece prim gerekçeli kalır."
+      }
+    },
+    {
       "ticker": "ISRG",
       "price": 368.27,
       "currency": "USD",
@@ -106,8 +266,8 @@
       "sector": "Yarı İletken Ekip.",
       "industry": "Semiconductor Equipment & Materials",
       "pos52w": 0.781,
-      "upside12m": 25.07,
-      "targetMean": 2141.03,
+      "upside12m": 25.03,
+      "targetMean": 2140.29,
       "recommendationKey": "strong_buy",
       "numAnalysts": 15,
       "revenueGrowth": 21.3,
@@ -117,7 +277,7 @@
       "fcfMargin": 23.88,
       "dividendYield": 0.56,
       "forwardPE": 33.51,
-      "trailingPE": 58.71,
+      "trailingPE": 58.55,
       "priceToBook": 1451.01,
       "score": 75,
       "signal": "AL",
@@ -189,6 +349,83 @@
       ],
       "hasReport": false,
       "report": null
+    },
+    {
+      "ticker": "NFLX",
+      "price": 73.57,
+      "currency": "USD",
+      "changePct": 0.33,
+      "marketCap": 306341019648,
+      "sector": "Medya/Yayın",
+      "industry": "Entertainment",
+      "pos52w": 0.138,
+      "upside12m": 28.21,
+      "targetMean": 94.33,
+      "recommendationKey": "buy",
+      "numAnalysts": 45,
+      "revenueGrowth": 13.4,
+      "revenue3yCagr": 12.64,
+      "profitMargins": 28.22,
+      "netDebtToEbitda": 0.51,
+      "fcfMargin": 52.49,
+      "dividendYield": null,
+      "forwardPE": 19.27,
+      "trailingPE": 23.14,
+      "priceToBook": 10.16,
+      "score": 72,
+      "signal": "AL",
+      "name": "Netflix",
+      "indices": [
+        "NDX"
+      ],
+      "hasReport": true,
+      "report": {
+        "asOf": "FY2024 yıllık rapor verilerine dayalı, yaklaşık",
+        "segments": [
+          {
+            "name": "Abonelik (akış hizmeti — küresel)",
+            "sharePct": 92,
+            "note": "Ana gelir kaynağı, reklamlı katman hızla büyüyor"
+          },
+          {
+            "name": "Reklam gelirleri (reklamlı ucuz katman)",
+            "sharePct": 8,
+            "note": "En hızlı büyüyen, henüz küçük ama stratejik"
+          }
+        ],
+        "revenue3yNote": "3 yıllık gelir CAGR ~%10-12 — şifre paylaşımı önleme + reklamlı katman abone/gelir büyümesini yeniden hızlandırdı.",
+        "marginNote": "Net kâr marjı hızla genişledi (~%20'nin üzerine), içerik harcaması disiplini + abone büyümesinin sabit maliyeti yayması sayesinde.",
+        "balanceNote": "Borç azaltılıyor, Net Debt/EBITDA düşük bandda; içerik yükümlülükleri bilanço dışı önemli bir kalem olarak izlenmeli.",
+        "fcfNote": "FCF, içerik harcamasının gelire göre normalize olmasıyla güçlü pozitife döndü ve büyümeye devam ediyor.",
+        "competitors": [
+          "Disney+",
+          "Amazon Prime Video",
+          "YouTube",
+          "Max (Warner Bros Discovery)",
+          "Apple TV+"
+        ],
+        "moat": [
+          {
+            "title": "İçerik + veri destekli öneri motoru",
+            "desc": "Devasa izleme verisi, içerik yatırımını ve kişiselleştirilmiş öneriyi optimize ederek elde tutmayı rakiplerden daha verimli kılıyor."
+          },
+          {
+            "title": "Küresel ölçek + yerel içerik üretimi",
+            "desc": "Onlarca ülkede yerel dilde orijinal içerik üretim kapasitesi, tek pazara odaklı rakiplere göre abone tabanını genişletme avantajı sağlıyor."
+          }
+        ],
+        "strengths": [
+          "Reklamlı katman + şifre paylaşımı önleme abone ve gelir büyümesini yeniden hızlandırdı",
+          "İçerik harcaması disiplini marjı yapısal olarak genişletti",
+          "Canlı spor/etkinlik yayıncılığına giriş (WWE, NFL) yeni izleyici/reklam geliri kapısı açıyor"
+        ],
+        "risks": [
+          "Akış pazarı olgunlaştıkça abone büyümesi gelişmiş pazarlarda doğal olarak yavaşlıyor",
+          "İçerik maliyeti enflasyonu (yıldız oyuncu/yapımcı anlaşmaları) marjı tekrar baskılayabilir",
+          "Rakiplerin (Disney, Amazon) agresif içerik/reklam paketleme stratejisi rekabeti kızıştırıyor"
+        ],
+        "verdict": "Marj genişlemesi ve reklamlı katmanın büyümesi mevcut değerlemeyi destekliyor; ancak abone büyümesinin gelişmiş pazarlarda doğal olarak yavaşlayacağı göz önüne alındığında, tez giderek \"büyüme\"den \"marj + reklam parasallaştırma\" hikâyesine kaymalı."
+      }
     },
     {
       "ticker": "INTU",
@@ -274,6 +511,84 @@
           "KOBİ segmentinde küçük/bölgesel rakiplerin fiyat rekabeti mevcut"
         ],
         "verdict": "QuickBooks ve Credit Karma'nın büyüme+marj katkısı değerlemeyi destekliyor; TurboTax'a yönelik düzenleyici risk gerçekleşirse (ücretsiz dosyalama zorunluluğu gibi) tez üzerinde belirgin bir baskı unsuru olur."
+      }
+    },
+    {
+      "ticker": "META",
+      "price": 587.94,
+      "currency": "USD",
+      "changePct": -0.39,
+      "marketCap": 1497780846592,
+      "sector": "Teknoloji",
+      "industry": "Internet Content & Information",
+      "pos52w": 0.245,
+      "upside12m": 29.16,
+      "targetMean": 759.41,
+      "recommendationKey": "strong_buy",
+      "numAnalysts": 57,
+      "revenueGrowth": 28,
+      "revenue3yCagr": 19.89,
+      "profitMargins": 29.83,
+      "netDebtToEbitda": 0.2,
+      "fcfMargin": 9.44,
+      "dividendYield": 0.38,
+      "forwardPE": 16.85,
+      "trailingPE": 22.14,
+      "priceToBook": 6.12,
+      "score": 71,
+      "signal": "AL",
+      "name": "Meta Platforms",
+      "indices": [
+        "NDX",
+        "SPX"
+      ],
+      "hasReport": true,
+      "report": {
+        "asOf": "FY2024 yıllık rapor verilerine dayalı, yaklaşık",
+        "segments": [
+          {
+            "name": "Aile Uygulamaları reklam (Facebook, Instagram, WhatsApp, Messenger)",
+            "sharePct": 97,
+            "note": "Gelirin neredeyse tamamı reklamcılıktan"
+          },
+          {
+            "name": "Reality Labs (AR/VR, Quest, Ray-Ban Meta)",
+            "sharePct": 3,
+            "note": "Büyük zarar üreten ama stratejik uzun vadeli bahis"
+          }
+        ],
+        "revenue3yNote": "3 yıllık gelir CAGR ~%15-20 aralığında (2022'deki durgunluktan sonra AI destekli reklam hedeflemesiyle güçlü toparlanma).",
+        "marginNote": "Net kâr marjı ~%34-35'e yükseldi — maliyet disiplini (\"Year of Efficiency\") + reklam verimliliği artışı sayesinde.",
+        "balanceNote": "Net nakit pozisyonuna yakın, borç yükü düşük; Reality Labs zararı bilançoyu değil kârlılığı etkiliyor.",
+        "fcfNote": "FCF güçlü ama AI/veri merkezi capex'i hızla artıyor ve FCF marjını sıkıştırıyor.",
+        "competitors": [
+          "Google/YouTube",
+          "TikTok (ByteDance)",
+          "Snap",
+          "Amazon (reklam)",
+          "Apple (Vision Pro — Reality Labs'te)"
+        ],
+        "moat": [
+          {
+            "title": "Sosyal ağ etkisi",
+            "desc": "Facebook/Instagram/WhatsApp'ın milyarlarca kullanıcılı ağı, yeni bir platformun kullanıcı tabanıyla eşleşmesini son derece zorlaştırıyor."
+          },
+          {
+            "title": "Reklam hedefleme + veri ölçeği",
+            "desc": "Kullanıcı davranış verisinin hacmi ve AI destekli reklam optimizasyonu (Advantage+), reklamverenler için ölçülebilir yüksek getiri sağlıyor ve bütçe payını koruyor."
+          }
+        ],
+        "strengths": [
+          "Reklam iş modeli, AI hedeflemesiyle verimliliğini sürekli artırıyor",
+          "Instagram Reels, TikTok'a karşı kullanıcı/zaman payını başarıyla savundu",
+          "Güçlü FCF üretimi (Reality Labs zararına rağmen) sermaye getirisi (temettü + geri alım) imkânı veriyor"
+        ],
+        "risks": [
+          "Reality Labs yılda milyarlarca dolar zarar üretmeye devam ediyor, getiri belirsiz",
+          "Gelirin reklamcılığa aşırı yoğunlaşması makro/reklam bütçesi döngülerine kırılganlık yaratıyor",
+          "Düzenleyici baskı (veri gizliliği, AB dijital pazarlar yasası, olası bölünme talepleri) devam ediyor"
+        ],
+        "verdict": "Çekirdek reklam işinin marjı ve büyümesi mevcut değerlemeyi destekliyor; asıl belirsizlik Reality Labs'in ne zaman (ve edip etmeyeceği) kârlılığa katkı sağlayacağı — bu yatırım tezi değil çekirdek işin bir yan bahsi olarak görülmeli."
       }
     },
     {
@@ -451,7 +766,7 @@
       "fcfMargin": null,
       "dividendYield": 1.96,
       "forwardPE": 14.22,
-      "trailingPE": 16.26,
+      "trailingPE": 16.25,
       "priceToBook": 2.87,
       "score": 68,
       "signal": "AL",
@@ -570,37 +885,6 @@
       "report": null
     },
     {
-      "ticker": "VRTX",
-      "price": 478.71,
-      "currency": "USD",
-      "changePct": 1.7,
-      "marketCap": 121497919488,
-      "sector": "Biyoteknoloji",
-      "industry": "Biotechnology",
-      "pos52w": 0.679,
-      "upside12m": 16.63,
-      "targetMean": 558.32,
-      "recommendationKey": "buy",
-      "numAnalysts": 25,
-      "revenueGrowth": 12.5,
-      "revenue3yCagr": 10.35,
-      "profitMargins": 35,
-      "netDebtToEbitda": -1.15,
-      "fcfMargin": null,
-      "dividendYield": null,
-      "forwardPE": 22.48,
-      "trailingPE": 28.43,
-      "priceToBook": 6.28,
-      "score": 67,
-      "signal": "AL",
-      "name": "Vertex Pharmaceuticals",
-      "indices": [
-        "NDX"
-      ],
-      "hasReport": false,
-      "report": null
-    },
-    {
       "ticker": "V",
       "price": 369.59,
       "currency": "USD",
@@ -609,17 +893,17 @@
       "sector": "Ödeme Sistemleri",
       "industry": "Credit Services",
       "pos52w": 0.945,
-      "upside12m": 11.87,
-      "targetMean": 413.45,
+      "upside12m": 12.05,
+      "targetMean": 414.12,
       "recommendationKey": "strong_buy",
-      "numAnalysts": 38,
+      "numAnalysts": 37,
       "revenueGrowth": 14.4,
       "revenue3yCagr": 10.92,
       "profitMargins": 50.78,
       "netDebtToEbitda": 0.32,
       "fcfMargin": 45.86,
       "dividendYield": 0.73,
-      "forwardPE": 24.72,
+      "forwardPE": 24.69,
       "trailingPE": 31.48,
       "priceToBook": 19.59,
       "score": 67,
@@ -775,7 +1059,7 @@
       "profitMargins": 38.79,
       "netDebtToEbitda": null,
       "fcfMargin": null,
-      "dividendYield": 1.22,
+      "dividendYield": 1.21,
       "forwardPE": 13.63,
       "trailingPE": 19.37,
       "priceToBook": 3.68,
@@ -849,6 +1133,122 @@
       ],
       "hasReport": false,
       "report": null
+    },
+    {
+      "ticker": "VRTX",
+      "price": 478.71,
+      "currency": "USD",
+      "changePct": 1.7,
+      "marketCap": 121497919488,
+      "sector": "Biyoteknoloji",
+      "industry": "Biotechnology",
+      "pos52w": 0.679,
+      "upside12m": 16.63,
+      "targetMean": 558.32,
+      "recommendationKey": "buy",
+      "numAnalysts": 25,
+      "revenueGrowth": 7.8,
+      "revenue3yCagr": 10.35,
+      "profitMargins": 35.51,
+      "netDebtToEbitda": -1.06,
+      "fcfMargin": 22.78,
+      "dividendYield": null,
+      "forwardPE": 22.48,
+      "trailingPE": 28.43,
+      "priceToBook": 6.28,
+      "score": 66,
+      "signal": "AL",
+      "name": "Vertex Pharmaceuticals",
+      "indices": [
+        "NDX"
+      ],
+      "hasReport": false,
+      "report": null
+    },
+    {
+      "ticker": "AMD",
+      "price": 518.58,
+      "currency": "USD",
+      "changePct": 7,
+      "marketCap": 845596852224,
+      "sector": "Yarı İletken",
+      "industry": "Semiconductors",
+      "pos52w": 0.848,
+      "upside12m": 11.67,
+      "targetMean": 579.11,
+      "recommendationKey": "strong_buy",
+      "numAnalysts": 47,
+      "revenueGrowth": 37.8,
+      "revenue3yCagr": 13.64,
+      "profitMargins": 13.37,
+      "netDebtToEbitda": -1.14,
+      "fcfMargin": 19.15,
+      "dividendYield": null,
+      "forwardPE": 37.26,
+      "trailingPE": 172.86,
+      "priceToBook": 13.11,
+      "score": 65,
+      "signal": "AL",
+      "name": "Advanced Micro Devices",
+      "indices": [
+        "NDX"
+      ],
+      "hasReport": true,
+      "report": {
+        "asOf": "FY2024 yıllık rapor verilerine dayalı, yaklaşık",
+        "segments": [
+          {
+            "name": "Veri Merkezi (EPYC CPU + Instinct AI GPU)",
+            "sharePct": 50,
+            "note": "En hızlı büyüyen segment, NVIDIA'ya karşı AI GPU iddiası burada"
+          },
+          {
+            "name": "İstemci (Ryzen — PC işlemci)",
+            "sharePct": 24,
+            "note": "PC döngüsüne bağlı, pazar payı Intel'e karşı artıyor"
+          },
+          {
+            "name": "Oyun (konsol + GPU)",
+            "sharePct": 12,
+            "note": "Konsol döngüsü sonu nedeniyle zayıflıyor"
+          },
+          {
+            "name": "Gömülü (Xilinx sonrası)",
+            "sharePct": 14,
+            "note": "Sanayi/savunma odaklı, döngüsel zayıflık yaşıyor"
+          }
+        ],
+        "revenue3yNote": "3 yıllık gelir CAGR ~%10-15 — Veri Merkezi segmentinin AI GPU talebiyle hızlanması diğer segmentlerin zayıflığını dengeliyor.",
+        "marginNote": "Net kâr marjı tek haneden çift haneye toparlanıyor; Veri Merkezi payı arttıkça marj yapısal olarak iyileşiyor.",
+        "balanceNote": "Net nakit pozisyonuna yakın, borç yükü düşük; Xilinx satın alması sonrası bilanço disiplinli yönetiliyor.",
+        "fcfNote": "FCF pozitif ve büyüyor, ama NVIDIA'ya göre büyüklük farkı hâlâ çok büyük.",
+        "competitors": [
+          "NVIDIA (AI GPU'da)",
+          "Intel (CPU'da)",
+          "Qualcomm/ARM tasarımcıları (mobil/gömülüde dolaylı)"
+        ],
+        "moat": [
+          {
+            "title": "x86 CPU'da iki oyunculu pazarda güçlenen konum",
+            "desc": "Intel'e karşı hem sunucu hem PC'de pazar payı kazanımı sürüyor; büyük bulut sağlayıcılarının çoklu-tedarikçi isteği AMD'yi kalıcı bir ikinci kaynak yapıyor."
+          },
+          {
+            "title": "Chiplet tasarım/üretim esnekliği",
+            "desc": "TSMC ile chiplet tabanlı modüler tasarım, ürün geliştirme hızını ve maliyet verimliliğini artırıyor."
+          }
+        ],
+        "strengths": [
+          "Sunucu CPU pazarında Intel'e karşı payı istikrarlı biçimde artırıyor",
+          "AI GPU (Instinct/MI serisi) NVIDIA'ya karşı gerçek (ikincil) bir alternatif olarak konumlanıyor",
+          "Xilinx entegrasyonu gömülü/FPGA pazarına çeşitlendirme sağladı"
+        ],
+        "risks": [
+          "AI GPU'da NVIDIA'nın CUDA yazılım avantajını kapatmak uzun ve maliyetli bir süreç",
+          "Oyun/konsol segmenti döngü sonu nedeniyle belirgin zayıflıyor",
+          "Değerleme büyük ölçüde AI GPU pazar payı kazanımı varsayımına dayanıyor — gerçekleşme hızı belirsiz"
+        ],
+        "verdict": "CPU tarafındaki payı artırma hikâyesi somut ve gerekçeli; AI GPU tarafında ise değerleme, henüz kanıtlanmamış bir pazar payı kazanım hızını fiyatlıyor — bu ikisi arasındaki ayrım yatırım tezinin netliği için önemli."
+      }
     },
     {
       "ticker": "TXN",
@@ -971,7 +1371,7 @@
       "sector": "E-ticaret",
       "industry": "Internet Retail",
       "pos52w": 0.283,
-      "upside12m": 28.04,
+      "upside12m": 28.03,
       "targetMean": 116.55,
       "recommendationKey": "buy",
       "numAnalysts": 34,
@@ -1098,7 +1498,7 @@
       "fcfMargin": 19.73,
       "dividendYield": 0.5,
       "forwardPE": 12.75,
-      "trailingPE": 18.82,
+      "trailingPE": 18.83,
       "priceToBook": 2.41,
       "score": 65,
       "signal": "AL",
@@ -1344,7 +1744,7 @@
       "fcfMargin": null,
       "dividendYield": 2.19,
       "forwardPE": 15.92,
-      "trailingPE": 17.55,
+      "trailingPE": 17.53,
       "priceToBook": 3.28,
       "score": 64,
       "signal": "TUT",
@@ -1435,6 +1835,284 @@
       ],
       "hasReport": false,
       "report": null
+    },
+    {
+      "ticker": "GOOGL",
+      "price": 377.65,
+      "currency": "USD",
+      "changePct": 1.11,
+      "marketCap": 4618634919936,
+      "sector": "Teknoloji",
+      "industry": "Internet Content & Information",
+      "pos52w": 0.856,
+      "upside12m": 13.34,
+      "targetMean": 428.04,
+      "recommendationKey": "strong_buy",
+      "numAnalysts": 55,
+      "revenueGrowth": 24.2,
+      "revenue3yCagr": 12.51,
+      "profitMargins": 54.77,
+      "netDebtToEbitda": -0.7,
+      "fcfMargin": 5.08,
+      "dividendYield": 0.25,
+      "forwardPE": 25.63,
+      "trailingPE": 18.93,
+      "priceToBook": 7.42,
+      "score": 63,
+      "signal": "TUT",
+      "name": "Alphabet (A)",
+      "indices": [
+        "NDX",
+        "SPX"
+      ],
+      "hasReport": true,
+      "report": {
+        "asOf": "FY2024 yıllık rapor verilerine dayalı, yaklaşık",
+        "segments": [
+          {
+            "name": "Google Arama & diğer",
+            "sharePct": 56,
+            "note": "Ana nakit makinesi, AI yanıt motorlarından pay kaybı riski tartışılıyor"
+          },
+          {
+            "name": "YouTube reklam",
+            "sharePct": 10,
+            "note": "Video/short-form içerikte güçlü büyüme"
+          },
+          {
+            "name": "Google Cloud",
+            "sharePct": 12,
+            "note": "Zarardan kâra geçti, en hızlı büyüyen segment"
+          },
+          {
+            "name": "Google Network + diğer bahisler",
+            "sharePct": 22,
+            "note": "Ağ reklamcılığı + Waymo gibi erken aşama projeler"
+          }
+        ],
+        "revenue3yNote": "3 yıllık gelir CAGR ~%9-10 — Arama olgun ama büyümeye devam ediyor, Cloud çift haneli büyüyor.",
+        "marginNote": "Net kâr marjı ~%28-29; Cloud segmentinin kârlılığa dönmesi konsolide marjı yukarı taşıdı.",
+        "balanceNote": "Net nakit pozisyonu güçlü, borç yükü düşük; Net Debt/EBITDA negatife yakın.",
+        "fcfNote": "FCF yüksek ve pozitif trendde; AI altyapı yatırımları capex'i artırsa da nakit üretimi güçlü kalmaya devam ediyor.",
+        "competitors": [
+          "Microsoft (Bing/Copilot)",
+          "Amazon (arama+reklam)",
+          "Meta",
+          "OpenAI/Perplexity (AI arama)",
+          "AWS/Azure (Cloud)"
+        ],
+        "moat": [
+          {
+            "title": "Dağıtım + veri ölçeği",
+            "desc": "Android, Chrome ve varsayılan arama motoru anlaşmaları milyarlarca cihazda erişim sağlıyor; bu veri hacmi reklam hedeflemesinde taklit edilmesi zor bir avantaj yaratıyor."
+          },
+          {
+            "title": "Reklamveren ağ etkisi",
+            "desc": "Search + YouTube + Network'ün birleşik envanteri, reklamverenler için tek noktadan geniş erişim sunuyor ve değiştirme maliyetini yükseltiyor."
+          }
+        ],
+        "strengths": [
+          "Cloud segmenti kâra döndü ve büyümeyi çeşitlendiriyor",
+          "YouTube, video reklamcılıkta güçlü ve büyüyen bir konumda",
+          "Güçlü bilanço, AI Ar-Ge'sini (Gemini, TPU) organik olarak finanse edebiliyor"
+        ],
+        "risks": [
+          "Generatif AI tabanlı arama alternatifleri (ChatGPT, Perplexity) çekirdek arama iş modelini uzun vadede tehdit ediyor",
+          "ABD ve AB'de arama tekeli ve reklam teknolojisi davaları yapısal değişiklik riski taşıyor",
+          "Arama sonuçlarında AI özetleri, tıklama oranlarını ve reklam envanterini baskılayabilir"
+        ],
+        "verdict": "Değerleme, Arama'nın hâlâ büyüyen bir nakit makinesi olduğu ve Cloud'un kâra geçtiği gerçeğiyle makul; ancak AI arama rekabetinin çekirdek iş modelini nasıl etkileyeceği netleşmeden çarpanlar temkinli kalmaya devam edebilir."
+      }
+    },
+    {
+      "ticker": "GOOG",
+      "price": 375.35,
+      "currency": "USD",
+      "changePct": 0.77,
+      "marketCap": 4590506344448,
+      "sector": "Teknoloji",
+      "industry": "Internet Content & Information",
+      "pos52w": 0.861,
+      "upside12m": 12.37,
+      "targetMean": 421.79,
+      "recommendationKey": "strong_buy",
+      "numAnalysts": 14,
+      "revenueGrowth": 24.2,
+      "revenue3yCagr": 12.51,
+      "profitMargins": 54.77,
+      "netDebtToEbitda": -0.7,
+      "fcfMargin": 5.08,
+      "dividendYield": 0.24,
+      "forwardPE": 25.47,
+      "trailingPE": 18.83,
+      "priceToBook": 7.37,
+      "score": 63,
+      "signal": "TUT",
+      "name": "Alphabet (C)",
+      "indices": [
+        "NDX",
+        "SPX"
+      ],
+      "hasReport": false,
+      "report": null
+    },
+    {
+      "ticker": "ORCL",
+      "price": 145.74,
+      "currency": "USD",
+      "changePct": 2.74,
+      "marketCap": 419799859200,
+      "sector": "Yazılım",
+      "industry": "Software - Infrastructure",
+      "pos52w": 0.135,
+      "upside12m": 70.27,
+      "targetMean": 248.15,
+      "recommendationKey": "buy",
+      "numAnalysts": 41,
+      "revenueGrowth": 20.6,
+      "revenue3yCagr": 10.48,
+      "profitMargins": 25.37,
+      "netDebtToEbitda": 4.44,
+      "fcfMargin": -36.43,
+      "dividendYield": 1.54,
+      "forwardPE": 13.38,
+      "trailingPE": 25,
+      "priceToBook": 11.18,
+      "score": 63,
+      "signal": "TUT",
+      "name": "Oracle",
+      "indices": [
+        "SPX"
+      ],
+      "hasReport": true,
+      "report": {
+        "asOf": "FY2024 (Mayıs sonu biten mali yıl) verilerine dayalı, yaklaşık",
+        "segments": [
+          {
+            "name": "Bulut hizmetleri & lisans desteği (SaaS+IaaS)",
+            "sharePct": 76,
+            "note": "Oracle Cloud Infrastructure (OCI) hızla büyüyor, AI eğitim talebiyle destekleniyor"
+          },
+          {
+            "name": "Bulut lisansı & şirket içi lisans",
+            "sharePct": 8,
+            "note": "Yapısal olarak küçülen eski iş"
+          },
+          {
+            "name": "Donanım + hizmetler",
+            "sharePct": 16,
+            "note": "Görece durağan"
+          }
+        ],
+        "revenue3yNote": "3 yıllık gelir CAGR ~%8-10; OCI'nin AI eğitim iş yükleri için tercih edilmesi son dönemde büyümeyi belirgin hızlandırdı.",
+        "marginNote": "Net kâr marjı ~%20 bandında; OCI capex'i büyürken kısa vadede marjı baskılıyor ama uzun vadede ölçek ekonomisi bekleniyor.",
+        "balanceNote": "Borç yükü sektöre göre yüksek (geçmiş büyük satın almalar + geri alımlar); Net Debt/EBITDA orta-yüksek bandda — izlenmesi gereken bir kalem.",
+        "fcfNote": "FCF pozitif ama OCI veri merkezi yatırımları arttıkça marj baskısı sürüyor.",
+        "competitors": [
+          "Microsoft Azure",
+          "AWS",
+          "Google Cloud",
+          "SAP",
+          "Salesforce (uygulama katmanında)"
+        ],
+        "moat": [
+          {
+            "title": "Kurumsal veritabanı kilitlenmesi",
+            "desc": "Büyük kurumların (bankalar, devlet kurumları) kritik veritabanı iş yükleri Oracle'a derinden bağımlı; geçiş riski/maliyeti çok yüksek."
+          },
+          {
+            "title": "AI iş yükleri için OCI'nin fiyat/performans konumu",
+            "desc": "NVIDIA kümeleriyle rekabetçi fiyatlandırma, büyük AI laboratuvarlarını (ör. OpenAI ile duyurulan kapasite anlaşmaları) OCI'ye çekiyor."
+          }
+        ],
+        "strengths": [
+          "OCI, AI eğitim talebiyle üç büyük bulut sağlayıcısına (AWS/Azure/GCP) karşı pazar payı kazanıyor",
+          "Kurumsal veritabanı tabanı çok yüksek elde tutma oranına sahip, öngörülebilir gelir sağlıyor",
+          "Büyük ölçekli AI kapasite anlaşmaları (multi-yıl) gelir görünürlüğünü artırıyor"
+        ],
+        "risks": [
+          "Yüksek borç yükü, faiz oranı ortamına duyarlılığı artırıyor",
+          "OCI büyümesini sürdürmek için gereken capex çok büyük; getiri zamanlaması belirsiz",
+          "Büyük bulut sağlayıcılarıyla (özellikle Azure/AWS) fiyat rekabeti marjı baskılayabilir"
+        ],
+        "verdict": "OCI'nin AI talebiyle ivmelenmesi büyüme anlatısını güçlü destekliyor, ama yüksek borç ve büyük capex yükü, değerlemenin OCI büyümesinin kesintisiz süreceği varsayımına duyarlılığını artırıyor."
+      }
+    },
+    {
+      "ticker": "ADBE",
+      "price": 257.49,
+      "currency": "USD",
+      "changePct": 2.45,
+      "marketCap": 102352273408,
+      "sector": "Yazılım",
+      "industry": "Software - Application",
+      "pos52w": 0.373,
+      "upside12m": 4.71,
+      "targetMean": 269.61,
+      "recommendationKey": "hold",
+      "numAnalysts": 34,
+      "revenueGrowth": 12.7,
+      "revenue3yCagr": 10.52,
+      "profitMargins": 28.69,
+      "netDebtToEbitda": 0.15,
+      "fcfMargin": 36.58,
+      "dividendYield": null,
+      "forwardPE": 9.37,
+      "trailingPE": 14.74,
+      "priceToBook": 8.92,
+      "score": 63,
+      "signal": "TUT",
+      "name": "Adobe",
+      "indices": [
+        "NDX"
+      ],
+      "hasReport": true,
+      "report": {
+        "asOf": "FY2024 (Kasım sonu biten mali yıl) verilerine dayalı, yaklaşık",
+        "segments": [
+          {
+            "name": "Digital Media (Creative Cloud, Document Cloud)",
+            "sharePct": 74,
+            "note": "Abonelik ağırlıklı, ana kâr kaynağı"
+          },
+          {
+            "name": "Digital Experience (pazarlama/analitik yazılımı)",
+            "sharePct": 25,
+            "note": "Kurumsal odaklı, görece yavaş büyüyen"
+          }
+        ],
+        "revenue3yNote": "3 yıllık gelir CAGR ~%10-11 — abonelik modelinin olgunluğuyla istikrarlı ama hızlanmıyor.",
+        "marginNote": "Net kâr marjı ~%27-30 bandında, yazılım/SaaS modelinin tipik yüksek marjı.",
+        "balanceNote": "Net nakit pozisyonuna yakın, borç yükü düşük; Figma satın alma girişiminin düzenleyici engelle iptali bilançoyu rahatlattı.",
+        "fcfNote": "FCF çok güçlü ve istikrarlı; büyük ölçüde hisse geri alımına yönlendiriliyor.",
+        "competitors": [
+          "Figma",
+          "Canva",
+          "Microsoft (Designer, Office)",
+          "Salesforce (Digital Experience'da)"
+        ],
+        "moat": [
+          {
+            "title": "Yaratıcı profesyonel iş akışı standardı",
+            "desc": "Photoshop/Premiere/Illustrator onlarca yıldır kreatif endüstrinin standardı; eğitim, eklenti ekosistemi ve dosya format bağımlılığı geçişi zorlaştırıyor."
+          },
+          {
+            "title": "Abonelik + bulut senkronizasyon kilitlenmesi",
+            "desc": "Creative Cloud aboneliği, dosya/varlık senkronizasyonu ve ekip iş birliği özellikleriyle kurumsal müşterileri elde tutuyor."
+          }
+        ],
+        "strengths": [
+          "Abonelik modeli tekrarlayan, öngörülebilir gelir sağlıyor",
+          "Kreatif yazılımda fiili endüstri standardı konumu güçlü fiyatlama gücü veriyor",
+          "AI özelliklerinin (Firefly) mevcut ürünlere entegrasyonu ek gelir/elde tutma potansiyeli taşıyor"
+        ],
+        "risks": [
+          "Canva gibi daha ucuz/kolay kullanımlı AI-native araçlar giriş seviyesi kullanıcıları çekiyor",
+          "Figma satın almasının düzenleyici engelle iptali, tasarım işbirliği alanında rekabeti dışarıda bıraktı",
+          "Genel amaçlı AI görsel/video üretim araçları (Midjourney, Sora vb.) uzun vadede iş akışını değiştirebilir"
+        ],
+        "verdict": "İstikrarlı abonelik geliri ve yüksek marj değerlemeyi destekliyor, ama AI-native rakiplerin genç/girişimci kullanıcı segmentinde payı aşındırma riski, büyüme çarpanının eskisi kadar rahat savunulmasını zorlaştırıyor."
+      }
     },
     {
       "ticker": "TEAM",
@@ -1624,6 +2302,98 @@
       "report": null
     },
     {
+      "ticker": "AAPL",
+      "price": 309.38,
+      "currency": "USD",
+      "changePct": 1.96,
+      "marketCap": 4515147284480,
+      "sector": "Teknoloji",
+      "industry": "Consumer Electronics",
+      "pos52w": 0.753,
+      "upside12m": 4.73,
+      "targetMean": 324.01,
+      "recommendationKey": "buy",
+      "numAnalysts": 41,
+      "revenueGrowth": 16.4,
+      "revenue3yCagr": 1.81,
+      "profitMargins": 27.62,
+      "netDebtToEbitda": 0.13,
+      "fcfMargin": 23.08,
+      "dividendYield": 0.36,
+      "forwardPE": 32.52,
+      "trailingPE": 35.52,
+      "priceToBook": 42.04,
+      "score": 61,
+      "signal": "TUT",
+      "name": "Apple",
+      "indices": [
+        "NDX",
+        "SPX"
+      ],
+      "hasReport": true,
+      "report": {
+        "asOf": "FY2024 yıllık rapor verilerine dayalı, yaklaşık",
+        "segments": [
+          {
+            "name": "iPhone",
+            "sharePct": 51,
+            "note": "Ana gelir kalemi; yenileme döngüsüne duyarlı"
+          },
+          {
+            "name": "Hizmetler (App Store, iCloud, reklam, abonelik)",
+            "sharePct": 24,
+            "note": "En yüksek marjlı, en hızlı büyüyen segment"
+          },
+          {
+            "name": "Mac",
+            "sharePct": 8,
+            "note": "Apple Silicon geçişiyle payı toparladı"
+          },
+          {
+            "name": "Giyilebilir/Ev/Aksesuar",
+            "sharePct": 9,
+            "note": "Watch, AirPods"
+          },
+          {
+            "name": "iPad",
+            "sharePct": 7,
+            "note": "Döngüsel, yenileme aralığı uzun"
+          }
+        ],
+        "revenue3yNote": "3 yıllık gelir CAGR ~%4-6 — donanım tarafı olgun/yavaş, Hizmetler segmenti çift haneli büyüyerek toplamı yukarı çekiyor.",
+        "marginNote": "Net kâr marjı ~%25-26, sektörün en istikrarlı marjlarından; Hizmetler payı arttıkça marj yapısal olarak destekleniyor.",
+        "balanceNote": "Brüt nakit büyük, ama aktif hisse geri alımı nedeniyle net nakit pozisyonu daralıyor; Net Debt/EBITDA düşük/negatife yakın — kaldıraç riski yok.",
+        "fcfNote": "FCF çok güçlü ve istikrarlı (yıllık ~90-100 milyar $ bandı); neredeyse tamamı temettü + geri alımla hissedara dönüyor.",
+        "competitors": [
+          "Samsung Electronics",
+          "Google (Android)",
+          "Microsoft",
+          "Xiaomi"
+        ],
+        "moat": [
+          {
+            "title": "Ekosistem kilitlenmesi",
+            "desc": "iPhone-Mac-Watch-Hizmetler entegrasyonu geçiş maliyetini yükseltiyor; kullanıcı elde tutma oranı sektörde en yüksekler arasında."
+          },
+          {
+            "title": "Marka gücü + fiyatlama gücü",
+            "desc": "Premium segmentte fiyat esnekliği düşük talep sayesinde rakiplerin ulaşamadığı marjlarla satış yapabiliyor."
+          }
+        ],
+        "strengths": [
+          "Hizmetler gelirinin büyüyen payı marjı ve öngörülebilirliği artırıyor",
+          "Devasa, öngörülebilir serbest nakit akışı ve agresif hissedar getirisi programı",
+          "Marka sadakati ve ekosistem, iPhone dışı ürünlerde çapraz satışı kolaylaştırıyor"
+        ],
+        "risks": [
+          "iPhone'a gelir yoğunlaşması; yenileme döngüsü uzarsa büyüme yavaşlar",
+          "Çin'de hem talep hem tedarik zinciri riski (jeopolitik + yerel rakipler)",
+          "App Store komisyon modeline düzenleyici baskı (AB, ABD) Hizmetler marjını tehdit ediyor"
+        ],
+        "verdict": "Değerleme, çoğu döngüde F/K primini Hizmetler büyümesi ve nakit getirisiyle gerekçelendiriyor; ancak donanım büyümesi durağanlaşırsa prim savunulması zorlaşır. Kısa vadeli katalizör (yeni ürün döngüsü) olmadan mevcut çarpanlar gerilim taşır."
+      }
+    },
+    {
       "ticker": "IDXX",
       "price": 588.09,
       "currency": "USD",
@@ -1653,6 +2423,93 @@
       ],
       "hasReport": false,
       "report": null
+    },
+    {
+      "ticker": "CRM",
+      "price": 190.99,
+      "currency": "USD",
+      "changePct": 2.71,
+      "marketCap": 156420816896,
+      "sector": "Yazılım",
+      "industry": "Software - Application",
+      "pos52w": 0.364,
+      "upside12m": 26.56,
+      "targetMean": 241.72,
+      "recommendationKey": "buy",
+      "numAnalysts": 53,
+      "revenueGrowth": 13.3,
+      "revenue3yCagr": 9.82,
+      "profitMargins": 18.73,
+      "netDebtToEbitda": 2.38,
+      "fcfMargin": 38.65,
+      "dividendYield": 0.96,
+      "forwardPE": 12.31,
+      "trailingPE": 22.13,
+      "priceToBook": 4.57,
+      "score": 60,
+      "signal": "TUT",
+      "name": "Salesforce",
+      "indices": [
+        "SPX"
+      ],
+      "hasReport": true,
+      "report": {
+        "asOf": "FY2024 (Ocak sonu biten mali yıl) verilerine dayalı, yaklaşık",
+        "segments": [
+          {
+            "name": "Sales & Service Cloud",
+            "sharePct": 46,
+            "note": "Çekirdek CRM iş kolu"
+          },
+          {
+            "name": "Platform & diğer (Data Cloud, Slack, MuleSoft)",
+            "sharePct": 30,
+            "note": "Entegrasyon ve veri platformu büyümesi"
+          },
+          {
+            "name": "Marketing & Commerce Cloud",
+            "sharePct": 15,
+            "note": "Görece yavaş büyüyen"
+          },
+          {
+            "name": "Diğer",
+            "sharePct": 9,
+            "note": "Tableau, Agentforce (AI ajanları) gibi yeni ürünler"
+          }
+        ],
+        "revenue3yNote": "3 yıllık gelir CAGR ~%11-12; büyüme hızı önceki yıllara göre yavaşladı ama kârlılık odağıyla dengelendi.",
+        "marginNote": "Net kâr marjı aktivist yatırımcı baskısı sonrası maliyet disipliniyle belirgin iyileşti (~%15-18 bandına yükseldi).",
+        "balanceNote": "Net nakit pozisyonuna yakın, borç yükü makul; büyük satın almalar (Slack) sonrası bilanço disiplinli yönetiliyor.",
+        "fcfNote": "FCF marjı son yıllarda hızla genişledi — kârlılık odaklı yönetim değişiminin en somut sonucu.",
+        "competitors": [
+          "Microsoft Dynamics",
+          "SAP",
+          "Oracle",
+          "HubSpot",
+          "ServiceNow (bitişik alanlarda)"
+        ],
+        "moat": [
+          {
+            "title": "CRM veri + iş akışı kilitlenmesi",
+            "desc": "Satış/müşteri hizmet ekiplerinin günlük iş akışına derinden yerleşmiş CRM verisi, rakibe geçişi operasyonel olarak riskli ve maliyetli kılıyor."
+          },
+          {
+            "title": "AppExchange ekosistemi",
+            "desc": "Binlerce üçüncü parti eklenti ve entegrasyon, platformun değerini artırıyor ve müşteri bağımlılığını derinleştiriyor."
+          }
+        ],
+        "strengths": [
+          "Aktivist yatırımcı baskısı sonrası kârlılık ve FCF disiplini kalıcı görünüyor",
+          "Data Cloud + Agentforce (AI ajanları) yeni büyüme vektörleri sunuyor",
+          "Kurumsal CRM pazarında lider konum ve yüksek müşteri elde tutma"
+        ],
+        "risks": [
+          "Büyüme hızı, geçmiş yılların çift haneli yüksek seviyelerinden belirgin yavaşladı",
+          "AI-native CRM/satış araçları (yeni girişimler) niş segmentlerde pay çalabilir",
+          "Çoklu ürün (Slack, Tableau, MuleSoft) entegrasyonunun karmaşıklığı satış döngüsünü uzatabilir"
+        ],
+        "verdict": "Kârlılığa geçiş değerlemeyi somut biçimde destekliyor; büyüme yeniden hızlanmadan (Agentforce/Data Cloud'un gerçek katkısı netleşmeden) çarpanların önceki döngünün büyüme primini tekrar kazanması zor görünüyor."
+      }
     },
     {
       "ticker": "GILD",
@@ -1703,7 +2560,7 @@
       "profitMargins": 29.52,
       "netDebtToEbitda": null,
       "fcfMargin": null,
-      "dividendYield": 2.07,
+      "dividendYield": 2.05,
       "forwardPE": 11.89,
       "trailingPE": 14.53,
       "priceToBook": 1.6,
@@ -1944,6 +2801,89 @@
       ],
       "hasReport": false,
       "report": null
+    },
+    {
+      "ticker": "MSFT",
+      "price": 492.81,
+      "currency": "USD",
+      "changePct": 1.06,
+      "marketCap": 3659383177216,
+      "sector": "Yazılım",
+      "industry": "Software - Infrastructure",
+      "pos52w": 0.702,
+      "upside12m": 14.19,
+      "targetMean": 562.73,
+      "recommendationKey": "strong_buy",
+      "numAnalysts": 53,
+      "revenueGrowth": 17.7,
+      "revenue3yCagr": 16.12,
+      "profitMargins": 40.31,
+      "netDebtToEbitda": 0.27,
+      "fcfMargin": 4.93,
+      "dividendYield": 0.78,
+      "forwardPE": 21,
+      "trailingPE": 27.45,
+      "priceToBook": 8.27,
+      "score": 57,
+      "signal": "TUT",
+      "name": "Microsoft",
+      "indices": [
+        "NDX",
+        "SPX"
+      ],
+      "hasReport": true,
+      "report": {
+        "asOf": "FY2024 yıllık rapor verilerine dayalı, yaklaşık",
+        "segments": [
+          {
+            "name": "Intelligent Cloud (Azure, sunucu ürünleri)",
+            "sharePct": 43,
+            "note": "En hızlı büyüyen, AI talebiyle ivmeleniyor"
+          },
+          {
+            "name": "Productivity & Business Processes (Office 365, LinkedIn, Dynamics)",
+            "sharePct": 32,
+            "note": "İstikrarlı abonelik geliri"
+          },
+          {
+            "name": "More Personal Computing (Windows, Xbox, arama/reklam)",
+            "sharePct": 25,
+            "note": "PC döngüsüne bağlı, görece yavaş büyüyor"
+          }
+        ],
+        "revenue3yNote": "3 yıllık gelir CAGR ~%15-16 — Azure ve AI altyapı talebi ana itici güç.",
+        "marginNote": "Net kâr marjı ~%35-36, yazılım/bulut karmasının olgunluğuyla sektörün en yüksekleri arasında.",
+        "balanceNote": "Net nakit pozisyonuna yakın; Activision satın alması sonrası borç arttı ama Net Debt/EBITDA hâlâ düşük bandın içinde.",
+        "fcfNote": "FCF çok güçlü, ama AI/veri merkezi yatırım harcaması (capex) hızla artıyor ve FCF marjını kısa vadede baskılıyor.",
+        "competitors": [
+          "Amazon (AWS)",
+          "Google Cloud",
+          "Salesforce",
+          "Oracle",
+          "Apple"
+        ],
+        "moat": [
+          {
+            "title": "Kurumsal geçiş maliyeti",
+            "desc": "Windows-Office-Azure-Active Directory yığını kurumlarda değiştirilmesi çok maliyetli bir bağımlılık yaratıyor."
+          },
+          {
+            "title": "Ölçek + AI entegrasyonu",
+            "desc": "OpenAI ortaklığı ve Copilot'un tüm ürün ailesine entegrasyonu, dağıtım ölçeğinde rakiplerin kolayca kopyalayamayacağı bir avantaj sağlıyor."
+          }
+        ],
+        "strengths": [
+          "Azure + AI talebi çok yıllı büyüme görünürlüğü sağlıyor",
+          "Abonelik ağırlıklı gelir modeli öngörülebilirlik ve marj istikrarı veriyor",
+          "Bilanço gücü, büyük ölçekli satın almaları (Activision gibi) organik büyümeyi bozmadan finanse edebiliyor"
+        ],
+        "risks": [
+          "AI capex döngüsü getiri hızını (ROIC) baskılayabilir, yatırımcı sabrı sınanabilir",
+          "Bulut pazarında AWS/Google ile fiyat/kapasite rekabeti yoğunlaşıyor",
+          "Düzenleyici inceleme (rekabet, AI, bundling) büyük teknoloji genelinde artıyor"
+        ],
+        "verdict": "Prim değerleme, Azure/AI büyüme görünürlüğü ve marj kalitesiyle büyük ölçüde gerekçeli görünüyor; asıl soru capex'in ne zaman gelir/marja dönüşeceği — bu netleşene kadar çarpanlarda volatilite beklenmeli."
+      }
     },
     {
       "ticker": "DXCM",
@@ -2307,7 +3247,7 @@
       "profitMargins": 21.83,
       "netDebtToEbitda": null,
       "fcfMargin": null,
-      "dividendYield": 2.02,
+      "dividendYield": 2.01,
       "forwardPE": 10.62,
       "trailingPE": 14.75,
       "priceToBook": 1.19,
@@ -2400,7 +3340,7 @@
       "profitMargins": 21.01,
       "netDebtToEbitda": 0.58,
       "fcfMargin": 23.24,
-      "dividendYield": 2.49,
+      "dividendYield": 2.43,
       "forwardPE": 15.8,
       "trailingPE": 18.59,
       "priceToBook": 6.22,
@@ -2476,7 +3416,7 @@
       "profitMargins": 20.11,
       "netDebtToEbitda": 0.18,
       "fcfMargin": 24.31,
-      "dividendYield": 2.55,
+      "dividendYield": 2.52,
       "forwardPE": 20.19,
       "trailingPE": 24.71,
       "priceToBook": 17.85,
@@ -2602,7 +3542,7 @@
       "fcfMargin": 15.6,
       "dividendYield": null,
       "forwardPE": 13.83,
-      "trailingPE": 30.03,
+      "trailingPE": 30.08,
       "priceToBook": 2.93,
       "score": 53,
       "signal": "TUT",
@@ -2824,37 +3764,6 @@
       "report": null
     },
     {
-      "ticker": "BSX",
-      "price": 49.09,
-      "currency": "USD",
-      "changePct": 1.36,
-      "marketCap": 71142678528,
-      "sector": "Tıbbi Cihaz",
-      "industry": "Medical Devices",
-      "pos52w": 0.102,
-      "upside12m": 27.7,
-      "targetMean": 62.69,
-      "recommendationKey": "buy",
-      "numAnalysts": 29,
-      "revenueGrowth": 7.5,
-      "revenue3yCagr": 16.54,
-      "profitMargins": 17.5,
-      "netDebtToEbitda": 1.67,
-      "fcfMargin": null,
-      "dividendYield": null,
-      "forwardPE": 14.28,
-      "trailingPE": 19.87,
-      "priceToBook": 2.82,
-      "score": 52,
-      "signal": "TUT",
-      "name": "Boston Scientific",
-      "indices": [
-        "SPX"
-      ],
-      "hasReport": false,
-      "report": null
-    },
-    {
       "ticker": "GE",
       "price": 377.28,
       "currency": "USD",
@@ -2936,7 +3845,7 @@
       "fcfMargin": 38.13,
       "dividendYield": 2.02,
       "forwardPE": 56.44,
-      "trailingPE": 67.88,
+      "trailingPE": 67.54,
       "priceToBook": 7.21,
       "score": 52,
       "signal": "TUT",
@@ -2966,7 +3875,7 @@
       "netDebtToEbitda": -0.15,
       "fcfMargin": null,
       "dividendYield": 0.55,
-      "forwardPE": 33.23,
+      "forwardPE": 33.16,
       "trailingPE": 42.18,
       "priceToBook": 10.02,
       "score": 51,
@@ -3084,6 +3993,206 @@
         ],
         "verdict": "Güçlü bilanço ve düşük maliyetli üretim varlıkları, mevcut petrol fiyat ortamında değerlemeyi gerekçelendiriyor; bu doğası gereği döngüsel bir iştir — değerleme mevcut emtia fiyat seviyesinin sürdürülebilirliğine duyarlı olarak okunmalı, kalıcı bir büyüme çarpanı olarak değil."
       }
+    },
+    {
+      "ticker": "AMZN",
+      "price": 277.42,
+      "currency": "USD",
+      "changePct": -2.32,
+      "marketCap": 2992339156992,
+      "sector": "Perakende/Bulut",
+      "industry": "Internet Retail",
+      "pos52w": 0.957,
+      "upside12m": 16.53,
+      "targetMean": 323.29,
+      "recommendationKey": "strong_buy",
+      "numAnalysts": 61,
+      "revenueGrowth": 19.6,
+      "revenue3yCagr": 11.73,
+      "profitMargins": 17.44,
+      "netDebtToEbitda": 0.76,
+      "fcfMargin": 0.42,
+      "dividendYield": null,
+      "forwardPE": 26.89,
+      "trailingPE": 22.3,
+      "priceToBook": 5.42,
+      "score": 49,
+      "signal": "TUT",
+      "name": "Amazon",
+      "indices": [
+        "NDX",
+        "SPX"
+      ],
+      "hasReport": true,
+      "report": {
+        "asOf": "FY2024 yıllık rapor verilerine dayalı, yaklaşık",
+        "segments": [
+          {
+            "name": "Kuzey Amerika e-ticaret",
+            "sharePct": 42,
+            "note": "Düşük marjlı, hacim odaklı"
+          },
+          {
+            "name": "Uluslararası e-ticaret",
+            "sharePct": 22,
+            "note": "Marj toparlanma aşamasında"
+          },
+          {
+            "name": "AWS (bulut)",
+            "sharePct": 17,
+            "note": "Şirket kârının çoğunu tek başına üretiyor"
+          },
+          {
+            "name": "Reklam + diğer",
+            "sharePct": 19,
+            "note": "En yüksek marjlı, hızlı büyüyen segment"
+          }
+        ],
+        "revenue3yNote": "3 yıllık gelir CAGR ~%10-11 — AWS ve reklam segmentleri toplam büyümeyi e-ticaretten daha hızlı çekiyor.",
+        "marginNote": "Konsolide net marj ~%8-9'a yükseldi (pandemi sonrası maliyet disiplini + AWS/reklam payı); AWS segment marjı %35+ civarında.",
+        "balanceNote": "Net Debt/EBITDA düşük bandda, bilanço sağlam; büyük capex (lojistik + veri merkezi) borçla değil büyük ölçüde operasyonel nakitle finanse ediliyor.",
+        "fcfNote": "FCF, AWS/reklam kârlılığı arttıkça belirgin biçimde iyileşti; ama AI veri merkezi yatırımları önümüzdeki dönemde FCF'yi baskılayabilir.",
+        "competitors": [
+          "Walmart",
+          "Microsoft Azure",
+          "Google Cloud",
+          "Shopify",
+          "Alibaba"
+        ],
+        "moat": [
+          {
+            "title": "Lojistik + Prime ağ etkisi",
+            "desc": "Devasa yerine getirme ağı ve Prime aboneliği, teslimat hızında rakiplerin kısa vadede eşleyemeyeceği bir müşteri bağlılığı yaratıyor."
+          },
+          {
+            "title": "AWS ölçek + geçiş maliyeti",
+            "desc": "Kurumsal iş yükleri bir kez AWS'e taşındığında, mimari bağımlılık ve veri geçiş maliyeti müşteriyi elde tutuyor."
+          }
+        ],
+        "strengths": [
+          "AWS ve reklam segmentleri konsolide marjı yapısal olarak yukarı taşıyor",
+          "Prime ekosistemi (teslimat + video + müzik) müşteri elde tutmayı güçlendiriyor",
+          "Lojistik altyapısındaki verimlilik kazanımları e-ticaret marjını da destekliyor"
+        ],
+        "risks": [
+          "AWS büyüme hızı Azure/Google Cloud'a kıyasla yavaşlarsa pazar payı algısı zayıflar",
+          "AI veri merkezi capex'i kısa-orta vadede FCF'yi baskılayabilir",
+          "E-ticaret tarafında düzenleyici (antitröst) baskı ve düşük marjlı rekabet (Temu, Shein) devam ediyor"
+        ],
+        "verdict": "Değerleme büyük ölçüde AWS ve reklamın kâr katkısına dayanıyor; bu iki segment büyümeyi sürdürdükçe çarpanlar gerekçeli kalır, ancak AWS büyümesinde belirgin bir yavaşlama primi hızla erodere edebilir."
+      }
+    },
+    {
+      "ticker": "CSCO",
+      "price": 121.74,
+      "currency": "USD",
+      "changePct": 5.08,
+      "marketCap": 479830245376,
+      "sector": "Ağ Donanımı",
+      "industry": "Communication Equipment",
+      "pos52w": 0.866,
+      "upside12m": 7.91,
+      "targetMean": 131.36,
+      "recommendationKey": "buy",
+      "numAnalysts": 22,
+      "revenueGrowth": 12,
+      "revenue3yCagr": 3.19,
+      "profitMargins": 19.68,
+      "netDebtToEbitda": 0.96,
+      "fcfMargin": 15.29,
+      "dividendYield": 1.45,
+      "forwardPE": 25.41,
+      "trailingPE": 40.58,
+      "priceToBook": 9.82,
+      "score": 49,
+      "signal": "TUT",
+      "name": "Cisco Systems",
+      "indices": [
+        "NDX"
+      ],
+      "hasReport": true,
+      "report": {
+        "asOf": "FY2024 (Temmuz sonu biten mali yıl) verilerine dayalı, yaklaşık",
+        "segments": [
+          {
+            "name": "Ağ altyapısı (switch/router)",
+            "sharePct": 54,
+            "note": "Olgun, döngüsel; AI veri merkezi ağ talebiyle destekleniyor"
+          },
+          {
+            "name": "Güvenlik",
+            "sharePct": 12,
+            "note": "Splunk satın alması sonrası büyüyen segment"
+          },
+          {
+            "name": "İşbirliği (Webex) + gözlemlenebilirlik + diğer",
+            "sharePct": 34,
+            "note": "Yazılım/abonelik ağırlığı artıyor"
+          }
+        ],
+        "revenue3yNote": "3 yıllık gelir CAGR düşük tek hane — donanım pazarı olgun; Splunk konsolidasyonu son yıl büyümeyi yukarı çekti.",
+        "marginNote": "Net kâr marjı ~%20 bandında istikrarlı; yazılım/abonelik payının artması marjı destekliyor.",
+        "balanceNote": "Splunk satın alması (~28 milyar $) sonrası borç arttı ama Net Debt/EBITDA hâlâ makul bandda; güçlü nakit üretimiyle hızla azaltılıyor.",
+        "fcfNote": "FCF istikrarlı ve güçlü; temettü + geri alım programını rahatça finanse ediyor.",
+        "competitors": [
+          "Arista Networks",
+          "Juniper Networks (HPE tarafından satın alınıyor)",
+          "Palo Alto Networks (güvenlikte)",
+          "Huawei (küresel pazarda)"
+        ],
+        "moat": [
+          {
+            "title": "Kurumsal ağ altyapısında kurulu taban",
+            "desc": "Dünya çapında kurumların/servis sağlayıcıların ağ omurgası Cisco donanımı üzerine kurulu; değiştirme operasyonel olarak yüksek riskli ve maliyetli."
+          },
+          {
+            "title": "Yazılım + abonelik geçişi (Splunk ile veri/güvenlik)",
+            "desc": "Ağ donanımından abonelik yazılımına (güvenlik, gözlemlenebilirlik) geçiş, tekrarlayan gelir ve çapraz satış fırsatı yaratıyor."
+          }
+        ],
+        "strengths": [
+          "AI veri merkezi inşası, yüksek performanslı ağ donanımına talebi artırıyor",
+          "Splunk entegrasyonu güvenlik/veri analitiğinde büyüme ve marj katkısı sağlıyor",
+          "Güçlü FCF ve düşük kaldıraç hissedar getirisi programını destekliyor"
+        ],
+        "risks": [
+          "Ağ donanımı pazarı yapısal olarak yavaş büyüyor, Arista gibi rakipler bulut/AI segmentinde pay kazanıyor",
+          "Splunk entegrasyon riski (kültür, satış organizasyonu, ürün) beklenen sinerjinin gecikmesine yol açabilir",
+          "Kurumsal BT harcamalarındaki döngüsel yavaşlamalara donanım geliri duyarlı kalıyor"
+        ],
+        "verdict": "İstikrarlı nakit akışı ve temettü verimi, düşük büyüme beklentisiyle makul biçimde fiyatlanmış görünüyor; yeniden değerleme için Splunk sinerjilerinin ve AI veri merkezi ağ talebinin somut büyüme ivmesine dönüşmesi gerekiyor."
+      }
+    },
+    {
+      "ticker": "BSX",
+      "price": 49.09,
+      "currency": "USD",
+      "changePct": 1.36,
+      "marketCap": 71142678528,
+      "sector": "Tıbbi Cihaz",
+      "industry": "Medical Devices",
+      "pos52w": 0.102,
+      "upside12m": 27.7,
+      "targetMean": 62.69,
+      "recommendationKey": "buy",
+      "numAnalysts": 29,
+      "revenueGrowth": 7.5,
+      "revenue3yCagr": 16.54,
+      "profitMargins": 17.5,
+      "netDebtToEbitda": 2.12,
+      "fcfMargin": 11.68,
+      "dividendYield": null,
+      "forwardPE": 14.28,
+      "trailingPE": 19.87,
+      "priceToBook": 2.82,
+      "score": 49,
+      "signal": "TUT",
+      "name": "Boston Scientific",
+      "indices": [
+        "SPX"
+      ],
+      "hasReport": false,
+      "report": null
     },
     {
       "ticker": "BRK.B",
@@ -3377,9 +4486,9 @@
       "profitMargins": 11.46,
       "netDebtToEbitda": 3.42,
       "fcfMargin": 12.3,
-      "dividendYield": 2.36,
+      "dividendYield": 2.3,
       "forwardPE": 12.27,
-      "trailingPE": 18.52,
+      "trailingPE": 18.54,
       "priceToBook": 3.44,
       "score": 46,
       "signal": "TUT",
@@ -3451,6 +4560,92 @@
       ],
       "hasReport": false,
       "report": null
+    },
+    {
+      "ticker": "INTC",
+      "price": 100.86,
+      "currency": "USD",
+      "changePct": 10.84,
+      "marketCap": 508737814528,
+      "sector": "Yarı İletken",
+      "industry": "Semiconductors",
+      "pos52w": 0.662,
+      "upside12m": 14.29,
+      "targetMean": 115.27,
+      "recommendationKey": "hold",
+      "numAnalysts": 41,
+      "revenueGrowth": 25.4,
+      "revenue3yCagr": -5.71,
+      "profitMargins": -19.79,
+      "netDebtToEbitda": 1.24,
+      "fcfMargin": 8.53,
+      "dividendYield": null,
+      "forwardPE": 49.51,
+      "trailingPE": null,
+      "priceToBook": 5.81,
+      "score": 45,
+      "signal": "TUT",
+      "name": "Intel",
+      "indices": [
+        "SPX"
+      ],
+      "hasReport": true,
+      "report": {
+        "asOf": "FY2024 yıllık rapor verilerine dayalı, yaklaşık",
+        "segments": [
+          {
+            "name": "İstemci Bilişim (Client Computing — PC işlemci)",
+            "sharePct": 51,
+            "note": "Ana nakit kaynağı ama pazar payı AMD'ye kayıyor"
+          },
+          {
+            "name": "Veri Merkezi & AI",
+            "sharePct": 27,
+            "note": "AI hızlandırıcı yarışında geride kaldı"
+          },
+          {
+            "name": "Intel Foundry (döküm/üretim hizmeti)",
+            "sharePct": 15,
+            "note": "Büyük stratejik dönüşüm, henüz zarar üretiyor"
+          },
+          {
+            "name": "Diğer (Mobileye, NEX)",
+            "sharePct": 7,
+            "note": "Küçük, çeşitlendirilmiş"
+          }
+        ],
+        "revenue3yNote": "Gelir son 3 yılda gerçek anlamda küçüldü/durgunlaştı — PC pazarı zayıflığı + sunucu/AI pazar payı kaybı.",
+        "marginNote": "Net marj ağır baskı altında (bazı dönemlerde zarar); Foundry yatırımları ve pazar payı kaybı kârlılığı büyük ölçüde aşındırdı.",
+        "balanceNote": "Foundry'ye dev capex nedeniyle borç belirgin arttı; Net Debt/EBITDA yüksek bandda — devlet teşvikleri (CHIPS Act) kısmen dengeliyor.",
+        "fcfNote": "FCF negatif/zayıf — Foundry inşaat/ekipman yatırımı devam ettiği sürece bu böyle kalması bekleniyor.",
+        "competitors": [
+          "AMD",
+          "NVIDIA (AI'da)",
+          "TSMC/Samsung (döküm hizmetinde)",
+          "Qualcomm/ARM ekosistemi"
+        ],
+        "moat": [
+          {
+            "title": "x86 kurulu tabanı + kurumsal uyumluluk",
+            "desc": "On yıllardır süren x86 mimarisi kurumsal yazılım/donanım uyumluluğunda hâlâ geniş bir kurulu taban avantajı sağlıyor, ama bu avantaj aşınıyor."
+          },
+          {
+            "title": "ABD içi ileri düğüm üretim kapasitesi (Foundry)",
+            "desc": "Jeopolitik olarak ABD hükümetinin ve büyük müşterilerin \"Tayvan dışı\" ileri üretim arayışında Intel Foundry stratejik bir konum hedefliyor — henüz kanıtlanmadı."
+          }
+        ],
+        "strengths": [
+          "CHIPS Act teşvikleri ve ABD hükümeti desteği Foundry yatırımını kısmen finanse ediyor",
+          "x86 kurulu tabanı hâlâ kurumsal PC/sunucu pazarında önemli bir gelir tabanı sağlıyor",
+          "Mobileye gibi yan varlıklar opsiyonel değer taşıyor"
+        ],
+        "risks": [
+          "Foundry stratejisi başarısız olursa (dış müşteri kazanamazsa) devasa capex geri dönüşsüz zarara dönüşebilir",
+          "AI hızlandırıcı pazarında NVIDIA/AMD'ye karşı belirgin geriden geliyor",
+          "PC/sunucu CPU pazar payı kaybı sürerse çekirdek nakit üretimi daha da zayıflar"
+        ],
+        "verdict": "Bu bir dönüşüm hikâyesi — mevcut nakit akışları değerlemeyi değil, Foundry stratejisinin başarı ihtimali gerekçelendiriyor; sonuç netleşene kadar (dış müşteri kazanımları, düğüm geçişlerinin zamanlaması) değerleme yüksek belirsizlik taşır."
+      }
     },
     {
       "ticker": "MELI",
@@ -3594,7 +4789,7 @@
       "profitMargins": 16.14,
       "netDebtToEbitda": null,
       "fcfMargin": null,
-      "dividendYield": 1.13,
+      "dividendYield": 1.1,
       "forwardPE": 17.24,
       "trailingPE": 21.04,
       "priceToBook": 6.83,
@@ -3764,6 +4959,37 @@
       "name": "Baker Hughes",
       "indices": [
         "NDX"
+      ],
+      "hasReport": false,
+      "report": null
+    },
+    {
+      "ticker": "ACN",
+      "price": 170.43,
+      "currency": "USD",
+      "changePct": 2.82,
+      "marketCap": 104293285888,
+      "sector": "BT Danışmanlık",
+      "industry": "Information Technology Services",
+      "pos52w": 0.302,
+      "upside12m": 4.96,
+      "targetMean": 178.89,
+      "recommendationKey": "buy",
+      "numAnalysts": 25,
+      "revenueGrowth": 5.6,
+      "revenue3yCagr": 4.19,
+      "profitMargins": 10.66,
+      "netDebtToEbitda": -0.14,
+      "fcfMargin": 16.54,
+      "dividendYield": 3.93,
+      "forwardPE": 11.61,
+      "trailingPE": 13.62,
+      "priceToBook": 3.27,
+      "score": 44,
+      "signal": "İZLE",
+      "name": "Accenture",
+      "indices": [
+        "SPX"
       ],
       "hasReport": false,
       "report": null
@@ -4248,7 +5474,7 @@
       "fcfMargin": 17.23,
       "dividendYield": 0.82,
       "forwardPE": 20.95,
-      "trailingPE": 34.23,
+      "trailingPE": 34.72,
       "priceToBook": 2.6,
       "score": 42,
       "signal": "İZLE",
@@ -4728,7 +5954,7 @@
       "profitMargins": 2.47,
       "netDebtToEbitda": -0.78,
       "fcfMargin": 2.14,
-      "dividendYield": 1.83,
+      "dividendYield": 1.8,
       "forwardPE": 12.76,
       "trailingPE": 16.71,
       "priceToBook": 1.83,
@@ -4841,7 +6067,7 @@
       "profitMargins": 8.28,
       "netDebtToEbitda": 1.92,
       "fcfMargin": 10.57,
-      "dividendYield": 1.36,
+      "dividendYield": 1.35,
       "forwardPE": 27.85,
       "trailingPE": 38.37,
       "priceToBook": 4.43,
@@ -5131,7 +6357,7 @@
       "profitMargins": 20.96,
       "netDebtToEbitda": 2.68,
       "fcfMargin": 19.98,
-      "dividendYield": 2.62,
+      "dividendYield": 2.66,
       "forwardPE": 16.64,
       "trailingPE": 27.16,
       "priceToBook": 22.9,
@@ -5432,7 +6658,7 @@
       "profitMargins": 7.51,
       "netDebtToEbitda": 3.32,
       "fcfMargin": 5.45,
-      "dividendYield": 2.41,
+      "dividendYield": 2.36,
       "forwardPE": 16.2,
       "trailingPE": 18.45,
       "priceToBook": null,
@@ -5575,7 +6801,7 @@
       "profitMargins": 15.52,
       "netDebtToEbitda": 3.47,
       "fcfMargin": 17.44,
-      "dividendYield": 3.02,
+      "dividendYield": 2.99,
       "forwardPE": 17.85,
       "trailingPE": 20.87,
       "priceToBook": 6.43,
@@ -5694,7 +6920,7 @@
       "fcfMargin": 5.06,
       "dividendYield": 2.24,
       "forwardPE": 18.17,
-      "trailingPE": 30.67,
+      "trailingPE": 30.74,
       "priceToBook": 3.53,
       "score": 31,
       "signal": "İZLE",
@@ -5875,7 +7101,7 @@
       "profitMargins": 5.08,
       "netDebtToEbitda": 2.16,
       "fcfMargin": 5.53,
-      "dividendYield": 6.29,
+      "dividendYield": 6.14,
       "forwardPE": 13.51,
       "trailingPE": 20.28,
       "priceToBook": 6.16,
@@ -6158,8 +7384,8 @@
       "sector": "İçecek Şişeleme",
       "industry": "Beverages - Non-Alcoholic",
       "pos52w": 0.74,
-      "upside12m": 4.19,
-      "targetMean": 110.57,
+      "upside12m": 4.15,
+      "targetMean": 110.54,
       "recommendationKey": "buy",
       "numAnalysts": 11,
       "revenueGrowth": 0.2,
@@ -6198,7 +7424,7 @@
       "profitMargins": 1.05,
       "netDebtToEbitda": 6.32,
       "fcfMargin": 11.82,
-      "dividendYield": 0.81,
+      "dividendYield": 0.82,
       "forwardPE": 6,
       "trailingPE": 39.42,
       "priceToBook": 1.25,
@@ -6322,7 +7548,7 @@
       "profitMargins": 5.17,
       "netDebtToEbitda": 3.34,
       "fcfMargin": 8,
-      "dividendYield": 2.36,
+      "dividendYield": 2.4,
       "forwardPE": 33.75,
       "trailingPE": 60.68,
       "priceToBook": null,
@@ -6353,7 +7579,7 @@
       "profitMargins": 3.24,
       "netDebtToEbitda": 1.89,
       "fcfMargin": 2.95,
-      "dividendYield": 3.21,
+      "dividendYield": 3.11,
       "forwardPE": 16.53,
       "trailingPE": 19.57,
       "priceToBook": 4.1,
