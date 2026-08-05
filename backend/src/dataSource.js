@@ -1,4 +1,5 @@
 import { toSymbol, INSTRUMENTS } from './stocks.js';
+import { US_STOCKS } from './usStocks.js';
 
 // Yahoo Finance chart endpoint'i BIST hisseleri için ".IS" ekiyle çalışır
 // ve crumb/cookie gerektirmez. 1 aylık günlük veriyi çekiyoruz.
@@ -117,14 +118,6 @@ function roundPrice(x) {
   const f = 10 ** d;
   return Math.round(x * f) / f;
 }
-let livePriceCache = { at: 0, data: null };
-// Önbellekteki canlı fiyatları BEKLEMEDEN döner (yoksa/çok eskiyse null).
-// Grafik ucu bunu kullanır: modal açılışı fiyat çekimini beklemesin.
-export function peekLivePrices(maxAgeMs = 60000) {
-  return Date.now() - livePriceCache.at < maxAgeMs ? livePriceCache.data : null;
-}
-// Aynı anda birden çok istek gelirse tek çekim yapılsın diye uçuştaki söz.
-let livePriceInflight = null;
 const LIVE_TTL_MS = 15000;
 // Bayat veri en fazla bu kadar servis edilir; daha eskiyse istek çekimi bekler.
 const LIVE_STALE_MS = Number(process.env.LIVE_PRICE_STALE_MS ?? 120000);
@@ -136,21 +129,36 @@ const LIVE_MIN_ORAN = Number(process.env.LIVE_PRICE_MIN_RATIO ?? 0.5);
 // Önbellek tazeyse onu döner. Bayatsa TAZELEMEYİ ARKA PLANDA başlatır ve elde
 // olan veriyi HEMEN döner — istemci Yahoo turunu beklemez (ölçüldü: bekleyen
 // istek 3,5 sn, önbellekten gelen 5 ms). Hiç veri yoksa (ilk istek) beklenir.
-export async function fetchLivePrices() {
-  const yas = Date.now() - livePriceCache.at;
-  if (livePriceCache.data && yas < LIVE_TTL_MS) return livePriceCache.data;
-  if (!livePriceInflight) {
-    livePriceInflight = refreshLivePrices()
-      .catch((err) => { console.warn(`[live] Fiyat tazelenemedi: ${err.message}`); return livePriceCache.data; })
-      .finally(() => { livePriceInflight = null; });
-  }
-  if (livePriceCache.data && yas < LIVE_STALE_MS) return livePriceCache.data;
-  return livePriceInflight;
-}
+// Canlı fiyat hattını bir enstrüman kümesi için kurar. BIST ve ABD ayrı
+// önbellek/uçuş durumu taşısın diye fabrika: iki küme farklı seanslarda
+// hareket ediyor, tek önbellekte tutulursa biri diğerini "eksik tur" sanıp
+// koruma mantığını yanlış tetiklerdi.
+function canliFiyatHatti(ad, enstrumanlar) {
+  let cache = { at: 0, data: null };
+  let inflight = null;
 
-async function refreshLivePrices() {
-  const bySym = new Map(INSTRUMENTS.map((i) => [i.symbol, i.ticker]));
-  const symbols = INSTRUMENTS.map((i) => i.symbol);
+  // Önbellekteki fiyatları BEKLEMEDEN döner (yoksa/çok eskiyse null).
+  const peek = (maxAgeMs = 60000) => (Date.now() - cache.at < maxAgeMs ? cache.data : null);
+
+  // Önbellek tazeyse onu döner. Bayatsa TAZELEMEYİ ARKA PLANDA başlatır ve elde
+  // olan veriyi HEMEN döner — istemci Yahoo turunu beklemez (ölçüldü: bekleyen
+  // istek 3,5 sn, önbellekten gelen 5 ms). Hiç veri yoksa (ilk istek) beklenir.
+  const fetchPrices = async () => {
+    const yas = Date.now() - cache.at;
+    if (cache.data && yas < LIVE_TTL_MS) return cache.data;
+    if (!inflight) {
+      inflight = refresh()
+        .catch((err) => { console.warn(`[${ad}] Fiyat tazelenemedi: ${err.message}`); return cache.data; })
+        .finally(() => { inflight = null; });
+    }
+    if (cache.data && yas < LIVE_STALE_MS) return cache.data;
+    return inflight;
+  };
+
+  async function refresh() {
+  const liste = typeof enstrumanlar === 'function' ? enstrumanlar() : enstrumanlar;
+  const bySym = new Map(liste.map((i) => [i.symbol, i.ticker]));
+  const symbols = liste.map((i) => i.symbol);
   const prices = {};
   const CHUNK = 20; // spark en fazla 20 sembol kabul ediyor
   const CONC = 5;   // eşzamanlı istek
@@ -194,18 +202,31 @@ async function refreshLivePrices() {
   // Çözüm: eksik turu tur sayma. Eldeki veri ve ESKİ zaman damgası korunur,
   // böylece saat dürüstçe donar ve arayüz "gecikiyor" rozetini gösterebilir.
   const yeniSayi = Object.keys(prices).length;
-  const oncekiSayi = Object.keys(livePriceCache.data?.prices ?? {}).length;
+  const oncekiSayi = Object.keys(cache.data?.prices ?? {}).length;
   if (oncekiSayi > 0 && yeniSayi < oncekiSayi * LIVE_MIN_ORAN) {
-    console.warn(`[live] Fiyat turu eksik geldi (${yeniSayi}/${oncekiSayi}); önbellek korunuyor.`);
+    console.warn(`[${ad}] Fiyat turu eksik geldi (${yeniSayi}/${oncekiSayi}); önbellek korunuyor.`);
     // `at` yine de ilerletilir: bir sonraki denemeye kadar normal aralık (15 sn)
     // beklensin, her istek Yahoo turunu beklemek zorunda kalmasın.
-    livePriceCache = { at: Date.now(), data: livePriceCache.data };
-    return livePriceCache.data;
+    cache = { at: Date.now(), data: cache.data };
+    return cache.data;
   }
 
-  livePriceCache = { at: Date.now(), data: { updatedAt: new Date().toISOString(), prices } };
-  return livePriceCache.data;
+  cache = { at: Date.now(), data: { updatedAt: new Date().toISOString(), prices } };
+  return cache.data;
+  }
+
+  return { fetchPrices, peek };
 }
+
+// BIST hattı (mevcut davranış birebir korunuyor).
+const bistHatti = canliFiyatHatti('live', () => INSTRUMENTS);
+export const fetchLivePrices = bistHatti.fetchPrices;
+export const peekLivePrices = bistHatti.peek;
+
+// ABD hattı — ayrı önbellek, ayrı uçuş durumu.
+const usHatti = canliFiyatHatti('live-us', () => US_STOCKS.map((u) => ({ symbol: u.ticker, ticker: u.ticker })));
+export const fetchUsLivePrices = usHatti.fetchPrices;
+export const peekUsLivePrices = usHatti.peek;
 
 // --- Toplu GÜN İÇİ bar verisi (v7/quote) ------------------------------------
 // Süregelen günlük barın HACMİ + gün içi yüksek/düşük/açılışı. 100'er sembol tek

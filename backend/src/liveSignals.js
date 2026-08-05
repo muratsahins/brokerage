@@ -9,15 +9,17 @@
 // gün içi yüksek/düşüğü önbellek tazeliği kadar gecikir).
 
 import { INSTRUMENTS } from './stocks.js';
+import { US_STOCKS } from './usStocks.js';
 
 import {
   fetchBars, fetchLivePrices, fetchLiveBars, peekLivePrices, peekLiveBars,
-  fetchAltinInPrices, fetchSpotMetals, fetchUsdTryRate, metalTryPerGram,
+  fetchAltinInPrices, fetchSpotMetals, fetchUsdTryRate, metalTryPerGram, fetchUsLivePrices,
 } from './dataSource.js';
 import {
   supertrendSignal, wavetrendSignals, smcBullish,
 } from './indicators.js';
 import { priceDerived } from './recommend.js';
+import { usPriceDerived } from './recommendUs.js';
 
 // Bar geçmişi önbelleği ömrü. Geçmiş barlar seans içinde değişmez; tazelik
 // yalnızca SON barın gün içi yüksek/düşük ve HACİM değerleri için gerekir
@@ -35,9 +37,15 @@ const round = (x, d = 2) => (x == null ? null : Math.round(x * 10 ** d) / 10 ** 
 const cache = new Map();
 let filling = false;
 
-// total: madenler hariç — onların bar geçmişi bilerek tutulmuyor, sayıya
-// katılırsa önbellek hiçbir zaman "tam" görünmezdi.
-const SERIES_TOTAL = INSTRUMENTS.filter((i) => i.kind !== 'metal').length;
+// Bar geçmişi tutulan küme: BIST (madenler hariç) + ABD hisseleri.
+// ABD tarafında Yahoo sembolü ticker'ın kendisi (AAPL). Ticker çakışması yok
+// (kontrol edildi: 627 BIST / 172 ABD, kesişim boş) — önbellek düz bir Map
+// olduğu için liste büyürse bu yeniden doğrulanmalı.
+const SERIES_INSTRUMENTS = [
+  ...INSTRUMENTS.filter((i) => i.kind !== 'metal'),
+  ...US_STOCKS.map((u) => ({ ticker: u.ticker, symbol: u.ticker, kind: 'us' })),
+];
+const SERIES_TOTAL = SERIES_INSTRUMENTS.length;
 
 export function seriesStats() {
   return { cached: cache.size, total: SERIES_TOTAL, filling };
@@ -54,7 +62,7 @@ export async function refreshSeries() {
     // ve kontrat yuvarlandıkça sıçruyor). İki farklı seriyi karıştırmamak için
     // bar geçmişi hiç tutulmuyor — bu aynı zamanda göstergeleri ve UYARI
     // taramasını da madenler için kendiliğinden devre dışı bırakır.
-    for (const inst of INSTRUMENTS.filter((i) => i.kind !== 'metal')) {
+    for (const inst of SERIES_INSTRUMENTS) {
       const cur = cache.get(inst.ticker);
       if (cur && Date.now() - cur.at < TTL_MS) { skip++; continue; }
       try {
@@ -266,4 +274,34 @@ export async function getLivePrices(items = []) {
   }
 
   return { ...live, prices, signals: sigCache.signals, scores: sigCache.scores, metals };
+}
+
+// --- ABD canlı yanıtı --------------------------------------------------------
+// BIST'teki getLivePrices'ın karşılığı. Farkları: ayrı fiyat hattı (ayrı
+// önbellek), puan ABD formülüyle (usPriceDerived) yeniden hesaplanıyor ve
+// gün içi bar (v7/quote) çekilmiyor — ABD tarafında crumb gerektiren o uç
+// kullanılmıyor, son bar yalnızca canlı fiyatla yamalanıyor.
+let usSigCache = { key: null, signals: {}, scores: {} };
+
+export async function getUsLivePrices(items = []) {
+  const live = await fetchUsLivePrices();
+
+  if (usSigCache.key !== live.updatedAt) {
+    const t0 = Date.now();
+    const signals = computeLiveSignals(live.prices);
+    const scores = {};
+    for (const it of items) {
+      const p = live.prices[it.ticker];
+      if (!p || p.price == null) continue;
+      const d = usPriceDerived(it, p.price);
+      const o = { sc: d.score, sg: d.signal };
+      if (d.upside12m != null) o.u = d.upside12m;
+      scores[it.ticker] = o;
+    }
+    usSigCache = { key: live.updatedAt, signals, scores };
+    const ms = Date.now() - t0;
+    if (ms > 500) console.log(`[live-us] ${Object.keys(signals).length} hisse ${ms} ms'de hesaplandı.`);
+  }
+
+  return { ...live, signals: usSigCache.signals, scores: usSigCache.scores };
 }

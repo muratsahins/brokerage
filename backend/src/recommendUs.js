@@ -94,3 +94,44 @@ export function scoreUsQuote(q) {
 export function buildUsRecommendations(quotes) {
   return quotes.map(scoreUsQuote).sort((a, b) => (b.score ?? -1) - (a.score ?? -1));
 }
+
+// Yayınlanan bir ABD kalemini CANLI fiyattan yeniden puanlar (BIST'teki
+// priceDerived'in ABD karşılığı). Seans içinde değişen tek girdi analist
+// potansiyeli; gelir büyümesi, marj, kaldıraç ve FCF yayından gelir.
+//
+// Puanı sıfırdan hesaplamak yerine FARKINI uyguluyoruz. Sebep: yayınlanan
+// yüzdeler 2 ondalığa yuvarlı, geri bölününce mikro sapma oluşuyor ve puan
+// eşiğe yakınsa (65/45) sinyali yanlış çeviriyordu — ölçüldü, 169 kalemde
+// INTC 45 (TUT) yerine 44 (İZLE) çıkıyordu. Fark yöntemi, fiyat değişmediğinde
+// yayınlanan puanı BİREBİR korur; yalnızca fiyat oynadıkça kayar.
+export function usPriceDerived(item, price) {
+  const hasTarget = item.targetMean != null && item.targetMean > 0 && price > 0;
+  const upside12m = hasTarget ? ((item.targetMean - price) / price) * 100 : null;
+
+  // Analist bileşeninin eski ve yeni normalleştirilmiş değeri (scoreUsQuote ile
+  // aynı aralık: -%20..+%60).
+  const nUp = (u) => (u != null ? clamp01((u + 20) / 80) : null);
+  const yeni = nUp(upside12m);
+  const eski = nUp(item.upside12m);
+
+  // Toplam ağırlık, hangi bileşenlerin dolu olduğuna bağlı (scoreUsQuote'taki
+  // filtrenin aynısı).
+  const wsum = [
+    [eski, 0.35], [item.revenueGrowth, 0.20], [item.profitMargins, 0.15],
+    [item.netDebtToEbitda, 0.15], [item.fcfMargin, 0.15],
+  ].reduce((s, [v, w]) => s + (v != null ? w : 0), 0);
+
+  let score = item.score;
+  if (score != null && wsum > 0 && yeni != null && eski != null) {
+    score = Math.round(item.score + ((0.35 / wsum) * (yeni - eski) * 100));
+    score = Math.max(0, Math.min(100, score));
+  }
+
+  let signal = 'İZLE';
+  if (score != null) {
+    if (score >= 65) signal = 'AL';
+    else if (score >= 45) signal = 'TUT';
+  }
+
+  return { score, signal, upside12m: upside12m != null ? round(upside12m) : null };
+}

@@ -7,7 +7,7 @@ import {
   syncData, getRecommendations, getCachedItems, getUsRecommendations, refreshUs, syncUsData,
 } from './service.js';
 import { diagnose, fetchOhlc, peekLivePrices } from './dataSource.js';
-import { getLivePrices, refreshSeries, seriesStats } from './liveSignals.js';
+import { getLivePrices, getUsLivePrices, refreshSeries, seriesStats } from './liveSignals.js';
 import { fetchNews } from './newsSource.js';
 import { getAlerts } from './alerts.js';
 import { INSTRUMENTS } from './stocks.js';
@@ -123,6 +123,18 @@ app.get('/api/us-recommendations', async (req, res) => {
     res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// ABD canlı fiyat + göstergeler + puan. /api/prices'ın ABD karşılığı; ayrı
+// fiyat hattından beslenir ve puan ABD formülüyle (usPriceDerived) yeniden
+// hesaplanır — analist hedefi yayından gelir, potansiyel fiyattan türer.
+app.get('/api/us-prices', async (req, res) => {
+  try {
+    const { items } = await getUsRecommendations();
+    res.json(await getUsLivePrices(items));
+  } catch (err) {
+    res.status(502).json({ error: err.message, prices: {}, signals: {}, scores: {} });
   }
 });
 

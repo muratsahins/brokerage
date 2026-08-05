@@ -5,13 +5,16 @@ name: API'yi uyanık tut
 # bekliyor. Seans saatlerinde düzenli ping atarak servisi ayakta tutuyoruz.
 #
 # Neden 7/24 değil: Render ücretsiz hesabı ayda 750 instance-saat veriyor.
-# Hafta içi 06:00-15:59 UTC (TR 09:00-18:59) ≈ 10 saat × 22 gün ≈ 220 saat —
+# Hafta içi 06:00-21:59 UTC ≈ 16 saat × 22 gün ≈ 352 saat —
 # kotanın rahat içinde. Seans dışında zaten fiyat hareket etmediği için
 # servisin uyuması sorun değil; ilk ziyaretçi statik tohum veriyi görür
 # (frontend/scripts/copy-seed.mjs).
 on:
   schedule:
-    - cron: '*/10 6-15 * * 1-5'   # BIST seansı boyunca 10 dakikada bir (UTC)
+    # BIST seansı 07:00-15:10 UTC, ABD seansı 13:30-21:00 UTC (yaz/kış kayar).
+    # İkisini birlikte kapsar; ABD sekmesi artık canlı fiyat çektiği için
+    # Render'ın seans ortasında uyuması cold start'a yol açardı.
+    - cron: '*/10 6-21 * * 1-5'   # iki seans boyunca 10 dakikada bir (UTC)
   workflow_dispatch:               # elle tetikleme
 
 concurrency:

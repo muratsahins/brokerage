@@ -1,7 +1,9 @@
 // ABD Büyük Şirketler sekmesi (NASDAQ100 + S&P100) — temel analiz odaklı.
 // BIST sekmelerinden bilinçli olarak izole: kendi veri kaynağı
-// (/api/us-recommendations), kendi arama/sıralama state'i, teknik gösterge
-// (overzone/WaveTrend/SuperTrend) YOK — bu sekme fundamentals'a odaklanıyor.
+// (/api/us-recommendations + /api/us-prices) ve kendi arama/sıralama state'i.
+// Puan temel analiz ağırlıklı (BIST momentum ağırlıklı), ama fiyat, göstergeler
+// ve canlı puan artık BIST ile aynı ritimde (18 sn) — yalnızca ABD seansı
+// açıkken çekilir.
 // App.jsx'ten yalnızca sekmeye tıklanınca lazy-load edilir (ChartModal ile
 // aynı desen), böylece BIST kullanıcıları bu bundle'ı hiç indirmez.
 import { useEffect, useMemo, useState } from 'react';
@@ -36,19 +38,111 @@ function ScoreBar({ score }) {
     </div>
   );
 }
+// BIST'teki IndicatorBadge ile aynı görünüm.
+function IndicatorBadge({ signal }) {
+  if (!signal) return <span className="muted-dash">—</span>;
+  const buy = signal === 'AL';
+  return (
+    <span style={{
+      background: buy ? '#0f5132' : '#5b1a1a',
+      color: buy ? '#4ade80' : '#f87171',
+      padding: '3px 10px', borderRadius: 999,
+      fontSize: 12, fontWeight: 700, letterSpacing: 0.5,
+    }}>
+      {signal}
+    </span>
+  );
+}
 const pctCell = (v) => (v == null ? <span className="muted-dash">—</span> : <span>%{fmtNum(v)}</span>);
 
+// ABD seansı açık mı? 09:30–16:00 New York saati, hafta içi. Saat dilimini
+// Intl ile soruyoruz: yaz saati (EDT/EST) geçişini kendisi hallediyor, elle
+// UTC farkı tutmaya gerek kalmıyor.
+function usSeansAcik(simdi = new Date()) {
+  const bicim = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York', weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false,
+  });
+  const parca = Object.fromEntries(bicim.formatToParts(simdi).map((p) => [p.type, p.value]));
+  if (['Sat', 'Sun'].includes(parca.weekday)) return false;
+  const dk = Number(parca.hour) * 60 + Number(parca.minute);
+  return dk >= 9 * 60 + 30 && dk < 16 * 60; // resmi tatiller kapsanmıyor
+}
+
+// Canlı fiyatı yayınlanan kaleme işler. BIST'teki mergeLivePrices ile aynı
+// mantık: hiçbir alan oynamadıysa ESKİ nesneyi döndürür, böylece değişmeyen
+// satır yeniden render edilmez.
+function mergeUsLive(items, live) {
+  if (!live?.prices) return items;
+  const { prices, signals = {}, scores = {} } = live;
+  let degisti = false;
+  const yeni = items.map((it) => {
+    const p = prices[it.ticker];
+    if (!p || p.price == null) return it;
+    const n = { ...it, price: p.price };
+    if (p.changePct != null) n.changePct = p.changePct;
+    const s = signals[it.ticker];
+    if (s) {
+      n.stSignal = s.st ?? null;
+      n.wtCrossSignal = s.wt ?? null;
+      n.wtSignal = s.wo ?? null;
+      n.smc = !!s.smc;
+    }
+    const sc = scores[it.ticker];
+    if (sc) {
+      n.score = sc.sc;
+      n.signal = sc.sg;
+      n.upside12m = sc.u ?? null;
+    }
+    const anahtarlar = Object.keys(n);
+    if (anahtarlar.length === Object.keys(it).length && anahtarlar.every((k) => it[k] === n[k])) return it;
+    degisti = true;
+    return n;
+  });
+  return degisti ? yeni : items;
+}
+
 function useUsRecommendations() {
-  const [state, setState] = useState({ loading: true, items: [], updatedAt: null, ok: true });
+  // Yayınlanan liste ve canlı yanıt AYRI tutuluyor, birleştirme render'da
+  // yapılıyor. Tek state'te birleştirseydik yarış olurdu: canlı yanıt öneri
+  // listesinden önce dönerse boş diziyle birleşip kaybolurdu.
+  const [base, setBase] = useState({ loading: true, items: [], updatedAt: null, ok: true });
+  const [live, setLive] = useState(null);
+
   useEffect(() => {
     let cancelled = false;
     fetch(`${API_BASE}/api/us-recommendations`)
       .then((r) => r.json())
-      .then((d) => { if (!cancelled) setState({ loading: false, items: d.items || [], updatedAt: d.updatedAt, ok: true }); })
-      .catch(() => { if (!cancelled) setState((s) => ({ ...s, loading: false, ok: false })); });
+      .then((d) => { if (!cancelled) setBase({ loading: false, items: d.items || [], updatedAt: d.updatedAt, ok: true }); })
+      .catch(() => { if (!cancelled) setBase((s) => ({ ...s, loading: false, ok: false })); });
     return () => { cancelled = true; };
   }, []);
-  return state;
+
+  // Canlı fiyat/gösterge/puan — BIST ile aynı 18 saniyelik ritim.
+  //
+  // İlk çekim KOŞULSUZ: göstergeler (overzone/WaveTrend/SuperTrend) yalnızca bu
+  // uçtan geliyor, yayınlanan JSON'da yoklar. Seans kapalıyken de bir kez
+  // çekmezsek sütunlar sürekli boş kalırdı — Yahoo seans dışında son kapanışı
+  // döndüğü için hesaplanan göstergeler yine doğru.
+  // ANKET ise yalnızca ABD seansı açıkken ve sayfa görünürken: seans dışında
+  // fiyat hareket etmiyor, 18 saniyede bir istek atmanın anlamı yok.
+  useEffect(() => {
+    let cancelled = false;
+    const cek = () => {
+      fetch(`${API_BASE}/api/us-prices`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d) => { if (!cancelled && d?.prices) setLive(d); })
+        .catch(() => { /* yoksay; bir sonraki turda tekrar denenir */ });
+    };
+    cek();
+    const acik = () => !document.hidden && usSeansAcik();
+    const id = setInterval(() => { if (acik()) cek(); }, 18 * 1000);
+    const donunce = () => { if (acik()) cek(); };
+    document.addEventListener('visibilitychange', donunce);
+    return () => { cancelled = true; clearInterval(id); document.removeEventListener('visibilitychange', donunce); };
+  }, []);
+
+  const items = useMemo(() => (live ? mergeUsLive(base.items, live) : base.items), [base.items, live]);
+  return { ...base, items, canliAt: live?.updatedAt ?? null };
 }
 
 function QuantGrid({ item }) {
@@ -224,12 +318,18 @@ function UsCard({ s, rank, onSelect }) {
           <span>{s.hasReport ? '📄 var' : <span className="muted-dash">—</span>}</span>
         </div>
       </div>
+
+      <div className="card-signals">
+        <div className="sig"><span className="metric-label">overzone</span><IndicatorBadge signal={s.wtSignal} /></div>
+        <div className="sig"><span className="metric-label">WaveTrend</span><IndicatorBadge signal={s.wtCrossSignal} /></div>
+        <div className="sig"><span className="metric-label">SuperTrend</span><IndicatorBadge signal={s.stSignal} /></div>
+      </div>
     </div>
   );
 }
 
 export default function UsStocksTab({ view = 'web' }) {
-  const { loading, items, updatedAt, ok } = useUsRecommendations();
+  const { loading, items, updatedAt, ok, canliAt } = useUsRecommendations();
   const [query, setQuery] = useState('');
   const [idx, setIdx] = useState('ALL'); // ALL | NDX | SPX
   const [sort, setSort] = useState('score'); // score | ticker
@@ -296,6 +396,9 @@ export default function UsStocksTab({ view = 'web' }) {
             {s.label}
           </button>
         ))}
+        {canliAt && (
+          <span className="updated">Fiyat: {new Date(canliAt).toLocaleTimeString('tr-TR')}</span>
+        )}
         {updatedAt && (
           <span className="updated">Veri: {new Date(updatedAt).toLocaleString('tr-TR')}</span>
         )}
@@ -325,6 +428,9 @@ export default function UsStocksTab({ view = 'web' }) {
                 <th className="num">FCF Marjı</th>
                 <th className="num">İleri F/K</th>
                 <th>Rapor</th>
+                <th>overzone</th>
+                <th>WaveTrend</th>
+                <th>SuperTrend</th>
               </tr>
             </thead>
             <tbody>
@@ -355,6 +461,9 @@ export default function UsStocksTab({ view = 'web' }) {
                   <td className="num">{pctCell(s.fcfMargin)}</td>
                   <td className="num">{s.forwardPE != null ? fmtNum(s.forwardPE) : <span className="muted-dash">—</span>}</td>
                   <td>{s.hasReport ? <span title="Tam analist raporu mevcut">📄 var</span> : <span className="muted-dash">—</span>}</td>
+                  <td><IndicatorBadge signal={s.wtSignal} /></td>
+                  <td><IndicatorBadge signal={s.wtCrossSignal} /></td>
+                  <td><IndicatorBadge signal={s.stSignal} /></td>
                 </tr>
               ))}
             </tbody>
