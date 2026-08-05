@@ -4,7 +4,7 @@ import cors from 'cors';
 import compression from 'compression';
 import { initDb } from './db.js';
 import {
-  syncData, getRecommendations, getCachedItems, getUsRecommendations, refreshUs,
+  syncData, getRecommendations, getCachedItems, getUsRecommendations, refreshUs, syncUsData,
 } from './service.js';
 import { diagnose, fetchOhlc, peekLivePrices } from './dataSource.js';
 import { getLivePrices, refreshSeries, seriesStats } from './liveSignals.js';
@@ -144,6 +144,7 @@ async function start() {
 
   // İlk veriyi yükle (yayınlanan JSON → yoksa canlı). Sunucuyu bloklama.
   syncData().catch((err) => console.warn(`[start] İlk veri yüklemesi başarısız: ${err.message}`));
+  syncUsData().catch((err) => console.warn(`[start] ABD ilk veri yüklemesi başarısız: ${err.message}`));
 
   // Canlı gösterge tazelemesi için bar geçmişini arka planda doldur ve
   // periyodik olarak (yeni günlük barlar kapandıkça) tazele. Sunucuyu bloklamaz.
@@ -161,6 +162,18 @@ async function start() {
       syncData().catch((err) => console.warn(`[cron] Veri senkronizasyonu başarısız: ${err.message}`));
     }, minutes * 60 * 1000);
     console.log(`[start] Otomatik veri senkronizasyonu her ${minutes} dakikada bir açık.`);
+  }
+
+  // ABD verisi (NASDAQ100+S&P100) günde 1 kez yayınlanıyor (refresh-us-data.yml);
+  // BIST'ten daha seyrek tazelenmesi yeterli. Süreç yeniden başlamadan
+  // getUsRecommendations() ilk çağrıdan sonra belleği hiç güncellemediği için
+  // bu periyodik senkronizasyon olmadan yayınlanan yeni veri hiç görünmezdi.
+  const usMinutes = Number(process.env.US_REFRESH_INTERVAL_MINUTES ?? 180);
+  if (usMinutes > 0) {
+    setInterval(() => {
+      syncUsData().catch((err) => console.warn(`[cron] ABD veri senkronizasyonu başarısız: ${err.message}`));
+    }, usMinutes * 60 * 1000);
+    console.log(`[start] ABD veri senkronizasyonu her ${usMinutes} dakikada bir açık.`);
   }
 
   app.listen(PORT, () => console.log(`[start] Backend hazır: http://localhost:${PORT}`));
