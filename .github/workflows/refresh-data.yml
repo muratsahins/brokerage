@@ -41,5 +41,16 @@ jobs:
             echo "Değişiklik yok."
           else
             git commit -m "chore: BIST verisi güncellendi [skip ci]"
-            git push
+            # ABD veri turu (refresh-us-data.yml) da main'e push ediyor ve ayrı
+            # bir concurrency grubunda olduğu için aynı anda çalışabiliyor.
+            # Araya girip push'u reddettirirse rebase edip tekrar deniyoruz.
+            # (İki iş akışı farklı dosyalara dokunduğu için rebase çakışmaz.)
+            for deneme in 1 2 3; do
+              git push && exit 0
+              echo "Push reddedildi (deneme $deneme); rebase edilip tekrar denenecek."
+              git pull --rebase --autostash
+              sleep 5
+            done
+            echo "::error::Push 3 denemede de başarısız oldu."
+            exit 1
           fi

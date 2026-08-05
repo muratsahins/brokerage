@@ -7,7 +7,10 @@ name: ABD verisini yenile
 # yayınlanıyor.
 on:
   schedule:
-    - cron: '0 6 * * *'    # her gün 06:00 UTC
+    # BIST turu her 3 saatte bir tam saatte çalışıyor (00, 03, 06, ...) ve ikisi
+    # de main'e push ediyor. 06:00'da birebir çakışıyorlardı; yarım saat kaydırıldı.
+    # Push adımındaki rebase+tekrar deneme yine de yedek olarak duruyor.
+    - cron: '30 6 * * *'   # her gün 06:30 UTC
   workflow_dispatch:          # elle tetikleme (Actions sekmesinden "Run workflow")
 
 permissions:
@@ -44,5 +47,16 @@ jobs:
             echo "Değişiklik yok."
           else
             git commit -m "chore: ABD verisi güncellendi [skip ci]"
-            git push
+            # BIST veri turu (refresh-data.yml) da main'e push ediyor ve ayrı
+            # bir concurrency grubunda olduğu için aynı anda çalışabiliyor.
+            # Araya girip push'u reddettirirse rebase edip tekrar deniyoruz.
+            # (İki iş akışı farklı dosyalara dokunduğu için rebase çakışmaz.)
+            for deneme in 1 2 3; do
+              git push && exit 0
+              echo "Push reddedildi (deneme $deneme); rebase edilip tekrar denenecek."
+              git pull --rebase --autostash
+              sleep 5
+            done
+            echo "::error::Push 3 denemede de başarısız oldu."
+            exit 1
           fi
