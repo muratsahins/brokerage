@@ -396,7 +396,7 @@ function NewsList({ kind }) {
 }
 
 // UYARI sekmesi iki grup gösterir (Backend /api/alerts tarar):
-//   • ALIM ADAYLARI (tüm BIST): son barda overzone AL (tetik) + MACD AL +
+//   • ALIM ADAYLARI (BIST 100 + ABD hisseleri): son barda overzone AL (tetik) + MACD AL +
 //     RSI 0-40 arası (o anki durum, süzgeç).
 //   • KENDİ HİSSELERİM: SuperTrend son barda SAT'a dönen hisselerden Sanal
 //     Borsa portföyünde olanlar. Portföy tarayıcıda durur, sunucuya gitmez —
@@ -519,7 +519,7 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
         <span className="alert-main">
           {taze && <span className="alert-new" title="Bu ziyarette yeni gelen sinyal">YENİ</span>}
           <span className="ticker">{a.ticker}</span>
-          <span className="name">{it?.name || ''}</span>
+          <span className="name">{a.name || it?.name || ''}</span>
         </span>
         <span className="alert-meta">
           {a.signals.map((s) => (
@@ -549,7 +549,7 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
         <strong>Alım adayları</strong> = <code>overzone</code> <strong>AL</strong> (aşırı satım bölgesinde,
         −50/−60, kurulan yukarı kesişim, tetik) <strong>+</strong> <code>MACD</code> <strong>AL</strong>
         (mavi çizgi sinyalin üstünde) <strong>+</strong> <code>RSI</code> <strong>0-40 arası</strong>
-        (o anki durum, süzgeç) — tüm BIST'te;{' '}
+        (o anki durum, süzgeç) — BIST 100 + ABD hisselerinde (NASDAQ-100 + S&P 100);{' '}
         <strong>Kendi hisselerim</strong> = <code>SuperTrend</code> <strong>SAT</strong>'a dönenlerden Sanal
         Borsa portföyünde olanlar. Önceki günlerde üretilmiş sinyaller listeye girmez; son bar canlı fiyatla
         güncellendiği için sinyal, kapanış beklenmeden gün içinde görünür.
@@ -571,7 +571,7 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
         </div>
       ) : (
         <>
-          <div className="alert-group">Alım adayları — overzone AL + MACD AL + RSI 0-40 (tüm BIST)</div>
+          <div className="alert-group">Alım adayları — overzone AL + MACD AL + RSI 0-40 (BIST 100 + ABD)</div>
           {list.length === 0 ? (
             <div className="state">
               Bugün üç koşulu (overzone AL + MACD AL + RSI 0-40 arası) birden sağlayan hisse yok.

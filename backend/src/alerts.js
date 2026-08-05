@@ -1,5 +1,7 @@
 // UYARI taraması — GÜNLÜK grafikte, İKİ AYRI grup:
 //
+//   Taranan evren: BIST 100 + Maden & Emtia + ABD hisseleri (NASDAQ-100 +
+//   S&P 100) — bar geçmişi üçü için de aynı önbellekte tutulur (liveSignals.js).
 //   items  (ALIM ADAYLARI, tüm enstrümanlar): overzone AL — aşırı satım
 //          bölgesinde (wt2 <= -50) kurulan YUKARI kesişim, SON BARDA oluşmuş
 //          olacak — ARTI iki süzgeç (o ANKİ durum, kesişim değil): MACD AL
@@ -21,8 +23,18 @@
 // günlük bar kapanışını beklemeden gün içinde yakalanır.
 
 import { INSTRUMENTS } from './stocks.js';
+import { US_STOCKS } from './usStocks.js';
 import { recentSignals, supertrendSignal, macdBullish, rsiValue } from './indicators.js';
 import { liveDailySeries } from './liveSignals.js';
+
+// Taranan evren: BIST (+ maden/emtia) ile ABD hisseleri (ayrı bir ticker
+// kümesi — ".IS" eki yok, isim/sektör de yok; sadece görüntü için aşağıda
+// META'dan tamamlanır). Bar geçmişi ikisi için de aynı önbellekte (liveSignals.js
+// SERIES_INSTRUMENTS) tutulduğu için ek istek gerekmez.
+const SCAN_INSTRUMENTS = [...INSTRUMENTS, ...US_STOCKS.map((u) => ({ ticker: u.ticker }))];
+// Uyarı satırında isim/sektör göstermek için (frontend BIST dışı ticker'ları
+// kendi listesinde bulamaz — /api/recommendations yalnızca BIST taşır).
+const META = new Map([...INSTRUMENTS, ...US_STOCKS].map((i) => [i.ticker, i]));
 
 // Kaç bar geriye kadar "yeni" sayılır (1 = yalnızca bugünün günlük barı).
 const LOOKBACK = Number(process.env.ALERT_LOOKBACK_BARS ?? 1);
@@ -54,7 +66,7 @@ function scan() {
 
   const series = [];
   let lastDay = -Infinity, lastOff = DEFAULT_OFF, lastTs = null; // en yeni bar (bugün olmayabilir)
-  for (const inst of INSTRUMENTS) {
+  for (const inst of SCAN_INSTRUMENTS) {
     const s = liveDailySeries(inst.ticker);
     if (!s) continue; // bar geçmişi henüz önbellekte değil
     ready++;
@@ -83,6 +95,7 @@ function scan() {
         const stState = supertrendSignal(s.high, s.low, s.close); // bilgi amaçlı trend
         items.push({
           ticker: inst.ticker,
+          name: META.get(inst.ticker)?.name ?? null, // ABD hisseleri BIST listesinde yok, istemci join edemez
           grup: 'al',
           dir: 'AL',
           barsAgo: r.oz.barsAgo,
@@ -137,6 +150,6 @@ export function getAlerts() {
     lastBarDate: scanCache.lastBarDate,
     items: scanCache.items,
     stSell: scanCache.stSell,
-    stats: { ready: scanCache.ready, scanned: scanCache.scanned, total: INSTRUMENTS.length },
+    stats: { ready: scanCache.ready, scanned: scanCache.scanned, total: SCAN_INSTRUMENTS.length },
   };
 }

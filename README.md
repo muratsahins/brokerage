@@ -52,7 +52,9 @@ npm start                 # http://localhost:4000
   `SERIES_TTL_MINUTES` (varsayılan 30) bar geçmişinin tazelenme sıklığı,
   `SERIES_CHECK_MINUTES` (15) kontrol aralığı, `SERIES_FETCH_GAP_MS` (350)
   Yahoo istekleri arası bekleme. Önbellek durumu: `GET /api/health`.
-- **UYARI taraması** (`/api/alerts`): günlük grafikte **iki grup** döner —
+- **UYARI taraması** (`/api/alerts`): taranan evren **BIST 100 + Maden & Emtia +
+  ABD hisseleri** (NASDAQ-100 + S&P 100) — bar geçmişi üçü için de aynı
+  önbellekte tutulur, ek istek gerekmez. Günlük grafikte **iki grup** döner —
   `items` = **alım adayları**: `overzone` **AL** (aşırı satımda, −50/−60,
   kurulan yukarı kesişim, TETİK) son barda oluşanlar (`ALERT_LOOKBACK_BARS`,
   varsayılan 1) **+** `MACD` **AL** **+** `RSI` **0-`ALERT_RSI_MAX`** (varsayılan
