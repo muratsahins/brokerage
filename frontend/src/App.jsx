@@ -158,9 +158,9 @@ const StockRow = memo(function StockRow({ s, rank, showBuySell, onSelect }) {
       <td className="rank">{rank}</td>
       <td>
         {/* Madenlerde grafik yok: bar geçmişi vadeli kontrata ait, gösterilen
-            fiyat ise spot. ABD hisselerinde de kapalı: grafik ucu ve sanal
-            borsa paneli ₺ fiyatlamaya göre kurulu, USD kalemler için değil. */}
-        {s.kind === 'metal' || s.kind === 'us-stock' ? (
+            fiyat ise spot. ABD hisselerinde grafik/sanal borsa açık — ₺
+            karşılığı (tryPrice) üzerinden alınıp satılır. */}
+        {s.kind === 'metal' ? (
           <span className="ticker">{s.ticker}</span>
         ) : (
           <button className="ticker ticker-link" onClick={() => onSelect(s)} title="Grafiği aç">
@@ -217,7 +217,7 @@ const StockCard = memo(function StockCard({ s, rank, onSelect }) {
         <div className="card-id">
           <span className="rank">{rank}</span>
           <div>
-            {s.kind === 'metal' || s.kind === 'us-stock' ? (
+            {s.kind === 'metal' ? (
               <span className="ticker">{s.ticker}</span>
             ) : (
               <button className="ticker ticker-link" onClick={() => onSelect(s)} title="Grafiği aç">
@@ -716,14 +716,14 @@ function VirtualTrade({ items, onSelect }) {
                 )}
               </>
             ) : (
-              <span className="muted-dash" title="Yalnızca USD fiyatlı (maden/emtia) pozisyon var; günlük K/Z kur etkisi nedeniyle hesaplanmıyor.">—</span>
+              <span className="muted-dash" title="Yalnızca USD fiyatlı (maden/emtia/ABD hissesi) pozisyon var; günlük K/Z kur etkisi nedeniyle hesaplanmıyor.">—</span>
             )}
           </div>
         )}
       </div>
 
       <div className="vb-trade">
-        <input className="search-input vb-search" placeholder="Al/sat için hisse veya maden ara (ör. GARAN, altın)" value={q} onChange={(e) => setQ(e.target.value)} />
+        <input className="search-input vb-search" placeholder="Al/sat için hisse veya maden ara (ör. GARAN, altın, AAPL)" value={q} onChange={(e) => setQ(e.target.value)} />
         {results.length > 0 && (
           <div className="vb-results">
             {results.map((i) => (
@@ -834,12 +834,13 @@ export default function App() {
     catch { return 'web'; }
   });
 
-  // Favori Listesi ABD hisselerini de içerir (aynı 4 koşulla — bkz. FAV_TAB).
-  // ABD verisi BIST'ten ayrı bir uçtan geldiği için (UsStocksTab ile aynı kaynak)
-  // yalnızca Favori sekmesi ilk açıldığında, tembel olarak çekilir.
+  // ABD hisseleri Favori Listesi'nde (aynı 4 koşulla) ve Sanal Borsa'da
+  // (alım-satım için arama havuzu) kullanılır. ABD verisi BIST'ten ayrı bir
+  // uçtan geldiği için (UsStocksTab ile aynı kaynak) yalnızca bu iki sekmeden
+  // biri ilk açıldığında, tembel olarak çekilir.
   const [usFav, setUsFav] = useState({ items: [], loading: false, fetched: false });
   useEffect(() => {
-    if (tab !== 'fav' || usFav.fetched) return;
+    if ((tab !== 'fav' && tab !== 'trade') || usFav.fetched) return;
     setUsFav((s) => ({ ...s, loading: true }));
     fetch(`${API_BASE}/api/us-recommendations`)
       .then((r) => r.json())
@@ -961,15 +962,34 @@ export default function App() {
       && i.wtSignal === 'AL' && i.wtCrossSignal === 'AL' && i.stSignal === 'AL'
       && (i.recommendationKey === 'buy' || i.recommendationKey === 'strong_buy'),
   };
-  // ABD hisseleri BIST'ten ayrı bir uçtan gelir (usFav) ama AYNI 4 koşulla
-  // süzülür. kind: 'us-stock' işaretlenir; grafik/sanal borsa BIST'e özgü
-  // olduğu için bu kalemlerde kapalı kalır (bkz. StockRow/StockCard).
+  // ABD hisseleri BIST'ten ayrı bir uçtan gelir (usFav). Sanal Borsa'da (ve
+  // grafik/alım-satım panelinde) TEK para biriminde kalınsın diye ₺ karşılığı
+  // (tryPrice) burada hesaplanır — metal/emtia/kripto ile AYNI desen. Kur,
+  // BIST verisindeki herhangi bir maden/emtia kaleminden okunur (service.js
+  // her ikisine de usdTry ekliyor).
+  const usdTryRate = useMemo(
+    () => data.items.find((i) => i.usdTry != null)?.usdTry ?? null,
+    [data.items],
+  );
+  const usTradableItems = useMemo(
+    () => usFav.items.map((i) => ({
+      ...i,
+      kind: 'us-stock',
+      bist: null,
+      tryPrice: usdTryRate != null ? roundPrice(i.price * usdTryRate) : null,
+    })),
+    [usFav.items, usdTryRate],
+  );
+  // Favori Listesi: AYNI 4 koşulla süzülen alt küme.
   const usFavItems = useMemo(
-    () => usFav.items
-      .filter((i) => i.wtSignal === 'AL' && i.wtCrossSignal === 'AL' && i.stSignal === 'AL'
-        && (i.recommendationKey === 'buy' || i.recommendationKey === 'strong_buy'))
-      .map((i) => ({ ...i, kind: 'us-stock', bist: null })),
-    [usFav.items],
+    () => usTradableItems.filter((i) => i.wtSignal === 'AL' && i.wtCrossSignal === 'AL' && i.stSignal === 'AL'
+      && (i.recommendationKey === 'buy' || i.recommendationKey === 'strong_buy')),
+    [usTradableItems],
+  );
+  // Sanal Borsa'nın arama/alım-satım havuzu: BIST + ABD birlikte.
+  const tradeItems = useMemo(
+    () => [...data.items, ...usTradableItems],
+    [data.items, usTradableItems],
   );
   // SMC (Smart Money Concept) yükseliş: ChoCh/MSB kırılımı (tetik) + POC üstünde
   // + haftalık SuperTrend AL (süzgeçler).
@@ -1045,11 +1065,14 @@ export default function App() {
   }, [data.priceUpdatedAt, data.updatedAt]);
 
   // Grafik pop-up'ındaki kalemin canlı karşılığı (fiyat/değişim tazelendikçe
-  // pop-up da tazelensin). data.items içinde yoksa açılış kopyası kullanılır.
-  const chartLive = useMemo(
-    () => (chartItem ? data.items.find((i) => i.ticker === chartItem.ticker) || chartItem : null),
-    [chartItem, data.items],
-  );
+  // pop-up da tazelensin). BIST'te data.items, ABD'de usTradableItems içinde
+  // aranır; ikisinde de yoksa açılış kopyası kullanılır.
+  const chartLive = useMemo(() => {
+    if (!chartItem) return null;
+    return data.items.find((i) => i.ticker === chartItem.ticker)
+      || usTradableItems.find((i) => i.ticker === chartItem.ticker)
+      || chartItem;
+  }, [chartItem, data.items, usTradableItems]);
 
   // Listeyi partiler hâlinde bas; sekme/filtre/sıralama/arama/görünüm
   // değişince baştan başla.
@@ -1169,7 +1192,7 @@ export default function App() {
           hasPortfolio={myTickers.size > 0}
         />
       ) : tab === 'trade' ? (
-        <VirtualTrade items={data.items} onSelect={setChartItem} />
+        <VirtualTrade items={tradeItems} onSelect={setChartItem} />
       ) : tab === 'us' ? (
         <Suspense fallback={<div className="state">Yükleniyor…</div>}>
           <UsStocksTab view={view} />
@@ -1240,8 +1263,8 @@ export default function App() {
           <strong>Favori kriterleri (hepsi birden):</strong> overzone <code>AL</code> · WaveTrend <code>AL</code> ·
           SuperTrend <code>AL</code> · analist tavsiyesi <code>AL / Güçlü AL</code>.
           <span className="muted-dash"> (Analist verisi BIST 30/50/100 hisselerinde bulunur. Aynı 4 koşul
-          NASDAQ-100 + S&P 100 evrenindeki ABD hisselerinde de aranır — grafik/sanal borsa bu kalemlerde
-          kapalıdır.{usFav.loading ? ' ABD verisi yükleniyor…' : ''})</span>
+          NASDAQ-100 + S&P 100 evrenindeki ABD hisselerinde de aranır — grafik ve Sanal Borsa alım-satımı
+          bu kalemlerde de açık (₺ karşılığı üzerinden).{usFav.loading ? ' ABD verisi yükleniyor…' : ''})</span>
         </div>
       )}
 

@@ -16,7 +16,9 @@ export function vbSave(email, pf) { try { localStorage.setItem('vb_pf_' + email,
 export function vbUnitPrice(it) {
   if (!it) return null;
   if (it.kind === 'metal') return it.tryPerGram;
-  if (it.kind === 'crypto' || it.kind === 'emtia') return it.tryPrice;
+  // ABD hisseleri de USD fiyatlı: emtia/kripto ile aynı desen, ₺ karşılığı
+  // (tryPrice) üzerinden alınıp satılır — portföy tek para biriminde kalır.
+  if (it.kind === 'crypto' || it.kind === 'emtia' || it.kind === 'us-stock') return it.tryPrice;
   return it.price;
 }
 // İşlem birimi: madende gram, emtiada kendi birimi (Brent = varil), hissede adet.

@@ -17,7 +17,7 @@ import { US_STOCKS } from './usStocks.js';
 // BIST'te .IS ekli. Grafik ucu ikisini de servis ediyor.
 const symbolByTicker = new Map([
   ...INSTRUMENTS.map((i) => [i.ticker, i.symbol]),
-  ...US_STOCKS.map((u) => [u.ticker, u.ticker]),
+  ...US_STOCKS.map((u) => [u.ticker, u.symbol || u.ticker]), // BRK.B -> BRK-B gibi istisnalar
 ]);
 const usTickers = new Set(US_STOCKS.map((u) => u.ticker));
 const VALID_RANGE = /^(1mo|3mo|6mo|1y|2y|5y)$/;
