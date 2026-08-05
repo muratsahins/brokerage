@@ -6,9 +6,13 @@
 // açıkken çekilir.
 // App.jsx'ten yalnızca sekmeye tıklanınca lazy-load edilir (ChartModal ile
 // aynı desen), böylece BIST kullanıcıları bu bundle'ı hiç indirmez.
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { API_BASE, fmtNum, norm } from './lib/common.js';
 import { Expected, Pct } from './lib/ui.jsx';
+
+// BIST ile aynı grafik bileşeni; aynı tembel parçadan gelir, ikinci bir indirme
+// olmaz. alimSatim=false — ABD fiyatları USD, sanal borsa nakdi ₺.
+const ChartModal = lazy(() => import('./ChartModal.jsx'));
 
 const SIGNAL_STYLES = {
   AL: { label: 'AL', bg: '#0f5132', fg: '#4ade80' },
@@ -253,15 +257,15 @@ function ReportPanel({ item, onClose }) {
 
 // Mobil kart — BIST kartıyla aynı iskelet (card-top / card-price /
 // card-metrics), yalnızca gösterge şeridi yerine temel analiz metrikleri.
-function UsCard({ s, rank, onSelect }) {
+function UsCard({ s, rank, onSelect, onChart }) {
   return (
     <div className="card">
       <div className="card-top">
         <div className="card-id">
           <span className="rank">{rank}</span>
           <div>
-            <button className="ticker ticker-link" onClick={() => onSelect(s)} title="Detay/rapor aç">
-              {s.ticker} <span className="chart-ico">📄</span>
+            <button className="ticker ticker-link" onClick={() => onChart(s)} title="Grafiği aç">
+              {s.ticker} <span className="chart-ico">📈</span>
             </button>
             <div className="name">{s.name}{s.sector ? ` · ${s.sector}` : ''}</div>
           </div>
@@ -315,7 +319,7 @@ function UsCard({ s, rank, onSelect }) {
         </div>
         <div className="metric">
           <span className="metric-label">Rapor</span>
-          <span>{s.hasReport ? '📄 var' : <span className="muted-dash">—</span>}</span>
+          <button className="ticker-link" onClick={() => onSelect(s)}>{s.hasReport ? '📄 rapor' : '📄 özet'}</button>
         </div>
       </div>
 
@@ -334,6 +338,7 @@ export default function UsStocksTab({ view = 'web' }) {
   const [idx, setIdx] = useState('ALL'); // ALL | NDX | SPX
   const [sort, setSort] = useState('score'); // score | ticker
   const [selected, setSelected] = useState(null);
+  const [chartItem, setChartItem] = useState(null);
 
   const filtered = useMemo(() => {
     const nq = norm(query.trim());
@@ -438,8 +443,8 @@ export default function UsStocksTab({ view = 'web' }) {
                 <tr key={s.ticker}>
                   <td className="rank">{i + 1}</td>
                   <td>
-                    <button className="ticker ticker-link" onClick={() => setSelected(s)} title="Detay/rapor aç">
-                      {s.ticker} <span className="chart-ico">📄</span>
+                    <button className="ticker ticker-link" onClick={() => setChartItem(s)} title="Grafiği aç">
+                      {s.ticker} <span className="chart-ico">📈</span>
                     </button>
                     <div className="name">{s.name}{s.sector ? ` · ${s.sector}` : ''}</div>
                   </td>
@@ -460,7 +465,11 @@ export default function UsStocksTab({ view = 'web' }) {
                   <td className="num">{s.netDebtToEbitda != null ? `${fmtNum(s.netDebtToEbitda)}x` : <span className="muted-dash">—</span>}</td>
                   <td className="num">{pctCell(s.fcfMargin)}</td>
                   <td className="num">{s.forwardPE != null ? fmtNum(s.forwardPE) : <span className="muted-dash">—</span>}</td>
-                  <td>{s.hasReport ? <span title="Tam analist raporu mevcut">📄 var</span> : <span className="muted-dash">—</span>}</td>
+                  <td>
+                    <button className="ticker-link" onClick={() => setSelected(s)} title="Detay/rapor aç">
+                      {s.hasReport ? '📄 rapor' : '📄 özet'}
+                    </button>
+                  </td>
                   <td><IndicatorBadge signal={s.wtSignal} /></td>
                   <td><IndicatorBadge signal={s.wtCrossSignal} /></td>
                   <td><IndicatorBadge signal={s.stSignal} /></td>
@@ -474,12 +483,17 @@ export default function UsStocksTab({ view = 'web' }) {
       {filtered.length > 0 && view === 'mobile' && (
         <div className="cards">
           {filtered.map((s, i) => (
-            <UsCard key={s.ticker} s={s} rank={i + 1} onSelect={setSelected} />
+            <UsCard key={s.ticker} s={s} rank={i + 1} onSelect={setSelected} onChart={setChartItem} />
           ))}
         </div>
       )}
 
       {selected && <ReportPanel item={selected} onClose={() => setSelected(null)} />}
+      {chartItem && (
+        <Suspense fallback={<div className="modal-overlay"><div className="chart-state">Grafik yükleniyor…</div></div>}>
+          <ChartModal item={chartItem} onClose={() => setChartItem(null)} alimSatim={false} />
+        </Suspense>
+      )}
     </>
   );
 }

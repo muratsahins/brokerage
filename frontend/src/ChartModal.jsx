@@ -131,7 +131,10 @@ function loadChartInds() {
 // Charts (açık kaynak, ücretsiz) ile çizer — mum + hacim, altında RSI ve MACD
 // panelleri (zaman eksenleri senkron). TradingView embed'i BIST verisini
 // göstermediği için harici widget yerine kendi grafiğimizi çiziyoruz.
-export default function ChartModal({ item, onClose }) {
+// alimSatim=false ile Sanal Borsa paneli ve pozisyon şeridi gizlenir. ABD
+// hisselerinde şart: fiyatları USD, portföyün nakdi ise ₺ — vbTrade ikisini
+// karıştırıp yanlış tutar hesaplardı.
+export default function ChartModal({ item, onClose, alimSatim = true }) {
   const priceRef = useRef(null);
   const wtRef = useRef(null);
   const stochRef = useRef(null);
@@ -344,7 +347,7 @@ export default function ChartModal({ item, onClose }) {
         {/* Şerit giriş yapılmışsa HER ZAMAN görünür. Pozisyon yokken gizlemek,
             "K/Z neden yok?" sorusunu cevapsız bırakıyordu: eksik özellikle
             hatasız-ama-boş durum ayırt edilemiyordu. */}
-        {vbe && (
+        {alimSatim && vbe && (
           <div className="modal-pos">
             {poz ? (
               <>
@@ -383,6 +386,7 @@ export default function ChartModal({ item, onClose }) {
           </div>
         )}
 
+        {alimSatim && (
         <div className="modal-trade">
           {vbe ? (
             <>
@@ -415,7 +419,8 @@ export default function ChartModal({ item, onClose }) {
             </span>
           )}
         </div>
-        {tmsg && <div className={`vb-msg ${tmsg.ok ? 'ok' : 'err'}`} style={{ margin: '0 14px' }}>{tmsg.m}</div>}
+        )}
+        {alimSatim && tmsg && <div className={`vb-msg ${tmsg.ok ? 'ok' : 'err'}`} style={{ margin: '0 14px' }}>{tmsg.m}</div>}
         <div className="modal-ind">
           {CHART_INDS.map((ind) => (
             <button

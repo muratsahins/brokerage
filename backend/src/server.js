@@ -6,13 +6,20 @@ import { initDb } from './db.js';
 import {
   syncData, getRecommendations, getCachedItems, getUsRecommendations, refreshUs, syncUsData,
 } from './service.js';
-import { diagnose, fetchOhlc, peekLivePrices } from './dataSource.js';
+import { diagnose, fetchOhlc, peekLivePrices, peekUsLivePrices } from './dataSource.js';
 import { getLivePrices, getUsLivePrices, refreshSeries, seriesStats } from './liveSignals.js';
 import { fetchNews } from './newsSource.js';
 import { getAlerts } from './alerts.js';
 import { INSTRUMENTS } from './stocks.js';
+import { US_STOCKS } from './usStocks.js';
 
-const symbolByTicker = new Map(INSTRUMENTS.map((i) => [i.ticker, i.symbol]));
+// Ticker -> Yahoo sembolü. ABD hisselerinde sembol ticker'ın kendisi (AAPL),
+// BIST'te .IS ekli. Grafik ucu ikisini de servis ediyor.
+const symbolByTicker = new Map([
+  ...INSTRUMENTS.map((i) => [i.ticker, i.symbol]),
+  ...US_STOCKS.map((u) => [u.ticker, u.ticker]),
+]);
+const usTickers = new Set(US_STOCKS.map((u) => u.ticker));
 const VALID_RANGE = /^(1mo|3mo|6mo|1y|2y|5y)$/;
 
 const app = express();
@@ -51,7 +58,8 @@ app.get('/api/chart', async (req, res) => {
     // saniyelik kotasyon farkı kalmasın diye grafik tabloya bağlanır.
     // Yalnızca canlı fiyat son mumla AYNI seansa aitse uygulanır.
     const last = data.candles[data.candles.length - 1];
-    const lp = peekLivePrices()?.prices?.[ticker];
+    // Son mumu canlı fiyata eşitlerken doğru hattan oku (ABD ayrı önbellek).
+    const lp = (usTickers.has(ticker) ? peekUsLivePrices() : peekLivePrices())?.prices?.[ticker];
     if (last && lp?.price != null && lp.ts != null) {
       const d = new Date((lp.ts + (data.gmtoffset ?? 0)) * 1000).toISOString().slice(0, 10);
       if (d === last.time) {
