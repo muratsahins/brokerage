@@ -584,3 +584,30 @@ export function taramaDetay(series, benchCloses, opts = {}) {
 export function taramaGecti(series, benchCloses, opts) {
   return !!taramaDetay(series, benchCloses, opts)?.pass;
 }
+
+// series'i SONDAN k bar kırpar (geriye dönük gün kontrolü için) — diğer
+// alanlar (gmtoffset) olduğu gibi kalır.
+function seriKirp(series, k) {
+  if (!k) return series;
+  const kes = (arr) => (arr ? arr.slice(0, Math.max(0, arr.length - k)) : arr);
+  return {
+    open: kes(series.open), high: kes(series.high), low: kes(series.low),
+    close: kes(series.close), volume: kes(series.volume), time: kes(series.time),
+    gmtoffset: series.gmtoffset,
+  };
+}
+
+// 4 Faktörlü Tarama'yı SON `gunSayisi` gün için sırayla dener (bugünden
+// geriye) — dördü birden bugün değil de dün sağlanmışsa da yakalar. Neden:
+// dört bağımsız koşulun TAM OLARAK aynı günde çakışması istatistiksel olarak
+// çok nadir (~%0,02); iki günlük pencere, eşikleri gevşetmeden pratik isabet
+// oranını artırır. İlk geçen günü (barsAgo) döner.
+export function taramaSonNGun(series, benchCloses, gunSayisi = 2, opts = {}) {
+  for (let k = 0; k < gunSayisi; k++) {
+    const s = seriKirp(series, k);
+    const bench = benchCloses && k ? benchCloses.slice(0, Math.max(0, benchCloses.length - k)) : benchCloses;
+    const d = taramaDetay(s, bench, opts);
+    if (d?.pass) return { ...d, barsAgo: k };
+  }
+  return null;
+}

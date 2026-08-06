@@ -17,6 +17,9 @@
 //               EMA yükselişte.
 //            4) Tetik        — hacim ortalamasının 1.5 katı + yükselen gün +
 //               MACD son birkaç barda sinyal çizgisini yukarı kesmiş.
+//          Dördünün TAM OLARAK aynı günde çakışması istatistiksel olarak çok
+//          nadir (~%0,02) — eşikleri gevşetmeden pratik isabeti artırmak için
+//          son 2 gün (bugün, olmazsa dün) taranır (bkz. taramaSonNGun).
 //          Bilgi amaçlı SuperTrend durumu da eklenir (süzgeç değil).
 //   stSell (SATIŞ UYARISI adayları): SuperTrend'in SON BARDA SAT'a döndüğü
 //          hisseler. Arayüz bunu kullanıcının Sanal Borsa portföyüyle kesiştirir
@@ -33,8 +36,11 @@
 
 import { INSTRUMENTS } from './stocks.js';
 import { US_STOCKS } from './usStocks.js';
-import { recentSignals, supertrendSignal, taramaDetay } from './indicators.js';
+import { recentSignals, supertrendSignal, taramaSonNGun } from './indicators.js';
 import { liveDailySeries, XU100_TICKER, SPX_TICKER } from './liveSignals.js';
+
+// 4 Faktörlü Tarama kaç gün geriye kadar (bugünden başlayarak) denenir.
+const TARAMA_GUN_PENCERESI = Number(process.env.TARAMA_GUN_PENCERESI ?? 2);
 
 // Taranan evren: BIST (+ maden/emtia) ile ABD hisseleri (ayrı bir ticker
 // kümesi — ".IS" eki yok, isim/sektör de yok; sadece görüntü için aşağıda
@@ -103,7 +109,7 @@ function scan() {
     // Pullback + Tetik hepsi birden (bkz. indicators.js taramaDetay). Yetersiz
     // geçmişte (ör. yeni IPO, ~225 günden az bar) taramaDetay null döner.
     const benchCloses = (US_TICKER_SET.has(inst.ticker) ? spx : xu100)?.close;
-    const tarama = taramaDetay(s, benchCloses);
+    const tarama = taramaSonNGun(s, benchCloses, TARAMA_GUN_PENCERESI);
     if (tarama?.pass) {
       const stState = supertrendSignal(s.high, s.low, s.close); // bilgi amaçlı trend
       items.push({
@@ -111,7 +117,7 @@ function scan() {
         name: META.get(inst.ticker)?.name ?? null, // ABD hisseleri BIST listesinde yok, istemci join edemez
         grup: 'al',
         dir: 'AL',
-        barsAgo: 0, // durum taraması — "o anki" bugünkü bara göre değerlendirilir
+        barsAgo: tarama.barsAgo, // durum taraması — kaç gün önce (0=bugün, 1=dün...) sağlanmış
         signals: [
           { ind: 'trend', indLabel: IND_LABEL.trend, dir: 'AL', state: true },
           { ind: 'rs', indLabel: IND_LABEL.rs, dir: 'AL', state: true },
