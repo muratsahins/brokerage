@@ -411,7 +411,7 @@ function useAlerts() {
     let cancelled = false;
     const load = () => fetch(`${API_BASE}/api/alerts`)
       .then((r) => r.json())
-      .then((d) => { if (!cancelled) setState({ loading: false, items: d.items || [], stSell: d.stSell || [], updatedAt: d.updatedAt, stats: d.stats, sessionDate: d.sessionDate, lastBarDate: d.lastBarDate }); })
+      .then((d) => { if (!cancelled) setState({ loading: false, items: d.items || [], stSell: d.stSell || [], updatedAt: d.updatedAt, stats: d.stats, lastBarDate: d.lastBarDate }); })
       .catch(() => { if (!cancelled) setState((s) => ({ ...s, loading: false })); });
     load();
     // Sayfa arka plandayken tarama çekilmez; sayfaya dönülünce hemen tazelenir
@@ -445,8 +445,8 @@ function usePortfolioTickers(dep) {
 const alertKey = (a) => `${a.grup || 'al'}/${a.ticker}:${a.signals.map((s) => `${s.ind}${s.dir}`).sort().join('|')}`;
 
 // GÖRÜLDÜ durumu: hangi uyarıları kullanıcı UYARI sekmesinde açıkça gördü.
-// Tarayıcıda saklanır, gün (sessionDate) değişince sıfırlanır — yeni seansın
-// sinyalleri yeniden haber verilir.
+// Tarayıcıda saklanır, son bar tarihi (lastBarDate) değişince sıfırlanır —
+// yeni seansın sinyalleri yeniden haber verilir.
 const SEEN_KEY = 'alertsSeen';
 function loadSeen() {
   try {
@@ -458,10 +458,10 @@ function loadSeen() {
 // Yeni (henüz görülmemiş) uyarı sayısı + "gördüm" işaretleyicisi.
 function useNewAlerts(alerts, active) {
   const [seen, setSeen] = useState(() => loadSeen());
-  const { sessionDate, items, loading } = alerts;
+  const { lastBarDate, items, loading } = alerts;
 
-  // Gün değiştiyse görüldü listesi geçersiz — yeni seansın sinyalleri haber verilir.
-  const valid = seen && sessionDate && seen.date === sessionDate ? seen : null;
+  // Son bar tarihi değiştiyse görüldü listesi geçersiz — yeni seansın sinyalleri haber verilir.
+  const valid = seen && lastBarDate && seen.date === lastBarDate ? seen : null;
   const newKeys = useMemo(() => {
     if (loading) return new Set();
     return new Set(items.map(alertKey).filter((k) => !valid || !valid.keys.has(k)));
@@ -481,17 +481,17 @@ function useNewAlerts(alerts, active) {
   // planda açık duruyorsa kullanıcı görmemiştir; sayfaya döndüğünde
   // (visibilitychange) işaretlenir.
   useEffect(() => {
-    if (!active || loading || !sessionDate) return undefined;
+    if (!active || loading || !lastBarDate) return undefined;
     const mark = () => {
       if (document.visibilityState !== 'visible') return;
-      const next = { date: sessionDate, keys: items.map(alertKey) };
+      const next = { date: lastBarDate, keys: items.map(alertKey) };
       try { localStorage.setItem(SEEN_KEY, JSON.stringify(next)); } catch { /* yoksay */ }
       setSeen({ date: next.date, keys: new Set(next.keys) });
     };
     mark();
     document.addEventListener('visibilitychange', mark);
     return () => document.removeEventListener('visibilitychange', mark);
-  }, [active, loading, sessionDate, items]);
+  }, [active, loading, lastBarDate, items]);
 
   return { newCount: newKeys.size, highlight: highlightRef.current };
 }
@@ -500,8 +500,9 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
   const byTicker = useMemo(() => new Map(items.map((i) => [i.ticker, i])), [items]);
   const list = state.items;
   const warming = state.stats && state.stats.ready < state.stats.total * 0.9;
-  // Bugün hiçbir hissenin barı yoksa seans yok (hafta sonu/tatil) ya da veri
-  // henüz gelmedi — önceki seansın sinyalleri gösterilmez, durum yazılır.
+  // Tarama artık son tamamlanan seansı da gösterir (seans kapalıyken dahil) —
+  // scanned===0 yalnızca bar geçmişi henüz hiç yüklenmediğinde (sunucu yeni
+  // başladı) gerçekleşir.
   const noSession = state.stats && state.stats.scanned === 0;
   const trDate = (d) => (d ? new Date(d).toLocaleDateString('tr-TR') : null);
 
@@ -544,7 +545,7 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
       <div className="fav-note">
         <strong>Tarama</strong> — günlük grafikte{' '}
         <strong>
-          {trDate(state.sessionDate) ? `bugünün (${trDate(state.sessionDate)})` : 'bugünün'}
+          {trDate(state.lastBarDate) ? `son seansın (${trDate(state.lastBarDate)})` : 'son seansın'}
         </strong>{' '}
         barı taranır, iki grup:{' '}
         <strong>Alım adayları</strong> = <strong>4 Faktörlü Profesyonel Tarama Sistemi</strong> — hepsi birden:
@@ -555,9 +556,9 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
         aşırı uzamamış) <strong>+</strong> <strong>4) Tetik</strong> (hacim patlaması <strong>+</strong> MACD
         yukarı kesişimi) — BIST 100 + ABD hisselerinde (NASDAQ-100 + S&P 100);{' '}
         <strong>Kendi hisselerim</strong> = <code>SuperTrend</code> <strong>SAT</strong>'a dönenlerden Sanal
-        Borsa portföyünde olanlar. Son bar canlı fiyatla güncellendiği için sonuç, kapanış beklenmeden gün
-        içinde görünür.
-        {state.stats && ` (${state.stats.scanned} hisse bugün işlem gördü.)`}
+        Borsa portföyünde olanlar. Seans açıkken son bar canlı fiyatla güncellenir (kapanış beklenmeden gün
+        içinde görünür); seans kapalıyken son tamamlanan seansın sonucu gösterilmeye devam eder.
+        {state.stats && ` (${state.stats.scanned} hisse son seansta tarandı.)`}
         <span className="muted-dash"> Yatırım tavsiyesi değildir.</span>
       </div>
 
@@ -570,16 +571,14 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
 
       {noSession ? (
         <div className="state">
-          Bugün{trDate(state.sessionDate) ? ` (${trDate(state.sessionDate)})` : ''} işlem gören hisse yok —
-          seans kapalı (hafta sonu/tatil) ya da veri henüz gelmedi.
-          {trDate(state.lastBarDate) && ` Son seans: ${trDate(state.lastBarDate)}; o günün sinyalleri burada gösterilmez.`}
+          Veri henüz hazır değil — bar geçmişi sunucuda doldurulmaya devam ediyor, birazdan tekrar bakın.
         </div>
       ) : (
         <>
           <div className="alert-group">Alım adayları — 4 Faktörlü Profesyonel Tarama (BIST 100 + ABD)</div>
           {list.length === 0 ? (
             <div className="state">
-              Bugün dört faktörü (Ana Trend + Göreceli Güç + Pullback + Tetik) birden sağlayan hisse yok.
+              Son seansta dört faktörü (Ana Trend + Göreceli Güç + Pullback + Tetik) birden sağlayan hisse yok.
               {warming && ' Bar geçmişi hâlâ hazırlanıyor, birazdan tekrar bakın.'}
             </div>
           ) : (
@@ -590,7 +589,7 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
           {mine.length === 0 ? (
             <div className="state">
               {hasPortfolio
-                ? 'Portföyündeki hisselerde bugün SuperTrend SAT dönüşü yok.'
+                ? 'Portföyündeki hisselerde son seansta SuperTrend SAT dönüşü yok.'
                 : 'Sanal Borsa portföyün boş — hisse aldığında SAT dönüşleri burada uyarır.'}
             </div>
           ) : (

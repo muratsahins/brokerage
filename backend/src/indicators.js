@@ -686,11 +686,12 @@ function seriKirp(series, k) {
 }
 
 // 4 Faktörlü Tarama'yı SON `gunSayisi` gün için sırayla dener (bugünden
-// geriye) — dördü birden bugün değil de dün sağlanmışsa da yakalar. Neden:
-// dört bağımsız koşulun TAM OLARAK aynı günde çakışması istatistiksel olarak
-// çok nadir (~%0,02); iki günlük pencere, eşikleri gevşetmeden pratik isabet
-// oranını artırır. İlk geçen günü (barsAgo) döner.
-export function taramaSonNGun(series, benchCloses, gunSayisi = 2, opts = {}) {
+// geriye) — dördü birden bugün değil de önceki bir günde sağlanmışsa da
+// yakalar. Neden: dört bağımsız koşulun TAM OLARAK aynı günde çakışması
+// istatistiksel olarak çok nadir (~%0,02); haftalık (5 iş günü) pencere,
+// eşikleri gevşetmeden pratik isabet oranını artırır. İlk geçen günü
+// (barsAgo) döner.
+export function taramaSonNGun(series, benchCloses, gunSayisi = 5, opts = {}) {
   for (let k = 0; k < gunSayisi; k++) {
     const s = seriKirp(series, k);
     const bench = benchCloses && k ? benchCloses.slice(0, Math.max(0, benchCloses.length - k)) : benchCloses;

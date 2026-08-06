@@ -19,7 +19,8 @@
 //               MACD son birkaç barda sinyal çizgisini yukarı kesmiş.
 //          Dördünün TAM OLARAK aynı günde çakışması istatistiksel olarak çok
 //          nadir (~%0,02) — eşikleri gevşetmeden pratik isabeti artırmak için
-//          son 2 gün (bugün, olmazsa dün) taranır (bkz. taramaSonNGun).
+//          son 5 iş günü (bugünden geriye, bir haftalık pencere) taranır
+//          (bkz. taramaSonNGun).
 //          Bilgi amaçlı SuperTrend durumu da eklenir (süzgeç değil).
 //   stSell (SATIŞ UYARISI adayları): SuperTrend'in SON BARDA SAT'a döndüğü
 //          hisseler. Arayüz bunu kullanıcının Sanal Borsa portföyüyle kesiştirir
@@ -28,7 +29,10 @@
 //
 // stSell'de "yeni" = kalıcı durum değil, sinyalin OLUŞTUĞU bar; items'ta ise
 // o ANKİ durum (4 Faktörlü Tarama bir kesişim değil, bir durum taramasıdır).
-// İkisinde de son bar BUGÜNE ait olmalıdır — bugün seans yoksa listeler boştur.
+// İkisinde de son bar, hissenin AİT OLDUĞU GRUBUN (BIST/ABD) en güncel barı
+// olmalıdır — duvar saatine göre "bugün" değil. Seans kapalıyken (mesai dışı,
+// hafta sonu, tatil) son tamamlanan seansın sonucu gösterilmeye devam eder;
+// yalnızca kendi grubuna göre bayat kalan (ör. işlemi durdurulmuş) hisse elenir.
 //
 // Veri: liveSignals'ın canlı fiyatla yamalı günlük bar geçmişi — TARAMA için
 // Yahoo'ya EK İSTEK YOK. Son barın kapanışı/hacmi canlı olduğu için sinyal,
@@ -40,7 +44,10 @@ import { recentSignals, supertrendSignal, taramaSonNGun } from './indicators.js'
 import { liveDailySeries, XU100_TICKER, SPX_TICKER } from './liveSignals.js';
 
 // 4 Faktörlü Tarama kaç gün geriye kadar (bugünden başlayarak) denenir.
-const TARAMA_GUN_PENCERESI = Number(process.env.TARAMA_GUN_PENCERESI ?? 2);
+// 5 gün ~ bir haftalık işlem takvimi: dört bağımsız koşulun aynı günde
+// çakışması nadir olduğundan (bkz. indicators.js taramaSonNGun), pencere
+// haftalık işlem günü sayısına genişletilerek aday sayısı artırılır.
+const TARAMA_GUN_PENCERESI = Number(process.env.TARAMA_GUN_PENCERESI ?? 5);
 
 // Taranan evren: BIST (+ maden/emtia) ile ABD hisseleri (ayrı bir ticker
 // kümesi — ".IS" eki yok, isim/sektör de yok; sadece görüntü için aşağıda
@@ -66,12 +73,13 @@ const IND_LABEL = {
 
 // Tüm enstrümanları tarar; hisse başına tek kayıt döner.
 //
-// YALNIZCA BUGÜN: bir hissenin son barı eski bir güne ait olabilir (bugün işlem
-// görmemiş/durdurulmuş; ya da hafta sonu/tatil, yeniden başlatma sonrası henüz
-// canlı fiyat gelmemiş). Öyle bir barın "son bar" sinyali aslında önceki
-// günlerde üretilmiştir. Bu yüzden ölçüt GÖRECELİ DEĞİL: son bar, borsa saatine
-// göre BUGÜNÜN gününe ait olmalı. Bugün seans yoksa liste boş döner — dünün
-// sinyalleri bugünmüş gibi gösterilmez.
+// GRUBUN EN GÜNCEL BARI: BIST ve ABD ayrı saatlerde kapanır, tek bir "bugün"
+// duvar saatiyle kıyaslamak seans kapalıyken (mesai dışı, gece yarısı sonrası,
+// hafta sonu/tatil) listeyi haksız yere boşaltır. Ölçüt bu yüzden MUTLAK
+// "bugün" değil, hissenin kendi grubundaki (BIST/ABD) EN GÜNCEL bar — bir
+// hissenin son barı kendi grubunun geri kalanından daha eskiyse (ör. işlemi
+// durdurulmuş, yeniden başlatma sonrası veri gelmemiş) o hisse elenir, ama
+// grup genelinde seans kapalıyken de son tamamlanan seansın sonucu gösterilir.
 function scan() {
   const items = [];   // alım adayları (4 Faktörlü Tarama)
   const stSell = [];  // SuperTrend SAT dönüşü — portföy süzgeci istemcide
@@ -79,7 +87,6 @@ function scan() {
 
   const day = (ts, off) => Math.floor((ts + (off ?? 0)) / 86400);
   const iso = (ts, off) => new Date((ts + (off ?? 0)) * 1000).toISOString().slice(0, 10);
-  const now = Math.floor(Date.now() / 1000);
 
   // Göreceli Güç karşılaştırma endeksleri — enstrümanlarla AYNI önbellekten
   // (liveSignals.js) gelir, ek çekim gerekmez.
@@ -87,7 +94,9 @@ function scan() {
   const spx = liveDailySeries(SPX_TICKER);
 
   const series = [];
-  let lastDay = -Infinity, lastOff = DEFAULT_OFF, lastTs = null; // en yeni bar (bugün olmayabilir)
+  // En güncel bar HER GRUP (BIST/ABD) için AYRI izlenir (bkz. yukarıdaki not).
+  let lastDayBist = -Infinity, lastOffBist = DEFAULT_OFF, lastTsBist = null;
+  let lastDayUs = -Infinity, lastOffUs = DEFAULT_OFF, lastTsUs = null;
   for (const inst of SCAN_INSTRUMENTS) {
     const s = liveDailySeries(inst.ticker);
     if (!s) continue; // bar geçmişi henüz önbellekte değil
@@ -96,14 +105,17 @@ function scan() {
     if (s.lastTs != null) {
       const off = s.gmtoffset ?? DEFAULT_OFF;
       const d = day(s.lastTs, off);
-      if (d > lastDay) { lastDay = d; lastOff = off; lastTs = s.lastTs; }
+      if (US_TICKER_SET.has(inst.ticker)) {
+        if (d > lastDayUs) { lastDayUs = d; lastOffUs = off; lastTsUs = s.lastTs; }
+      } else if (d > lastDayBist) { lastDayBist = d; lastOffBist = off; lastTsBist = s.lastTs; }
     }
   }
+  const grupGunu = (ticker) => (US_TICKER_SET.has(ticker) ? lastDayUs : lastDayBist);
 
   for (const { inst, s } of series) {
-    // Son barı BUGÜNE ait olmayan hisseyi atla (eski sinyal taze görünmesin).
+    // Son barı KENDİ GRUBUNUN en güncel barından eski olan hisseyi atla.
     const off = s.gmtoffset ?? DEFAULT_OFF;
-    if (s.lastTs == null || day(s.lastTs, off) !== day(now, off)) continue;
+    if (s.lastTs == null || day(s.lastTs, off) !== grupGunu(inst.ticker)) continue;
 
     // ALIM ADAYI: 4 Faktörlü Profesyonel Tarama — Ana Trend + Göreceli Güç +
     // Pullback + Tetik hepsi birden (bkz. indicators.js taramaDetay). Yetersiz
@@ -145,28 +157,28 @@ function scan() {
   items.sort((a, b) => a.ticker.localeCompare(b.ticker));
   stSell.sort((a, b) => a.ticker.localeCompare(b.ticker));
 
-  // Taranan gün (borsa saatine göre bugün) ve önbellekteki en yeni bar tarihi —
-  // ikisi farklıysa arayüz "bugün seans yok" diyebilsin diye ayrı döner.
-  const sessionDate = iso(now, lastOff);
+  // Gösterilen sonuçların ait olduğu tarih: BIST/ABD gruplarından hangisinin
+  // en güncel barı daha yeniyse o (genelde ikisi aynı takvim günüdür).
+  const lastOff = lastDayUs > lastDayBist ? lastOffUs : lastOffBist;
+  const lastTs = lastDayUs > lastDayBist ? lastTsUs : lastTsBist;
   const lastBarDate = lastTs != null ? iso(lastTs, lastOff) : null;
-  const scanned = series.filter(({ s }) =>
-    s.lastTs != null && day(s.lastTs, s.gmtoffset ?? DEFAULT_OFF) === day(now, s.gmtoffset ?? DEFAULT_OFF)).length;
+  const scanned = series.filter(({ inst, s }) =>
+    s.lastTs != null && day(s.lastTs, s.gmtoffset ?? DEFAULT_OFF) === grupGunu(inst.ticker)).length;
 
   return {
     items: items.slice(0, MAX_ITEMS),
     stSell: stSell.slice(0, MAX_ITEMS),
-    ready, scanned, sessionDate, lastBarDate,
+    ready, scanned, lastBarDate,
   };
 }
 
-let scanCache = { at: 0, items: [], stSell: [], ready: 0, scanned: 0, sessionDate: null, lastBarDate: null };
+let scanCache = { at: 0, items: [], stSell: [], ready: 0, scanned: 0, lastBarDate: null };
 export function getAlerts() {
   if (Date.now() - scanCache.at > 60000) {
     scanCache = { at: Date.now(), ...scan() };
   }
   return {
     updatedAt: new Date(scanCache.at).toISOString(),
-    sessionDate: scanCache.sessionDate,
     lastBarDate: scanCache.lastBarDate,
     items: scanCache.items,
     stSell: scanCache.stSell,
