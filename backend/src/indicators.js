@@ -256,6 +256,64 @@ function haftalik(highs, lows, closes, times, off = 0, simdi = Date.now() / 1000
   return { h, l, c };
 }
 
+// --- Likidite Süpürmesi (SSL sweep) -----------------------------------------
+// ChoCh dibi rastgele bir dip mi, yoksa bir "Equal Lows" (SSL) havuzunu
+// süpürüp mü oluşmuş? Dipten ÖNCEKİ (aramaBar kadar geriye) pivot low'lar
+// arasında, dip seviyesine tolerans içinde YAKIN başka bir swing low varsa
+// (havuz = 2+ birbirine yakın dip), bu dip "likidite avı" sonrası oluşmuş
+// sayılır — rastgele bir dipten daha güvenilir bir SMC referans noktasıdır.
+const LIKIDITE_TOLERANS_PCT = 1.0; // % — iki dip bu kadar yakınsa "eşit" sayılır
+const LIKIDITE_ARAMA_BAR = 40;
+function likiditeSupuruldu(sl, dipIdx, dipPrice, opts = {}) {
+  const { toleransPct = LIKIDITE_TOLERANS_PCT, aramaBar = LIKIDITE_ARAMA_BAR } = opts;
+  if (dipIdx == null || dipPrice == null) return false;
+  for (const p of sl) {
+    if (p.i >= dipIdx || dipIdx - p.i > aramaBar) continue; // dipten sonrası veya çok eski
+    if (Math.abs(p.p - dipPrice) / dipPrice * 100 <= toleransPct) return true;
+  }
+  return false;
+}
+
+// --- Order Block + FVG Confluence -------------------------------------------
+// Boğa Order Block: impulsif YUKARI kırılımdan hemen önceki son kırmızı mum
+// (kurumsal alım bölgesi adayı). Aranan pencerede EN GÜNCEL olanı döner.
+const OB_FVG_ARAMA_BAR = 60;
+function sonBogaOB(opens, highs, lows, closes, aramaBar = OB_FVG_ARAMA_BAR) {
+  const n = closes?.length ?? 0;
+  for (let i = n - 2; i >= Math.max(1, n - aramaBar); i--) {
+    if (closes[i] < opens[i] && closes[i + 1] > highs[i]) {
+      return { top: highs[i], bottom: lows[i], barIdx: i };
+    }
+  }
+  return null;
+}
+// Boğa FVG (Fair Value Gap / Dengesizlik): 3 mumluk pencerede ortadaki mum o
+// kadar impulsif ki 1. mumun yükseği ile 3. mumun düşüğü arasında boşluk
+// kalır. Aranan pencerede EN GÜNCEL olanı döner.
+function sonBogaFVG(highs, lows, aramaBar = OB_FVG_ARAMA_BAR) {
+  const n = highs?.length ?? 0;
+  for (let i = n - 2; i >= Math.max(1, n - aramaBar); i--) {
+    if (highs[i - 1] < lows[i + 1]) {
+      return { top: lows[i + 1], bottom: highs[i - 1], barIdx: i };
+    }
+  }
+  return null;
+}
+// Confluence: en güncel Boğa OB ile en güncel Boğa FVG ÇAKIŞIYOR mu VE son
+// kapanış bu çakışan bölgenin içinde mi? İkisi aynı anda doğrulanan bölge,
+// SMC'de en güçlü kurumsal ilgi alanı kabul edilir.
+function obFvgConfluence(opens, highs, lows, closes, aramaBar = OB_FVG_ARAMA_BAR) {
+  if (!opens) return { var: false, ob: null, fvg: null };
+  const ob = sonBogaOB(opens, highs, lows, closes, aramaBar);
+  const fvg = sonBogaFVG(highs, lows, aramaBar);
+  if (!ob || !fvg) return { var: false, ob, fvg };
+  const ustSinir = Math.min(ob.top, fvg.top);
+  const altSinir = Math.max(ob.bottom, fvg.bottom);
+  const cakisiyor = ustSinir >= altSinir;
+  const son = closes[closes.length - 1];
+  return { var: cakisiyor && son >= altSinir && son <= ustSinir, ob, fvg };
+}
+
 // HTF yükseliş — GEVŞEK tanım: haftalık SuperTrend AL.
 // Üç aday 247 hisselik gerçek taramada ölçüldü:
 //   haftalık SuperTrend  %51  <- en gevşek, seçilen
@@ -270,43 +328,73 @@ export function htfBullish(highs, lows, closes, times, gmtoffset) {
   return supertrendSignal(h, l, c) === 'AL';
 }
 
-// SMC yükseliş:
-//   TETİK  : ChoCh/MSB kırılımı — kapanış, düşüşü başlatan tepeyi son `recent`
-//            barda yukarı kesti ve hâlâ üstünde.
-//   SÜZGEÇ : kapanış POC'un üstünde (piyasa değer bölgesini kabul etmiş)
-//   SÜZGEÇ : HTF (haftalık) yükseliş
-// Eski "likidite süpürme + son swing high kırılımı" yerini ChoCh'a bıraktı:
-// aynı fikrin daha doğru tanımlanmış hali.
+// SMC yükseliş — YAPI ONAYI (pencereli) + GİRİŞ TETİĞİ (şu anki bar), hepsi
+// birden. Gerçek ICT giriş modeli SIRALIDIR, EŞ ZAMANLI değil: önce likidite
+// süpürülür, ChoCh ile yapı kırılımı onaylanır (fiyat yukarı gider) — SONRA
+// fiyat GERİ ÇEKİLİP OB/FVG bölgesine döner (asıl giriş tetikleyicisi, günler
+// sonra olabilir ve doğası gereği kırılan seviyenin biraz altına sarkar).
+// Eskiden ChoCh "hâlâ kırılan seviyenin üstünde kapanmış olma" şartı taşıyordu
+// — bu, OB/FVG'ye geri çekilmeyle yapısal olarak çelişip skoru sürekli 0'a
+// düşürüyordu (canlı BIST 100 taramasında 0/101). Şimdi:
+//   YAPI ONAYI (son YAPI_ONAY_PENCERE bar içinde herhangi bir anda olmuş
+//   olması yeterli, hâlâ üstünde kapanmış olma şartı YOK):
+//     - ChoCh/MSB kırılımı — düşüşü başlatan tepe yukarı kesilmiş
+//     - Likidite Süpürmesi — ChoCh dibi bir Equal Lows (SSL) havuzunu
+//       süpürerek mi oluşmuş (bkz. likiditeSupuruldu)
+//   Yapı geçersizliği: fiyat ChoCh dibinin DE altına inerse (asıl destek de
+//   kırılmışsa) yapı onayı iptal sayılır.
+//   GİRİŞ TETİĞİ (şu anki bar):
+//     - Order Block + FVG Confluence — güncel fiyat, en güncel Boğa Order
+//       Block'un en güncel Boğa FVG ile ÇAKIŞTIĞI bölgenin içinde mi (bkz.
+//       obFvgConfluence) — en güçlü kurumsal ilgi alanı.
+//   BAĞLAM/KALİTE SÜZGEÇLERİ (şu anki bar):
+//     - kapanış POC'un üstünde (piyasa değer bölgesini kabul etmiş)
+//     - HTF (haftalık) yükseliş
 export function smcBullish(highs, lows, closes, volumes, sec = {}) {
   const d = smcDetay(highs, lows, closes, volumes, sec);
-  return !!d && d.choch && d.pocUstunde && d.htf;
+  return !!d && d.yapiOnayi && d.likidite && d.obFvg && d.pocUstunde && d.htf;
 }
 
-// Koşulların tek tek sonucu (ayar/ölçüm için).
+// ChoCh kırılımının "yapı onayı" sayılacağı pencere. OB/FVG geri çekilmesi bu
+// kırılımdan SONRA oluştuğu için "hâlâ üstünde kapanmış olma" aranmaz — bunun
+// yerine daha geniş bir pencerede kırılım gerçekleşmiş mi bakılır.
+const YAPI_ONAY_PENCERE = 15;
+
+// Koşulların tek tek sonucu (ayar/ölçüm için). sec.opens verilirse OB+FVG
+// confluence de hesaplanır (verilmezse o süzgeç geçilmemiş sayılır).
 export function smcDetay(highs, lows, closes, volumes, sec = {}) {
-  const { times, gmtoffset, recent = 5 } = sec;
+  const { times, gmtoffset, opens } = sec;
   const n = closes?.length ?? 0;
   if (n < 30) return null;
   const son = closes[n - 1];
 
+  const { sl } = findPivots(highs, lows);
   const ch = chochLevel(highs, lows);
   const poc = pointOfControl(highs, lows, volumes);
 
-  // Seviyeyi son `recent` barda aşağıdan yukarı kesip üstünde kaldı mı?
+  // Seviye, dipten sonra son YAPI_ONAY_PENCERE bar içinde aşağıdan yukarı
+  // kesilmiş mi? Yapı, dip TEKRAR kırılırsa (destek de gitmişse) geçersiz.
   let choch = false;
   if (ch?.seviye != null) {
-    for (let i = Math.max(1, n - recent); i < n; i++) {
+    const from = Math.max(ch.dipIdx + 1, n - YAPI_ONAY_PENCERE);
+    for (let i = from; i < n; i++) {
       if (closes[i - 1] <= ch.seviye && closes[i] > ch.seviye) choch = true;
     }
-    choch = choch && son > ch.seviye;
+    if (son < lows[ch.dipIdx]) choch = false; // yapı geçersiz: dip tekrar kırıldı
   }
+  const likidite = ch ? likiditeSupuruldu(sl, ch.dipIdx, lows[ch.dipIdx]) : false;
+
+  const confluence = obFvgConfluence(opens, highs, lows, closes);
 
   return {
     choch,
+    yapiOnayi: choch, // isim netliği için ayrı alan (choch geriye dönük uyumluluk)
     // "Üstünde" değil "belirgin biçimde üstünde": POC'a yapışık fiyat, değer
     // bölgesinin kabul edildiği anlamına gelmiyor.
     pocUstunde: poc != null && son > poc * (1 + POC_PAY),
     htf: htfBullish(highs, lows, closes, times, gmtoffset),
+    likidite,
+    obFvg: confluence.var,
     pocSeviye: poc,
     chochSeviye: ch?.seviye ?? null,
   };

@@ -185,7 +185,7 @@ export function computeLiveSignals(prices, bars = {}) {
     const { cross, overzone } = wavetrendSignals(s.highs, s.lows, s.closes);
     if (cross) sig.wt = cross;
     if (overzone) sig.wo = overzone;
-    if (smcBullish(s.highs, s.lows, s.closes, s.volumes, { times: s.times, gmtoffset: entry.gmtoffset })) sig.smc = 1;
+    if (smcBullish(s.highs, s.lows, s.closes, s.volumes, { times: s.times, gmtoffset: entry.gmtoffset, opens: s.opens })) sig.smc = 1;
     out[ticker] = sig; // boş nesne de anlamlı: "hesaplandı, sinyal yok"
   }
   return out;

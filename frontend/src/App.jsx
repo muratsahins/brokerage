@@ -1029,8 +1029,9 @@ export default function App() {
     () => [...data.items, ...usTradableItems],
     [data.items, usTradableItems],
   );
-  // SMC (Smart Money Concept) yükseliş: ChoCh/MSB kırılımı (tetik) + POC üstünde
-  // + haftalık SuperTrend AL (süzgeçler).
+  // SMC (Smart Money Concept) yükseliş: ChoCh/MSB kırılımı (tetik) + Likidite
+  // Süpürmesi + OB/FVG Confluence + POC üstünde + haftalık SuperTrend AL
+  // (dördü de süzgeç — bkz. backend/src/indicators.js smcDetay).
   const SMC_TAB = {
     key: 'smc',
     label: '🎯 SMC',
@@ -1308,10 +1309,16 @@ export default function App() {
 
       {tab === 'smc' && (
         <div className="fav-note">
-          <strong>SMC (Smart Money Concept) — günlük AL:</strong> üç koşul birden.
+          <strong>SMC (Smart Money Concept) — günlük AL:</strong> beş koşul birden.
           <strong> Tetik — ChoCh/MSB:</strong> son <code>90</code> bardaki düşüşü sonlandıran dibi yaptıran
           tepe (düşüşü başlatan swing high) son <code>5</code> barda yukarı kırıldı ve kapanış hâlâ üstünde
           (Change of Character / Market Structure Break).
+          <strong> Süzgeç — Likidite Süpürmesi:</strong> ChoCh dibi, dipten önceki <code>40</code> barda
+          o dibe %1 tolerans içinde yakın başka bir swing low (Equal Lows / SSL havuzu) varsa geçerli —
+          rastgele bir dip değil, likidite avı sonrası oluşmuş bir dip.
+          <strong> Süzgeç — OB + FVG Confluence:</strong> güncel kapanış, en güncel Boğa Order Block'un
+          (impulsif kırılımdan önceki son kırmızı mum) en güncel Boğa FVG (Fair Value Gap) ile
+          <strong> çakıştığı</strong> bölgenin içinde olmalı — en güçlü kurumsal ilgi alanı.
           <strong> Süzgeç — POC:</strong> kapanış, 1 yıllık hacim profilinin Point of Control’ünden
           en az <code>%3</code> yukarıda — piyasa en çok işlem gördüğü denge bölgesini yukarı kabul etmiş.
           <strong> Süzgeç — HTF:</strong> haftalık grafikte SuperTrend <code>AL</code> —
@@ -1320,7 +1327,8 @@ export default function App() {
           <span className="muted-dash"> (POC = hacmin en çok biriktiği fiyat; 1 yıllık aralık 50 dilime
           bölünüp her barın hacmi kendi yüksek-düşük aralığına dağıtılarak bulunur. ChoCh penceresi
           bilerek kısa: 1 yıl alınınca “dip” pratikte yılın dibi oluyor ve kırılan tepe aylar öncesinden
-          kalıyordu — o bir karakter değişimi değil, sadece yeni zirveye çıkış olurdu.)</span>
+          kalıyordu — o bir karakter değişimi değil, sadece yeni zirveye çıkış olurdu. Beş koşulun hepsinin
+          aynı anda sağlanması istatistiksel olarak çok nadirdir — sinyal sayısı azdır, bu beklenen bir durumdur.)</span>
         </div>
       )}
 
@@ -1331,7 +1339,7 @@ export default function App() {
             : tab === 'fav'
               ? 'Şu an üç sinyali (overzone + WaveTrend + SuperTrend) birden AL olan ve analist AL tavsiyesi bulunan BIST veya ABD hissesi yok.'
             : tab === 'smc'
-              ? 'Şu an SMC yükseliş sinyali (likidite süpürme + yapı kırılımı) veren hisse yok.'
+              ? 'Şu an beş SMC koşulunu (ChoCh + Likidite Süpürmesi + OB/FVG Confluence + POC + HTF) birden sağlayan hisse yok.'
               : data.items.length > 0
                 ? 'Bu sekme/filtrede gösterilecek hisse yok.'
                 : 'Henüz veri yok. “Yenile”ye basın veya backend’in çalıştığından emin olun.'}
