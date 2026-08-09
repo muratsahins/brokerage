@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-09T04:20:16.788Z",
+  "updatedAt": "2026-08-09T07:02:05.346Z",
   "source": "github-actions",
   "count": 105,
   "withAnalyst": 54,
@@ -1916,7 +1916,10 @@
       "name": "Paladyum",
       "sector": "Kıymetli Maden",
       "bist": null,
-      "kind": "metal"
+      "kind": "metal",
+      "tryPerGram": 2138.32,
+      "tryPerGramSource": "spot",
+      "usdTry": 47.6085
     },
     {
       "symbol": "EREGL.IS",
@@ -2048,7 +2051,10 @@
       "name": "Brent Petrol",
       "sector": "Emtia",
       "bist": null,
-      "kind": "emtia"
+      "kind": "emtia",
+      "tryPrice": 3977.69,
+      "usdTry": 47.6085,
+      "unit": "varil"
     },
     {
       "symbol": "TRALT.IS",
@@ -2118,7 +2124,8 @@
       "buyPrice": 2679.65,
       "sellPrice": 2685.32,
       "tryPerGram": 2685.32,
-      "tryPerGramSource": "altin.in"
+      "tryPerGramSource": "altin.in",
+      "usdTry": 47.6085
     },
     {
       "symbol": "BRSAN.IS",
@@ -2221,7 +2228,8 @@
       "buyPrice": 6602.28,
       "sellPrice": 6658.88,
       "tryPerGram": 6658.88,
-      "tryPerGramSource": "altin.in"
+      "tryPerGramSource": "altin.in",
+      "usdTry": 47.6085
     },
     {
       "symbol": "PETKM.IS",
@@ -2357,7 +2365,8 @@
       "buyPrice": 97.29,
       "sellPrice": 97.71,
       "tryPerGram": 97.71,
-      "tryPerGramSource": "altin.in"
+      "tryPerGramSource": "altin.in",
+      "usdTry": 47.6085
     },
     {
       "symbol": "EUPWR.IS",
