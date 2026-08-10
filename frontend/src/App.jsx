@@ -66,6 +66,7 @@ function mergeLivePrices(data, live) {
       next.wtCrossSignal = s.wt ?? null;
       next.wtSignal = s.wo ?? null;
       next.smc = !!s.smc;
+      next.smcBarsAgo = s.smc ? (s.smcBarsAgo ?? null) : null;
       next.signalsLive = true;
     }
     // Analist potansiyeli, momentum, puan ve AL/TUT/İZLE sinyali de canlı
@@ -168,6 +169,11 @@ const StockRow = memo(function StockRow({ s, rank, showBuySell, onSelect }) {
           </button>
         )}
         <div className="name">{s.name}{s.sector ? ` · ${s.sector}` : ''}</div>
+        {s.smc && (
+          <div className="exp-note" title="SMC (Smart Money Concept) — beş koşul birden sağlandı. Bir DURUM taraması: bugünün sinyali olmayabilir, aşağıdaki tazelik onu gösterir.">
+            🎯 SMC: {s.smcBarsAgo === 0 ? 'bugün' : `${s.smcBarsAgo} iş günü önce`}
+          </div>
+        )}
       </td>
       <td className="num">
         {fmtNum(s.price)} <span className="cur">{s.currency || 'TRY'}</span>
@@ -225,6 +231,11 @@ const StockCard = memo(function StockCard({ s, rank, onSelect }) {
               </button>
             )}
             <div className="name">{s.name}{s.sector ? ` · ${s.sector}` : ''}</div>
+            {s.smc && (
+              <div className="exp-note" title="SMC (Smart Money Concept) — beş koşul birden sağlandı. Bir DURUM taraması: bugünün sinyali olmayabilir, aşağıdaki tazelik onu gösterir.">
+                🎯 SMC: {s.smcBarsAgo === 0 ? 'bugün' : `${s.smcBarsAgo} iş günü önce`}
+              </div>
+            )}
           </div>
         </div>
         <SignalBadge signal={s.signal} />

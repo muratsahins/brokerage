@@ -388,7 +388,14 @@ export function htfBullish(highs, lows, closes, times, gmtoffset) {
 // penceresinin yarısı — "hâlâ yapısal olarak geçerli" kabul edilen bir OB/FVG
 // bölgesine son 6 hafta içinde değinilmiş olması makul bir tazelik eşiği.
 const SMC_GUN_PENCERESI = 30;
-export function smcBullish(highs, lows, closes, volumes, sec = {}) {
+// smcDetay'ı SON SMC_GUN_PENCERESI gün için sırayla dener (bugünden geriye) ve
+// beşi birden geçen İLK (en güncel) günü barsAgo ile birlikte döner — Tarama
+// sekmesindeki taramaSonNGun ile aynı desen. barsAgo'nun arayüzde gösterilmesi
+// önemli: sinyal bir DURUM taraması, kesişim değil, yani "AL" rozeti bugünün
+// değil haftalar önceki bir tetiklenmenin sonucu olabilir (bkz. AKSA örneği:
+// 16 bar önce tetiklenmiş, o günden bugüne fiyat hareketi rozetin yanına
+// eklenen barsAgo olmadan anlaşılamıyordu).
+export function smcSonNGun(highs, lows, closes, volumes, sec = {}) {
   const { times, gmtoffset, opens } = sec;
   const n = closes?.length ?? 0;
   const kes = (arr, k) => (arr ? arr.slice(0, n - k) : arr);
@@ -398,9 +405,12 @@ export function smcBullish(highs, lows, closes, volumes, sec = {}) {
       kes(highs, k), kes(lows, k), kes(closes, k), kes(volumes, k),
       { times: kes(times, k), gmtoffset, opens: kes(opens, k) },
     );
-    if (d && d.yapiOnayi && d.likidite && d.obFvg && d.pocUstunde && d.htf) return true;
+    if (d && d.yapiOnayi && d.likidite && d.obFvg && d.pocUstunde && d.htf) return { ...d, barsAgo: k };
   }
-  return false;
+  return null;
+}
+export function smcBullish(highs, lows, closes, volumes, sec = {}) {
+  return !!smcSonNGun(highs, lows, closes, volumes, sec);
 }
 
 // ChoCh kırılımının "yapı onayı" sayılacağı pencere. OB/FVG geri çekilmesi bu
