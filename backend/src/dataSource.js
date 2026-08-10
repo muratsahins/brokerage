@@ -165,11 +165,15 @@ function canliFiyatHatti(ad, enstrumanlar) {
   const chunks = [];
   for (let i = 0; i < symbols.length; i += CHUNK) chunks.push(symbols.slice(i, i + CHUNK));
 
-  const doChunk = async (chunk) => {
+  // Yahoo'nun ANLIK throttle'ı (429/timeout) genelde geçicidir — bir parça ilk
+  // denemede düşerse kısa bir bekleme sonrası 1 kez daha denenir. Bu, turun
+  // eksik sayılıp (LIVE_MIN_ORAN) önbelleğin donmasını ve "gecikiyor" rozetinin
+  // gereksiz yere çıkmasını azaltır. Throttle yoksa retry hiç tetiklenmez.
+  const doChunk = async (chunk, deneme = 0) => {
     try {
       const url = `${SPARK_URL}?symbols=${chunk.map(encodeURIComponent).join(',')}&range=1d&interval=1d`;
       const res = await fetch(url, { headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(12000) });
-      if (!res.ok) return;
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const j = await res.json();
       for (const [sym, d] of Object.entries(j || {})) {
         const closes = (d?.close || []).filter((x) => x != null);
@@ -186,7 +190,10 @@ function canliFiyatHatti(ad, enstrumanlar) {
           };
         }
       }
-    } catch { /* bu parçayı atla */ }
+    } catch {
+      if (deneme === 0) { await sleep(400); return doChunk(chunk, 1); }
+      // 2. deneme de düştü — bu parçayı atla (tur genel eksiklik kontrolüyle yönetilir).
+    }
   };
 
   for (let i = 0; i < chunks.length; i += CONC) {
