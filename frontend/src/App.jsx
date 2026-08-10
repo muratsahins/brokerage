@@ -1313,26 +1313,31 @@ export default function App() {
 
       {tab === 'smc' && (
         <div className="fav-note">
-          <strong>SMC (Smart Money Concept) — günlük AL:</strong> beş koşul birden.
-          <strong> Tetik — ChoCh/MSB:</strong> son <code>90</code> bardaki düşüşü sonlandıran dibi yaptıran
-          tepe (düşüşü başlatan swing high) son <code>5</code> barda yukarı kırıldı ve kapanış hâlâ üstünde
-          (Change of Character / Market Structure Break).
+          <strong>SMC (Smart Money Concept) — günlük grafikte AL:</strong> beş koşul birden, ama HEPSİNİN
+          AYNI GÜNDE çakışması aranmaz — son <code>30</code> iş günü (yaklaşık 6 hafta) içinde HERHANGİ bir
+          günde birlikte sağlanmış olması yeterli (bkz. altta neden).
+          <strong> Tetik — ChoCh/MSB:</strong> son <code>60</code> bardaki düşüşü sonlandıran dibi yaptıran
+          tepe (düşüşü başlatan swing high) son <code>15</code> barda yukarı kırılmış olmalı; fiyat o
+          dipten sonra dibin ALTINA bir daha inmediği sürece geçerliliğini korur (Change of Character /
+          Market Structure Break — kapanışın kırılan seviyenin hâlâ üstünde olması şartı YOK).
           <strong> Süzgeç — Likidite Süpürmesi:</strong> ChoCh dibi, dipten önceki <code>40</code> barda
           o dibe %1 tolerans içinde yakın başka bir swing low (Equal Lows / SSL havuzu) varsa geçerli —
           rastgele bir dip değil, likidite avı sonrası oluşmuş bir dip.
-          <strong> Süzgeç — OB + FVG Confluence:</strong> güncel kapanış, en güncel Boğa Order Block'un
-          (impulsif kırılımdan önceki son kırmızı mum) en güncel Boğa FVG (Fair Value Gap) ile
-          <strong> çakıştığı</strong> bölgenin içinde olmalı — en güçlü kurumsal ilgi alanı.
+          <strong> Süzgeç — OB + FVG Confluence:</strong> en güncel Boğa FVG (Fair Value Gap) ile bu FVG'den
+          en fazla <code>6</code> bar ÖNCESİNDE oluşmuş bir Boğa Order Block (impulsif kırılımdan önceki
+          son kırmızı mum) AYNI hareketten (bacaktan) gelmeli ve <strong>çakışmalı</strong> — fiyat da son{' '}
+          <code>15</code> bar içinde bu çakışan bölgeye girmiş olmalı. En güçlü kurumsal ilgi alanı; OB ve
+          FVG birbirinden bağımsız "en son"lar olarak değil, aynı hareketten eşleştirilerek aranır.
           <strong> Süzgeç — POC:</strong> kapanış, 1 yıllık hacim profilinin Point of Control’ünden
           en az <code>%3</code> yukarıda — piyasa en çok işlem gördüğü denge bölgesini yukarı kabul etmiş.
           <strong> Süzgeç — HTF:</strong> haftalık grafikte SuperTrend <code>AL</code> —
           gerçek takvim haftaları, <strong>devam eden hafta hariç</strong>, yani sinyal ancak hafta
           kapandığında değişir.
           <span className="muted-dash"> (POC = hacmin en çok biriktiği fiyat; 1 yıllık aralık 50 dilime
-          bölünüp her barın hacmi kendi yüksek-düşük aralığına dağıtılarak bulunur. ChoCh penceresi
-          bilerek kısa: 1 yıl alınınca “dip” pratikte yılın dibi oluyor ve kırılan tepe aylar öncesinden
-          kalıyordu — o bir karakter değişimi değil, sadece yeni zirveye çıkış olurdu. Beş koşulun hepsinin
-          aynı anda sağlanması istatistiksel olarak çok nadirdir — sinyal sayısı azdır, bu beklenen bir durumdur.)</span>
+          bölünüp her barın hacmi kendi yüksek-düşük aralığına dağıtılarak bulunur. Beş koşulun TAM OLARAK
+          aynı günde çakışması istatistiksel olarak çok nadir (canlı BIST 100 taramasında hepsi-birden
+          0/101 ölçüldü) — eşikler gevşetilmeden, Tarama sekmesindeki 4 Faktörlü Tarama'yla aynı yaklaşımla
+          son 30 iş gün taranır. Yine de sinyal sayısı azdır, bu beklenen bir durumdur.)</span>
         </div>
       )}
 
@@ -1343,7 +1348,7 @@ export default function App() {
             : tab === 'fav'
               ? 'Şu an üç sinyali (overzone + WaveTrend + SuperTrend) birden AL olan ve analist AL tavsiyesi bulunan BIST veya ABD hissesi yok.'
             : tab === 'smc'
-              ? 'Şu an beş SMC koşulunu (ChoCh + Likidite Süpürmesi + OB/FVG Confluence + POC + HTF) birden sağlayan hisse yok.'
+              ? 'Son 30 iş günde beş SMC koşulunu (ChoCh + Likidite Süpürmesi + OB/FVG Confluence + POC + HTF) birden sağlayan hisse yok.'
               : data.items.length > 0
                 ? 'Bu sekme/filtrede gösterilecek hisse yok.'
                 : 'Henüz veri yok. “Yenile”ye basın veya backend’in çalıştığından emin olun.'}
