@@ -949,8 +949,13 @@ export default function App() {
   // İlk yükleme + kendini yenileme: her 5 dakikada bir ve sekmeye geri dönünce
   // arka planda sessizce yeniden çeker (spinner göstermeden).
   useEffect(() => {
-    loadSeed(); // CDN'den anlık tohum; load() ile yarışır, geç kalan kaybeder
-    load();
+    loadSeed(); // CDN'den anlık tohum; triggerRefresh() ile yarışır, geç kalan kaybeder
+    // Sayfa ilk açıldığında "↻ Yenile" butonuyla AYNI zorla yenilemeyi tetikler
+    // (POST /api/refresh -> load()) — böylece kullanıcı Render'ın 30 dk'lık pasif
+    // arka plan senkronunu beklemeden en taze yayınlanan veriyi görür. Ucuz: normal
+    // durumda yalnızca GitHub'daki yayınlanan JSON'u tekrar okur, Yahoo'ya gitmez
+    // (bkz. service.js loadPublished/syncData).
+    triggerRefresh();
     // Sayfa arka plandayken (başka sekme/uygulama) çekim yapılmaz: kullanıcı
     // görmüyor, ama sunucu her seferinde ~700 enstrümanın göstergesini
     // hesaplıyor ve telefonda pil yakıyordu. Sayfaya dönülünce hemen tazelenir.
