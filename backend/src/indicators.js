@@ -275,43 +275,69 @@ function likiditeSupuruldu(sl, dipIdx, dipPrice, opts = {}) {
 }
 
 // --- Order Block + FVG Confluence -------------------------------------------
-// Boğa Order Block: impulsif YUKARI kırılımdan hemen önceki son kırmızı mum
-// (kurumsal alım bölgesi adayı). Aranan pencerede EN GÜNCEL olanı döner.
+// Boğa Order Block adayı mı? (impulsif YUKARI kırılımdan hemen önceki son
+// kırmızı mum — kurumsal alım bölgesi adayı). Bar j için tek nokta kontrolü.
+function bogaOBMu(opens, highs, lows, closes, j) {
+  if (closes[j] < opens[j] && closes[j + 1] > highs[j]) {
+    return { top: highs[j], bottom: lows[j], barIdx: j };
+  }
+  return null;
+}
+// Boğa FVG (Fair Value Gap / Dengesizlik) adayı mı? 3 mumluk pencerede
+// ortadaki mum o kadar impulsif ki 1. mumun yükseği ile 3. mumun düşüğü
+// arasında boşluk kalır. Bar i (ortadaki mum) için tek nokta kontrolü.
+function bogaFvgMi(highs, lows, i) {
+  if (highs[i - 1] < lows[i + 1]) {
+    return { top: lows[i + 1], bottom: highs[i - 1], barIdx: i };
+  }
+  return null;
+}
 const OB_FVG_ARAMA_BAR = 60;
-function sonBogaOB(opens, highs, lows, closes, aramaBar = OB_FVG_ARAMA_BAR) {
+// OB, eşleştiği FVG'nin en fazla bu kadar bar ÖNCESİNDE (ya da aynı barda)
+// olmalı — "aynı impulsif hareket" (bacak) şartı.
+const OB_FVG_AYNI_BACAK_BAR = 6;
+// AYNI impulsif hareketten gelen en güncel OB+FVG çiftini arar. Eskiden OB ve
+// FVG birbirinden BAĞIMSIZ "en son"ları alınıp eşleştiriliyordu — bu, tamamen
+// alakasız iki ayrı hareketten gelen bölgeleri rastlantısal çakıştırabilir
+// (sahte confluence) YA DA gerçek çifti kaçırabilirdi (biri diğerinden daha
+// yeni bir OB/FVG'nin gölgesinde kalırsa). Gerçek ICT confluence'ı, aynı
+// displacement mumunun hem OB hem FVG bırakmasından gelir: FVG en güncelden
+// eskiye taranır, her adayın hemen ÖNCESİNDE (OB_FVG_AYNI_BACAK_BAR içinde)
+// bir Boğa OB var mı bakılır — varsa bu, aynı bacaktan gelen gerçek bir çift.
+function sonBogaObFvgCifti(opens, highs, lows, closes, aramaBar = OB_FVG_ARAMA_BAR, ayniBacakBar = OB_FVG_AYNI_BACAK_BAR) {
   const n = closes?.length ?? 0;
+  if (!opens) return null;
   for (let i = n - 2; i >= Math.max(1, n - aramaBar); i--) {
-    if (closes[i] < opens[i] && closes[i + 1] > highs[i]) {
-      return { top: highs[i], bottom: lows[i], barIdx: i };
+    const fvg = bogaFvgMi(highs, lows, i);
+    if (!fvg) continue;
+    for (let j = i; j >= Math.max(1, i - ayniBacakBar); j--) {
+      const ob = bogaOBMu(opens, highs, lows, closes, j);
+      if (ob) return { ob, fvg };
     }
   }
   return null;
 }
-// Boğa FVG (Fair Value Gap / Dengesizlik): 3 mumluk pencerede ortadaki mum o
-// kadar impulsif ki 1. mumun yükseği ile 3. mumun düşüğü arasında boşluk
-// kalır. Aranan pencerede EN GÜNCEL olanı döner.
-function sonBogaFVG(highs, lows, aramaBar = OB_FVG_ARAMA_BAR) {
-  const n = highs?.length ?? 0;
-  for (let i = n - 2; i >= Math.max(1, n - aramaBar); i--) {
-    if (highs[i - 1] < lows[i + 1]) {
-      return { top: lows[i + 1], bottom: highs[i - 1], barIdx: i };
-    }
-  }
-  return null;
-}
-// Confluence: en güncel Boğa OB ile en güncel Boğa FVG ÇAKIŞIYOR mu VE son
-// kapanış bu çakışan bölgenin içinde mi? İkisi aynı anda doğrulanan bölge,
-// SMC'de en güçlü kurumsal ilgi alanı kabul edilir.
-function obFvgConfluence(opens, highs, lows, closes, aramaBar = OB_FVG_ARAMA_BAR) {
+// Confluence: aynı bacaktan gelen OB+FVG çifti ÇAKIŞIYOR mu VE son
+// OB_FVG_TETIK_PENCERE bar içinde kapanış bu çakışan bölgenin içine girmiş mi?
+// İkisi aynı anda doğrulanan bölge, SMC'de en güçlü kurumsal ilgi alanı kabul
+// edilir. "Fiyat o bölgeye girdi mi" kontrolü de tek bara sabit değil, pencereli
+// (bkz. YAPI_ONAY_PENCERE'deki aynı gerekçe).
+const OB_FVG_TETIK_PENCERE = 15;
+function obFvgConfluence(opens, highs, lows, closes, aramaBar = OB_FVG_ARAMA_BAR, tetikPencere = OB_FVG_TETIK_PENCERE) {
   if (!opens) return { var: false, ob: null, fvg: null };
-  const ob = sonBogaOB(opens, highs, lows, closes, aramaBar);
-  const fvg = sonBogaFVG(highs, lows, aramaBar);
-  if (!ob || !fvg) return { var: false, ob, fvg };
+  const cift = sonBogaObFvgCifti(opens, highs, lows, closes, aramaBar);
+  if (!cift) return { var: false, ob: null, fvg: null };
+  const { ob, fvg } = cift;
   const ustSinir = Math.min(ob.top, fvg.top);
   const altSinir = Math.max(ob.bottom, fvg.bottom);
-  const cakisiyor = ustSinir >= altSinir;
-  const son = closes[closes.length - 1];
-  return { var: cakisiyor && son >= altSinir && son <= ustSinir, ob, fvg };
+  if (ustSinir < altSinir) return { var: false, ob, fvg }; // çakışmıyor
+  const n = closes.length;
+  const from = Math.max(0, n - tetikPencere);
+  let girdi = false;
+  for (let i = from; i < n; i++) {
+    if (closes[i] >= altSinir && closes[i] <= ustSinir) { girdi = true; break; }
+  }
+  return { var: girdi, ob, fvg };
 }
 
 // HTF yükseliş — GEVŞEK tanım: haftalık SuperTrend AL.
@@ -350,9 +376,31 @@ export function htfBullish(highs, lows, closes, times, gmtoffset) {
 //   BAĞLAM/KALİTE SÜZGEÇLERİ (şu anki bar):
 //     - kapanış POC'un üstünde (piyasa değer bölgesini kabul etmiş)
 //     - HTF (haftalık) yükseliş
+// Beş koşul (yapiOnayi/likidite/obFvg/pocUstunde/htf) bağımsıza yakın —
+// TAM OLARAK aynı günde hepsinin çakışması nadir: canlı BIST 100 taramasında
+// hepsi-birden 0/101 çıktı (en iyi hisseler 4/5'te takılıyordu, günden güne
+// hangi koşulun eksik olduğu değişiyordu). obFvg'nin aynı-bacak eşleşmesine
+// (bkz. sonBogaObFvgCifti) geçilmesi sinyal kalitesini artırdı ama baz oranını
+// daha da düşürdü — ölçüldü: 5 ve 15 günlük pencerede de 0/101, ancak 30 günde
+// 1/101. Tarama sekmesindeki taramaSonNGun ile AYNI desen: eşikler gevşetilmeden
+// son SMC_GUN_PENCERESI iş günü denenir — ilk (en güncel) geçen gün kullanılır.
+// 30 gün (≈6 hafta), OB/FVG'nin kendisinin arandığı OB_FVG_ARAMA_BAR (60 bar)
+// penceresinin yarısı — "hâlâ yapısal olarak geçerli" kabul edilen bir OB/FVG
+// bölgesine son 6 hafta içinde değinilmiş olması makul bir tazelik eşiği.
+const SMC_GUN_PENCERESI = 30;
 export function smcBullish(highs, lows, closes, volumes, sec = {}) {
-  const d = smcDetay(highs, lows, closes, volumes, sec);
-  return !!d && d.yapiOnayi && d.likidite && d.obFvg && d.pocUstunde && d.htf;
+  const { times, gmtoffset, opens } = sec;
+  const n = closes?.length ?? 0;
+  const kes = (arr, k) => (arr ? arr.slice(0, n - k) : arr);
+  for (let k = 0; k < SMC_GUN_PENCERESI; k++) {
+    if (n - k < 30) break;
+    const d = smcDetay(
+      kes(highs, k), kes(lows, k), kes(closes, k), kes(volumes, k),
+      { times: kes(times, k), gmtoffset, opens: kes(opens, k) },
+    );
+    if (d && d.yapiOnayi && d.likidite && d.obFvg && d.pocUstunde && d.htf) return true;
+  }
+  return false;
 }
 
 // ChoCh kırılımının "yapı onayı" sayılacağı pencere. OB/FVG geri çekilmesi bu
