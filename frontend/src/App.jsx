@@ -395,9 +395,10 @@ function NewsList({ kind }) {
 }
 
 // TARAMA sekmesi iki grup gösterir (Backend /api/alerts tarar):
-//   • ALIM ADAYLARI (BIST 100 + ABD hisseleri): 4 Faktörlü Profesyonel Tarama
-//     Sistemi — Ana Trend + Göreceli Güç + Pullback + Tetik hepsi birden
-//     (bkz. backend/src/indicators.js taramaDetay).
+//   • ALIM ADAYLARI (BIST 100 + ABD hisseleri): WaveTrend Overzone AL sinyali
+//     — son 1 haftalık (5 iş günü) pencerede kurulmuş olması yeterli, hangi
+//     gün kurulduğu (barsAgo) satırda gösterilir (bkz. backend/src/indicators.js
+//     recentSignals).
 //   • KENDİ HİSSELERİM: SuperTrend son barda SAT'a dönen hisselerden Sanal
 //     Borsa portföyünde olanlar. Portföy tarayıcıda durur, sunucuya gitmez —
 //     kesişim burada yapılır.
@@ -547,13 +548,10 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
           {trDate(state.lastBarDate) ? `son seansın (${trDate(state.lastBarDate)})` : 'son seansın'}
         </strong>{' '}
         barı taranır, iki grup:{' '}
-        <strong>Alım adayları</strong> = <strong>4 Faktörlü Profesyonel Tarama Sistemi</strong> — hepsi birden:
-        {' '}<strong>1) Ana Trend</strong> (haftalık kapanış &gt; haftalık EMA 30, günlük kapanış &gt; SMA 200,
-        EMA 50 &gt; SMA 200, SMA 200 yatay/yükseliş eğiminde) <strong>+</strong>{' '}
-        <strong>2) Göreceli Güç</strong> (endeksten — BIST'te XU100, ABD'de S&P 500 — güçlü ayrışma)
-        <strong> +</strong> <strong>3) Pullback</strong> (sağlıklı düzeltme, referans EMA'ya yakın/destekli,
-        aşırı uzamamış) <strong>+</strong> <strong>4) Tetik</strong> (hacim patlaması <strong>+</strong> MACD
-        yukarı kesişimi) — BIST 100 + ABD hisselerinde (NASDAQ-100 + S&P 100);{' '}
+        <strong>Alım adayları</strong> = <code>WaveTrend</code> <strong>Overzone AL</strong> — yeşil çizginin
+        aşırı satım bölgesinde (kırmızı sinyal çizgisi ≤ -50) kırmızıyı yukarı kesmesi; son{' '}
+        <code>1 hafta</code> (5 iş günü) içinde HERHANGİ bir gün kurulmuş olması yeterli — hangi gün
+        kurulduğu satırda (<em>N bar önce</em>) gösterilir — BIST 100 + ABD hisselerinde (NASDAQ-100 + S&P 100);{' '}
         <strong>Kendi hisselerim</strong> = <code>SuperTrend</code> <strong>SAT</strong>'a dönenlerden Sanal
         Borsa portföyünde olanlar. Seans açıkken son bar canlı fiyatla güncellenir (kapanış beklenmeden gün
         içinde görünür); seans kapalıyken son tamamlanan seansın sonucu gösterilmeye devam eder.
@@ -574,10 +572,10 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
         </div>
       ) : (
         <>
-          <div className="alert-group">Alım adayları — 4 Faktörlü Profesyonel Tarama (BIST 100 + ABD)</div>
+          <div className="alert-group">Alım adayları — WaveTrend Overzone AL (son 1 hafta, BIST 100 + ABD)</div>
           {list.length === 0 ? (
             <div className="state">
-              Son seansta dört faktörü (Ana Trend + Göreceli Güç + Pullback + Tetik) birden sağlayan hisse yok.
+              Son 1 haftada Overzone AL sinyali veren hisse yok.
               {warming && ' Bar geçmişi hâlâ hazırlanıyor, birazdan tekrar bakın.'}
             </div>
           ) : (
@@ -984,8 +982,8 @@ export default function App() {
     // değil), o yüzden match yok — UsStocksTab kendi verisini kendi çeker.
     { key: 'us',      label: '🇺🇸 ABD Hisseleri' },
   ];
-  // Üst şerit: haberler + TARAMA (4 Faktörlü Profesyonel Tarama Sistemi;
-  // eskiden "Dikkat Çekenler", öncesinde KAP'ın yerini almıştı).
+  // Üst şerit: haberler + TARAMA (WaveTrend Overzone AL taraması; eskiden
+  // "Dikkat Çekenler", öncesinde KAP'ın yerini almıştı).
   // Anahtar 'uyari' olarak kaldı: localStorage'daki görülmüş sinyal kaydı
   // (alertsSeen) ve blink mantığı buna bağlı, etiket değişikliği onları
   // etkilemesin.

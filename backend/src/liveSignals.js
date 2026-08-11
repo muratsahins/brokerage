@@ -41,21 +41,9 @@ let filling = false;
 // ABD tarafında Yahoo sembolü ticker'ın kendisi (AAPL). Ticker çakışması yok
 // (kontrol edildi: 627 BIST / 172 ABD, kesişim boş) — önbellek düz bir Map
 // olduğu için liste büyürse bu yeniden doğrulanmalı.
-// Tarama sekmesinin Göreceli Güç (RS) filtresi için karşılaştırma endeksleri.
-// Aynı önbellek/canlı-yama altyapısını paylaşsınlar diye normal birer "enstrüman"
-// gibi eklendi — ayrı bir çekim/önbellek mekanizması gerekmedi. Ticker'lar "__"
-// ile sarılı ki gerçek bir hisse koduyla asla çakışmasın.
-const BENCHMARKS = [
-  { ticker: '__XU100__', symbol: 'XU100.IS', kind: 'benchmark' }, // BIST 100 endeksi
-  { ticker: '__SPX__', symbol: '^GSPC', kind: 'benchmark' },      // S&P 500 (ABD hisseleri için)
-];
-export const XU100_TICKER = '__XU100__';
-export const SPX_TICKER = '__SPX__';
-
 const SERIES_INSTRUMENTS = [
   ...INSTRUMENTS.filter((i) => i.kind !== 'metal'),
   ...US_STOCKS.map((u) => ({ ticker: u.ticker, symbol: u.ticker, kind: 'us' })),
-  ...BENCHMARKS,
 ];
 const SERIES_TOTAL = SERIES_INSTRUMENTS.length;
 

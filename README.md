@@ -55,31 +55,23 @@ npm start                 # http://localhost:4000
 - **Tarama** (`/api/alerts`): taranan evren **BIST 100 + Maden & Emtia +
   ABD hisseleri** (NASDAQ-100 + S&P 100) — bar geçmişi üçü için de aynı
   önbellekte tutulur, ek istek gerekmez. Günlük grafikte **iki grup** döner —
-  `items` = **alım adayları**: **4 Faktörlü Profesyonel Tarama Sistemi**
-  (`backend/src/indicators.js` → `taramaDetay`), KATI VE — dördü birden
-  sağlanmayınca liste dışı kalır:
-  1. **Ana Trend** (Weinstein Stage Analysis) — haftalık kapanış > haftalık
-     EMA(30), günlük kapanış > SMA(200), EMA(50) > SMA(200), SMA(200)
-     yatay/yükseliş eğiminde (düşen bıçak filtresi).
-  2. **Göreceli Güç** (IBD RS Line) — hissenin getirisi karşılaştırma
-     endeksinden (BIST'te `XU100.IS`, ABD'de `^GSPC`) yüksek VE Fiyat/Endeks
-     oranı kendi ortalamasının üstünde ve yükselişte.
-  3. **Pullback** (Minervini VCP) — referans EMA'ya (21) yakın veya ATR
-     cinsinden aşırı uzamamış, 52 haftalık zirveden çok uzak değil, referans
-     EMA yükselişte.
-  4. **Tetik** — hacim ortalamasının 1.5 katı + yükselen gün + MACD son
-     birkaç barda sinyal çizgisini yukarı kesmiş.
+  `items` = **alım adayları**: **WaveTrend Overzone AL** sinyali
+  (`backend/src/indicators.js` → `recentSignals` → `oz`) — yeşil çizginin
+  aşırı satım bölgesinde (kırmızı sinyal çizgisi ≤ -50) kırmızıyı yukarı
+  kesmesi. Kalıcı bir durum değil, sinyalin OLUŞTUĞU barı arar; son
+  `OVERZONE_GUN_PENCERESI` iş günü (varsayılan 5, ~1 hafta) içinde herhangi
+  bir gün kurulmuşsa yakalanır, hangi gün kurulduğu (`barsAgo`) döner.
 
-  Karşılaştırma endeksleri normal birer enstrüman gibi `liveSignals.js`'in
-  ortak bar önbelleğinde tutulur (`__XU100__`/`__SPX__`), ek çekim gerekmez.
   `stSell` = `SuperTrend`in **son barda SAT'a döndüğü** hisseler.
   Arayüz `stSell`i kullanıcının **Sanal Borsa portföyüyle kesiştirir** ("kendi
   hisselerim" — satış uyarısı); portföy tarayıcıda durduğu için sunucuya
   gönderilmez, süzme istemcide yapılır. Bar geçmişini kullanır, **ek veri
   çekmez**. Son bar canlı fiyatla güncellendiği için sinyal, günlük kapanış
-  beklenmeden gün içinde görünür. **Yalnızca BUGÜN**: son barı bugüne (borsa saati, `EXCHANGE_GMT_OFFSET`
-  varsayılan UTC+3) ait olmayan hisse taranmaz; bugün seans yoksa liste boş döner
-  (`lastBarDate` son seansın tarihini söyler). Liste tavanı `ALERT_MAX_ITEMS` (600).
+  beklenmeden gün içinde görünür. Her hisse **kendi grubunun (BIST/ABD) en
+  güncel barına** göre değerlendirilir — duvar saatine göre "bugün" değil;
+  seans kapalıyken (mesai dışı, hafta sonu, tatil) son tamamlanan seansın
+  sonucu gösterilmeye devam eder (`lastBarDate` bu tarihi söyler). Liste
+  tavanı `ALERT_MAX_ITEMS` (600).
   Arayüzde tarama sekme kapalıyken de sürer: görülmemiş yeni sinyal varsa **UYARI
   sekmesi yanıp söner** (rozette sayısı yazar), sekme açılıp sayfa görünür
   olduğunda söner. Görülenler tarayıcıda (`localStorage: alertsSeen`) tutulur ve

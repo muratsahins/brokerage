@@ -3,32 +3,21 @@
 //   Taranan evren: BIST 100 + Maden & Emtia + ABD hisseleri (NASDAQ-100 +
 //   S&P 100) — bar geçmişi üçü için de aynı önbellekte tutulur (liveSignals.js).
 //
-//   items  (ALIM ADAYLARI): 4 Faktörlü Profesyonel Tarama Sistemi
-//          (bkz. indicators.js taramaDetay) — KATI VE, dördü birden
-//          sağlanmayan hisse listeye girmez:
-//            1) Ana Trend    — haftalık kapanış > haftalık EMA(30), günlük
-//               kapanış > SMA(200), EMA(50) > SMA(200), SMA(200) yatay/
-//               yükseliş eğiminde (düşen bıçak filtresi).
-//            2) Göreceli Güç — hissenin getirisi karşılaştırma endeksinden
-//               (BIST'te XU100, ABD'de S&P 500) yüksek VE Fiyat/Endeks oranı
-//               (RS çizgisi) kendi ortalamasının üstünde ve yükselişte.
-//            3) Pullback     — referans EMA'ya (21) yakın veya ATR cinsinden
-//               aşırı uzamamış, 52 haftalık zirveden çok uzak değil, referans
-//               EMA yükselişte.
-//            4) Tetik        — hacim ortalamasının 1.5 katı + yükselen gün +
-//               MACD son birkaç barda sinyal çizgisini yukarı kesmiş.
-//          Dördünün TAM OLARAK aynı günde çakışması istatistiksel olarak çok
-//          nadir (~%0,02) — eşikleri gevşetmeden pratik isabeti artırmak için
-//          son 5 iş günü (bugünden geriye, bir haftalık pencere) taranır
-//          (bkz. taramaSonNGun).
+//   items  (ALIM ADAYLARI): WaveTrend OVERZONE AL sinyali — WaveTrend'in
+//          (LazyBear) yeşil çizgisi, AŞIRI SATIM bölgesinde (kırmızı sinyal
+//          çizgisi <= -50) yukarı kestiğinde kurulur (bkz. indicators.js
+//          recentSignals -> oz). Kalıcı bir durum değil, sinyalin OLUŞTUĞU
+//          BARI arar; son OVERZONE_GUN_PENCERESI iş günü (1 haftalık pencere)
+//          içinde herhangi bir gün kurulmuşsa yakalanır ve o günün kaç bar
+//          önce olduğu (barsAgo) döner.
 //          Bilgi amaçlı SuperTrend durumu da eklenir (süzgeç değil).
 //   stSell (SATIŞ UYARISI adayları): SuperTrend'in SON BARDA SAT'a döndüğü
 //          hisseler. Arayüz bunu kullanıcının Sanal Borsa portföyüyle kesiştirir
 //          ("kendi hisselerim"); portföy tarayıcıda durduğu için sunucuya
 //          gönderilmez, süzme istemcide yapılır.
 //
-// stSell'de "yeni" = kalıcı durum değil, sinyalin OLUŞTUĞU bar; items'ta ise
-// o ANKİ durum (4 Faktörlü Tarama bir kesişim değil, bir durum taramasıdır).
+// İkisi de sinyalin OLUŞTUĞU barı arar (kalıcı durum değil); barsAgo bu yüzden
+// arayüzde gösterilir — "AL" rozeti bugünün sinyali olmayabilir.
 // İkisinde de son bar, hissenin AİT OLDUĞU GRUBUN (BIST/ABD) en güncel barı
 // olmalıdır — duvar saatine göre "bugün" değil. Seans kapalıyken (mesai dışı,
 // hafta sonu, tatil) son tamamlanan seansın sonucu gösterilmeye devam eder;
@@ -40,14 +29,12 @@
 
 import { INSTRUMENTS } from './stocks.js';
 import { US_STOCKS } from './usStocks.js';
-import { recentSignals, supertrendSignal, taramaSonNGun } from './indicators.js';
-import { liveDailySeries, XU100_TICKER, SPX_TICKER } from './liveSignals.js';
+import { recentSignals, supertrendSignal } from './indicators.js';
+import { liveDailySeries } from './liveSignals.js';
 
-// 4 Faktörlü Tarama kaç gün geriye kadar (bugünden başlayarak) denenir.
-// 5 gün ~ bir haftalık işlem takvimi: dört bağımsız koşulun aynı günde
-// çakışması nadir olduğundan (bkz. indicators.js taramaSonNGun), pencere
-// haftalık işlem günü sayısına genişletilerek aday sayısı artırılır.
-const TARAMA_GUN_PENCERESI = Number(process.env.TARAMA_GUN_PENCERESI ?? 5);
+// Overzone AL taraması kaç iş günü geriye kadar denenir. 5 gün ~ bir haftalık
+// işlem takvimi.
+const OVERZONE_GUN_PENCERESI = Number(process.env.OVERZONE_GUN_PENCERESI ?? 5);
 
 // Taranan evren: BIST (+ maden/emtia) ile ABD hisseleri (ayrı bir ticker
 // kümesi — ".IS" eki yok, isim/sektör de yok; sadece görüntü için aşağıda
@@ -57,7 +44,7 @@ const SCAN_INSTRUMENTS = [...INSTRUMENTS, ...US_STOCKS.map((u) => ({ ticker: u.t
 // Uyarı satırında isim/sektör göstermek için (frontend BIST dışı ticker'ları
 // kendi listesinde bulamaz — /api/recommendations yalnızca BIST taşır).
 const META = new Map([...INSTRUMENTS, ...US_STOCKS].map((i) => [i.ticker, i]));
-// Göreceli Güç filtresi hangi endeksle kıyaslanacağını bu kümeden anlar.
+// Hangi hisseler ABD grubunda — grup bazlı tazelik kontrolü bunu kullanır.
 const US_TICKER_SET = new Set(US_STOCKS.map((u) => u.ticker));
 
 // Satış uyarısı (SuperTrend dönüşü) kaç bar geriye kadar "yeni" sayılır.
@@ -68,7 +55,7 @@ const MAX_ITEMS = Number(process.env.ALERT_MAX_ITEMS ?? 600);
 const DEFAULT_OFF = Number(process.env.EXCHANGE_GMT_OFFSET ?? 10800);
 
 const IND_LABEL = {
-  trend: 'Ana Trend', rs: 'Göreceli Güç', pullback: 'Pullback', tetik: 'Tetik', st: 'SuperTrend',
+  oz: 'Overzone', st: 'SuperTrend',
 };
 
 // Tüm enstrümanları tarar; hisse başına tek kayıt döner.
@@ -81,17 +68,12 @@ const IND_LABEL = {
 // durdurulmuş, yeniden başlatma sonrası veri gelmemiş) o hisse elenir, ama
 // grup genelinde seans kapalıyken de son tamamlanan seansın sonucu gösterilir.
 function scan() {
-  const items = [];   // alım adayları (4 Faktörlü Tarama)
+  const items = [];   // alım adayları (Overzone AL)
   const stSell = [];  // SuperTrend SAT dönüşü — portföy süzgeci istemcide
   let ready = 0;
 
   const day = (ts, off) => Math.floor((ts + (off ?? 0)) / 86400);
   const iso = (ts, off) => new Date((ts + (off ?? 0)) * 1000).toISOString().slice(0, 10);
-
-  // Göreceli Güç karşılaştırma endeksleri — enstrümanlarla AYNI önbellekten
-  // (liveSignals.js) gelir, ek çekim gerekmez.
-  const xu100 = liveDailySeries(XU100_TICKER);
-  const spx = liveDailySeries(SPX_TICKER);
 
   const series = [];
   // En güncel bar HER GRUP (BIST/ABD) için AYRI izlenir (bkz. yukarıdaki not).
@@ -117,39 +99,36 @@ function scan() {
     const off = s.gmtoffset ?? DEFAULT_OFF;
     if (s.lastTs == null || day(s.lastTs, off) !== grupGunu(inst.ticker)) continue;
 
-    // ALIM ADAYI: 4 Faktörlü Profesyonel Tarama — Ana Trend + Göreceli Güç +
-    // Pullback + Tetik hepsi birden (bkz. indicators.js taramaDetay). Yetersiz
-    // geçmişte (ör. yeni IPO, ~225 günden az bar) taramaDetay null döner.
-    const benchCloses = (US_TICKER_SET.has(inst.ticker) ? spx : xu100)?.close;
-    const tarama = taramaSonNGun(s, benchCloses, TARAMA_GUN_PENCERESI);
-    if (tarama?.pass) {
+    // Sinyalin OLUŞTUĞU barı son OVERZONE_GUN_PENCERESI gün içinde arar.
+    const r = recentSignals(s.high, s.low, s.close, OVERZONE_GUN_PENCERESI);
+
+    // ALIM ADAYI: WaveTrend Overzone AL (aşırı satımda yukarı kesişim).
+    if (r.oz && r.oz.dir === 'AL') {
       const stState = supertrendSignal(s.high, s.low, s.close); // bilgi amaçlı trend
       items.push({
         ticker: inst.ticker,
         name: META.get(inst.ticker)?.name ?? null, // ABD hisseleri BIST listesinde yok, istemci join edemez
         grup: 'al',
         dir: 'AL',
-        barsAgo: tarama.barsAgo, // durum taraması — kaç gün önce (0=bugün, 1=dün...) sağlanmış
+        barsAgo: r.oz.barsAgo, // kaç gün önce (0=bugün, 1=dün...) kuruldu
         signals: [
-          { ind: 'trend', indLabel: IND_LABEL.trend, dir: 'AL', state: true },
-          { ind: 'rs', indLabel: IND_LABEL.rs, dir: 'AL', state: true },
-          { ind: 'pullback', indLabel: IND_LABEL.pullback, dir: 'AL', state: true },
-          { ind: 'tetik', indLabel: IND_LABEL.tetik, dir: 'AL', state: true },
+          { ind: 'oz', indLabel: IND_LABEL.oz, dir: 'AL', barsAgo: r.oz.barsAgo },
           ...(stState ? [{ ind: 'st', indLabel: IND_LABEL.st, dir: stState, state: true }] : []),
         ],
       });
     }
 
     // SATIŞ UYARISI adayı: SuperTrend son barda SAT'a döndü. (Arayüz portföyle
-    // kesiştirir; burada tüm hisseler için üretilir.)
-    const r = recentSignals(s.high, s.low, s.close, LOOKBACK);
-    if (r.st && r.st.dir === 'SAT') {
+    // kesiştirir; burada tüm hisseler için üretilir.) LOOKBACK farklı (varsayılan
+    // 1 bar) olduğu için ayrı bir çağrı gerekir.
+    const rSat = LOOKBACK === OVERZONE_GUN_PENCERESI ? r : recentSignals(s.high, s.low, s.close, LOOKBACK);
+    if (rSat.st && rSat.st.dir === 'SAT') {
       stSell.push({
         ticker: inst.ticker,
         grup: 'pf',
         dir: 'SAT',
-        barsAgo: r.st.barsAgo,
-        signals: [{ ind: 'st', indLabel: IND_LABEL.st, dir: 'SAT', barsAgo: r.st.barsAgo }],
+        barsAgo: rSat.st.barsAgo,
+        signals: [{ ind: 'st', indLabel: IND_LABEL.st, dir: 'SAT', barsAgo: rSat.st.barsAgo }],
       });
     }
   }
