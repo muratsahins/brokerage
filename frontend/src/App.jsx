@@ -395,10 +395,12 @@ function NewsList({ kind }) {
 }
 
 // BIST TARAMA sekmesi iki grup gösterir (Backend /api/alerts tarar):
-//   • ALIM ADAYLARI (yalnızca BIST 100): Göreceli Güç Çekirdekli
-//     Momentum/Pullback Sistemi — top %20 RS sıralaması + yön filtresi
-//     (reel/relative bazda) + basit geri çekilme girişi, hepsi birden
+//   • ALIM ADAYLARI (yalnızca BIST 100 hisseleri; maden/emtia hariç): Göreceli
+//     Güç Çekirdekli Momentum/Pullback Sistemi — top %20 RS sıralaması + yön
+//     filtresi (reel/relative bazda) + basit geri çekilme girişi, hepsi birden
 //     (bkz. backend/src/alerts.js + indicators.js rsYonFiltresi/rsGirisTetigi).
+//     Sunucu en taze sinyali başa koyar (barsAgo artan); gösterilen stop güncel
+//     bara göre hesaplanır, sinyal barına göre değil.
 //     DÜRÜSTLÜK: ~180 günlük BIST 100 testinde medyan R negatif çıktı —
 //     kanıtlanmış bir kenarı yok, bilgi amaçlı bir tarayıcıdır.
 //   • KENDİ HİSSELERİM: SuperTrend son barda SAT'a dönen hisselerden Sanal
@@ -537,7 +539,7 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
             </span>
           ))}
           {a.stopSeviye != null && (
-            <span className="alert-sig sat" title="Leg4: ATR tabanlı başlangıç stopu (bilgi amaçlı, otomatik emir değil)">
+            <span className="alert-sig sat" title="Leg4: ATR tabanlı başlangıç stopu — GÜNCEL bara göre hesaplanır (sinyal barına göre değil), yani bugün girilseydi geçerli olacak seviye. Bilgi amaçlı, otomatik emir değil.">
               Stop <strong>{fmtNum(a.stopSeviye)}</strong>
             </span>
           )}
@@ -561,8 +563,12 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
         50 günlük ortalamasının üstünde — nominal TL fiyat değil, enflasyon ortamında ayırt ediciliğini
         kaybeder) <strong>+</strong> <strong>3) Giriş</strong> (kapanış, yükselen 20 günlük ortalamayı yukarı
         kesmiş — basit geri çekilme). Son <code>1 hafta</code> içinde HERHANGİ bir gün üçü birden sağlanmışsa
-        yakalanır; <strong>Stop</strong> etiketi Leg4'ün (risk/çıkış) ATR tabanlı başlangıç stop seviyesi,
-        bilgi amaçlı — otomatik emir değil. Yalnızca <strong>BIST 100</strong> taranır.{' '}
+        yakalanır; liste <strong>en taze sinyal başta</strong> sıralanır (giriş bir zamanlama tetiğidir,
+        değeri günler içinde erir — satırdaki “son bar / N bar önce” etiketine bakın).{' '}
+        <strong>Stop</strong> etiketi Leg4'ün (risk/çıkış) ATR tabanlı başlangıç stop seviyesi;
+        <strong> güncel bara göre</strong> hesaplanır, yani bugün girilseydi geçerli olacak seviyedir —
+        bilgi amaçlı, otomatik emir değil. Yalnızca <strong>BIST 100 hisseleri</strong> taranır
+        (maden ve emtia hariç).{' '}
         <strong>Kendi hisselerim</strong> = <code>SuperTrend</code> <strong>SAT</strong>'a dönenlerden Sanal
         Borsa portföyünde olanlar. Seans açıkken son bar canlı fiyatla güncellenir (kapanış beklenmeden gün
         içinde görünür); seans kapalıyken son tamamlanan seansın sonucu gösterilmeye devam eder.
@@ -585,7 +591,7 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
         </div>
       ) : (
         <>
-          <div className="alert-group">Alım adayları — Göreceli Güç Momentum/Pullback (son 1 hafta, BIST 100)</div>
+          <div className="alert-group">Alım adayları — Göreceli Güç Momentum/Pullback (son 1 hafta, BIST 100 · en taze başta)</div>
           {list.length === 0 ? (
             <div className="state">
               Son 1 haftada üç bacağı (Göreceli Güç + Yön Filtresi + Giriş) birden sağlayan hisse yok.

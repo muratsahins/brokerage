@@ -1,5 +1,5 @@
 // BIST TARAMA — Göreceli Güç Çekirdekli Momentum/Pullback Sistemi.
-// Evren: yalnızca BIST 100 (+ birkaç maden/emtia dışı INSTRUMENTS kalemi).
+// Evren: yalnızca BIST 100 hisseleri — maden ve emtia hariç (bkz. SCAN_INSTRUMENTS).
 // ABD hisseleri bu sekmede taranmıyor — Leg1'in kesitsel sıralaması tek bir
 // endekse (XU100) göre yapılıyor, karışık bir BIST+ABD evreni anlamsız
 // olurdu (aynı yüzdelik dilimde farklı piyasaların hisselerini kıyaslamak).
@@ -19,6 +19,8 @@
 //   Leg4 (risk/çıkış: ATR tabanlı başlangıç stopu, indicators.js
 //   rsBaslangicStopu) bilgi amaçlı `stopSeviye` alanında taşınır — süzgeç
 //   değil, ama tasarımın "asıl bölümü" risk/çıkış olduğu için gösterilir.
+//   GÜNCEL bardan hesaplanır (sinyal barından değil): sinyal günler önce
+//   oluşmuş olabilir, gösterilen stop bugün girildiğinde geçerli olandır.
 //
 //   DÜRÜSTLÜK NOTU: Bu sistem BIST 100 üzerinde ~180 günlük tarihsel test
 //   edildi (46 işlem) — MEDYAN R NEGATİF (−0,26) çıktı, pozitif ortalama
@@ -53,8 +55,15 @@ const TOP_PCT = 0.20; // top yüzde
 // BIST Tarama kaç iş günü geriye kadar denenir (durum taraması, kesişim değil).
 const GUN_PENCERESI = Number(process.env.BIST_TARAMA_GUN_PENCERESI ?? 5);
 
-// Taranan evren: yalnızca BIST (maden/emtia INSTRUMENTS'tan hariç).
-const SCAN_INSTRUMENTS = INSTRUMENTS.filter((i) => i.kind !== 'metal');
+// Taranan evren: yalnızca BIST hisseleri (maden VE emtia hariç).
+// Önceden `kind !== 'metal'` yazıyordu; emtiayı elemediği için BRENT
+// (kind:'emtia', USD, BZ=F) evrene sızıyordu. Sonuçları: Leg1'de "USD petrol
+// getirisi − TL endeks getirisi" gibi anlamsız bir göreceli getiri hesaplanıyor,
+// Leg2'de Brent/XU100 oranına bakılıyor, top %20'deki slotlardan birini işgal
+// edip gerçek bir hisseyi dışarı itebiliyor ve arayüzde "Yalnızca BIST 100
+// taranır" yazarken alım adayı olarak görünebiliyordu. `kind === 'stock'`
+// niyeti doğrudan ifade ediyor: yeni bir kind eklenirse de sessizce sızmaz.
+const SCAN_INSTRUMENTS = INSTRUMENTS.filter((i) => i.kind === 'stock');
 const META = new Map(INSTRUMENTS.map((i) => [i.ticker, i]));
 
 // Satış uyarısı (SuperTrend dönüşü) kaç bar geriye kadar "yeni" sayılır.
@@ -136,7 +145,12 @@ function scan() {
       if (!rsYonFiltresi(c, benchC)) continue;
       if (!rsGirisTetigi(c)) continue;
 
-      const stopSeviye = rsBaslangicStopu(h, l, c);
+      // Stop GÜNCEL bardan hesaplanır, sinyal barından değil. Sinyal 5 gün
+      // önce oluşmuş olabilir (GUN_PENCERESI) ve `kes(..., k)` ile hesaplanan
+      // stop o günkü kapanış−ATR seviyesiydi: bugün girecek kullanıcıya, arada
+      // fiyat stop mesafesi kadar hareket etmişken eski seviyeyi göstermek
+      // yanıltıcıydı. Kullanılabilir olan, bugün girildiğinde geçerli stop.
+      const stopSeviye = rsBaslangicStopu(s.high, s.low, s.close);
       const stState = supertrendSignal(s.high, s.low, s.close); // bilgi amaçlı trend
       items.push({
         ticker: inst.ticker,
@@ -169,7 +183,10 @@ function scan() {
     }
   }
 
-  items.sort((a, b) => a.ticker.localeCompare(b.ticker));
+  // TAZELİK ÖNCE: Leg3 bir zamanlama tetiği ve değeri günler içinde eriyor.
+  // Alfabetik sıralamada 5 gün önceki tetik bugünkünün üstünde çıkabiliyordu;
+  // artık bugün sağlananlar başta, eşitlikte alfabetik.
+  items.sort((a, b) => a.barsAgo - b.barsAgo || a.ticker.localeCompare(b.ticker));
   stSell.sort((a, b) => a.ticker.localeCompare(b.ticker));
 
   const lastBarDate = lastTs != null ? iso(lastTs, lastOff) : null;
