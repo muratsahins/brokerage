@@ -4,7 +4,12 @@ name: BIST verisini yenile
 # veriyi taze bir GitHub runner IP'sinde çekip repoya yayınlıyoruz.
 on:
   schedule:
-    - cron: '0 */3 * * *'   # her 3 saatte bir (UTC)
+    # Dakika 17 — saat başı DEĞİL. Ölçüm: `0 */3 * * *` ile son 12 tur ortalama
+    # 82 dakika (en kötüsü 123 dakika) gecikmeyle başladı, yani veri fiilen 3
+    # saatte bir değil ~4,5 saatte bir tazeleniyordu. Saat başı GitHub'ın en
+    # yoğun anı; tetik o pencereden kaydırıldı. (ABD turu :47'de — ikisi aynı
+    # dosyaya değil ama aynı dala push ediyor, aralarına mesafe kondu.)
+    - cron: '17 */3 * * *'   # her 3 saatte bir, saat:17 (UTC)
   workflow_dispatch:          # elle tetikleme (Actions sekmesinden "Run workflow")
 
 permissions:

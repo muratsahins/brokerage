@@ -7,14 +7,17 @@ name: ABD verisini yenile
 # yayınlanıyor.
 on:
   schedule:
-    # BIST turu her 3 saatte bir tam saatte çalışıyor (00, 03, 06, ...) ve ikisi
-    # de main'e push ediyor. 06:00'da birebir çakışıyorlardı; yarım saat kaydırıldı.
-    # Push adımındaki rebase+tekrar deneme yine de yedek olarak duruyor.
-    - cron: '30 6 * * *'    # her gün 06:30 UTC (hafta sonu dahil taban tur)
+    # Dakika 47 — ne saat başı ne de :30. Ölçüm: saat başına kurulu turlar 50-100
+    # dakika gecikmeyle başlıyor, hatta bazı slotlar tamamen düşüyordu (dün 9
+    # saatlik slottan 7'si çalıştı). Saat başı GitHub'ın en yoğun anı, :30 de
+    # yoğun; tetik ikisinden de kaydırıldı.
+    # BIST turu :17'de ve ikisi de main'e push ediyor — araya 30 dakika kondu.
+    # Push adımındaki tekrar deneme döngüsü yine de yedek olarak duruyor.
+    - cron: '47 6 * * *'    # her gün 06:47 UTC (hafta sonu dahil taban tur)
     # ABD seansı boyunca saatlik: analist hedefi yavaş değişir ama fiyat
     # değiştikçe potansiyel/puan zaten CANLI hesaplanıyor (/api/us-prices);
     # bu tur yalnızca hedef fiyat ve temel verileri tazeler.
-    - cron: '0 13-21 * * 1-5'  # hafta içi 13:00-21:00 UTC, saat başı
+    - cron: '47 13-21 * * 1-5'  # hafta içi 13:47-21:47 UTC, saatte bir
   workflow_dispatch:          # elle tetikleme (Actions sekmesinden "Run workflow")
 
 permissions:

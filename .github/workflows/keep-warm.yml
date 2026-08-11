@@ -4,19 +4,31 @@ name: API'yi uyanık tut
 # uyanması 30-60 sn sürdüğü için o aralıkta gelen ilk ziyaretçi boş ekran
 # bekliyor. Seans saatlerinde düzenli ping atarak servisi ayakta tutuyoruz.
 #
-# Neden 7/24 değil: Render ücretsiz hesabı ayda 750 instance-saat veriyor.
-# Hafta içi 06:00-21:59 UTC ≈ 16 saat × 22 gün ≈ 352 saat —
-# kotanın rahat içinde. Seans dışında zaten fiyat hareket etmediği için
-# servisin uyuması sorun değil; ilk ziyaretçi statik tohum veriyi görür
-# (frontend/scripts/copy-seed.mjs).
+# ÖNEMLİ — neden `*/10` cron DEĞİL: Bu iş akışı önceden `*/10 6-21 * * 1-5` ile
+# kuruluydu (saatte 6 tetik) ama GitHub tetiklerin 6'da 5'ini sessizce
+# düşürüyordu. Ölçüldü: son 30 tur `schedule` olayıydı, hiçbiri iptal değildi ve
+# aralar 52-92 dakikaydı — yani ping fiilen SAATTE BİR atıyordu. Render 15
+# dakikada uyuduğu için servis her saatin ~45 dakikasını uykuda geçiriyor,
+# ziyaretçi cold start bekliyordu. Bu iş akışının var oluş sebebi tam da buydu.
+#
+# Çözüm: zamanlamaya güvenmek yerine ping'i İŞİN İÇİNDE döngüye almak. Tetik
+# 2 saatte bir; tur ise 5 dakikada bir ping atarak seans sonuna kadar sürüyor.
+# Böylece bir tetik gecikse ya da tamamen düşse bile önceki turun döngüsü aradaki
+# boşluğu kapatıyor.
 on:
   schedule:
     # BIST seansı 07:00-15:10 UTC, ABD seansı 13:30-21:00 UTC (yaz/kış kayar).
-    # İkisini birlikte kapsar; ABD sekmesi artık canlı fiyat çektiği için
-    # Render'ın seans ortasında uyuması cold start'a yol açardı.
-    - cron: '*/10 6-21 * * 1-5'   # iki seans boyunca 10 dakikada bir (UTC)
+    # 2 saatte bir tetik: turun kendisi zaten uzun sürdüğü için bu sadece
+    # "döngü ölmüşse yeniden başlat" işlevi görüyor.
+    # Dakika 23: saat başı GitHub'ın en yoğun anı ve gecikmeler orada 1-2 saati
+    # buluyor (veri turlarında ölçüldü); tetik o pencereden kaydırıldı.
+    # 05:23'ten başlıyor — tetik ~60-90 dk gecikse bile 07:00 seans açılışında
+    # servis ayakta oluyor.
+    - cron: '23 5,7,9,11,13,15,17,19 * * 1-5'
   workflow_dispatch:               # elle tetikleme
 
+# Aynı anda tek döngü çalışsın. Yeni tur gelince eskisi iptal edilir; yeni tur
+# hemen ping atmaya başladığı için kapsamada boşluk oluşmaz.
 concurrency:
   group: keep-warm
   cancel-in-progress: true
@@ -24,22 +36,43 @@ concurrency:
 jobs:
   ping:
     runs-on: ubuntu-latest
+    # GitHub'ın iş üst sınırı 6 saat; döngü zaten seans bitince kendi çıkıyor.
+    timeout-minutes: 350
     steps:
       # API adresi repo değişkeniyle (Settings > Variables > API_URL) ezilebilir.
-      - name: /api/health'e ping at
+      - name: Seans boyunca /api/health'e ping at
         env:
           API_URL: ${{ vars.API_URL || 'https://brokerage-api.onrender.com' }}
+          # Render 15 dk'da uyuyor; 5 dk 3 kat pay bırakıyor.
+          ARALIK_SN: 300
+          # Bu saatten (UTC) sonra ping atılmaz. Seans dışında fiyat hareket
+          # etmiyor ve Render'ın ücretsiz kotası (ayda 750 instance-saat)
+          # boşuna yanmasın: hafta içi 06-21 UTC ≈ 16 saat × 22 gün ≈ 352 saat.
+          SON_SAAT: 21
         run: |
-          # Servis uykudaysa ilk istek ~60 sn sürebilir; --max-time bunu kaldırır.
-          # Ping'in kendisi başarısız olsa da iş akışı kırmızıya düşmesin: bu bir
-          # bakım görevi, bildirim gürültüsü üretmesin diye uyarıyla geçiyoruz.
-          for i in 1 2 3; do
-            code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 90 "$API_URL/api/health" || echo 000)
-            if [ "$code" = "200" ]; then
-              echo "API ayakta (deneme $i)."
-              exit 0
+          # Ping başarısızlığı iş akışını kırmızıya düşürmesin: bu bir bakım
+          # görevi, bildirim gürültüsü üretmesin diye uyarıyla geçiyoruz.
+          basarili=0
+          basarisiz=0
+          while true; do
+            saat=$(date -u +%H)
+            # 10#: `08`/`09` sekizlik sayı sanılıp hata vermesin diye onluk taban.
+            if [ "$((10#$saat))" -gt "$SON_SAAT" ]; then
+              echo "Seans penceresi kapandı (UTC $saat:00); döngü bitiyor."
+              break
             fi
-            echo "Deneme $i başarısız (HTTP $code); 15 sn sonra tekrar."
-            sleep 15
+            # Servis uykudaysa ilk istek ~60 sn sürebilir; --max-time bunu kaldırır.
+            kod=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 90 "$API_URL/api/health" || echo 000)
+            if [ "$kod" = "200" ]; then
+              basarili=$((basarili + 1))
+              echo "$(date -u +%H:%M:%S) API ayakta."
+            else
+              basarisiz=$((basarisiz + 1))
+              echo "::warning::$(date -u +%H:%M:%S) API yanıt vermedi (HTTP $kod)."
+            fi
+            sleep "$ARALIK_SN"
           done
-          echo "::warning::API 3 denemede de yanıt vermedi ($API_URL)."
+          echo "Tur özeti: $basarili başarılı, $basarisiz başarısız ping."
+          if [ "$basarili" -eq 0 ]; then
+            echo "::warning::Bu turda hiçbir ping başarılı olmadı ($API_URL)."
+          fi
