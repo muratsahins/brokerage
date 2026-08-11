@@ -16,7 +16,7 @@ import {
   fetchAltinInPrices, fetchSpotMetals, fetchUsdTryRate, metalTryPerGram, fetchUsLivePrices,
 } from './dataSource.js';
 import {
-  supertrendSignal, wavetrendSignals, smcSonNGun,
+  supertrendSignal, wavetrendSignals,
 } from './indicators.js';
 import { priceDerived } from './recommend.js';
 import { usPriceDerived } from './recommendUs.js';
@@ -172,7 +172,7 @@ export function liveDailySeries(ticker) {
 
 // Canlı fiyatlardan gösterge sinyallerini üretir. Yanıt küçük kalsın diye kısa
 // anahtar + yalnızca dolu alanlar: st=SuperTrend, wt=WaveTrend kesişimi,
-// wo=overzone (50-60), smc=SMC yükseliş.
+// wo=overzone (50-60).
 export function computeLiveSignals(prices, bars = {}) {
   const out = {};
   for (const [ticker, p] of Object.entries(prices)) {
@@ -185,8 +185,6 @@ export function computeLiveSignals(prices, bars = {}) {
     const { cross, overzone } = wavetrendSignals(s.highs, s.lows, s.closes);
     if (cross) sig.wt = cross;
     if (overzone) sig.wo = overzone;
-    const smc = smcSonNGun(s.highs, s.lows, s.closes, s.volumes, { times: s.times, gmtoffset: entry.gmtoffset, opens: s.opens });
-    if (smc) { sig.smc = 1; sig.smcBarsAgo = smc.barsAgo; }
     out[ticker] = sig; // boş nesne de anlamlı: "hesaplandı, sinyal yok"
   }
   return out;

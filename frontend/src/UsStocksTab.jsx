@@ -89,7 +89,6 @@ function mergeUsLive(items, live) {
       n.stSignal = s.st ?? null;
       n.wtCrossSignal = s.wt ?? null;
       n.wtSignal = s.wo ?? null;
-      n.smc = !!s.smc;
     }
     const sc = scores[it.ticker];
     if (sc) {

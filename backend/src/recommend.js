@@ -8,7 +8,7 @@
 
 import {
   supertrendSignal, wavetrendSignal, wavetrendCrossSignal,
-  rsiValue, macdBullish, rsiBullishReversal, macdBullCross, smcSonNGun,
+  rsiValue, macdBullish, rsiBullishReversal, macdBullCross,
 } from './indicators.js';
 
 export function clamp01(x) {
@@ -130,12 +130,6 @@ export function scoreQuote(q) {
   const macdBull = macdBullish(q.closes);
   const rsiReversal = rsiBullishReversal(q.closes);   // aşırı satımdan yukarı dönüş
   const macdCross = macdBullCross(q.closes);          // MACD pozitif kesişim
-  // SMC yükseliş yapı kırılımı — bir DURUM taraması (kesişim değil): barsAgo,
-  // rozetin bugüne mi yoksa haftalar önceki bir tetiklenmeye mi ait olduğunu
-  // arayüzde göstermek için taşınır (bkz. indicators.js smcSonNGun).
-  const smcResult = smcSonNGun(q.highs, q.lows, q.closes, q.volumes, { times: q.times, gmtoffset: q.gmtoffset, opens: q.opens });
-  const smc = !!smcResult;
-  const smcBarsAgo = smcResult?.barsAgo ?? null;
 
   return {
     symbol: q.symbol,
@@ -165,8 +159,6 @@ export function scoreQuote(q) {
     macdBull,           // MACD mavi çizgi sinyal çizgisinin üstünde mi
     rsiReversal,   // RSI aşırı satımdan (30 altı) yukarı dönüş
     macdCross,     // MACD pozitif kesişim (sıfır çizgisi şartsız)
-    smc,           // SMC yükseliş (likidite süpürme + yapı kırılımı)
-    smcBarsAgo,    // smc true ise kaç iş günü önce tetiklendi (0=bugün); değilse null
   };
 }
 
