@@ -1,7 +1,3 @@
-import OTHER_STOCKS_DATA from './other-stocks.js';
-// eslint-disable-next-line no-unused-vars -- kripto kapalı; liste geri açmak için duruyor
-import CRYPTOS from './crypto.js';
-
 // Takip edilen BIST hisseleri. `bist` alanı, hissenin ait olduğu EN DAR endeksi
 // belirtir (30 ⊂ 50 ⊂ 100). Frontend sekmeleri bunu iç içe filtre olarak kullanır:
 //   BIST 30  -> bist === 30
@@ -116,10 +112,6 @@ export const BIST_STOCKS = [
   { ticker: 'ZOREN', name: 'Zorlu Enerji',           sector: 'Enerji',        bist: 100 },
 ];
 
-// BIST 30/50/100 DIŞINDAKİ diğer hisseler (bist: null -> "Diğer" sekmesi).
-// Tam BIST evreni; other-stocks.js otomatik üretilir (finans.mynet.com listesi).
-export const OTHER_STOCKS = OTHER_STOCKS_DATA;
-
 // Kıymetli madenler (Yahoo vadeli sembolleri, USD/ons). Analist hedefi yoktur;
 // yalnızca fiyat, değişim ve teknik göstergeler (WaveTrend/SuperTrend) gösterilir.
 // altinInName: altin.in'deki alış/satış satırının adı (o metal orada yoksa null).
@@ -130,27 +122,23 @@ export const METALS = [
   { ticker: 'XPD', name: 'Paladyum', symbol: 'PA=F', currency: 'USD', altinInName: null },
 ];
 
-// Emtia: kıymetli madenler gibi USD fiyatlı, ama TROY ONS değil kendi birimi
-// üzerinden (Brent = varil). Bu yüzden ayrı bir `kind`: metal mantığı fiyatı
-// 31,1035'e bölüp ₺/gram üretiyor, varilde bu anlamsız olurdu. Arayüzde
-// Maden & Emtia sekmesinde birlikte listelenirler.
-export const COMMODITIES = [
-  { ticker: 'BRENT', name: 'Brent Petrol', symbol: 'BZ=F', currency: 'USD', unit: 'varil' },
-];
-
 // Fiyat/gösterge çekimi için birleşik enstrüman listesi. Her enstrümanın açık
 // Yahoo `symbol`'ü, `currency`'si ve `kind`'i (stock/metal) vardır.
-// TARAMA KAPSAMI: BIST 100 + Maden & Emtia + (ayrı hatta) ABD hisseleri.
-// KRİPTO KAPALI: sitede hiç görünmemesi istendi. Geri açmak için aşağıdaki
-// satırın yorumunu kaldırmak yeterli (crypto.js ve kind:'crypto' desteği duruyor).
-// DİĞER BIST (endeks dışı ~490 hisse) KAPALI: yalnızca BIST 100 taranır. Geri
-// açmak için aşağıdaki satırın yorumunu kaldırmak yeterli (other-stocks.js duruyor).
+//
+// KAPSAM — sitede YALNIZCA şu üçü var, başkası yok:
+//   1) BIST 100 hisseleri (kind:'stock')
+//   2) Kıymetli madenler (kind:'metal')
+//   3) ABD hisseleri — ayrı hattan gelir (usStocks.js), INSTRUMENTS'ta değil
+//
+// Kaldırılanlar (kod tamamen silindi, geri açma seçeneği bilinçli olarak yok):
+//   • Endeks dışı ~490 BIST hissesi — other-stocks.js
+//   • Kripto (100 coin) — crypto.js ve kind:'crypto' desteği
+//   • Emtia / Brent Petrol — COMMODITIES ve kind:'emtia' desteği
+// Sanal Borsa'da bu enstrümanlara ait açık pozisyonlar, portföy yüklenirken
+// maliyet fiyatından tasfiye edilir (frontend/src/lib/vb.js VB_RETIRED).
 export const INSTRUMENTS = [
   ...BIST_STOCKS.map((s) => ({ ...s, symbol: `${s.ticker}.IS`, currency: 'TRY', kind: 'stock' })),
-  // ...OTHER_STOCKS.map((s) => ({ ...s, symbol: `${s.ticker}.IS`, currency: 'TRY', bist: null, kind: 'stock' })),
   ...METALS.map((m) => ({ ...m, sector: 'Kıymetli Maden', bist: null, kind: 'metal' })),
-  ...COMMODITIES.map((c) => ({ ...c, sector: 'Emtia', bist: null, kind: 'emtia' })),
-  // ...CRYPTOS.map((c) => ({ ...c, sector: 'Kripto', bist: null, currency: 'USD', kind: 'crypto' })),
 ];
 
 export function toSymbol(ticker) {

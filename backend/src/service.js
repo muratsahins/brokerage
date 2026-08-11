@@ -3,7 +3,7 @@ import {
   fetchQuotes, fetchUsdTryRate, fetchAltinInPrices, fetchSpotMetals, metalTryPerGram,
   fetchUsQuotes,
 } from './dataSource.js';
-import { buildRecommendations, roundPrice } from './recommend.js';
+import { buildRecommendations } from './recommend.js';
 import {
   isDbAvailable,
   upsertStock,
@@ -47,15 +47,12 @@ export async function computeRecommendations() {
   const quotes = await fetchQuotes(INSTRUMENTS);
   const recos = buildRecommendations(quotes);
 
-  // USD fiyatlı enstrümanlar (kıymetli maden, kripto) için TCMB USD/TRY + altin.in.
+  // USD fiyatlı tek enstrüman grubu kıymetli madenler: TCMB USD/TRY + altin.in.
+  // (Kripto ve emtia kaldırıldı — bkz. stocks.js KAPSAM notu.) Bu yüzden
+  // "USD'li var mı" sorusu artık doğrudan "maden var mı" ile aynı.
   const hasMetal = INSTRUMENTS.some((i) => i.kind === 'metal');
-  const hasUsd = INSTRUMENTS.some((i) => i.kind === 'metal' || i.kind === 'crypto' || i.kind === 'emtia');
-  const [usdTry, altinIn, spot] = hasUsd
-    ? await Promise.all([
-      fetchUsdTryRate(),
-      hasMetal ? fetchAltinInPrices() : Promise.resolve({}),
-      hasMetal ? fetchSpotMetals() : Promise.resolve({}),
-    ])
+  const [usdTry, altinIn, spot] = hasMetal
+    ? await Promise.all([fetchUsdTryRate(), fetchAltinInPrices(), fetchSpotMetals()])
     : [null, {}, {}];
 
   return recos.map((r) => {
@@ -108,13 +105,6 @@ export async function computeRecommendations() {
         item.tryPerGramSource = source;
       }
       if (usdTry) item.usdTry = usdTry;
-    }
-    if ((kind === 'crypto' || kind === 'emtia') && item.price != null && usdTry) {
-      // USD fiyatının doğrudan ₺ karşılığı (sanal borsa ve ₺ gösterimi için).
-      // Emtiada birim çevrimi YOK: Brent varil başına, dolayısıyla ₺/varil.
-      item.tryPrice = roundPrice(item.price * usdTry);
-      item.usdTry = usdTry;
-      if (meta.unit) item.unit = meta.unit;
     }
     return item;
   });

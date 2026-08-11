@@ -16,25 +16,27 @@ export function vbSave(email, pf) { try { localStorage.setItem('vb_pf_' + email,
 export function vbUnitPrice(it) {
   if (!it) return null;
   if (it.kind === 'metal') return it.tryPerGram;
-  // ABD hisseleri de USD fiyatlı: emtia/kripto ile aynı desen, ₺ karşılığı
-  // (tryPrice) üzerinden alınıp satılır — portföy tek para biriminde kalır.
-  if (it.kind === 'crypto' || it.kind === 'emtia' || it.kind === 'us-stock') return it.tryPrice;
+  // ABD hisseleri USD fiyatlı: ₺ karşılığı (tryPrice) üzerinden alınıp satılır
+  // — portföy tek para biriminde kalır.
+  if (it.kind === 'us-stock') return it.tryPrice;
   return it.price;
 }
-// İşlem birimi: madende gram, emtiada kendi birimi (Brent = varil), hissede adet.
+// İşlem birimi: madende gram, hissede adet.
 export function vbUnitLabel(it) {
   if (!it) return 'adet';
   if (it.kind === 'metal') return 'gr';
-  if (it.kind === 'emtia') return it.unit || 'birim';
   return 'adet';
 }
 
-// Takip dışı bırakılan enstrümanlar (kripto). Sitede artık yoklar; sanal
+// Takip dışı bırakılan enstrümanlar (kripto + Brent). Sitede artık yoklar; sanal
 // portföyde kalırlarsa fiyatsız görünür ve satılamazlar. Portföy açılırken
 // MALİYET fiyatından tasfiye edilirler: kâr/zarar yaratmaz, para nakde döner.
 // (BIST ticker'larıyla çakışma yok — kontrol edildi.) Başka bir enstrüman
 // takipten çıkarsa ticker'ını buraya eklemek yeterli.
 const VB_RETIRED = new Set([
+  // Emtia: site kapsamı BIST 100 + kıymetli maden + ABD hissesiyle sınırlandı.
+  'BRENT',
+  // Kripto (daha önce kaldırılmıştı).
   'BTC', 'ETH', 'USDT', 'BNB', 'USDC', 'XRP', 'SOL', 'TRX', 'WBT', 'HYPE', 'DOGE',
   'USDS', 'RAIN', 'LEO', 'ZEC', 'XMR', 'XLM', 'ADA', 'CC', 'DAI', 'BCH', 'USD1', 'GRAM',
   'USDE', 'LTC', 'USDG', 'HBAR', 'SHIB', 'SUI', 'AVAX', 'CRO', 'PYUSD', 'BUIDL', 'XAUT',
@@ -62,7 +64,7 @@ export function vbCleanRetired(pf) {
   const refund = cash - pf.cash;
   return {
     pf: { ...pf, cash, positions, history: [...entries, ...(pf.history || [])].slice(0, 100) },
-    note: `${hit.length} kripto pozisyonu (${hit.map(([t]) => t).join(', ')}) artık takip edilmediği için `
+    note: `${hit.length} pozisyon (${hit.map(([t]) => t).join(', ')}) artık takip edilmediği için `
       + `maliyet fiyatından tasfiye edildi; ${fmtNum(refund)} ₺ nakde geçti.`,
   };
 }

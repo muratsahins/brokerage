@@ -1,5 +1,5 @@
 // BIST TARAMA — Göreceli Güç Çekirdekli Momentum/Pullback Sistemi.
-// Evren: yalnızca BIST 100 hisseleri — maden ve emtia hariç (bkz. SCAN_INSTRUMENTS).
+// Evren: yalnızca BIST 100 hisseleri — kıymetli madenler hariç (bkz. SCAN_INSTRUMENTS).
 // ABD hisseleri bu sekmede taranmıyor — Leg1'in kesitsel sıralaması tek bir
 // endekse (XU100) göre yapılıyor, karışık bir BIST+ABD evreni anlamsız
 // olurdu (aynı yüzdelik dilimde farklı piyasaların hisselerini kıyaslamak).
@@ -55,14 +55,11 @@ const TOP_PCT = 0.20; // top yüzde
 // BIST Tarama kaç iş günü geriye kadar denenir (durum taraması, kesişim değil).
 const GUN_PENCERESI = Number(process.env.BIST_TARAMA_GUN_PENCERESI ?? 5);
 
-// Taranan evren: yalnızca BIST hisseleri (maden VE emtia hariç).
-// Önceden `kind !== 'metal'` yazıyordu; emtiayı elemediği için BRENT
-// (kind:'emtia', USD, BZ=F) evrene sızıyordu. Sonuçları: Leg1'de "USD petrol
-// getirisi − TL endeks getirisi" gibi anlamsız bir göreceli getiri hesaplanıyor,
-// Leg2'de Brent/XU100 oranına bakılıyor, top %20'deki slotlardan birini işgal
-// edip gerçek bir hisseyi dışarı itebiliyor ve arayüzde "Yalnızca BIST 100
-// taranır" yazarken alım adayı olarak görünebiliyordu. `kind === 'stock'`
-// niyeti doğrudan ifade ediyor: yeni bir kind eklenirse de sessizce sızmaz.
+// Taranan evren: yalnızca BIST hisseleri (kıymetli madenler hariç).
+// `kind !== 'metal'` yerine `kind === 'stock'`: niyeti doğrudan ifade eder ve
+// INSTRUMENTS'a ileride yeni bir kind eklenirse sessizce sızmaz. (Bu filtre bir
+// dönem emtiayı elemiyordu ve BRENT taramaya karışıyordu; emtia artık siteden
+// tamamen kaldırıldı — bkz. stocks.js KAPSAM notu.)
 const SCAN_INSTRUMENTS = INSTRUMENTS.filter((i) => i.kind === 'stock');
 const META = new Map(INSTRUMENTS.map((i) => [i.ticker, i]));
 

@@ -1,7 +1,7 @@
 // Elle yazılmış, nitel analist raporları — YATIRIM TAVSİYESİ DEĞİLDİR.
 // Yahoo'nun quoteSummary API'si segment/rakip/moat gibi nitel veri vermediği
-// için bu içerik zorunlu olarak statik ve elle bakımlıdır (BIST_STOCKS/
-// other-stocks.js listeleriyle aynı felsefe). Rakamlar en son bilinen yıllık
+// için bu içerik zorunlu olarak statik ve elle bakımlıdır (stocks.js'teki
+// BIST_STOCKS listesiyle aynı felsefe). Rakamlar en son bilinen yıllık
 // rapor verilerine dayalı YAKLAŞIK değerlerdir, gerçek zamanlı değildir —
 // `asOf` alanı bunu her kayıtta açıkça belirtir.
 //

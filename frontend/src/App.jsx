@@ -56,7 +56,6 @@ function mergeLivePrices(data, live) {
         next.tryPerGram = Math.round((p.price / 31.1034768) * it.usdTry * 100) / 100;
       }
     }
-    if ((it.kind === 'crypto' || it.kind === 'emtia') && it.usdTry) next.tryPrice = roundPrice(p.price * it.usdTry);
     // Göstergeler: backend bar geçmişi + canlı fiyattan yeniden hesapladıysa
     // yayınlanan (3 saatte bir) değerlerin üstüne yazılır. Sinyal yoksa alan
     // boştur — bu da "artık sinyal yok" demektir, o yüzden temizlenir.
@@ -395,7 +394,7 @@ function NewsList({ kind }) {
 }
 
 // BIST TARAMA sekmesi iki grup gösterir (Backend /api/alerts tarar):
-//   • ALIM ADAYLARI (yalnızca BIST 100 hisseleri; maden/emtia hariç): Göreceli
+//   • ALIM ADAYLARI (yalnızca BIST 100 hisseleri; kıymetli madenler hariç): Göreceli
 //     Güç Çekirdekli Momentum/Pullback Sistemi — top %20 RS sıralaması + yön
 //     filtresi (reel/relative bazda) + basit geri çekilme girişi, hepsi birden
 //     (bkz. backend/src/alerts.js + indicators.js rsYonFiltresi/rsGirisTetigi).
@@ -568,7 +567,7 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
         <strong>Stop</strong> etiketi Leg4'ün (risk/çıkış) ATR tabanlı başlangıç stop seviyesi;
         <strong> güncel bara göre</strong> hesaplanır, yani bugün girilseydi geçerli olacak seviyedir —
         bilgi amaçlı, otomatik emir değil. Yalnızca <strong>BIST 100 hisseleri</strong> taranır
-        (maden ve emtia hariç).{' '}
+        (kıymetli madenler hariç).{' '}
         <strong>Kendi hisselerim</strong> = <code>SuperTrend</code> <strong>SAT</strong>'a dönenlerden Sanal
         Borsa portföyünde olanlar. Seans açıkken son bar canlı fiyatla güncellenir (kapanış beklenmeden gün
         içinde görünür); seans kapalıyken son tamamlanan seansın sonucu gösterilmeye devam eder.
@@ -730,13 +729,13 @@ function VirtualTrade({ items, onSelect }) {
               <>
                 <span className="vb-gunluk"><Tutar value={gunlukToplam} /> <Pct value={gunlukPct} /></span>
                 {gunlukDisi > 0 && (
-                  <span className="exp-note" title="Maden ve emtiada günlük yüzde USD fiyatın değişimidir; ₺ karşılığı ayrıca döviz kurundan etkilendiği için hesaba katılmıyor.">
+                  <span className="exp-note" title="Madende günlük yüzde USD fiyatın değişimidir; ₺ karşılığı ayrıca döviz kurundan etkilendiği için hesaba katılmıyor.">
                     {gunlukDisi} USD fiyatlı pozisyon hariç
                   </span>
                 )}
               </>
             ) : (
-              <span className="muted-dash" title="Yalnızca USD fiyatlı (maden/emtia/ABD hissesi) pozisyon var; günlük K/Z kur etkisi nedeniyle hesaplanmıyor.">—</span>
+              <span className="muted-dash" title="Yalnızca USD fiyatlı (maden/ABD hissesi) pozisyon var; günlük K/Z kur etkisi nedeniyle hesaplanmıyor.">—</span>
             )}
           </div>
         )}
@@ -989,14 +988,15 @@ export default function App() {
     };
   }, []);
 
-  // Sekmeler: BIST 30/50/100 iç içe (30⊂50⊂100) + ayrı Maden & Emtia sekmesi.
+  // Sekmeler — site kapsamı yalnızca üç grup: BIST 100, kıymetli maden, ABD.
   const TABS = [
     // BIST (tümü), BIST 30 ve BIST 50 sekmeleri kaldırıldı; açılış BIST 100.
+    // Endeks dışı BIST hisseleri de kaldırıldı (backend other-stocks.js silindi).
     { key: 'bist100', label: 'BIST 100',       match: (i) => i.bist != null && i.bist <= 100 },
-    // Emtia (Brent) da bu sekmede listelenir: ikisi de USD fiyatlı, analist
-    // kapsamı olmayan, BIST dışı enstrümanlar.
-    { key: 'metal',   label: 'Maden & Emtia', match: (i) => i.kind === 'metal' || i.kind === 'emtia' },
-    // Kripto kaldırıldı (backend'de de takip listesi dışında — stocks.js).
+    // Emtia (Brent) ve kripto kaldırıldı — backend'de kind:'emtia'/'crypto'
+    // desteğiyle birlikte silindi (stocks.js KAPSAM notu). Bu sekmede artık
+    // yalnızca kıymetli madenler var.
+    { key: 'metal',   label: 'Kıymetli Maden', match: (i) => i.kind === 'metal' },
     // ABD Büyük Şirketler: BIST'ten ayrı bir veri kaynağı (data.items içinde
     // değil), o yüzden match yok — UsStocksTab kendi verisini kendi çeker.
     { key: 'us',      label: '🇺🇸 ABD Hisseleri' },
@@ -1023,9 +1023,10 @@ export default function App() {
   };
   // ABD hisseleri BIST'ten ayrı bir uçtan gelir (usFav). Sanal Borsa'da (ve
   // grafik/alım-satım panelinde) TEK para biriminde kalınsın diye ₺ karşılığı
-  // (tryPrice) burada hesaplanır — metal/emtia/kripto ile AYNI desen. Kur,
-  // BIST verisindeki herhangi bir maden/emtia kaleminden okunur (service.js
-  // her ikisine de usdTry ekliyor).
+  // (tryPrice) burada hesaplanır — kıymetli madenlerle AYNI desen. Kur, BIST
+  // verisindeki herhangi bir maden kaleminden okunur (service.js maden
+  // dalında usdTry ekliyor; emtia/kripto kaldırıldıktan sonra USD'li tek
+  // kaynak orası).
   const usdTryRate = useMemo(
     () => data.items.find((i) => i.usdTry != null)?.usdTry ?? null,
     [data.items],
