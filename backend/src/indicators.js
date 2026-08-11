@@ -284,3 +284,59 @@ function overzoneFrom(w) {
   }
   return signal;
 }
+
+// --- BIST Tarama: Göreceli Güç Çekirdekli Momentum/Pullback Sistemi --------
+// Dört bacaklı bir tasarım (sohbette detaylı özet + backtest var):
+//   Leg1 (kesitsel sıralama, top %20)  — BURADA YOK, tüm evreni aynı anda
+//     gerektirir; bkz. alerts.js scan() (cross-sectional, per-symbol değil).
+//   Leg2 (yön filtresi, reel/relative bazda) — rsYonFiltresi
+//   Leg3 (giriş: basit geri çekilme)          — rsGirisTetigi
+//   Leg4 (risk: ATR tabanlı başlangıç stopu)  — rsBaslangicStopu
+//
+// DÜRÜSTLÜK NOTU: Bu sistem BIST 100 üzerinde ~180 günlük tarihsel test
+// edildi — MEDYAN R NEGATİF çıktı (tipik işlem kayıp), pozitif ortalama
+// birkaç aykırı (outlier) işleme bağımlıydı (KTLEV, ASTOR). Kanıtlanmış bir
+// kenarı YOKTUR — yalnızca bilgi amaçlı bir tarayıcı olarak kullanılmalı.
+const RS_TREND_MA = 50;  // Leg2: yön filtresi MA uzunluğu
+const RS_ENTRY_MA = 20;  // Leg3: giriş MA uzunluğu
+const RS_ATR_LEN = 14;
+const RS_ATR_K = 2.5;    // Leg4: stop/iz süren çarpanı — 3.0 denendi, medyan
+                         // bazda iyileşme sağlamadığı (aşırı-optimizasyon
+                         // olduğu) ölçüldü, 2.5'te bırakıldı.
+
+// Leg2 — Yön filtresi: kapanış/benchmark ORANI, kendi yükselen RS_TREND_MA
+// günlük ortalamasının üstünde mi? (BIST'te benchmark=XU100; nominal fiyat
+// DEĞİL, enflasyon ortamında nominal trend ayırt ediciliğini kaybeder.)
+export function rsYonFiltresi(closes, benchCloses) {
+  const n = closes?.length ?? 0, m = benchCloses?.length ?? 0;
+  const need = RS_TREND_MA + 4;
+  if (n < need || m < need) return false;
+  const k = Math.min(n, m);
+  const ratio = new Array(k);
+  for (let i = 0; i < k; i++) ratio[i] = closes[n - k + i] / benchCloses[m - k + i];
+  const ma = sma(ratio, RS_TREND_MA);
+  const last = k - 1;
+  return ratio[last] > ma[last] && ma[last] > ma[last - 3];
+}
+
+// Leg3 — Giriş: basit geri çekilme. Kapanış, YÜKSELEN RS_ENTRY_MA günlük
+// ortalamayı son barda yukarı kesti mi? Tek ve kaba bir kural (osilatör yok).
+export function rsGirisTetigi(closes) {
+  const n = closes?.length ?? 0;
+  if (n < RS_ENTRY_MA + 4) return false;
+  const ma = sma(closes, RS_ENTRY_MA);
+  const last = n - 1;
+  const rising = ma[last] > ma[last - 3];
+  const crossed = closes[last - 1] <= ma[last - 1] && closes[last] > ma[last];
+  return rising && crossed;
+}
+
+// Leg4 — Başlangıç stopu: Giriş − RS_ATR_K × ATR(14). Hesaplanamazsa null.
+export function rsBaslangicStopu(highs, lows, closes) {
+  const n = closes?.length ?? 0;
+  if (n < RS_ATR_LEN + 1) return null;
+  const atrArr = atr(highs, lows, closes, RS_ATR_LEN);
+  const last = n - 1;
+  if (atrArr[last] == null) return null;
+  return closes[last] - RS_ATR_K * atrArr[last];
+}

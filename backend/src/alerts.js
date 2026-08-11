@@ -1,51 +1,61 @@
-// TARAMA — GÜNLÜK grafikte, İKİ AYRI grup:
+// BIST TARAMA — Göreceli Güç Çekirdekli Momentum/Pullback Sistemi.
+// Evren: yalnızca BIST 100 (+ birkaç maden/emtia dışı INSTRUMENTS kalemi).
+// ABD hisseleri bu sekmede taranmıyor — Leg1'in kesitsel sıralaması tek bir
+// endekse (XU100) göre yapılıyor, karışık bir BIST+ABD evreni anlamsız
+// olurdu (aynı yüzdelik dilimde farklı piyasaların hisselerini kıyaslamak).
 //
-//   Taranan evren: BIST 100 + Maden & Emtia + ABD hisseleri (NASDAQ-100 +
-//   S&P 100) — bar geçmişi üçü için de aynı önbellekte tutulur (liveSignals.js).
+//   items (ALIM ADAYLARI) — üç bacak hepsi birden:
+//     Leg1 — Göreceli Güç sıralaması: evren son N_RS=60 barlık göreceli
+//       getiriye (hisse − XU100) göre sıralanır, en güçlü TOP_PCT=%20'de
+//       kalanlar aday havuzu (bkz. aşağıdaki cross-sectional hesap — bu,
+//       indicators.js'teki per-symbol fonksiyonlardan FARKLI olarak tüm
+//       evreni aynı anda gerektirir).
+//     Leg2 — Yön filtresi (reel/relative bazda): kapanış/XU100 oranı,
+//       yükselen 50 günlük ortalamasının üstünde mi (bkz. indicators.js
+//       rsYonFiltresi). Nominal TL fiyat trendi KULLANILMIYOR — enflasyon
+//       ortamında ayırt ediciliğini kaybeder.
+//     Leg3 — Giriş: basit geri çekilme, kapanış yükselen 20 günlük
+//       ortalamayı yukarı kesmiş mi (bkz. indicators.js rsGirisTetigi).
+//   Leg4 (risk/çıkış: ATR tabanlı başlangıç stopu, indicators.js
+//   rsBaslangicStopu) bilgi amaçlı `stopSeviye` alanında taşınır — süzgeç
+//   değil, ama tasarımın "asıl bölümü" risk/çıkış olduğu için gösterilir.
 //
-//   items  (ALIM ADAYLARI): WaveTrend OVERZONE AL sinyali — WaveTrend'in
-//          (LazyBear) yeşil çizgisi, AŞIRI SATIM bölgesinde (kırmızı sinyal
-//          çizgisi <= -50) yukarı kestiğinde kurulur (bkz. indicators.js
-//          recentSignals -> oz). Kalıcı bir durum değil, sinyalin OLUŞTUĞU
-//          BARI arar; son OVERZONE_GUN_PENCERESI iş günü (1 haftalık pencere)
-//          içinde herhangi bir gün kurulmuşsa yakalanır ve o günün kaç bar
-//          önce olduğu (barsAgo) döner.
-//          Bilgi amaçlı SuperTrend durumu da eklenir (süzgeç değil).
+//   DÜRÜSTLÜK NOTU: Bu sistem BIST 100 üzerinde ~180 günlük tarihsel test
+//   edildi (46 işlem) — MEDYAN R NEGATİF (−0,26) çıktı, pozitif ortalama
+//   1-2 aykırı (outlier) işleme bağımlıydı. Kanıtlanmış bir kenarı YOKTUR;
+//   yalnızca bilgi amaçlı bir tarayıcıdır, YATIRIM TAVSİYESİ DEĞİLDİR.
+//
+//   Sinyal bir DURUM taraması, kesişim değil: "AL" bugünün sinyali olmayabilir
+//   — son GUN_PENCERESI iş günü içinde herhangi bir gün üç bacak birlikte
+//   sağlanmışsa yakalanır, hangi gün olduğu (barsAgo) döner.
+//
 //   stSell (SATIŞ UYARISI adayları): SuperTrend'in SON BARDA SAT'a döndüğü
-//          hisseler. Arayüz bunu kullanıcının Sanal Borsa portföyüyle kesiştirir
-//          ("kendi hisselerim"); portföy tarayıcıda durduğu için sunucuya
-//          gönderilmez, süzme istemcide yapılır.
+//   BIST hisseleri. Arayüz bunu kullanıcının Sanal Borsa portföyüyle
+//   kesiştirir ("kendi hisselerim"); portföy tarayıcıda durduğu için
+//   sunucuya gönderilmez, süzme istemcide yapılır.
 //
-// İkisi de sinyalin OLUŞTUĞU barı arar (kalıcı durum değil); barsAgo bu yüzden
-// arayüzde gösterilir — "AL" rozeti bugünün sinyali olmayabilir.
-// İkisinde de son bar, hissenin AİT OLDUĞU GRUBUN (BIST/ABD) en güncel barı
-// olmalıdır — duvar saatine göre "bugün" değil. Seans kapalıyken (mesai dışı,
-// hafta sonu, tatil) son tamamlanan seansın sonucu gösterilmeye devam eder;
-// yalnızca kendi grubuna göre bayat kalan (ör. işlemi durdurulmuş) hisse elenir.
+//   Son bar, hissenin en güncel barı olmalıdır — duvar saatine göre "bugün"
+//   değil. Seans kapalıyken (mesai dışı, hafta sonu, tatil) son tamamlanan
+//   seansın sonucu gösterilmeye devam eder; yalnızca bayat kalan (ör. işlemi
+//   durdurulmuş) hisse elenir.
 //
 // Veri: liveSignals'ın canlı fiyatla yamalı günlük bar geçmişi — TARAMA için
-// Yahoo'ya EK İSTEK YOK. Son barın kapanışı/hacmi canlı olduğu için sinyal,
-// günlük bar kapanışını beklemeden gün içinde yakalanır.
+// Yahoo'ya EK İSTEK YOK.
 
 import { INSTRUMENTS } from './stocks.js';
-import { US_STOCKS } from './usStocks.js';
-import { recentSignals, supertrendSignal } from './indicators.js';
-import { liveDailySeries } from './liveSignals.js';
+import { recentSignals, supertrendSignal, rsYonFiltresi, rsGirisTetigi, rsBaslangicStopu } from './indicators.js';
+import { liveDailySeries, XU100_TICKER } from './liveSignals.js';
 
-// Overzone AL taraması kaç iş günü geriye kadar denenir. 5 gün ~ bir haftalık
-// işlem takvimi.
-const OVERZONE_GUN_PENCERESI = Number(process.env.OVERZONE_GUN_PENCERESI ?? 5);
+// Leg1 (kesitsel sıralama) parametreleri.
+const N_RS = 60;      // Göreceli Güç lookback (bar)
+const TOP_PCT = 0.20; // top yüzde
 
-// Taranan evren: BIST (+ maden/emtia) ile ABD hisseleri (ayrı bir ticker
-// kümesi — ".IS" eki yok, isim/sektör de yok; sadece görüntü için aşağıda
-// META'dan tamamlanır). Bar geçmişi ikisi için de aynı önbellekte (liveSignals.js
-// SERIES_INSTRUMENTS) tutulduğu için ek istek gerekmez.
-const SCAN_INSTRUMENTS = [...INSTRUMENTS, ...US_STOCKS.map((u) => ({ ticker: u.ticker }))];
-// Uyarı satırında isim/sektör göstermek için (frontend BIST dışı ticker'ları
-// kendi listesinde bulamaz — /api/recommendations yalnızca BIST taşır).
-const META = new Map([...INSTRUMENTS, ...US_STOCKS].map((i) => [i.ticker, i]));
-// Hangi hisseler ABD grubunda — grup bazlı tazelik kontrolü bunu kullanır.
-const US_TICKER_SET = new Set(US_STOCKS.map((u) => u.ticker));
+// BIST Tarama kaç iş günü geriye kadar denenir (durum taraması, kesişim değil).
+const GUN_PENCERESI = Number(process.env.BIST_TARAMA_GUN_PENCERESI ?? 5);
+
+// Taranan evren: yalnızca BIST (maden/emtia INSTRUMENTS'tan hariç).
+const SCAN_INSTRUMENTS = INSTRUMENTS.filter((i) => i.kind !== 'metal');
+const META = new Map(INSTRUMENTS.map((i) => [i.ticker, i]));
 
 // Satış uyarısı (SuperTrend dönüşü) kaç bar geriye kadar "yeni" sayılır.
 const LOOKBACK = Number(process.env.ALERT_LOOKBACK_BARS ?? 1);
@@ -55,30 +65,29 @@ const MAX_ITEMS = Number(process.env.ALERT_MAX_ITEMS ?? 600);
 const DEFAULT_OFF = Number(process.env.EXCHANGE_GMT_OFFSET ?? 10800);
 
 const IND_LABEL = {
-  oz: 'Overzone', st: 'SuperTrend',
+  rs: 'Göreceli Güç', yon: 'Yön Filtresi', giris: 'Giriş', st: 'SuperTrend',
 };
 
+// series'i SONDAN k bar kırpar (geriye dönük gün kontrolü için).
+function kes(arr, k) {
+  return arr ? arr.slice(0, Math.max(0, arr.length - k)) : arr;
+}
+
 // Tüm enstrümanları tarar; hisse başına tek kayıt döner.
-//
-// GRUBUN EN GÜNCEL BARI: BIST ve ABD ayrı saatlerde kapanır, tek bir "bugün"
-// duvar saatiyle kıyaslamak seans kapalıyken (mesai dışı, gece yarısı sonrası,
-// hafta sonu/tatil) listeyi haksız yere boşaltır. Ölçüt bu yüzden MUTLAK
-// "bugün" değil, hissenin kendi grubundaki (BIST/ABD) EN GÜNCEL bar — bir
-// hissenin son barı kendi grubunun geri kalanından daha eskiyse (ör. işlemi
-// durdurulmuş, yeniden başlatma sonrası veri gelmemiş) o hisse elenir, ama
-// grup genelinde seans kapalıyken de son tamamlanan seansın sonucu gösterilir.
 function scan() {
-  const items = [];   // alım adayları (Overzone AL)
+  const items = [];   // alım adayları (RS sistemi)
   const stSell = [];  // SuperTrend SAT dönüşü — portföy süzgeci istemcide
   let ready = 0;
 
   const day = (ts, off) => Math.floor((ts + (off ?? 0)) / 86400);
   const iso = (ts, off) => new Date((ts + (off ?? 0)) * 1000).toISOString().slice(0, 10);
 
+  const xu100 = liveDailySeries(XU100_TICKER);
+  if (!xu100) return { items: [], stSell: [], ready: 0, scanned: 0, lastBarDate: null };
+
   const series = [];
-  // En güncel bar HER GRUP (BIST/ABD) için AYRI izlenir (bkz. yukarıdaki not).
-  let lastDayBist = -Infinity, lastOffBist = DEFAULT_OFF, lastTsBist = null;
-  let lastDayUs = -Infinity, lastOffUs = DEFAULT_OFF, lastTsUs = null;
+  // En güncel bar tek grup için izlenir (evren artık yalnızca BIST).
+  let lastDay = -Infinity, lastOff = DEFAULT_OFF, lastTs = null;
   for (const inst of SCAN_INSTRUMENTS) {
     const s = liveDailySeries(inst.ticker);
     if (!s) continue; // bar geçmişi henüz önbellekte değil
@@ -87,48 +96,75 @@ function scan() {
     if (s.lastTs != null) {
       const off = s.gmtoffset ?? DEFAULT_OFF;
       const d = day(s.lastTs, off);
-      if (US_TICKER_SET.has(inst.ticker)) {
-        if (d > lastDayUs) { lastDayUs = d; lastOffUs = off; lastTsUs = s.lastTs; }
-      } else if (d > lastDayBist) { lastDayBist = d; lastOffBist = off; lastTsBist = s.lastTs; }
+      if (d > lastDay) { lastDay = d; lastOff = off; lastTs = s.lastTs; }
     }
   }
-  const grupGunu = (ticker) => (US_TICKER_SET.has(ticker) ? lastDayUs : lastDayBist);
+
+  // Leg1: her geçmiş gün (k=0..GUN_PENCERESI-1) için kesitsel top-%20 kümesi.
+  // LOOKAHEAD YOK: k gününe ait küme yalnızca o güne kadar kırpılmış veriyle
+  // hesaplanır (seriKirp mantığı).
+  const topSetByK = [];
+  for (let k = 0; k < GUN_PENCERESI; k++) {
+    const benchC = kes(xu100.close, k);
+    const bn = benchC.length;
+    if (bn < N_RS + 5) { topSetByK.push(new Set()); continue; }
+    const endeksGetiri = benchC[bn - 1] / benchC[bn - 1 - N_RS] - 1;
+    const gunluk = [];
+    for (const { inst, s } of series) {
+      const c = kes(s.close, k);
+      const n = c.length;
+      if (n < N_RS + 5) continue;
+      gunluk.push({ ticker: inst.ticker, relRet: (c[n - 1] / c[n - 1 - N_RS] - 1) - endeksGetiri });
+    }
+    gunluk.sort((a, b) => b.relRet - a.relRet);
+    const topN = Math.max(1, Math.round(gunluk.length * TOP_PCT));
+    topSetByK.push(new Set(gunluk.slice(0, topN).map((x) => x.ticker)));
+  }
 
   for (const { inst, s } of series) {
-    // Son barı KENDİ GRUBUNUN en güncel barından eski olan hisseyi atla.
+    // Son barı en güncel bardan eski olan hisseyi atla.
     const off = s.gmtoffset ?? DEFAULT_OFF;
-    if (s.lastTs == null || day(s.lastTs, off) !== grupGunu(inst.ticker)) continue;
+    if (s.lastTs == null || day(s.lastTs, off) !== lastDay) continue;
 
-    // Sinyalin OLUŞTUĞU barı son OVERZONE_GUN_PENCERESI gün içinde arar.
-    const r = recentSignals(s.high, s.low, s.close, OVERZONE_GUN_PENCERESI);
+    // ALIM ADAYI: Leg1 (top %20) + Leg2 (yön filtresi) + Leg3 (giriş) —
+    // son GUN_PENCERESI gün içinde herhangi birinde birlikte sağlanmış mı.
+    // İlk (en güncel) geçen gün kullanılır.
+    for (let k = 0; k < GUN_PENCERESI; k++) {
+      if (!topSetByK[k].has(inst.ticker)) continue;
+      const c = kes(s.close, k), h = kes(s.high, k), l = kes(s.low, k);
+      const benchC = kes(xu100.close, k);
+      if (!rsYonFiltresi(c, benchC)) continue;
+      if (!rsGirisTetigi(c)) continue;
 
-    // ALIM ADAYI: WaveTrend Overzone AL (aşırı satımda yukarı kesişim).
-    if (r.oz && r.oz.dir === 'AL') {
+      const stopSeviye = rsBaslangicStopu(h, l, c);
       const stState = supertrendSignal(s.high, s.low, s.close); // bilgi amaçlı trend
       items.push({
         ticker: inst.ticker,
-        name: META.get(inst.ticker)?.name ?? null, // ABD hisseleri BIST listesinde yok, istemci join edemez
+        name: META.get(inst.ticker)?.name ?? null,
         grup: 'al',
         dir: 'AL',
-        barsAgo: r.oz.barsAgo, // kaç gün önce (0=bugün, 1=dün...) kuruldu
+        barsAgo: k, // durum taraması — kaç gün önce (0=bugün, 1=dün...) sağlanmış
+        stopSeviye, // Leg4: ATR tabanlı başlangıç stopu (bilgi amaçlı)
         signals: [
-          { ind: 'oz', indLabel: IND_LABEL.oz, dir: 'AL', barsAgo: r.oz.barsAgo },
+          { ind: 'rs', indLabel: IND_LABEL.rs, dir: 'AL', state: true },
+          { ind: 'yon', indLabel: IND_LABEL.yon, dir: 'AL', state: true },
+          { ind: 'giris', indLabel: IND_LABEL.giris, dir: 'AL', barsAgo: k },
           ...(stState ? [{ ind: 'st', indLabel: IND_LABEL.st, dir: stState, state: true }] : []),
         ],
       });
+      break;
     }
 
     // SATIŞ UYARISI adayı: SuperTrend son barda SAT'a döndü. (Arayüz portföyle
-    // kesiştirir; burada tüm hisseler için üretilir.) LOOKBACK farklı (varsayılan
-    // 1 bar) olduğu için ayrı bir çağrı gerekir.
-    const rSat = LOOKBACK === OVERZONE_GUN_PENCERESI ? r : recentSignals(s.high, s.low, s.close, LOOKBACK);
-    if (rSat.st && rSat.st.dir === 'SAT') {
+    // kesiştirir; burada tüm hisseler için üretilir.)
+    const r = recentSignals(s.high, s.low, s.close, LOOKBACK);
+    if (r.st && r.st.dir === 'SAT') {
       stSell.push({
         ticker: inst.ticker,
         grup: 'pf',
         dir: 'SAT',
-        barsAgo: rSat.st.barsAgo,
-        signals: [{ ind: 'st', indLabel: IND_LABEL.st, dir: 'SAT', barsAgo: rSat.st.barsAgo }],
+        barsAgo: r.st.barsAgo,
+        signals: [{ ind: 'st', indLabel: IND_LABEL.st, dir: 'SAT', barsAgo: r.st.barsAgo }],
       });
     }
   }
@@ -136,13 +172,9 @@ function scan() {
   items.sort((a, b) => a.ticker.localeCompare(b.ticker));
   stSell.sort((a, b) => a.ticker.localeCompare(b.ticker));
 
-  // Gösterilen sonuçların ait olduğu tarih: BIST/ABD gruplarından hangisinin
-  // en güncel barı daha yeniyse o (genelde ikisi aynı takvim günüdür).
-  const lastOff = lastDayUs > lastDayBist ? lastOffUs : lastOffBist;
-  const lastTs = lastDayUs > lastDayBist ? lastTsUs : lastTsBist;
   const lastBarDate = lastTs != null ? iso(lastTs, lastOff) : null;
-  const scanned = series.filter(({ inst, s }) =>
-    s.lastTs != null && day(s.lastTs, s.gmtoffset ?? DEFAULT_OFF) === grupGunu(inst.ticker)).length;
+  const scanned = series.filter(({ s }) =>
+    s.lastTs != null && day(s.lastTs, s.gmtoffset ?? DEFAULT_OFF) === lastDay).length;
 
   return {
     items: items.slice(0, MAX_ITEMS),

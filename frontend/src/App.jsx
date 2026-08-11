@@ -394,11 +394,13 @@ function NewsList({ kind }) {
   );
 }
 
-// TARAMA sekmesi iki grup gösterir (Backend /api/alerts tarar):
-//   • ALIM ADAYLARI (BIST 100 + ABD hisseleri): WaveTrend Overzone AL sinyali
-//     — son 1 haftalık (5 iş günü) pencerede kurulmuş olması yeterli, hangi
-//     gün kurulduğu (barsAgo) satırda gösterilir (bkz. backend/src/indicators.js
-//     recentSignals).
+// BIST TARAMA sekmesi iki grup gösterir (Backend /api/alerts tarar):
+//   • ALIM ADAYLARI (yalnızca BIST 100): Göreceli Güç Çekirdekli
+//     Momentum/Pullback Sistemi — top %20 RS sıralaması + yön filtresi
+//     (reel/relative bazda) + basit geri çekilme girişi, hepsi birden
+//     (bkz. backend/src/alerts.js + indicators.js rsYonFiltresi/rsGirisTetigi).
+//     DÜRÜSTLÜK: ~180 günlük BIST 100 testinde medyan R negatif çıktı —
+//     kanıtlanmış bir kenarı yok, bilgi amaçlı bir tarayıcıdır.
 //   • KENDİ HİSSELERİM: SuperTrend son barda SAT'a dönen hisselerden Sanal
 //     Borsa portföyünde olanlar. Portföy tarayıcıda durur, sunucuya gitmez —
 //     kesişim burada yapılır.
@@ -534,6 +536,11 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
               {s.state ? ' (trend)' : ''}
             </span>
           ))}
+          {a.stopSeviye != null && (
+            <span className="alert-sig sat" title="Leg4: ATR tabanlı başlangıç stopu (bilgi amaçlı, otomatik emir değil)">
+              Stop <strong>{fmtNum(a.stopSeviye)}</strong>
+            </span>
+          )}
           <span className="news-time">{a.barsAgo === 0 ? 'son bar' : `${a.barsAgo} bar önce`}</span>
         </span>
       </button>
@@ -543,20 +550,26 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
   return (
     <>
       <div className="fav-note">
-        <strong>Tarama</strong> — günlük grafikte{' '}
+        <strong>BIST Tarama</strong> — günlük grafikte{' '}
         <strong>
           {trDate(state.lastBarDate) ? `son seansın (${trDate(state.lastBarDate)})` : 'son seansın'}
         </strong>{' '}
         barı taranır, iki grup:{' '}
-        <strong>Alım adayları</strong> = <code>WaveTrend</code> <strong>Overzone AL</strong> — yeşil çizginin
-        aşırı satım bölgesinde (kırmızı sinyal çizgisi ≤ -50) kırmızıyı yukarı kesmesi; son{' '}
-        <code>1 hafta</code> (5 iş günü) içinde HERHANGİ bir gün kurulmuş olması yeterli — hangi gün
-        kurulduğu satırda (<em>N bar önce</em>) gösterilir — BIST 100 + ABD hisselerinde (NASDAQ-100 + S&P 100);{' '}
+        <strong>Alım adayları</strong> = <strong>Göreceli Güç Çekirdekli Momentum/Pullback Sistemi</strong> —
+        üç bacak birden: <strong>1) Göreceli Güç</strong> (son 60 barlık getiride BIST 100 içinde en güçlü
+        %20'de olmak) <strong>+</strong> <strong>2) Yön Filtresi</strong> (kapanış/XU100 oranı, yükselen
+        50 günlük ortalamasının üstünde — nominal TL fiyat değil, enflasyon ortamında ayırt ediciliğini
+        kaybeder) <strong>+</strong> <strong>3) Giriş</strong> (kapanış, yükselen 20 günlük ortalamayı yukarı
+        kesmiş — basit geri çekilme). Son <code>1 hafta</code> içinde HERHANGİ bir gün üçü birden sağlanmışsa
+        yakalanır; <strong>Stop</strong> etiketi Leg4'ün (risk/çıkış) ATR tabanlı başlangıç stop seviyesi,
+        bilgi amaçlı — otomatik emir değil. Yalnızca <strong>BIST 100</strong> taranır.{' '}
         <strong>Kendi hisselerim</strong> = <code>SuperTrend</code> <strong>SAT</strong>'a dönenlerden Sanal
         Borsa portföyünde olanlar. Seans açıkken son bar canlı fiyatla güncellenir (kapanış beklenmeden gün
         içinde görünür); seans kapalıyken son tamamlanan seansın sonucu gösterilmeye devam eder.
         {state.stats && ` (${state.stats.scanned} hisse son seansta tarandı.)`}
-        <span className="muted-dash"> Yatırım tavsiyesi değildir.</span>
+        <span className="muted-dash"> DÜRÜSTLÜK: bu sistem ~180 günlük BIST 100 tarihsel testinde MEDYAN
+        R negatif çıktı (tipik işlem kayıp) — kanıtlanmış bir kenarı yok, pozitif ortalama 1-2 aykırı
+        işleme bağımlıydı. Bilgi amaçlıdır, yatırım tavsiyesi değildir.</span>
       </div>
 
       <div className="filters">
@@ -572,10 +585,10 @@ function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
         </div>
       ) : (
         <>
-          <div className="alert-group">Alım adayları — WaveTrend Overzone AL (son 1 hafta, BIST 100 + ABD)</div>
+          <div className="alert-group">Alım adayları — Göreceli Güç Momentum/Pullback (son 1 hafta, BIST 100)</div>
           {list.length === 0 ? (
             <div className="state">
-              Son 1 haftada Overzone AL sinyali veren hisse yok.
+              Son 1 haftada üç bacağı (Göreceli Güç + Yön Filtresi + Giriş) birden sağlayan hisse yok.
               {warming && ' Bar geçmişi hâlâ hazırlanıyor, birazdan tekrar bakın.'}
             </div>
           ) : (
@@ -982,12 +995,13 @@ export default function App() {
     // değil), o yüzden match yok — UsStocksTab kendi verisini kendi çeker.
     { key: 'us',      label: '🇺🇸 ABD Hisseleri' },
   ];
-  // Üst şerit: haberler + TARAMA (WaveTrend Overzone AL taraması; eskiden
-  // "Dikkat Çekenler", öncesinde KAP'ın yerini almıştı).
+  // Üst şerit: haberler + BIST TARAMA (Göreceli Güç Çekirdekli
+  // Momentum/Pullback Sistemi, yalnızca BIST 100; eskiden "Dikkat Çekenler",
+  // öncesinde KAP'ın yerini almıştı).
   // Anahtar 'uyari' olarak kaldı: localStorage'daki görülmüş sinyal kaydı
   // (alertsSeen) ve blink mantığı buna bağlı, etiket değişikliği onları
   // etkilemesin.
-  const UYARI_TAB = { key: 'uyari', label: '🔍 Tarama' };
+  const UYARI_TAB = { key: 'uyari', label: '🔍 BIST Tarama' };
   const NEWS_TABS = [
     { key: 'news',  label: '📰 Haberler', news: 'news' },
     UYARI_TAB,

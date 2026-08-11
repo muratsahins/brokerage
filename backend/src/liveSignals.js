@@ -41,9 +41,15 @@ let filling = false;
 // ABD tarafında Yahoo sembolü ticker'ın kendisi (AAPL). Ticker çakışması yok
 // (kontrol edildi: 627 BIST / 172 ABD, kesişim boş) — önbellek düz bir Map
 // olduğu için liste büyürse bu yeniden doğrulanmalı.
+// BIST Tarama'nın Leg1/Leg2 (Göreceli Güç) kesitsel sıralaması için XU100
+// karşılaştırma endeksi — aynı önbellek/canlı-yama altyapısını paylaşsın diye
+// normal bir "enstrüman" gibi eklendi. Ticker "__" ile sarılı ki gerçek bir
+// hisse koduyla asla çakışmasın.
+export const XU100_TICKER = '__XU100__';
 const SERIES_INSTRUMENTS = [
   ...INSTRUMENTS.filter((i) => i.kind !== 'metal'),
   ...US_STOCKS.map((u) => ({ ticker: u.ticker, symbol: u.ticker, kind: 'us' })),
+  { ticker: XU100_TICKER, symbol: 'XU100.IS', kind: 'benchmark' },
 ];
 const SERIES_TOTAL = SERIES_INSTRUMENTS.length;
 
