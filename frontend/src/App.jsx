@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, lazy, memo, Suspense } from 'react';
 import { API_BASE, fmtNum, norm, roundPrice } from './lib/common.js';
 import { Expected, Pct, Tutar } from './lib/ui.jsx';
+import { useModalBack } from './lib/useModalBack.js';
 import {
   VB_START, vbCleanRetired, vbEmail, vbLoad, vbSave, vbTrade, vbUnitLabel, vbUnitPrice,
 } from './lib/vb.js';
@@ -846,6 +847,10 @@ export default function App() {
   });
   const [query, setQuery] = useState('');
   const [chartItem, setChartItem] = useState(null); // grafik pop-up'ı için seçili enstrüman
+  // Grafik açıkken geri tuşu siteden çıkmasın, sadece pop-up'ı kapatsın.
+  // ChartModal'ın İÇİNDE değil burada: pop-up tembel yükleniyor ("Grafik
+  // yükleniyor…" ekranı), geçmiş kaydı dokunur dokunmaz eklensin.
+  useModalBack(chartItem != null, () => setChartItem(null));
   const [gecikti, setGecikti] = useState(false); // fiyat akışı duraklamış mı
   // Görünüm: 'mobile' (kart, yatay scroll yok) | 'web' (tam tablo).
   const [view, setView] = useState(() => {

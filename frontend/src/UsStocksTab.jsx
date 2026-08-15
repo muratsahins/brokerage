@@ -9,6 +9,7 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { API_BASE, fmtNum, norm } from './lib/common.js';
 import { Expected, Pct } from './lib/ui.jsx';
+import { useModalBack } from './lib/useModalBack.js';
 
 // BIST ile aynı grafik bileşeni; aynı tembel parçadan gelir, ikinci bir indirme
 // olmaz. alimSatim=false — ABD fiyatları USD, sanal borsa nakdi ₺.
@@ -338,6 +339,11 @@ export default function UsStocksTab({ view = 'web' }) {
   const [sort, setSort] = useState('score'); // score | ticker
   const [selected, setSelected] = useState(null);
   const [chartItem, setChartItem] = useState(null);
+  // Pop-up açıkken geri tuşu siteden çıkmasın, sadece pop-up'ı kapatsın.
+  // İkisi ayrı ayrı kaydediliyor: rapor açıkken grafiğe de girilebiliyor,
+  // o durumda geri tuşu önce grafiği, sonra raporu kapatır.
+  useModalBack(selected != null, () => setSelected(null));
+  useModalBack(chartItem != null, () => setChartItem(null));
 
   const filtered = useMemo(() => {
     const nq = norm(query.trim());
