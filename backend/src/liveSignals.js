@@ -47,10 +47,23 @@ let filling = false;
 // hisse koduyla asla çakışmasın.
 export const XU100_TICKER = '__XU100__';
 const SERIES_INSTRUMENTS = [
+  // XU100 EN BAŞTA olmalı. BIST Tarama'nın tamamı buna bağlı: alerts.js
+  // scan() endeks serisini bulamazsa hiç taramadan boş dönüyor
+  // ({ ready: 0, scanned: 0 }) ve sekme tamamen boş görünüyor.
+  // Liste sonundayken 273 kalemlik sıralı döngünün (aralarda GAP_MS bekleme)
+  // EN SONUNDA çekiliyordu: her soğuk başlangıçtan sonra ~3-4 dakika boyunca
+  // Tarama boştu, o son istek başarısız olursa bir sonraki tura (15 dk) kadar
+  // boş kalıyordu. Canlıda yaşandı: önbellekte 269/273 varken ready=0.
+  { ticker: XU100_TICKER, symbol: 'XU100.IS', kind: 'benchmark' },
   ...INSTRUMENTS.filter((i) => i.kind !== 'metal'),
   ...US_STOCKS.map((u) => ({ ticker: u.ticker, symbol: u.ticker, kind: 'us' })),
-  { ticker: XU100_TICKER, symbol: 'XU100.IS', kind: 'benchmark' },
 ];
+
+// Karşılaştırma endeksi tek bir HTTP hatasında düşerse TÜM tarama devre dışı
+// kalıyor; tek hisse için aynı şey yalnızca o hisseyi eksiltiyor. Bu yüzden
+// yalnızca endekse yeniden deneme hakkı veriliyor.
+const BENCHMARK_DENEME = 3;
+const BENCHMARK_BEKLEME_MS = 1500;
 const SERIES_TOTAL = SERIES_INSTRUMENTS.length;
 
 export function seriesStats() {
@@ -71,24 +84,39 @@ export async function refreshSeries() {
     for (const inst of SERIES_INSTRUMENTS) {
       const cur = cache.get(inst.ticker);
       if (cur && Date.now() - cur.at < TTL_MS) { skip++; continue; }
-      try {
-        const { bars, meta } = await fetchBars(inst.symbol);
-        if (bars.length) {
-          cache.set(inst.ticker, {
-            open: bars.map((b) => b.open),
-            high: bars.map((b) => b.high),
-            low: bars.map((b) => b.low),
-            close: bars.map((b) => b.close),
-            volume: bars.map((b) => b.volume),
-            time: bars.map((b) => b.ts),
-            lastTs: bars[bars.length - 1].ts,
-            gmtoffset: meta.gmtoffset ?? 0,
-            at: Date.now(),
-          });
-          ok++;
-        } else fail++;
-      } catch {
-        fail++; // bu enstrümanı atla; bir sonraki turda tekrar denenir
+      // fetchBars'ın kendi yeniden denemesi yok: tek HTTP hatası enstrümanı bir
+      // sonraki tura (15 dk) bırakır. Endeks için bu bedel çok yüksek, ona
+      // birkaç deneme hakkı veriliyor; hisseler eskisi gibi tek denemelik.
+      const hak = inst.kind === 'benchmark' ? BENCHMARK_DENEME : 1;
+      let yazildi = false;
+      for (let d = 0; d < hak && !yazildi; d++) {
+        if (d > 0) await sleep(BENCHMARK_BEKLEME_MS * d);
+        try {
+          const { bars, meta } = await fetchBars(inst.symbol);
+          if (bars.length) {
+            cache.set(inst.ticker, {
+              open: bars.map((b) => b.open),
+              high: bars.map((b) => b.high),
+              low: bars.map((b) => b.low),
+              close: bars.map((b) => b.close),
+              volume: bars.map((b) => b.volume),
+              time: bars.map((b) => b.ts),
+              lastTs: bars[bars.length - 1].ts,
+              gmtoffset: meta.gmtoffset ?? 0,
+              at: Date.now(),
+            });
+            ok++;
+            yazildi = true;
+          }
+        } catch { /* son denemeyse aşağıda fail sayılır */ }
+      }
+      if (!yazildi) {
+        fail++;
+        // Endeks düştüyse sessiz kalma: Tarama sekmesi bu yüzden komple boş
+        // görünecek ve sebebi log'suz anlaşılmıyordu.
+        if (inst.kind === 'benchmark') {
+          console.warn(`[live] XU100 endeksi ${hak} denemede alınamadı — BIST Tarama bu tur boş dönecek.`);
+        }
       }
       await sleep(GAP_MS);
     }
@@ -96,7 +124,10 @@ export async function refreshSeries() {
     filling = false;
   }
   if (ok || fail) {
-    console.log(`[live] Bar geçmişi tazelendi — ${ok} yeni, ${skip} taze, ${fail} başarısız (önbellek ${cache.size}/${INSTRUMENTS.length}).`);
+    // Payda SERIES_TOTAL: önbellek SERIES_INSTRUMENTS'ı (BIST + ABD + endeks)
+    // tutuyor, INSTRUMENTS'ı değil. Eskiden "269/104" gibi anlamsız bir oran
+    // basılıyordu ve eksik serinin hangi kümeden olduğunu gizliyordu.
+    console.log(`[live] Bar geçmişi tazelendi — ${ok} yeni, ${skip} taze, ${fail} başarısız (önbellek ${cache.size}/${SERIES_TOTAL}).`);
   }
 }
 
