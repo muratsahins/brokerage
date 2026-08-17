@@ -259,7 +259,7 @@ export default function ChartModal({ item, onClose, alimSatim = true }) {
           wt1s.setData(ws(wt1));
           const wt2s = wtChart.addLineSeries({ color: '#f87171', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
           wt2s.setData(ws(wt2));
-          [60, 50, 0, -50, -60].forEach((lvl) => wt1s.createPriceLine({ price: lvl, color: lvl === 0 ? 'rgba(139,147,161,0.45)' : 'rgba(139,147,161,0.25)', lineWidth: 1, lineStyle: 2 }));
+          [60, 53, 0, -53, -60].forEach((lvl) => wt1s.createPriceLine({ price: lvl, color: lvl === 0 ? 'rgba(139,147,161,0.45)' : 'rgba(139,147,161,0.25)', lineWidth: 1, lineStyle: 2 }));
           panes.push({ chart: wtChart, series: wt1s });
         }
 

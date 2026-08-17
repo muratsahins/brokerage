@@ -1411,7 +1411,7 @@ export default function App() {
           <strong>WaveTrend</strong> (LazyBear WaveTrend Oscillator) ve <strong>SuperTrend</strong>
           (Kıvanç Özbilgiç), günlük fiyat verisinden hesaplanan teknik göstergelerdir.
           <strong>overzone</strong>: yeşil çizgi kırmızı sinyal çizgisini aşırı satım bölgesinde
-          (−50/−60) yukarı kestiğinde <code>AL</code>, aşırı alım bölgesinde (+50/+60) aşağı kestiğinde
+          (−53/−60) yukarı kestiğinde <code>AL</code>, aşırı alım bölgesinde (+53/+60) aşağı kestiğinde
           <code>SAT</code>; ters kesişim olunca boşalır. <strong>WaveTrend</strong>: yeşil çizgi
           kırmızıyı (herhangi bölgede) yukarı kestiğinde <code>AL</code>, aşağı kestiğinde <code>SAT</code>.
           SuperTrend'de fiyat trend çizgisinin üstünde <code>AL</code>, altında <code>SAT</code>.

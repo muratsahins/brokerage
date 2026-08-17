@@ -97,7 +97,7 @@ export function scoreUsQuote(q) {
     score,
     signal,
 
-    wtSignal: wt.overzone,   // 50-60 WaveTrend (aşırı bölge kesişimi): 'AL' | 'SAT' | null
+    wtSignal: wt.overzone,   // 53-60 WaveTrend (aşırı bölge kesişimi): 'AL' | 'SAT' | null
     wtCrossSignal: wt.cross, // WaveTrend standart kesişim (LazyBear): 'AL' | 'SAT' | null
     stSignal,                // SuperTrend (Kıvanç Özbilgiç): 'AL' | 'SAT' | null
   };
