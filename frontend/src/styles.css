@@ -658,7 +658,26 @@ th.num { text-align: right; }
 .us-report-section p { margin: 6px 0; line-height: 1.5; font-size: 13px; }
 .us-report-list { margin: 6px 0; padding-left: 18px; font-size: 13px; line-height: 1.5; }
 .us-report-list li { margin: 4px 0; }
-.us-report-asof { margin-bottom: 14px; }
+/* Raporun hangi döneme ait olduğu, okuma biçimini değiştiren bir bilgi; bu
+   yüzden exp-note'un 10px/nowrap davranışını devralmıyor. Uzun asOf metinleri
+   telefonda kırpılmasın diye satır kırılması açık. */
+.us-report-asof {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+  white-space: normal;
+}
+/* İki mali yıl ve fazlası geride kalan anlatı: sessizce soluk kalmak yerine
+   görünür bir uyarı olsun — sayılar güncelken metnin eski olması, ikisini
+   bağdaştırmaya çalışan kullanıcıyı yanıltıyor. */
+.us-report-asof-eski {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.08);
+  border-left: 3px solid rgba(251, 191, 36, 0.5);
+  padding: 8px 10px;
+  border-radius: 6px;
+}
 .us-report-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .us-report-subhead { font-size: 12px; font-weight: 700; margin-bottom: 4px; }
 .us-report-good { color: #4ade80; }

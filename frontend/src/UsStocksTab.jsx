@@ -173,8 +173,21 @@ function QuantGrid({ item }) {
   );
 }
 
+// asOf serbest metindir ("FY2024 yıllık rapor verilerine dayalı, yaklaşık").
+// İçinden mali yılı çekip bugüne göre yaşını hesaplıyoruz: çıplak "FY2024"
+// ibaresi 2026'da okuyan birine kaç yıl geride olduğunu anlatmıyor, oysa
+// anlatının ne kadar eskidiği raporun okunma biçimini değiştiren bir bilgi.
+// Kalıp tutmazsa (elle yazılan alan) sessizce null döner, metin yine basılır.
+function raporYasi(asOf) {
+  const m = /FY(\d{4})/.exec(asOf || '');
+  if (!m) return null;
+  return new Date().getFullYear() - Number(m[1]);
+}
+
 function ReportPanel({ item, onClose }) {
   const r = item.report;
+  const yas = r ? raporYasi(r.asOf) : null;
+  const cokEski = yas != null && yas >= 2;
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal us-modal" onClick={(e) => e.stopPropagation()}>
@@ -201,7 +214,14 @@ function ReportPanel({ item, onClose }) {
             </div>
           ) : (
             <>
-              <p className="exp-note us-report-asof">{r.asOf}</p>
+              {/* exp-note sınıfı BİLEREK kaldırıldı: 10px + white-space:nowrap
+                  taşıyordu ve uzun asOf metinleri telefonda kırpılıyordu. */}
+              <p className={`us-report-asof ${cokEski ? 'us-report-asof-eski' : ''}`}>
+                {cokEski && <strong>⚠ </strong>}
+                Aşağıdaki anlatı: {r.asOf}
+                {yas > 0 && ` — ${yas} yıl geride.`}
+                {' '}Yukarıdaki sayılar canlı verilerden hesaplanır, bu metinden gelmez.
+              </p>
               <div className="us-report-section">
                 <h4>1. Gelir Modeli ve Büyüme</h4>
                 <ul className="us-report-list">
