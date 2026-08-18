@@ -13,6 +13,7 @@ import {
 import { US_STOCKS } from './usStocks.js';
 import { buildUsRecommendations } from './recommendUs.js';
 import { US_ANALYSIS } from './usAnalysis.js';
+import { sayisalNotlar } from './usNotes.js';
 
 // Analist verisi Render'ın datacenter IP'sinde throttle olduğu için,
 // asıl veri GitHub Actions'ta (taze runner IP) çekilip repoya yayınlanır.
@@ -236,9 +237,16 @@ export async function computeUsRecommendations() {
   const quotes = await fetchUsQuotes(instruments);
   const recos = buildUsRecommendations(quotes);
 
+  // Sayısal notlar ham temel veriden üretilir; quotes'ta var, puanlanmış
+  // kayıtta (r) mutlak değerler taşınmıyor. Bu yüzden ticker ile eşleştiriliyor.
+  const quoteByTicker = new Map(quotes.map((q) => [q.ticker, q]));
+
   return recos.map((r) => {
     const meta = usByTicker.get(r.ticker);
-    const report = US_ANALYSIS[r.ticker] ?? null;
+    const elle = US_ANALYSIS[r.ticker] ?? null;
+    // Elle yazılan nitel içerik + her turda canlı veriden üretilen sayısal
+    // notlar. Dört sayısal alan artık usAnalysis.js'te tutulmuyor (usNotes.js).
+    const report = elle ? { ...elle, ...sayisalNotlar(quoteByTicker.get(r.ticker)) } : null;
     return {
       ...r,
       name: meta?.name ?? r.ticker,

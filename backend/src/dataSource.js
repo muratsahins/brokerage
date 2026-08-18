@@ -620,6 +620,10 @@ export async function fetchUsFundamentals(symbol, attempt = 0) {
   // Yahoo genelde son 4 mali yılı döner; ilkiyle sonuncusu arasındaki yıl
   // sayısı kadar kök alınır. Modül yoksa/tek yıl varsa null (uydurulmaz).
   let revenue3yCagr = null;
+  // CAGR'ın hangi mali yılları kapladığı: TTM alanlarından farklı bir dönem
+  // (yıllık tablolar), bu yüzden ayrıca taşınıyor — "veri hangi yıla ait"
+  // sorusu bu iki dönem ayrıştırılmadan doğru cevaplanamıyor.
+  let cagrDonem = null;
   const stmts = r.incomeStatementHistory?.incomeStatementHistory;
   if (Array.isArray(stmts) && stmts.length >= 2) {
     const sorted = [...stmts].sort((a, b) => (a.endDate?.raw ?? 0) - (b.endDate?.raw ?? 0));
@@ -628,6 +632,8 @@ export async function fetchUsFundamentals(symbol, attempt = 0) {
     const years = sorted.length - 1;
     if (first > 0 && last > 0 && years > 0) {
       revenue3yCagr = Math.pow(last / first, 1 / years) - 1;
+      const yil = (x) => (x?.endDate?.raw ? new Date(x.endDate.raw * 1000).getUTCFullYear() : null);
+      cagrDonem = { ilk: yil(sorted[0]), son: yil(sorted[sorted.length - 1]) };
     }
   }
 
@@ -648,6 +654,10 @@ export async function fetchUsFundamentals(symbol, attempt = 0) {
     numAnalysts: fd.numberOfAnalystOpinions?.raw ?? null,
     revenueGrowth: fd.revenueGrowth?.raw ?? null, // YoY, çeyreklik bazlı (Yahoo)
     revenue3yCagr,
+    // financialData alanları (gelir/marj/EBITDA/FCF) SON 12 AY (TTM) — mali yıla
+    // değil, bu tarihte biten kayan pencereye ait. Verinin gerçek tazeliği bu.
+    mostRecentQuarter: ks.mostRecentQuarter?.raw ?? null,
+    cagrDonem, // 3y CAGR'ın kapsadığı mali yıllar — TTM'den FARKLI dönem
     profitMargins: fd.profitMargins?.raw ?? null,
     totalRevenue: fd.totalRevenue?.raw ?? null,
     totalCash: fd.totalCash?.raw ?? null,

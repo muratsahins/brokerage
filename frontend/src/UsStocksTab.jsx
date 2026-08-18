@@ -229,13 +229,15 @@ function ReportPanel({ item, onClose }) {
                     <li key={s.name}><strong>{s.name}</strong> (~%{s.sharePct}) — {s.note}</li>
                   ))}
                 </ul>
-                <p>{r.revenue3yNote}</p>
-                <p>{r.marginNote}</p>
+                {/* Sayısal notlar canlı veriden üretiliyor (usNotes.js); veri
+                    eksikse null gelir ve boş <p> basılmasın diye korunuyor. */}
+                {r.revenue3yNote && <p>{r.revenue3yNote}</p>}
+                {r.marginNote && <p>{r.marginNote}</p>}
               </div>
               <div className="us-report-section">
                 <h4>2. Bilanço Sağlığı</h4>
-                <p>{r.balanceNote}</p>
-                <p>{r.fcfNote}</p>
+                {r.balanceNote && <p>{r.balanceNote}</p>}
+                {r.fcfNote && <p>{r.fcfNote}</p>}
               </div>
               <div className="us-report-section">
                 <h4>3. Rekabet Avantajı (Moat)</h4>
