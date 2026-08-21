@@ -4,7 +4,7 @@ import cors from 'cors';
 import compression from 'compression';
 import { initDb } from './db.js';
 import {
-  syncData, getRecommendations, getCachedItems, getUsRecommendations, refreshUs, syncUsData,
+  syncData, getRecommendations, getCachedItems, getUsRecommendations, syncUsData,
 } from './service.js';
 import { diagnose, fetchOhlc, peekLivePrices, peekUsLivePrices } from './dataSource.js';
 import { getLivePrices, getUsLivePrices, refreshSeries, seriesStats } from './liveSignals.js';
@@ -146,10 +146,19 @@ app.get('/api/us-prices', async (req, res) => {
   }
 });
 
-// Manuel yenileme (ABD): canlı çekime düşer (published JSON'u değil, belleği günceller).
+// Manuel yenileme (ABD): önce YAYINLANAN veriyi okur, olmazsa canlı çekime
+// düşer — /api/refresh (BIST) ile aynı davranış.
+//
+// Eskiden doğrudan refreshUs() çağırıyordu, yani yayınlanan JSON'u atlayıp
+// Yahoo'dan canlı çekime gidiyordu. Bu ucun asıl işe yaradığı an, yayın turu
+// yeni veri ürettiği ama sürecin 3 saatlik ABD senkronunun (US_REFRESH_
+// INTERVAL_MINUTES) henüz gelmediği andır; tam o anda taze yayını atlayıp
+// Render'ın throttle'lı IP'sinden 200 hisse çekmeye kalkıyordu — hem yavaş
+// hem de yayından daha kötü veri. Yaşandı: 2026-08-21'de yayın 200 kaleme
+// çıktı, süreç 168'de kaldı ve "manuel yenileme" bunu düzeltemiyordu.
 app.post('/api/us-refresh', async (req, res) => {
   try {
-    await refreshUs();
+    await syncUsData();
     const data = await getUsRecommendations();
     res.json({ ok: true, count: data.items.length, source: data.source });
   } catch (err) {
