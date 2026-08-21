@@ -145,7 +145,7 @@ function SignalBadge({ signal }) {
   );
 }
 
-// Tablo satırı ve mobil kart ayrı, memo'lu bileşenler. 619 kalemin fiyatı
+// Tablo satırı ve mobil kart ayrı, memo'lu bileşenler. 104 kalemin fiyatı
 // 18 saniyede bir tazeleniyor ama tek tick'te hepsi birden oynamıyor;
 // mergeLivePrices değişmeyen kaleme ESKİ nesneyi geri verdiği için burada
 // referans karşılaştırması tutuyor ve o satır hiç yeniden render edilmiyor.
@@ -280,8 +280,10 @@ const StockCard = memo(function StockCard({ s, rank, onSelect }) {
   );
 });
 
-// Kademeli render: 619 kalemin hepsini birden basmak ~17.000 DOM düğümü demek
-// ve ilk boyamayı (özellikle telefonda) uzatıyor. Önce bir parti basılır,
+// Kademeli render: liste ~620 kalemken hepsini birden basmak ~17.000 DOM düğümü
+// demekti ve ilk boyamayı (özellikle telefonda) uzatıyordu. Evren BIST 100 +
+// madene indikten sonra (104 kalem) tek parti zaten yetiyor — mekanizma, liste
+// yeniden büyürse diye duruyor. Önce bir parti basılır,
 // listenin sonundaki nöbetçi öğe görünür olunca bir parti daha eklenir —
 // kullanıcı kaydırdıkça büyür. Sabit satır yüksekliği varsaymadığı için
 // klasik sanallaştırmanın zıplama/kaydırma sorunları yok.
@@ -977,7 +979,7 @@ export default function App() {
     // (bkz. service.js loadPublished/syncData).
     triggerRefresh();
     // Sayfa arka plandayken (başka sekme/uygulama) çekim yapılmaz: kullanıcı
-    // görmüyor, ama sunucu her seferinde ~700 enstrümanın göstergesini
+    // görmüyor, ama sunucu her seferinde tüm enstrümanların göstergesini
     // hesaplıyor ve telefonda pil yakıyordu. Sayfaya dönülünce hemen tazelenir.
     const gorunur = () => document.visibilityState === 'visible';
     const idFull = setInterval(() => { if (gorunur()) load(); }, 15 * 60 * 1000); // tüm veri 15 dk
@@ -1041,7 +1043,11 @@ export default function App() {
       ...i,
       kind: 'us-stock',
       bist: null,
-      tryPrice: usdTryRate != null ? roundPrice(i.price * usdTryRate) : null,
+      // i.price null olabilir (Yahoo o hisseyi o turda döndürmediyse). Kontrolsüz
+      // çarpım null*kur = 0 veriyor ve roundPrice(0)=0 olduğu için hisse Sanal
+      // Borsa'da "0,00 ₺" fiyatla işleme AÇIK hâle geliyordu — bedavaya sınırsız
+      // alım. Fiyat yoksa tryPrice de null kalmalı (vbUnitPrice null'ı reddediyor).
+      tryPrice: usdTryRate != null && i.price != null ? roundPrice(i.price * usdTryRate) : null,
     })),
     [usFav.items, usdTryRate],
   );

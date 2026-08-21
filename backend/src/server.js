@@ -24,7 +24,7 @@ const VALID_RANGE = /^(1mo|3mo|6mo|1y|2y|5y)$/;
 
 const app = express();
 app.use(cors());
-// /api/prices artık fiyatla birlikte ~700 enstrümanın gösterge sinyallerini de
+// /api/prices artık fiyatla birlikte ~104 enstrümanın gösterge sinyallerini de
 // taşıyor ve 18 sn'de bir çekiliyor — gzip ile tel üstünde ~10 kat küçülüyor.
 app.use(compression());
 app.use(express.json());

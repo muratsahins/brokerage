@@ -1,6 +1,6 @@
 // Teknik göstergeleri FİYATLA AYNI ANDA tazeler.
 //
-// Neden önbellek: göstergeler 1 yıllık günlük bar geçmişi ister; 692 enstrüman
+// Neden önbellek: göstergeler 1 yıllık günlük bar geçmişi ister; 273 enstrüman
 // için bunu her fiyat yenilemesinde (~18 sn) Yahoo'dan çekmek mümkün değil.
 // Ama seans içinde geçmiş barlar DEĞİŞMEZ — yalnızca son bar hareket eder.
 // Bu yüzden bar geçmişi bellekte tutulur, her fiyat yenilemesinde son bar canlı
@@ -39,7 +39,7 @@ let filling = false;
 
 // Bar geçmişi tutulan küme: BIST (madenler hariç) + ABD hisseleri.
 // ABD tarafında Yahoo sembolü ticker'ın kendisi (AAPL). Ticker çakışması yok
-// (kontrol edildi: 627 BIST / 172 ABD, kesişim boş) — önbellek düz bir Map
+// (kontrol edildi: 100 BIST hissesi / 172 ABD, kesişim boş) — önbellek düz bir Map
 // olduğu için liste büyürse bu yeniden doğrulanmalı.
 // BIST Tarama'nın Leg1/Leg2 (Göreceli Güç) kesitsel sıralaması için XU100
 // karşılaştırma endeksi — aynı önbellek/canlı-yama altyapısını paylaşsın diye
@@ -56,7 +56,11 @@ const SERIES_INSTRUMENTS = [
   // boş kalıyordu. Canlıda yaşandı: önbellekte 269/273 varken ready=0.
   { ticker: XU100_TICKER, symbol: 'XU100.IS', kind: 'benchmark' },
   ...INSTRUMENTS.filter((i) => i.kind !== 'metal'),
-  ...US_STOCKS.map((u) => ({ ticker: u.ticker, symbol: u.ticker, kind: 'us' })),
+  // Yahoo sembolü `symbol || ticker` (dataSource.js'teki ABD fiyat hattıyla aynı
+  // gerekçe): BRK.B'nin Yahoo karşılığı BRK-B. Sembol yerine ticker geçilince
+  // fetchBars "No data found" alıyor, hisse bar geçmişi önbelleğine hiç girmiyor
+  // ve göstergeleri (overzone/WaveTrend/SuperTrend) sürekli boş kalıyordu.
+  ...US_STOCKS.map((u) => ({ ticker: u.ticker, symbol: u.symbol || u.ticker, kind: 'us' })),
 ];
 
 // Karşılaştırma endeksi tek bir HTTP hatasında düşerse TÜM tarama devre dışı

@@ -122,7 +122,8 @@ const LIVE_TTL_MS = 15000;
 // Bayat veri en fazla bu kadar servis edilir; daha eskiyse istek çekimi bekler.
 const LIVE_STALE_MS = Number(process.env.LIVE_PRICE_STALE_MS ?? 120000);
 // Bir tur, önceki turun bu oranından az fiyat getirdiyse başarısız sayılır ve
-// önbellek korunur. Normalde ~621 fiyat döner; tek tük sembol düşmesi olağan,
+// önbellek korunur. Normalde BIST hattında ~104, ABD hattında ~168 fiyat döner;
+// tek tük sembol düşmesi olağan,
 // yarıya inmesi değil.
 const LIVE_MIN_ORAN = Number(process.env.LIVE_PRICE_MIN_RATIO ?? 0.5);
 
@@ -231,14 +232,20 @@ export const fetchLivePrices = bistHatti.fetchPrices;
 export const peekLivePrices = bistHatti.peek;
 
 // ABD hattı — ayrı önbellek, ayrı uçuş durumu.
-const usHatti = canliFiyatHatti('live-us', () => US_STOCKS.map((u) => ({ symbol: u.ticker, ticker: u.ticker })));
+// Yahoo sembolü ticker'ın kendisi DEĞİL `symbol || ticker`: BRK.B gibi noktalı
+// kodlarda Yahoo tireli biçimi (BRK-B) kullanıyor ve nokta biçimi "No data
+// found" dönüyordu. Ticker'ı sembol sanan bu satır yüzünden BRK.B canlı fiyat
+// hattına hiç girmiyor, tabloda yalnızca günlük yayınlanan (donmuş) fiyatla
+// görünüyordu — ölçüldü: 172 hissenin 167'si dönerken BRK.B hiç dönmüyordu.
+const usHatti = canliFiyatHatti('live-us', () => US_STOCKS.map((u) => ({ symbol: u.symbol || u.ticker, ticker: u.ticker })));
 export const fetchUsLivePrices = usHatti.fetchPrices;
 export const peekUsLivePrices = usHatti.peek;
 
 // --- Toplu GÜN İÇİ bar verisi (v7/quote) ------------------------------------
 // Süregelen günlük barın HACMİ + gün içi yüksek/düşük/açılışı. 100'er sembol tek
 // istekte geldiği için fiyatla aynı sıklıkta (~15 sn) tazelenebilir; tek tek
-// chart çekmek 692 istek demek olurdu. crumb gerektirir (analist verisiyle aynı
+// chart çekmek enstrüman sayısı kadar (BIST'te 104) istek demek olurdu. crumb
+// gerektirir (analist verisiyle aynı
 // oturum); alınamazsa null döner ve çağıran taraf önbellekteki bara düşer.
 const QUOTE_URL = 'https://query1.finance.yahoo.com/v7/finance/quote';
 let liveBarCache = { at: 0, data: null };
