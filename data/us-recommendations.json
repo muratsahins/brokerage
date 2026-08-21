@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-21T21:06:13.841Z",
+  "updatedAt": "2026-08-21T22:03:58.709Z",
   "source": "github-actions",
   "count": 200,
   "withReport": 48,
@@ -770,7 +770,7 @@
       "dividendYield": 0.52,
       "forwardPE": 34.3,
       "trailingPE": 59.97,
-      "priceToBook": 1477.3,
+      "priceToBook": 1475.48,
       "score": 75,
       "signal": "AL",
       "wtSignal": null,
