@@ -386,14 +386,16 @@ export default function UsStocksTab({ view = 'web' }) {
   return (
     <>
       <div className="fav-note">
-        <strong>ABD Büyük Şirketler</strong> — NASDAQ-100 + S&P 100 birleşimi ({items.length || '~170'} hisse),
+        <strong>ABD Büyük Şirketler</strong> — NASDAQ-100 + S&P 100 birleşimi ({items.length || '~200'} hisse;
+        endeksten çıkmış ama takipte tutulan şirketler dahil — bunlar yalnızca <strong>Tümü</strong>'de görünür),
         temel analiz ağırlıklı bir <strong>puan</strong>: analist 12 aylık hedef potansiyeli (%35), yıllık
         (YoY) gelir büyümesi (%20), net kâr marjı (%15), kaldıraç/<code>Net Debt-EBITDA</code> (%15) ve
         <code> FCF</code> marjı (%15) — BIST sekmesindeki momentum ağırlıklı puanla karıştırılmamalı.
         <strong> 📄 Analiz</strong> — segment/rakip/moat/güçlü-zayıf yön anlatısı içeren tam rapor — yalnızca
         elle hazırlanmış {reportCount || '~48'} mega-cap'te var; diğerlerinde ticker'a tıklayınca yalnızca
-        otomatik sayısal özet açılır. Veriler <strong>günde bir yayınlanır</strong> (canlı tik akışı yok),
-        fiyatlar USD'dir. <span className="muted-dash">Yatırım tavsiyesi değildir.</span>
+        otomatik sayısal özet açılır. Temel veriler (analist hedefi, marj, kaldıraç) <strong>günde bir
+        yayınlanır</strong>; fiyat, göstergeler ve puan ABD seansı boyunca ~18 saniyede bir tazelenir.
+        Fiyatlar USD'dir. <span className="muted-dash">Yatırım tavsiyesi değildir.</span>
       </div>
 
       <div className="search">
