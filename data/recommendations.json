@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-22T01:49:41.295Z",
+  "updatedAt": "2026-08-22T03:55:08.485Z",
   "source": "github-actions",
   "count": 104,
   "withAnalyst": 55,
@@ -2525,7 +2525,7 @@
       "currency": "TRY",
       "changePct": -3.18,
       "momentum1m": -4.18,
-      "pos52w": 0.752,
+      "pos52w": 0.75,
       "exp1m": null,
       "exp3m": null,
       "upside12m": null,
