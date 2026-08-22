@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-22T12:59:36.859Z",
+  "updatedAt": "2026-08-22T15:35:09.891Z",
   "source": "github-actions",
   "count": 104,
   "withAnalyst": 55,
@@ -1745,7 +1745,7 @@
     {
       "symbol": "GC=F",
       "ticker": "XAU",
-      "price": 4604.399902,
+      "price": 4680.6,
       "currency": "USD",
       "changePct": 3.64,
       "momentum1m": 15.67,
