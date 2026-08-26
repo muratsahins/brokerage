@@ -468,8 +468,8 @@ function normalizeBars(result) {
   return bars;
 }
 
-// Normalleştirilmiş barlar + meta — grafiğin, göstergelerin, canlı gösterge
-// tazelemesinin (liveSignals.js) ve UYARI taramasının (alerts.js) ORTAK kaynağı.
+// Normalleştirilmiş barlar + meta — grafiğin, göstergelerin ve canlı gösterge
+// tazelemesinin (liveSignals.js) ORTAK kaynağı.
 // interval: '1d' (varsayılan), '1h', '4h' — Yahoo üçünü de yerel destekliyor.
 export async function fetchBars(symbol, range = '1y', interval = '1d') {
   const url = `${CHART_URL}/${encodeURIComponent(symbol)}?range=${range}&interval=${interval}`;

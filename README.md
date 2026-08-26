@@ -52,48 +52,6 @@ npm start                 # http://localhost:4000
   `SERIES_TTL_MINUTES` (varsayılan 30) bar geçmişinin tazelenme sıklığı,
   `SERIES_CHECK_MINUTES` (15) kontrol aralığı, `SERIES_FETCH_GAP_MS` (350)
   Yahoo istekleri arası bekleme. Önbellek durumu: `GET /api/health`.
-- **BIST Tarama** (`/api/alerts`): taranan evren **yalnızca BIST 100**
-  (ABD hisseleri bu sekmede taranmıyor — Leg1'in kesitsel sıralaması tek
-  bir endekse göre yapıldığından karışık bir evren anlamsız olurdu).
-  Günlük grafikte **iki grup** döner — `items` = **alım adayları**:
-  **Göreceli Güç Çekirdekli Momentum/Pullback Sistemi**
-  (`backend/src/alerts.js` + `indicators.js` → `rsYonFiltresi`/`rsGirisTetigi`),
-  üç bacak birden:
-  1. **Göreceli Güç (Leg1)** — evren son 60 barlık göreceli getiriye (hisse
-     − XU100) göre sıralanır, en güçlü %20'de kalanlar aday havuzu
-     (kesitsel — tüm evreni aynı anda gerektirir, tek sembolde hesaplanamaz).
-  2. **Yön Filtresi (Leg2)** — kapanış/XU100 oranı, yükselen 50 günlük
-     ortalamasının üstünde mi (reel/relative bazda — nominal TL fiyat
-     KULLANILMIYOR, enflasyon ortamında ayırt ediciliğini kaybeder).
-  3. **Giriş (Leg3)** — kapanış, yükselen 20 günlük ortalamayı yukarı
-     kesmiş mi (basit geri çekilme).
-
-  Leg4 (risk/çıkış: `2.5×ATR(14)` başlangıç stopu) bilgi amaçlı
-  `stopSeviye` alanında taşınır. Kalıcı bir durum değil, sinyalin
-  OLUŞTUĞU barı arar; son `BIST_TARAMA_GUN_PENCERESI` iş günü (varsayılan
-  5, ~1 hafta) içinde herhangi bir gün kurulmuşsa yakalanır, hangi gün
-  kurulduğu (`barsAgo`) döner.
-
-  **DÜRÜSTLÜK:** Bu sistem BIST 100 üzerinde ~180 günlük tarihsel testte
-  MEDYAN R negatif çıktı (tipik işlem kayıp) — kanıtlanmış bir kenarı yok,
-  pozitif ortalama 1-2 aykırı (outlier) işleme bağımlıydı. Bilgi amaçlı bir
-  tarayıcıdır, yatırım tavsiyesi değildir.
-
-  `stSell` = `SuperTrend`in **son barda SAT'a döndüğü** BIST hisseleri.
-  Arayüz `stSell`i kullanıcının **Sanal Borsa portföyüyle kesiştirir** ("kendi
-  hisselerim" — satış uyarısı); portföy tarayıcıda durduğu için sunucuya
-  gönderilmez, süzme istemcide yapılır. Bar geçmişini kullanır, **ek veri
-  çekmez**. Son bar canlı fiyatla güncellendiği için sinyal, günlük kapanış
-  beklenmeden gün içinde görünür. Her hisse **evrenin en güncel barına**
-  göre değerlendirilir — duvar saatine göre "bugün" değil; seans kapalıyken
-  (mesai dışı, hafta sonu, tatil) son tamamlanan seansın sonucu gösterilmeye
-  devam eder (`lastBarDate` bu tarihi söyler). Liste tavanı `ALERT_MAX_ITEMS`
-  (600).
-  Arayüzde tarama sekme kapalıyken de sürer: görülmemiş yeni sinyal varsa **UYARI
-  sekmesi yanıp söner** (rozette sayısı yazar), sekme açılıp sayfa görünür
-  olduğunda söner. Görülenler tarayıcıda (`localStorage: alertsSeen`) tutulur ve
-  gün değişince sıfırlanır; o ziyarette yeni gelenler satırda **YENİ** rozeti alır.
-
 ### 3) Frontend
 ```bash
 cd frontend
@@ -151,7 +109,6 @@ da korunur ve React tüm güncellemeyi atlar (yalnızca "Fiyat: …" saati ilerl
 | GET   | `/api/recommendations`  | Puana göre sıralı öneri listesi           |
 | GET   | `/api/prices`           | Canlı fiyat + aynı andaki gösterge sinyalleri |
 | GET   | `/api/chart`            | Grafik için günlük OHLC serisi            |
-| GET   | `/api/alerts`           | UYARI: yeni sinyal veren hisseler (1s/4s/günlük) |
 | POST  | `/api/refresh`          | Veriyi Yahoo'dan yeniden çeker ve puanlar |
 | GET   | `/api/us-recommendations` | ABD (NASDAQ100+S&P100) temel analiz ağırlıklı öneri listesi |
 | POST  | `/api/us-refresh`       | ABD verisini canlı yeniden çeker (belleği günceller) |

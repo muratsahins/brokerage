@@ -3,7 +3,7 @@ import { API_BASE, fmtNum, norm, roundPrice } from './lib/common.js';
 import { Expected, Pct, Tutar } from './lib/ui.jsx';
 import { useModalBack } from './lib/useModalBack.js';
 import {
-  VB_START, vbCleanRetired, vbEmail, vbLoad, vbSave, vbTrade, vbUnitLabel, vbUnitPrice,
+  VB_START, vbCleanRetired, vbSave, vbTrade, vbUnitLabel, vbUnitPrice,
 } from './lib/vb.js';
 
 // Grafik pop-up'ı lightweight-charts'a bağlı: bundle'ın 109 KB gzip'inin
@@ -392,229 +392,6 @@ function NewsList({ kind }) {
           </a>
         ))}
       </div>
-    </>
-  );
-}
-
-// BIST TARAMA sekmesi iki grup gösterir (Backend /api/alerts tarar):
-//   • ALIM ADAYLARI (yalnızca BIST 100 hisseleri; kıymetli madenler hariç): Göreceli
-//     Güç Çekirdekli Momentum/Pullback Sistemi — top %20 RS sıralaması + yön
-//     filtresi (reel/relative bazda) + basit geri çekilme girişi, hepsi birden
-//     (bkz. backend/src/alerts.js + indicators.js rsYonFiltresi/rsGirisTetigi).
-//     Sunucu en taze sinyali başa koyar (barsAgo artan); gösterilen stop güncel
-//     bara göre hesaplanır, sinyal barına göre değil.
-//     DÜRÜSTLÜK: ~180 günlük BIST 100 testinde medyan R negatif çıktı —
-//     kanıtlanmış bir kenarı yok, bilgi amaçlı bir tarayıcıdır.
-//   • KENDİ HİSSELERİM: SuperTrend son barda SAT'a dönen hisselerden Sanal
-//     Borsa portföyünde olanlar. Portföy tarayıcıda durur, sunucuya gitmez —
-//     kesişim burada yapılır.
-
-// UYARI taraması UYGULAMA SEVİYESİNDE tutulur: sekme kapalıyken de sürer ki
-// yeni sinyal geldiğinde sekme yanıp sönerek haber verebilsin.
-function useAlerts() {
-  const [state, setState] = useState({ loading: true, items: [], stSell: [], updatedAt: null, stats: null });
-  useEffect(() => {
-    let cancelled = false;
-    const load = () => fetch(`${API_BASE}/api/alerts`)
-      .then((r) => r.json())
-      .then((d) => { if (!cancelled) setState({ loading: false, items: d.items || [], stSell: d.stSell || [], updatedAt: d.updatedAt, stats: d.stats, lastBarDate: d.lastBarDate }); })
-      .catch(() => { if (!cancelled) setState((s) => ({ ...s, loading: false })); });
-    load();
-    // Sayfa arka plandayken tarama çekilmez; sayfaya dönülünce hemen tazelenir
-    // (yeni sinyal varsa sekme o an yanıp sönmeye başlar).
-    const id = setInterval(() => {
-      if (document.visibilityState === 'visible') load();
-    }, 60 * 1000); // tarama sunucuda ~60 sn önbellekli
-    const donunce = () => { if (document.visibilityState === 'visible') load(); };
-    document.addEventListener('visibilitychange', donunce);
-    return () => {
-      cancelled = true;
-      clearInterval(id);
-      document.removeEventListener('visibilitychange', donunce);
-    };
-  }, []);
-  return state;
-}
-
-// Sanal Borsa portföyündeki hisse kodları ("kendi hisselerim"). Tarama her
-// tazelendiğinde ve UYARI sekmesine girildiğinde yeniden okunur — arada alım
-// satım yapılmış olabilir.
-function usePortfolioTickers(dep) {
-  return useMemo(() => {
-    const pf = vbLoad(vbEmail());
-    return new Set(Object.keys(pf?.positions || {}));
-  }, [dep]);
-}
-
-// Bir uyarı satırının kimliği: grup + hisse + tetiklenen gösterge/yön kümesi.
-// Grup da girer, çünkü aynı hisse iki grupta birden çıkabilir.
-const alertKey = (a) => `${a.grup || 'al'}/${a.ticker}:${a.signals.map((s) => `${s.ind}${s.dir}`).sort().join('|')}`;
-
-// GÖRÜLDÜ durumu: hangi uyarıları kullanıcı UYARI sekmesinde açıkça gördü.
-// Tarayıcıda saklanır, son bar tarihi (lastBarDate) değişince sıfırlanır —
-// yeni seansın sinyalleri yeniden haber verilir.
-const SEEN_KEY = 'alertsSeen';
-function loadSeen() {
-  try {
-    const s = JSON.parse(localStorage.getItem(SEEN_KEY) || 'null');
-    return s && Array.isArray(s.keys) ? { date: s.date, keys: new Set(s.keys) } : null;
-  } catch { return null; }
-}
-
-// Yeni (henüz görülmemiş) uyarı sayısı + "gördüm" işaretleyicisi.
-function useNewAlerts(alerts, active) {
-  const [seen, setSeen] = useState(() => loadSeen());
-  const { lastBarDate, items, loading } = alerts;
-
-  // Son bar tarihi değiştiyse görüldü listesi geçersiz — yeni seansın sinyalleri haber verilir.
-  const valid = seen && lastBarDate && seen.date === lastBarDate ? seen : null;
-  const newKeys = useMemo(() => {
-    if (loading) return new Set();
-    return new Set(items.map(alertKey).filter((k) => !valid || !valid.keys.has(k)));
-  }, [items, valid, loading]);
-  // "YENİ" rozetli satırlar: sekmeye girildiği ANDA görülmemiş olanlar. Değer
-  // render sırasında dondurulur (efekt içinde state güncellemek yerine) — sekme
-  // değişimiyle aynı render'da hesaplandığı için görüldü kaydı yazıldıktan
-  // sonra da o ziyaret boyunca sabit kalır.
-  const wasActive = useRef(false);
-  const highlightRef = useRef(new Set());
-  if (!active) highlightRef.current = new Set();
-  else if (!wasActive.current) highlightRef.current = new Set(newKeys); // memo'yu kirletmemek için kopya
-  else newKeys.forEach((k) => highlightRef.current.add(k)); // sekme açıkken gelen yeniler
-  wasActive.current = active;
-
-  // GÖRÜLDÜ kaydı yalnızca sayfa gerçekten görünürken yazılır — sekme arka
-  // planda açık duruyorsa kullanıcı görmemiştir; sayfaya döndüğünde
-  // (visibilitychange) işaretlenir.
-  useEffect(() => {
-    if (!active || loading || !lastBarDate) return undefined;
-    const mark = () => {
-      if (document.visibilityState !== 'visible') return;
-      const next = { date: lastBarDate, keys: items.map(alertKey) };
-      try { localStorage.setItem(SEEN_KEY, JSON.stringify(next)); } catch { /* yoksay */ }
-      setSeen({ date: next.date, keys: new Set(next.keys) });
-    };
-    mark();
-    document.addEventListener('visibilitychange', mark);
-    return () => document.removeEventListener('visibilitychange', mark);
-  }, [active, loading, lastBarDate, items]);
-
-  return { newCount: newKeys.size, highlight: highlightRef.current };
-}
-
-function AlertList({ items, onSelect, state, highlight, mine, hasPortfolio }) {
-  const byTicker = useMemo(() => new Map(items.map((i) => [i.ticker, i])), [items]);
-  const list = state.items;
-  const warming = state.stats && state.stats.ready < state.stats.total * 0.9;
-  // Tarama artık son tamamlanan seansı da gösterir (seans kapalıyken dahil) —
-  // scanned===0 yalnızca bar geçmişi henüz hiç yüklenmediğinde (sunucu yeni
-  // başladı) gerçekleşir.
-  const noSession = state.stats && state.stats.scanned === 0;
-  const trDate = (d) => (d ? new Date(d).toLocaleDateString('tr-TR') : null);
-
-  if (state.loading) return <div className="state">Taranıyor…</div>;
-
-  const satir = (a) => {
-    const it = byTicker.get(a.ticker);
-    const taze = highlight?.has(alertKey(a));
-    return (
-      <button
-        key={alertKey(a)}
-        className={`alert-row ${a.dir === 'AL' ? 'al' : 'sat'} ${taze ? 'fresh' : ''}`}
-        onClick={() => it && onSelect(it)}
-        title={it ? 'Grafiği aç' : ''}
-      >
-        <span className="alert-main">
-          {taze && <span className="alert-new" title="Bu ziyarette yeni gelen sinyal">YENİ</span>}
-          <span className="ticker">{a.ticker}</span>
-          <span className="name">{a.name || it?.name || ''}</span>
-        </span>
-        <span className="alert-meta">
-          {a.signals.map((s) => (
-            <span
-              key={s.ind}
-              className={`alert-sig ${s.dir === 'AL' ? 'al' : 'sat'}`}
-              title={s.state ? 'Gösterge durumu (dönüş barı değil)' : 'Sinyalin oluştuğu bar'}
-            >
-              {s.indLabel} <strong>{s.dir}</strong>
-              {s.state ? ' (trend)' : ''}
-            </span>
-          ))}
-          {a.stopSeviye != null && (
-            <span className="alert-sig sat" title="Leg4: ATR tabanlı başlangıç stopu — GÜNCEL bara göre hesaplanır (sinyal barına göre değil), yani bugün girilseydi geçerli olacak seviye. Bilgi amaçlı, otomatik emir değil.">
-              Stop <strong>{fmtNum(a.stopSeviye)}</strong>
-            </span>
-          )}
-          <span className="news-time">{a.barsAgo === 0 ? 'son bar' : `${a.barsAgo} bar önce`}</span>
-        </span>
-      </button>
-    );
-  };
-
-  return (
-    <>
-      <div className="fav-note">
-        <strong>BIST Tarama</strong> — günlük grafikte{' '}
-        <strong>
-          {trDate(state.lastBarDate) ? `son seansın (${trDate(state.lastBarDate)})` : 'son seansın'}
-        </strong>{' '}
-        barı taranır, iki grup:{' '}
-        <strong>Alım adayları</strong> = <strong>Göreceli Güç Çekirdekli Momentum/Pullback Sistemi</strong> —
-        üç bacak birden: <strong>1) Göreceli Güç</strong> (son 60 barlık getiride BIST 100 içinde en güçlü
-        %20'de olmak) <strong>+</strong> <strong>2) Yön Filtresi</strong> (kapanış/XU100 oranı, yükselen
-        50 günlük ortalamasının üstünde — nominal TL fiyat değil, enflasyon ortamında ayırt ediciliğini
-        kaybeder) <strong>+</strong> <strong>3) Giriş</strong> (kapanış, yükselen 20 günlük ortalamayı yukarı
-        kesmiş — basit geri çekilme). Son <code>1 hafta</code> içinde HERHANGİ bir gün üçü birden sağlanmışsa
-        yakalanır; liste <strong>en taze sinyal başta</strong> sıralanır (giriş bir zamanlama tetiğidir,
-        değeri günler içinde erir — satırdaki “son bar / N bar önce” etiketine bakın).{' '}
-        <strong>Stop</strong> etiketi Leg4'ün (risk/çıkış) ATR tabanlı başlangıç stop seviyesi;
-        <strong> güncel bara göre</strong> hesaplanır, yani bugün girilseydi geçerli olacak seviyedir —
-        bilgi amaçlı, otomatik emir değil. Yalnızca <strong>BIST 100 hisseleri</strong> taranır
-        (kıymetli madenler hariç).{' '}
-        <strong>Kendi hisselerim</strong> = <code>SuperTrend</code> <strong>SAT</strong>'a dönenlerden Sanal
-        Borsa portföyünde olanlar. Seans açıkken son bar canlı fiyatla güncellenir (kapanış beklenmeden gün
-        içinde görünür); seans kapalıyken son tamamlanan seansın sonucu gösterilmeye devam eder.
-        {state.stats && ` (${state.stats.scanned} hisse son seansta tarandı.)`}
-        <span className="muted-dash"> DÜRÜSTLÜK: bu sistem ~180 günlük BIST 100 tarihsel testinde MEDYAN
-        R negatif çıktı (tipik işlem kayıp) — kanıtlanmış bir kenarı yok, pozitif ortalama 1-2 aykırı
-        işleme bağımlıydı. Bilgi amaçlıdır, yatırım tavsiyesi değildir.</span>
-      </div>
-
-      <div className="filters">
-        <span className="updated">{list.length + mine.length} uyarı</span>
-        {state.updatedAt && (
-          <span className="updated">Tarama: {new Date(state.updatedAt).toLocaleTimeString('tr-TR')}</span>
-        )}
-      </div>
-
-      {noSession ? (
-        <div className="state">
-          Veri henüz hazır değil — bar geçmişi sunucuda doldurulmaya devam ediyor, birazdan tekrar bakın.
-        </div>
-      ) : (
-        <>
-          <div className="alert-group">Alım adayları — Göreceli Güç Momentum/Pullback (son 1 hafta, BIST 100 · en taze başta)</div>
-          {list.length === 0 ? (
-            <div className="state">
-              Son 1 haftada üç bacağı (Göreceli Güç + Yön Filtresi + Giriş) birden sağlayan hisse yok.
-              {warming && ' Bar geçmişi hâlâ hazırlanıyor, birazdan tekrar bakın.'}
-            </div>
-          ) : (
-            <div className="news-list">{list.map(satir)}</div>
-          )}
-
-          <div className="alert-group">Kendi hisselerim — SuperTrend SAT'a döndü</div>
-          {mine.length === 0 ? (
-            <div className="state">
-              {hasPortfolio
-                ? 'Portföyündeki hisselerde son seansta SuperTrend SAT dönüşü yok.'
-                : 'Sanal Borsa portföyün boş — hisse aldığında SAT dönüşleri burada uyarır.'}
-            </div>
-          ) : (
-            <div className="news-list">{mine.map(satir)}</div>
-          )}
-        </>
-      )}
     </>
   );
 }
@@ -1008,16 +785,9 @@ export default function App() {
     // değil), o yüzden match yok — UsStocksTab kendi verisini kendi çeker.
     { key: 'us',      label: '🇺🇸 ABD Hisseleri' },
   ];
-  // Üst şerit: haberler + BIST TARAMA (Göreceli Güç Çekirdekli
-  // Momentum/Pullback Sistemi, yalnızca BIST 100; eskiden "Dikkat Çekenler",
-  // öncesinde KAP'ın yerini almıştı).
-  // Anahtar 'uyari' olarak kaldı: localStorage'daki görülmüş sinyal kaydı
-  // (alertsSeen) ve blink mantığı buna bağlı, etiket değişikliği onları
-  // etkilemesin.
-  const UYARI_TAB = { key: 'uyari', label: '🔍 BIST Tarama' };
+  // Üst şerit: haberler.
   const NEWS_TABS = [
     { key: 'news',  label: '📰 Haberler', news: 'news' },
-    UYARI_TAB,
   ];
   // Favori listesi: 4 teknik+analist koşulunu birden sağlayan hisseler
   // (BIST + ABD — aynı koşullar, ayrı veri kaynaklarından gelir).
@@ -1065,22 +835,6 @@ export default function App() {
   const TRADE_TAB = { key: 'trade', label: '💼 Sanal Borsa' };
   const activeTab = [...TABS, FAV_TAB, TRADE_TAB, ...NEWS_TABS].find((t) => t.key === tab) ?? TABS[0];
   const isNews = !!activeTab.news;
-
-  // UYARI taraması sekme kapalıyken de sürer; görülmemiş yeni sinyal varsa
-  // sekme yanıp söner, sekmeye girilince (sayfa görünürken) söner.
-  // "Kendi hisselerim" grubu: SuperTrend SAT dönüşlerinden portföyde olanlar.
-  const alerts = useAlerts();
-  const myTickers = usePortfolioTickers(`${tab}|${alerts.updatedAt}`);
-  const mine = useMemo(
-    () => (alerts.stSell || []).filter((a) => myTickers.has(a.ticker)),
-    [alerts.stSell, myTickers],
-  );
-  // Yanıp sönme iki grubun toplamına bakar.
-  const alertsAll = useMemo(
-    () => ({ ...alerts, items: [...alerts.items, ...mine] }),
-    [alerts, mine],
-  );
-  const { newCount, highlight } = useNewAlerts(alertsAll, tab === 'uyari');
 
   // Önce aktif sekmeye göre, sonra sinyale göre süz. Favori sekmesinde BIST
   // eşleşmelerinin üstüne aynı koşulu sağlayan ABD hisseleri de eklenir.
@@ -1153,8 +907,6 @@ export default function App() {
           <p className="subtitle">
             {tab === 'trade'
               ? 'Sanal borsa · e-posta ile giriş, sanal alım-satım (gerçek para değildir)'
-              : tab === 'uyari'
-              ? 'Bugün yeni sinyal veren hisseler · günlük grafik taraması'
               : tab === 'us'
               ? 'NASDAQ-100 + S&P 100 · temel analiz ağırlıklı puan + seçili hisselerde tam analist raporu'
               : isNews
@@ -1209,21 +961,6 @@ export default function App() {
         >
           {TRADE_TAB.label}
         </button>
-        {/* Tarama, Sanal Borsa'nın yanına alındı. Görülmemiş yeni
-            sinyal varsa yanıp söner ve rozette sayısı görünür. */}
-        {(() => {
-          const blink = newCount > 0 && tab !== 'uyari';
-          return (
-            <button
-              className={`news-tab uyari-tab ${blink ? 'blink' : ''} ${tab === 'uyari' ? 'active' : ''}`}
-              onClick={() => setTab('uyari')}
-              title={blink ? `${newCount} yeni sinyal — görmek için aç` : undefined}
-            >
-              {UYARI_TAB.label}
-              {blink && <span className="tab-badge">{newCount}</span>}
-            </button>
-          );
-        })()}
       </div>
 
       <div className="tabs">
@@ -1240,15 +977,6 @@ export default function App() {
 
       {isNews ? (
         <NewsList kind={activeTab.news} />
-      ) : tab === 'uyari' ? (
-        <AlertList
-          items={data.items}
-          onSelect={setChartItem}
-          state={alerts}
-          highlight={highlight}
-          mine={mine}
-          hasPortfolio={myTickers.size > 0}
-        />
       ) : tab === 'trade' ? (
         <VirtualTrade items={tradeItems} onSelect={setChartItem} />
       ) : tab === 'us' ? (

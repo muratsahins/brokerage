@@ -213,41 +213,6 @@ function crossFrom(w) {
   return signal;
 }
 
-// --- YENİ sinyal tespiti (UYARI taraması) -----------------------------------
-// Kalıcı durumu değil, sinyalin OLUŞTUĞU BARI arar: son `lookback` bar içinde
-// SuperTrend trend dönüşü, WaveTrend kesişimi ve overzone (53-60) sinyalinin
-// kurulması. Her biri için en yeni olay { dir, barsAgo } olarak döner (yoksa null).
-export function recentSignals(highs, lows, closes, lookback = 6) {
-  const n = closes?.length ?? 0;
-  const out = { st: null, wt: null, oz: null };
-  if (n < 3) return out;
-  const from = Math.max(1, n - lookback);
-
-  // SuperTrend: yön değişimi (AL <-> SAT)
-  const dir = supertrendSeries(highs, lows, closes);
-  for (let i = from; i < n; i++) {
-    if (dir[i] == null || dir[i - 1] == null || dir[i] === dir[i - 1]) continue;
-    out.st = { dir: dir[i] === 1 ? 'AL' : 'SAT', barsAgo: n - 1 - i };
-  }
-
-  const w = computeWaveTrend(highs, lows, closes);
-  if (w) {
-    const { wt1, wt2 } = w;
-    for (let i = from; i < n; i++) {
-      if (wt1[i - 1] == null || wt2[i - 1] == null || wt1[i] == null || wt2[i] == null) continue;
-      const prev = wt1[i - 1] - wt2[i - 1], cur = wt1[i] - wt2[i];
-      const up = prev <= 0 && cur > 0, down = prev >= 0 && cur < 0;
-      if (up) out.wt = { dir: 'AL', barsAgo: n - 1 - i };
-      else if (down) out.wt = { dir: 'SAT', barsAgo: n - 1 - i };
-      // overzone: yalnızca aşırı bölgede kurulan kesişimler sinyaldir
-      const level = wt2[i];
-      if (up && level <= WT_OS_LEVEL) out.oz = { dir: 'AL', barsAgo: n - 1 - i };
-      else if (down && level >= WT_OB_LEVEL) out.oz = { dir: 'SAT', barsAgo: n - 1 - i };
-    }
-  }
-  return out;
-}
-
 // 53-60 WaveTrend: sinyal TERS kesişime kadar kalıcıdır, sonra boşalır (null).
 //   AL  : aşırı satımda (wt2 <= -53) YUKARI kesişimle kurulur;
 //         sonraki AŞAĞI kesişim (tersi) olunca boşalır.
@@ -283,60 +248,4 @@ function overzoneFrom(w) {
     }
   }
   return signal;
-}
-
-// --- BIST Tarama: Göreceli Güç Çekirdekli Momentum/Pullback Sistemi --------
-// Dört bacaklı bir tasarım (sohbette detaylı özet + backtest var):
-//   Leg1 (kesitsel sıralama, top %20)  — BURADA YOK, tüm evreni aynı anda
-//     gerektirir; bkz. alerts.js scan() (cross-sectional, per-symbol değil).
-//   Leg2 (yön filtresi, reel/relative bazda) — rsYonFiltresi
-//   Leg3 (giriş: basit geri çekilme)          — rsGirisTetigi
-//   Leg4 (risk: ATR tabanlı başlangıç stopu)  — rsBaslangicStopu
-//
-// DÜRÜSTLÜK NOTU: Bu sistem BIST 100 üzerinde ~180 günlük tarihsel test
-// edildi — MEDYAN R NEGATİF çıktı (tipik işlem kayıp), pozitif ortalama
-// birkaç aykırı (outlier) işleme bağımlıydı (KTLEV, ASTOR). Kanıtlanmış bir
-// kenarı YOKTUR — yalnızca bilgi amaçlı bir tarayıcı olarak kullanılmalı.
-const RS_TREND_MA = 50;  // Leg2: yön filtresi MA uzunluğu
-const RS_ENTRY_MA = 20;  // Leg3: giriş MA uzunluğu
-const RS_ATR_LEN = 14;
-const RS_ATR_K = 2.5;    // Leg4: stop/iz süren çarpanı — 3.0 denendi, medyan
-                         // bazda iyileşme sağlamadığı (aşırı-optimizasyon
-                         // olduğu) ölçüldü, 2.5'te bırakıldı.
-
-// Leg2 — Yön filtresi: kapanış/benchmark ORANI, kendi yükselen RS_TREND_MA
-// günlük ortalamasının üstünde mi? (BIST'te benchmark=XU100; nominal fiyat
-// DEĞİL, enflasyon ortamında nominal trend ayırt ediciliğini kaybeder.)
-export function rsYonFiltresi(closes, benchCloses) {
-  const n = closes?.length ?? 0, m = benchCloses?.length ?? 0;
-  const need = RS_TREND_MA + 4;
-  if (n < need || m < need) return false;
-  const k = Math.min(n, m);
-  const ratio = new Array(k);
-  for (let i = 0; i < k; i++) ratio[i] = closes[n - k + i] / benchCloses[m - k + i];
-  const ma = sma(ratio, RS_TREND_MA);
-  const last = k - 1;
-  return ratio[last] > ma[last] && ma[last] > ma[last - 3];
-}
-
-// Leg3 — Giriş: basit geri çekilme. Kapanış, YÜKSELEN RS_ENTRY_MA günlük
-// ortalamayı son barda yukarı kesti mi? Tek ve kaba bir kural (osilatör yok).
-export function rsGirisTetigi(closes) {
-  const n = closes?.length ?? 0;
-  if (n < RS_ENTRY_MA + 4) return false;
-  const ma = sma(closes, RS_ENTRY_MA);
-  const last = n - 1;
-  const rising = ma[last] > ma[last - 3];
-  const crossed = closes[last - 1] <= ma[last - 1] && closes[last] > ma[last];
-  return rising && crossed;
-}
-
-// Leg4 — Başlangıç stopu: Giriş − RS_ATR_K × ATR(14). Hesaplanamazsa null.
-export function rsBaslangicStopu(highs, lows, closes) {
-  const n = closes?.length ?? 0;
-  if (n < RS_ATR_LEN + 1) return null;
-  const atrArr = atr(highs, lows, closes, RS_ATR_LEN);
-  const last = n - 1;
-  if (atrArr[last] == null) return null;
-  return closes[last] - RS_ATR_K * atrArr[last];
 }

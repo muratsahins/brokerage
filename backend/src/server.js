@@ -9,7 +9,6 @@ import {
 import { diagnose, fetchOhlc, peekLivePrices, peekUsLivePrices } from './dataSource.js';
 import { getLivePrices, getUsLivePrices, refreshSeries, seriesStats } from './liveSignals.js';
 import { fetchNews } from './newsSource.js';
-import { getAlerts } from './alerts.js';
 import { INSTRUMENTS } from './stocks.js';
 import { US_STOCKS } from './usStocks.js';
 
@@ -80,17 +79,6 @@ app.get('/api/news', async (req, res) => {
     res.json({ items: await fetchNews() });
   } catch (err) {
     res.status(502).json({ error: err.message, items: [] });
-  }
-});
-
-// UYARI: overzone / WaveTrend / SuperTrend sinyalini YENİ veren hisseler
-// (günlük grafik). KAP bildirimlerinin yerini aldı. Bar geçmişi zaten bellekte
-// olduğu için ek veri çekimi gerektirmez.
-app.get('/api/alerts', (req, res) => {
-  try {
-    res.json(getAlerts());
-  } catch (err) {
-    res.status(500).json({ error: err.message, items: [] });
   }
 });
 

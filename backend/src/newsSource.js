@@ -105,8 +105,8 @@ export async function fetchNews() {
 }
 
 // --- KAP bildirimleri (KULLANILMIYOR) ---------------------------------------
-// KAP sekmesi kaldırıldı, yerini UYARI (yeni sinyal taraması) aldı; /api/kap ucu
-// da yok. Fonksiyon geri açmak istenirse dursun diye bırakıldı.
+// KAP sekmesi kaldırıldı; /api/kap ucu da yok. Fonksiyon geri açmak istenirse
+// dursun diye bırakıldı.
 // kap.org.tr datacenter IP'lerini bloklıyor; KAP odaklı haberleri Google News
 // üzerinden (her yerden erişilebilir) çekip yatırımcı diline sınıflandırıyoruz.
 function kapClassify(text) {

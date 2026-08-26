@@ -12,7 +12,7 @@ import { INSTRUMENTS } from './stocks.js';
 import { US_STOCKS } from './usStocks.js';
 
 import {
-  fetchBars, fetchLivePrices, fetchLiveBars, peekLivePrices, peekLiveBars,
+  fetchBars, fetchLivePrices, fetchLiveBars,
   fetchAltinInPrices, fetchSpotMetals, fetchUsdTryRate, metalTryPerGram, fetchUsLivePrices,
 } from './dataSource.js';
 import {
@@ -41,20 +41,7 @@ let filling = false;
 // ABD tarafında Yahoo sembolü ticker'ın kendisi (AAPL). Ticker çakışması yok
 // (kontrol edildi: 100 BIST hissesi / 172 ABD, kesişim boş) — önbellek düz bir Map
 // olduğu için liste büyürse bu yeniden doğrulanmalı.
-// BIST Tarama'nın Leg1/Leg2 (Göreceli Güç) kesitsel sıralaması için XU100
-// karşılaştırma endeksi — aynı önbellek/canlı-yama altyapısını paylaşsın diye
-// normal bir "enstrüman" gibi eklendi. Ticker "__" ile sarılı ki gerçek bir
-// hisse koduyla asla çakışmasın.
-export const XU100_TICKER = '__XU100__';
 const SERIES_INSTRUMENTS = [
-  // XU100 EN BAŞTA olmalı. BIST Tarama'nın tamamı buna bağlı: alerts.js
-  // scan() endeks serisini bulamazsa hiç taramadan boş dönüyor
-  // ({ ready: 0, scanned: 0 }) ve sekme tamamen boş görünüyor.
-  // Liste sonundayken 273 kalemlik sıralı döngünün (aralarda GAP_MS bekleme)
-  // EN SONUNDA çekiliyordu: her soğuk başlangıçtan sonra ~3-4 dakika boyunca
-  // Tarama boştu, o son istek başarısız olursa bir sonraki tura (15 dk) kadar
-  // boş kalıyordu. Canlıda yaşandı: önbellekte 269/273 varken ready=0.
-  { ticker: XU100_TICKER, symbol: 'XU100.IS', kind: 'benchmark' },
   ...INSTRUMENTS.filter((i) => i.kind !== 'metal'),
   // Yahoo sembolü `symbol || ticker` (dataSource.js'teki ABD fiyat hattıyla aynı
   // gerekçe): BRK.B'nin Yahoo karşılığı BRK-B. Sembol yerine ticker geçilince
@@ -63,11 +50,6 @@ const SERIES_INSTRUMENTS = [
   ...US_STOCKS.map((u) => ({ ticker: u.ticker, symbol: u.symbol || u.ticker, kind: 'us' })),
 ];
 
-// Karşılaştırma endeksi tek bir HTTP hatasında düşerse TÜM tarama devre dışı
-// kalıyor; tek hisse için aynı şey yalnızca o hisseyi eksiltiyor. Bu yüzden
-// yalnızca endekse yeniden deneme hakkı veriliyor.
-const BENCHMARK_DENEME = 3;
-const BENCHMARK_BEKLEME_MS = 1500;
 const SERIES_TOTAL = SERIES_INSTRUMENTS.length;
 
 export function seriesStats() {
@@ -83,44 +65,31 @@ export async function refreshSeries() {
     // Kıymetli madenlerde grafik ve gösterge yok: fiyatları SPOT'tan geliyor,
     // Yahoo'da ise yalnızca VADELİ kontratın barları var (spottan ~%1,4 yüksek
     // ve kontrat yuvarlandıkça sıçruyor). İki farklı seriyi karıştırmamak için
-    // bar geçmişi hiç tutulmuyor — bu aynı zamanda göstergeleri ve UYARI
-    // taramasını da madenler için kendiliğinden devre dışı bırakır.
+    // bar geçmişi hiç tutulmuyor — bu aynı zamanda göstergeleri de madenler
+    // için kendiliğinden devre dışı bırakır.
     for (const inst of SERIES_INSTRUMENTS) {
       const cur = cache.get(inst.ticker);
       if (cur && Date.now() - cur.at < TTL_MS) { skip++; continue; }
-      // fetchBars'ın kendi yeniden denemesi yok: tek HTTP hatası enstrümanı bir
-      // sonraki tura (15 dk) bırakır. Endeks için bu bedel çok yüksek, ona
-      // birkaç deneme hakkı veriliyor; hisseler eskisi gibi tek denemelik.
-      const hak = inst.kind === 'benchmark' ? BENCHMARK_DENEME : 1;
-      let yazildi = false;
-      for (let d = 0; d < hak && !yazildi; d++) {
-        if (d > 0) await sleep(BENCHMARK_BEKLEME_MS * d);
-        try {
-          const { bars, meta } = await fetchBars(inst.symbol);
-          if (bars.length) {
-            cache.set(inst.ticker, {
-              open: bars.map((b) => b.open),
-              high: bars.map((b) => b.high),
-              low: bars.map((b) => b.low),
-              close: bars.map((b) => b.close),
-              volume: bars.map((b) => b.volume),
-              time: bars.map((b) => b.ts),
-              lastTs: bars[bars.length - 1].ts,
-              gmtoffset: meta.gmtoffset ?? 0,
-              at: Date.now(),
-            });
-            ok++;
-            yazildi = true;
-          }
-        } catch { /* son denemeyse aşağıda fail sayılır */ }
-      }
-      if (!yazildi) {
-        fail++;
-        // Endeks düştüyse sessiz kalma: Tarama sekmesi bu yüzden komple boş
-        // görünecek ve sebebi log'suz anlaşılmıyordu.
-        if (inst.kind === 'benchmark') {
-          console.warn(`[live] XU100 endeksi ${hak} denemede alınamadı — BIST Tarama bu tur boş dönecek.`);
+      try {
+        const { bars, meta } = await fetchBars(inst.symbol);
+        if (bars.length) {
+          cache.set(inst.ticker, {
+            open: bars.map((b) => b.open),
+            high: bars.map((b) => b.high),
+            low: bars.map((b) => b.low),
+            close: bars.map((b) => b.close),
+            volume: bars.map((b) => b.volume),
+            time: bars.map((b) => b.ts),
+            lastTs: bars[bars.length - 1].ts,
+            gmtoffset: meta.gmtoffset ?? 0,
+            at: Date.now(),
+          });
+          ok++;
+        } else {
+          fail++;
         }
+      } catch {
+        fail++;
       }
       await sleep(GAP_MS);
     }
@@ -128,7 +97,7 @@ export async function refreshSeries() {
     filling = false;
   }
   if (ok || fail) {
-    // Payda SERIES_TOTAL: önbellek SERIES_INSTRUMENTS'ı (BIST + ABD + endeks)
+    // Payda SERIES_TOTAL: önbellek SERIES_INSTRUMENTS'ı (BIST + ABD)
     // tutuyor, INSTRUMENTS'ı değil. Eskiden "269/104" gibi anlamsız bir oran
     // basılıyordu ve eksik serinin hangi kümeden olduğunu gizliyordu.
     console.log(`[live] Bar geçmişi tazelendi — ${ok} yeni, ${skip} taze, ${fail} başarısız (önbellek ${cache.size}/${SERIES_TOTAL}).`);
@@ -176,27 +145,6 @@ function seriesWithLive(entry, price, priceTs, bar) {
     volumes[i] = b.volume; // gün içi hacim (önbellektekinin yerine)
   }
   return { opens, highs, lows, closes, volumes, times: entry.time, lastTs: entry.lastTs };
-}
-
-// Bir enstrümanın CANLI yamalı günlük serisi (UYARI taraması için).
-// Fiyat/gün içi bar önbellekleri beklenmez; yoksa ham önbellek serisi döner.
-// lastTs/gmtoffset: son barın hangi SEANSA ait olduğunu çağıran taraf bilsin
-// diye — bugün işlem görmeyen hissede son bar eski bir güne aittir.
-export function liveDailySeries(ticker) {
-  const entry = cache.get(ticker);
-  if (!entry) return null;
-  const p = peekLivePrices(5 * 60 * 1000)?.prices?.[ticker];
-  if (p?.price == null) {
-    return {
-      open: entry.open, high: entry.high, low: entry.low, close: entry.close, volume: entry.volume,
-      time: entry.time, lastTs: entry.lastTs, gmtoffset: entry.gmtoffset,
-    };
-  }
-  const s = seriesWithLive(entry, p.price, p.ts, peekLiveBars()?.[ticker]);
-  return {
-    open: s.opens, high: s.highs, low: s.lows, close: s.closes, volume: s.volumes,
-    time: s.times, lastTs: s.lastTs, gmtoffset: entry.gmtoffset,
-  };
 }
 
 // Canlı fiyatlardan gösterge sinyallerini üretir. Yanıt küçük kalsın diye kısa
