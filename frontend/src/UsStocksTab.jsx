@@ -60,17 +60,41 @@ function IndicatorBadge({ signal }) {
 }
 const pctCell = (v) => (v == null ? <span className="muted-dash">—</span> : <span>%{fmtNum(v)}</span>);
 
-// ABD seansı açık mı? 09:30–16:00 New York saati, hafta içi. Saat dilimini
-// Intl ile soruyoruz: yaz saati (EDT/EST) geçişini kendisi hallediyor, elle
-// UTC farkı tutmaya gerek kalmıyor.
-function usSeansAcik(simdi = new Date()) {
+// Fiyat normal seans dışında (pre/post market) geldiyse küçük bir etiketle
+// belirt — yoksa kullanıcı "neden Midas'takinden farklı" diye şaşırıyor
+// (yaşandı): aynı kaynak, yalnızca seans dışı fiyat farklı bir Yahoo alanından
+// (postMarketPrice/preMarketPrice) geliyor.
+const EXT_LABELS = { pre: 'Seans öncesi', post: 'Seans sonrası' };
+function ExtBadge({ ext }) {
+  if (!ext || !EXT_LABELS[ext]) return null;
+  return (
+    <span
+      title={`${EXT_LABELS[ext]} fiyatı (normal seans kapanışı değil)`}
+      style={{
+        marginLeft: 6, fontSize: 10, fontWeight: 700, letterSpacing: 0.5,
+        color: '#94a3b8', border: '1px solid #475569', borderRadius: 4, padding: '1px 4px',
+      }}
+    >
+      {ext === 'pre' ? 'ÖN SEANS' : 'SEANS SONRASI'}
+    </span>
+  );
+}
+
+// Fiyat akışını (18 sn'lik anket) ne zaman canlı tutalım? Yalnızca normal
+// seans (09:30-16:00 ET) değil, pre-market (04:00-09:30) ve after-hours
+// (16:00-20:00) de gerçek işlem gördüğü için o aralıkları da kapsıyor — backend
+// bu saatlerde fiyatı otomatik pre/post market değerine çeviriyor (bkz.
+// liveSignals.js withExtendedHours). Saat dilimini Intl ile soruyoruz: yaz
+// saati (EDT/EST) geçişini kendisi hallediyor, elle UTC farkı tutmaya gerek
+// kalmıyor.
+function usFiyatAkisiAcik(simdi = new Date()) {
   const bicim = new Intl.DateTimeFormat('en-US', {
     timeZone: 'America/New_York', weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false,
   });
   const parca = Object.fromEntries(bicim.formatToParts(simdi).map((p) => [p.type, p.value]));
   if (['Sat', 'Sun'].includes(parca.weekday)) return false;
   const dk = Number(parca.hour) * 60 + Number(parca.minute);
-  return dk >= 9 * 60 + 30 && dk < 16 * 60; // resmi tatiller kapsanmıyor
+  return dk >= 4 * 60 && dk < 20 * 60; // 04:00-20:00 ET, resmi tatiller kapsanmıyor
 }
 
 // Canlı fiyatı yayınlanan kaleme işler. BIST'teki mergeLivePrices ile aynı
@@ -85,6 +109,7 @@ function mergeUsLive(items, live) {
     if (!p || p.price == null) return it;
     const n = { ...it, price: p.price };
     if (p.changePct != null) n.changePct = p.changePct;
+    n.ext = p.ext ?? null;
     const s = signals[it.ticker];
     if (s) {
       n.stSignal = s.st ?? null;
@@ -127,8 +152,10 @@ function useUsRecommendations() {
   // uçtan geliyor, yayınlanan JSON'da yoklar. Seans kapalıyken de bir kez
   // çekmezsek sütunlar sürekli boş kalırdı — Yahoo seans dışında son kapanışı
   // döndüğü için hesaplanan göstergeler yine doğru.
-  // ANKET ise yalnızca ABD seansı açıkken ve sayfa görünürken: seans dışında
-  // fiyat hareket etmiyor, 18 saniyede bir istek atmanın anlamı yok.
+  // ANKET ise yalnızca fiyatın gerçekten hareket ettiği saatlerde (04:00-20:00
+  // ET: pre-market + normal seans + after-hours) ve sayfa görünürken — bunun
+  // dışında (gece, hafta sonu) fiyat hareket etmiyor, 18 saniyede bir istek
+  // atmanın anlamı yok.
   useEffect(() => {
     let cancelled = false;
     const cek = () => {
@@ -138,7 +165,7 @@ function useUsRecommendations() {
         .catch(() => { /* yoksay; bir sonraki turda tekrar denenir */ });
     };
     cek();
-    const acik = () => !document.hidden && usSeansAcik();
+    const acik = () => !document.hidden && usFiyatAkisiAcik();
     const id = setInterval(() => { if (acik()) cek(); }, 18 * 1000);
     const donunce = () => { if (acik()) cek(); };
     document.addEventListener('visibilitychange', donunce);
@@ -195,7 +222,7 @@ function ReportPanel({ item, onClose }) {
           <div className="modal-title">
             <span className="modal-ticker">{item.ticker} <SignalBadge signal={item.signal} /></span>
             <span className="modal-name">
-              {item.name} · {fmtNum(item.price)} {item.currency} <Pct value={item.changePct} />
+              {item.name} · {fmtNum(item.price)} {item.currency} <Pct value={item.changePct} /><ExtBadge ext={item.ext} />
             </span>
           </div>
           <button className="modal-close" onClick={onClose}>✕</button>
@@ -299,7 +326,7 @@ function UsCard({ s, rank, onSelect, onChart }) {
         <span className="card-price-val">
           {fmtNum(s.price)} <span className="cur">{s.currency || 'USD'}</span>
         </span>
-        <Pct value={s.changePct} />
+        <Pct value={s.changePct} /><ExtBadge ext={s.ext} />
       </div>
 
       <div className="card-metrics">
@@ -477,7 +504,7 @@ export default function UsStocksTab({ view = 'web' }) {
                     </button>
                     <div className="name">{s.name}{s.sector ? ` · ${s.sector}` : ''}</div>
                   </td>
-                  <td className="num">{fmtNum(s.price)} <span className="cur">{s.currency || 'USD'}</span></td>
+                  <td className="num">{fmtNum(s.price)} <span className="cur">{s.currency || 'USD'}</span><ExtBadge ext={s.ext} /></td>
                   <td className="num"><Pct value={s.changePct} /></td>
                   <td className="num">
                     <Expected

@@ -14,6 +14,7 @@ import { US_STOCKS } from './usStocks.js';
 import {
   fetchBars, fetchLivePrices, fetchLiveBars,
   fetchAltinInPrices, fetchSpotMetals, fetchUsdTryRate, metalTryPerGram, fetchUsLivePrices,
+  fetchUsExtendedPrices,
 } from './dataSource.js';
 import {
   supertrendSignal, wavetrendSignals,
@@ -271,15 +272,33 @@ export async function getLivePrices(items = []) {
 // kullanılmıyor, son bar yalnızca canlı fiyatla yamalanıyor.
 let usSigCache = { key: null, signals: {}, scores: {} };
 
+// Seans dışında (pre/post market) normal seans kapanışı donuk kalır; gerçek
+// fiyat hareketi extended-hours'ta devam eder. fetchUsExtendedPrices() bunu
+// crumb'lı v7/quote'tan ayrıca çeker (bkz. dataSource.js) — burada varsa
+// spark'ın seans fiyatının ÜSTÜNE yazılır, yoksa (REGULAR seans veya crumb
+// alınamadıysa) seans fiyatı aynen kalır. `ext` alanı frontend'e "bu fiyat
+// pre/post market'ten" bilgisini taşır.
+async function withExtendedHours(prices) {
+  const ext = await fetchUsExtendedPrices().catch(() => null);
+  if (!ext || Object.keys(ext).length === 0) return prices;
+  const out = { ...prices };
+  for (const [ticker, e] of Object.entries(ext)) {
+    if (!out[ticker]) continue;
+    out[ticker] = { ...out[ticker], price: e.price, ext: e.state, extChangePct: e.changePct };
+  }
+  return out;
+}
+
 export async function getUsLivePrices(items = []) {
   const live = await fetchUsLivePrices();
+  const prices = await withExtendedHours(live.prices);
 
   if (usSigCache.key !== live.updatedAt) {
     const t0 = Date.now();
-    const signals = computeLiveSignals(live.prices);
+    const signals = computeLiveSignals(prices);
     const scores = {};
     for (const it of items) {
-      const p = live.prices[it.ticker];
+      const p = prices[it.ticker];
       if (!p || p.price == null) continue;
       const d = usPriceDerived(it, p.price);
       const o = { sc: d.score, sg: d.signal };
@@ -291,5 +310,5 @@ export async function getUsLivePrices(items = []) {
     if (ms > 500) console.log(`[live-us] ${Object.keys(signals).length} hisse ${ms} ms'de hesaplandı.`);
   }
 
-  return { ...live, signals: usSigCache.signals, scores: usSigCache.scores };
+  return { ...live, prices, signals: usSigCache.signals, scores: usSigCache.scores };
 }

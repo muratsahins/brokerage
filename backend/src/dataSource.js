@@ -324,6 +324,82 @@ async function refreshLiveBars() {
   return out;
 }
 
+// --- ABD borsa-dışı (pre/post market) fiyatları -----------------------------
+// ABD hisseleri normal seans (09:30-16:00 ET) dışında da (04:00-09:30 pre,
+// 16:00-20:00 post) gerçek işlem görüyor — spark ucu bunu döndürmüyor (yalnızca
+// günlük kapanış). v7/quote (BIST bar hattıyla aynı crumb oturumu) marketState +
+// preMarketPrice/postMarketPrice alanlarını veriyor; regularMarketPrice normal
+// seans kapanışında sabit kalırken bunlar seans dışında hareket etmeye devam
+// ediyor. 60 sn önbellek: bu veri saniyede değişecek kadar likit değil, crumb
+// oturumunu (BIST'le paylaşılıyor) gereksiz yormayalım.
+let usExtCache = { at: 0, data: null };
+let usExtPausedUntil = 0;
+const US_EXT_TTL_MS = 60000;
+let usExtInflight = null;
+
+export async function fetchUsExtendedPrices() {
+  const yas = Date.now() - usExtCache.at;
+  if (usExtCache.data && yas < US_EXT_TTL_MS) return usExtCache.data;
+  if (Date.now() < usExtPausedUntil) return usExtCache.data;
+  if (!usExtInflight) {
+    usExtInflight = refreshUsExtendedPrices()
+      .catch((err) => { console.warn(`[data] ABD pre/post fiyatları tazelenemedi: ${err.message}`); return usExtCache.data; })
+      .finally(() => { usExtInflight = null; });
+  }
+  return usExtInflight;
+}
+
+async function refreshUsExtendedPrices() {
+  const { cookie, crumb } = await ensureSession();
+  if (!crumb) {
+    usExtPausedUntil = Date.now() + LIVE_BAR_PAUSE_MS;
+    return usExtCache.data;
+  }
+
+  const bySym = new Map(US_STOCKS.map((u) => [u.symbol || u.ticker, u.ticker]));
+  const symbols = US_STOCKS.map((u) => u.symbol || u.ticker);
+  const out = {};
+  const CHUNK = 100;
+  const CONC = 3;
+  const chunks = [];
+  for (let i = 0; i < symbols.length; i += CHUNK) chunks.push(symbols.slice(i, i + CHUNK));
+
+  let failed = 0;
+  const doChunk = async (chunk) => {
+    try {
+      const url = `${QUOTE_URL}?symbols=${chunk.map(encodeURIComponent).join(',')}&crumb=${encodeURIComponent(crumb)}`;
+      const res = await fetch(url, {
+        headers: { ...BROWSER_HEADERS, Cookie: cookie },
+        signal: AbortSignal.timeout(12000),
+      });
+      if (!res.ok) { failed++; return; }
+      const j = await res.json();
+      for (const q of j?.quoteResponse?.result ?? []) {
+        const ticker = bySym.get(q.symbol);
+        if (!ticker) continue;
+        // Yalnızca gerçekten seans dışıysa (POST/POSTPOST/PRE/PREPRE) ve ilgili
+        // fiyat alanı doluysa taşı — REGULAR'da bu alanlar zaten boş/anlamsız.
+        if ((q.marketState === 'POST' || q.marketState === 'POSTPOST') && q.postMarketPrice != null) {
+          out[ticker] = { price: q.postMarketPrice, changePct: q.postMarketChangePercent ?? null, state: 'post' };
+        } else if ((q.marketState === 'PRE' || q.marketState === 'PREPRE') && q.preMarketPrice != null) {
+          out[ticker] = { price: q.preMarketPrice, changePct: q.preMarketChangePercent ?? null, state: 'pre' };
+        }
+      }
+    } catch { failed++; }
+  };
+
+  for (let i = 0; i < chunks.length; i += CONC) {
+    await Promise.all(chunks.slice(i, i + CONC).map(doChunk));
+  }
+  if (Object.keys(out).length === 0 && failed) {
+    console.warn(`[data] ABD pre/post fiyat turu tamamen başarısız (${failed} parça) — ${LIVE_BAR_PAUSE_MS / 60000} dk duraklatılıyor.`);
+    usExtPausedUntil = Date.now() + LIVE_BAR_PAUSE_MS;
+    return usExtCache.data;
+  }
+  usExtCache = { at: Date.now(), data: out };
+  return out;
+}
+
 // --- TCMB USD/TRY kuru ------------------------------------------------------
 // Kıymetli madenlerin (USD/ons) TRY/gram karşılığı için güncel döviz satış kuru.
 // TCMB kuru iş günü başına bir kez yayınlanır; canlı fiyat yolu bunu 15-18
