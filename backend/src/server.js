@@ -181,11 +181,12 @@ async function start() {
     console.log(`[start] Otomatik veri senkronizasyonu her ${minutes} dakikada bir açık.`);
   }
 
-  // ABD verisi (NASDAQ100+S&P100) günde 1 kez yayınlanıyor (refresh-us-data.yml);
-  // BIST'ten daha seyrek tazelenmesi yeterli. Süreç yeniden başlamadan
-  // getUsRecommendations() ilk çağrıdan sonra belleği hiç güncellemediği için
-  // bu periyodik senkronizasyon olmadan yayınlanan yeni veri hiç görünmezdi.
-  const usMinutes = Number(process.env.US_REFRESH_INTERVAL_MINUTES ?? 180);
+  // ABD verisi (NASDAQ100+S&P100) refresh-us-data.yml tarafından ABD seansı
+  // boyunca (13:47-21:47 UTC, hafta içi) saatte bir yayınlanıyor. Süreç yeniden
+  // başlamadan getUsRecommendations() ilk çağrıdan sonra belleği hiç
+  // güncellemediği için bu periyodik senkronizasyon olmadan yayınlanan yeni
+  // veri hiç görünmezdi; 60 dk, yayın sıklığıyla eşleşiyor.
+  const usMinutes = Number(process.env.US_REFRESH_INTERVAL_MINUTES ?? 60);
   if (usMinutes > 0) {
     setInterval(() => {
       syncUsData().catch((err) => console.warn(`[cron] ABD veri senkronizasyonu başarısız: ${err.message}`));
