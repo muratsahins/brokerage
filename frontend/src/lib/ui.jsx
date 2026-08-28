@@ -34,14 +34,34 @@ const TRADINGVIEW_LOGO_SLUGS = {
 };
 
 // Kıymetli madenlerin logo servislerinde karşılığı yok; her biri kendi
-// metalinin rengiyle (parlaklık hissi veren radial-gradient) ve kimyasal
-// simgesiyle gösterilir.
+// metaline uygun renkte küçük bir külçe (ingot) resmiyle gösterilir.
 const MADEN_STIL = {
-  XAU: { gradient: 'radial-gradient(circle at 35% 30%, #fff6cf, #f5c542 45%, #b8860b 100%)', renk: '#5c3d00', sembol: 'Au' },
-  XAG: { gradient: 'radial-gradient(circle at 35% 30%, #ffffff, #d9d9d9 45%, #9a9a9a 100%)', renk: '#3f3f3f', sembol: 'Ag' },
-  XPT: { gradient: 'radial-gradient(circle at 35% 30%, #f4f4f2, #d7d7d4 45%, #a8a8a4 100%)', renk: '#3f3f3f', sembol: 'Pt' },
-  XPD: { gradient: 'radial-gradient(circle at 35% 30%, #eef0f7, #ccd0dd 45%, #9a9dae 100%)', renk: '#3f3f3f', sembol: 'Pd' },
+  XAU: { acik: '#fff6cf', orta: '#f5c542', koyu: '#a9791a' },
+  XAG: { acik: '#ffffff', orta: '#d6d6d6', koyu: '#8f8f8f' },
+  XPT: { acik: '#f5f5f3', orta: '#d3d2ce', koyu: '#98968f' },
+  XPD: { acik: '#f0f2f9', orta: '#cdd0dd', koyu: '#8c8fa0' },
 };
+
+// Külçe (ingot) ikonu: trapez gövde + üstte parlama şeridi, saf CSS/SVG,
+// hiçbir ağa bağımlı değil.
+function MadenResmi({ ticker, size }) {
+  const renk = MADEN_STIL[ticker];
+  if (!renk) return null;
+  const id = `ingot-${ticker}`;
+  return (
+    <svg className="logo logo-metal" width={size} height={size} viewBox="0 0 40 40" aria-hidden="true">
+      <defs>
+        <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={renk.acik} />
+          <stop offset="55%" stopColor={renk.orta} />
+          <stop offset="100%" stopColor={renk.koyu} />
+        </linearGradient>
+      </defs>
+      <polygon points="7,29 11,11 29,11 33,29" fill={`url(#${id})`} stroke="rgba(0,0,0,0.25)" strokeWidth="0.6" />
+      <polygon points="11,11 14,11 10,29 7,29" fill="rgba(255,255,255,0.35)" />
+    </svg>
+  );
+}
 
 // Şirket logosu: önce parqet.com'un ücretsiz sembol logo servisini (BIST için
 // ".IS" ekiyle) dener; 404/yüklenemezse elimizde varsa TradingView'in sembol
@@ -51,18 +71,8 @@ export function Logo({ ticker, market, size = 42 }) {
   const [asama, setAsama] = useState(0);
   const stil = { width: size, height: size };
 
-  if (market === 'metal') {
-    const maden = MADEN_STIL[ticker];
-    if (maden) {
-      return (
-        <span
-          className="logo logo-metal"
-          style={{ ...stil, background: maden.gradient, color: maden.renk, fontSize: size * 0.36 }}
-        >
-          {maden.sembol}
-        </span>
-      );
-    }
+  if (market === 'metal' && MADEN_STIL[ticker]) {
+    return <MadenResmi ticker={ticker} size={size} />;
   }
 
   const kaynaklar = market === 'metal' || !ticker ? [] : [
