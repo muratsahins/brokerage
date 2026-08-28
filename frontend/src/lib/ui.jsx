@@ -33,13 +33,37 @@ const TRADINGVIEW_LOGO_SLUGS = {
   TUKAS: 'tukas-gida', 'BRK.B': 'berkshire-hathaway', MNST: 'monster-beverage',
 };
 
+// Kıymetli madenlerin logo servislerinde karşılığı yok; her biri kendi
+// metalinin rengiyle (parlaklık hissi veren radial-gradient) ve kimyasal
+// simgesiyle gösterilir.
+const MADEN_STIL = {
+  XAU: { gradient: 'radial-gradient(circle at 35% 30%, #fff6cf, #f5c542 45%, #b8860b 100%)', renk: '#5c3d00', sembol: 'Au' },
+  XAG: { gradient: 'radial-gradient(circle at 35% 30%, #ffffff, #d9d9d9 45%, #9a9a9a 100%)', renk: '#3f3f3f', sembol: 'Ag' },
+  XPT: { gradient: 'radial-gradient(circle at 35% 30%, #f4f4f2, #d7d7d4 45%, #a8a8a4 100%)', renk: '#3f3f3f', sembol: 'Pt' },
+  XPD: { gradient: 'radial-gradient(circle at 35% 30%, #eef0f7, #ccd0dd 45%, #9a9dae 100%)', renk: '#3f3f3f', sembol: 'Pd' },
+};
+
 // Şirket logosu: önce parqet.com'un ücretsiz sembol logo servisini (BIST için
 // ".IS" ekiyle) dener; 404/yüklenemezse elimizde varsa TradingView'in sembol
 // logosuna düşer; o da yoksa ticker'ın baş harfleriyle renkli bir rozet
 // gösterir. `market` 'BIST' | 'US' | 'metal'.
-export function Logo({ ticker, market, size = 28 }) {
+export function Logo({ ticker, market, size = 42 }) {
   const [asama, setAsama] = useState(0);
   const stil = { width: size, height: size };
+
+  if (market === 'metal') {
+    const maden = MADEN_STIL[ticker];
+    if (maden) {
+      return (
+        <span
+          className="logo logo-metal"
+          style={{ ...stil, background: maden.gradient, color: maden.renk, fontSize: size * 0.36 }}
+        >
+          {maden.sembol}
+        </span>
+      );
+    }
+  }
 
   const kaynaklar = market === 'metal' || !ticker ? [] : [
     `https://assets.parqet.com/logos/symbol/${market === 'BIST' ? `${ticker}.IS` : ticker}?format=png`,
