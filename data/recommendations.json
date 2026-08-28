@@ -1988,8 +1988,8 @@
       "macdBull": true,
       "rsiReversal": false,
       "macdCross": false,
-      "name": "Papilon Savunma",
-      "sector": "Savunma",
+      "name": "Pasifik Teknoloji",
+      "sector": "Teknoloji",
       "bist": 100,
       "kind": "stock"
     },
@@ -2993,7 +2993,7 @@
       "macdBull": false,
       "rsiReversal": false,
       "macdCross": false,
-      "name": "Panora GYO",
+      "name": "Pasifik GYO",
       "sector": "GYO",
       "bist": 100,
       "kind": "stock"

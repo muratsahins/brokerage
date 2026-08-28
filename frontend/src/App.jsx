@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, lazy, memo, Suspense } from 'react';
 import { API_BASE, fmtNum, norm, roundPrice } from './lib/common.js';
-import { Expected, Pct, Tutar } from './lib/ui.jsx';
+import { Expected, Logo, Pct, Tutar } from './lib/ui.jsx';
 import { useModalBack } from './lib/useModalBack.js';
 import {
   VB_START, vbCleanRetired, vbSave, vbTrade, vbUnitLabel, vbUnitPrice,
@@ -154,7 +154,7 @@ function SignalBadge({ signal }) {
 const StockRow = memo(function StockRow({ s, rank, showBuySell, onSelect }) {
   return (
     <tr>
-      <td className="rank">{rank}</td>
+      <td><Logo ticker={s.ticker} market={s.kind === 'metal' ? 'metal' : 'BIST'} /></td>
       <td>
         {/* Madenlerde grafik yok: bar geçmişi vadeli kontrata ait, gösterilen
             fiyat ise spot. ABD hisselerinde grafik/sanal borsa açık — ₺
@@ -214,7 +214,7 @@ const StockCard = memo(function StockCard({ s, rank, onSelect }) {
     <div className="card">
       <div className="card-top">
         <div className="card-id">
-          <span className="rank">{rank}</span>
+          <Logo ticker={s.ticker} market={s.kind === 'metal' ? 'metal' : 'BIST'} />
           <div>
             {s.kind === 'metal' ? (
               <span className="ticker">{s.ticker}</span>
@@ -1071,7 +1071,7 @@ export default function App() {
           <table>
             <thead>
               <tr>
-                <th>#</th>
+                <th></th>
                 <th>Hisse</th>
                 <th className="num">Fiyat</th>
                 {showBuySell && <th className="num">Alış</th>}

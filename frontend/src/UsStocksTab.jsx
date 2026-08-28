@@ -8,7 +8,7 @@
 // aynı desen), böylece BIST kullanıcıları bu bundle'ı hiç indirmez.
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { API_BASE, fmtNum, norm } from './lib/common.js';
-import { Expected, Pct } from './lib/ui.jsx';
+import { Expected, Logo, Pct } from './lib/ui.jsx';
 import { useModalBack } from './lib/useModalBack.js';
 
 // BIST ile aynı grafik bileşeni; aynı tembel parçadan gelir, ikinci bir indirme
@@ -311,7 +311,7 @@ function UsCard({ s, rank, onSelect, onChart }) {
     <div className="card">
       <div className="card-top">
         <div className="card-id">
-          <span className="rank">{rank}</span>
+          <Logo ticker={s.ticker} market="US" />
           <div>
             <button className="ticker ticker-link" onClick={() => onChart(s)} title="Grafiği aç">
               {s.ticker} <span className="chart-ico">📈</span>
@@ -476,7 +476,7 @@ export default function UsStocksTab({ view = 'web' }) {
           <table>
             <thead>
               <tr>
-                <th>#</th>
+                <th></th>
                 <th>Hisse</th>
                 <th className="num">Fiyat</th>
                 <th className="num">Günlük</th>
@@ -497,7 +497,7 @@ export default function UsStocksTab({ view = 'web' }) {
             <tbody>
               {filtered.map((s, i) => (
                 <tr key={s.ticker}>
-                  <td className="rank">{i + 1}</td>
+                  <td><Logo ticker={s.ticker} market="US" /></td>
                   <td>
                     <button className="ticker ticker-link" onClick={() => setChartItem(s)} title="Grafiği aç">
                       {s.ticker} <span className="chart-ico">📈</span>
