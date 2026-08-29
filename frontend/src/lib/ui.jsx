@@ -42,23 +42,26 @@ const MADEN_STIL = {
   XPD: { acik: '#f0f2f9', orta: '#cdd0dd', koyu: '#8c8fa0' },
 };
 
-// Külçe (ingot) ikonu: trapez gövde + üstte parlama şeridi, saf CSS/SVG,
-// hiçbir ağa bağımlı değil.
+// Sikke (coin) ikonu: iki üst üste binen madeni para, kabartma kenarlı ve
+// parlamalı — saf SVG, hiçbir ağa bağımlı değil. Tek sikkeden çok "kıymetli
+// maden yığını" hissi versin diye arkada ikinci bir sikke var.
 function MadenResmi({ ticker, size }) {
   const renk = MADEN_STIL[ticker];
   if (!renk) return null;
-  const id = `ingot-${ticker}`;
+  const id = `coin-${ticker}`;
   return (
     <svg className="logo logo-metal" width={size} height={size} viewBox="0 0 40 40" aria-hidden="true">
       <defs>
-        <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
+        <radialGradient id={id} cx="38%" cy="32%" r="75%">
           <stop offset="0%" stopColor={renk.acik} />
           <stop offset="55%" stopColor={renk.orta} />
           <stop offset="100%" stopColor={renk.koyu} />
-        </linearGradient>
+        </radialGradient>
       </defs>
-      <polygon points="7,29 11,11 29,11 33,29" fill={`url(#${id})`} stroke="rgba(0,0,0,0.25)" strokeWidth="0.6" />
-      <polygon points="11,11 14,11 10,29 7,29" fill="rgba(255,255,255,0.35)" />
+      <circle cx="24" cy="24" r="12" fill={renk.koyu} opacity="0.55" />
+      <circle cx="16" cy="16" r="13" fill={`url(#${id})`} stroke="rgba(0,0,0,0.3)" strokeWidth="1" />
+      <circle cx="16" cy="16" r="9" fill="none" stroke="rgba(0,0,0,0.18)" strokeWidth="1" />
+      <ellipse cx="12" cy="12" rx="4.5" ry="3" fill="rgba(255,255,255,0.55)" />
     </svg>
   );
 }
