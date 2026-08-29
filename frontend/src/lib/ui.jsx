@@ -33,35 +33,71 @@ const TRADINGVIEW_LOGO_SLUGS = {
   TUKAS: 'tukas-gida', 'BRK.B': 'berkshire-hathaway', MNST: 'monster-beverage',
 };
 
-// Kıymetli madenlerin logo servislerinde karşılığı yok; her biri kendi
-// metaline uygun renkte küçük bir külçe (ingot) resmiyle gösterilir.
+// Kıymetli madenlerin logo servislerinde karşılığı yok; sadece renk değil,
+// her biri kendine özgü bir SİLUETLE de ayrışsın diye dört farklı şekil
+// kullanılır: altın külçe, gümüş sikke, platin yüzük, paladyum kristal.
 const MADEN_STIL = {
-  XAU: { acik: '#fff6cf', orta: '#f5c542', koyu: '#a9791a' },
-  XAG: { acik: '#ffffff', orta: '#d6d6d6', koyu: '#8f8f8f' },
-  XPT: { acik: '#f5f5f3', orta: '#d3d2ce', koyu: '#98968f' },
-  XPD: { acik: '#f0f2f9', orta: '#cdd0dd', koyu: '#8c8fa0' },
+  XAU: { tip: 'bar', acik: '#fff6cf', orta: '#f5c542', koyu: '#a9791a' },
+  XAG: { tip: 'coin', acik: '#ffffff', orta: '#d6d6d6', koyu: '#8f8f8f' },
+  XPT: { tip: 'ring', acik: '#eef2f5', orta: '#b9c4cb', koyu: '#6f7c85' },
+  XPD: { tip: 'gem', acik: '#f3eefc', orta: '#c9b8e8', koyu: '#7c6a9c' },
 };
 
-// Sikke (coin) ikonu: iki üst üste binen madeni para, kabartma kenarlı ve
-// parlamalı — saf SVG, hiçbir ağa bağımlı değil. Tek sikkeden çok "kıymetli
-// maden yığını" hissi versin diye arkada ikinci bir sikke var.
+// Şekle göre iç çizim: külçe (3B blok), sikke (kabartma kenarlı), yüzük
+// (halka), kristal (çokgen mücevher) — saf SVG, ağa bağımlı değil.
+function MadenIcerik({ tip, gradId }) {
+  const dolgu = `url(#${gradId})`;
+  if (tip === 'bar') {
+    return (
+      <>
+        <polygon points="9,30 13,13 29,13 33,30" fill={dolgu} stroke="rgba(0,0,0,0.3)" strokeWidth="1" />
+        <polygon points="13,13 16,9 32,9 29,13" fill="rgba(255,255,255,0.4)" stroke="rgba(0,0,0,0.15)" strokeWidth="0.6" />
+        <line x1="12" y1="22" x2="30" y2="22" stroke="rgba(0,0,0,0.2)" strokeWidth="0.8" />
+      </>
+    );
+  }
+  if (tip === 'ring') {
+    return (
+      <>
+        <circle cx="20" cy="21" r="12" fill="none" stroke={dolgu} strokeWidth="7" />
+        <path d="M 11 15 A 12 12 0 0 1 20 9" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2.2" strokeLinecap="round" />
+      </>
+    );
+  }
+  if (tip === 'gem') {
+    return (
+      <>
+        <polygon points="20,6 32,16 20,34 8,16" fill={dolgu} stroke="rgba(0,0,0,0.3)" strokeWidth="1" />
+        <polyline points="8,16 32,16" stroke="rgba(0,0,0,0.2)" strokeWidth="0.8" />
+        <polygon points="20,6 25,16 15,16" fill="rgba(255,255,255,0.4)" />
+      </>
+    );
+  }
+  // coin
+  return (
+    <>
+      <circle cx="24" cy="24" r="12" fill="currentColor" opacity="0.35" />
+      <circle cx="16" cy="16" r="13" fill={dolgu} stroke="rgba(0,0,0,0.3)" strokeWidth="1" />
+      <circle cx="16" cy="16" r="9" fill="none" stroke="rgba(0,0,0,0.18)" strokeWidth="1" />
+      <ellipse cx="12" cy="12" rx="4.5" ry="3" fill="rgba(255,255,255,0.55)" />
+    </>
+  );
+}
+
 function MadenResmi({ ticker, size }) {
   const renk = MADEN_STIL[ticker];
   if (!renk) return null;
-  const id = `coin-${ticker}`;
+  const id = `maden-${ticker}`;
   return (
-    <svg className="logo logo-metal" width={size} height={size} viewBox="0 0 40 40" aria-hidden="true">
+    <svg className="logo logo-metal" width={size} height={size} viewBox="0 0 40 40" aria-hidden="true" style={{ color: renk.koyu }}>
       <defs>
-        <radialGradient id={id} cx="38%" cy="32%" r="75%">
+        <linearGradient id={id} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor={renk.acik} />
           <stop offset="55%" stopColor={renk.orta} />
           <stop offset="100%" stopColor={renk.koyu} />
-        </radialGradient>
+        </linearGradient>
       </defs>
-      <circle cx="24" cy="24" r="12" fill={renk.koyu} opacity="0.55" />
-      <circle cx="16" cy="16" r="13" fill={`url(#${id})`} stroke="rgba(0,0,0,0.3)" strokeWidth="1" />
-      <circle cx="16" cy="16" r="9" fill="none" stroke="rgba(0,0,0,0.18)" strokeWidth="1" />
-      <ellipse cx="12" cy="12" rx="4.5" ry="3" fill="rgba(255,255,255,0.55)" />
+      <MadenIcerik tip={renk.tip} gradId={id} />
     </svg>
   );
 }
