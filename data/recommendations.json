@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-29T10:01:31.606Z",
+  "updatedAt": "2026-08-29T16:42:37.076Z",
   "source": "github-actions",
   "count": 104,
   "withAnalyst": 55,
@@ -1990,8 +1990,7 @@
       "buyPrice": 102.77,
       "sellPrice": 103.19,
       "tryPerGram": 103.19,
-      "tryPerGramSource": "altin.in",
-      "usdTry": 48.1598
+      "tryPerGramSource": "altin.in"
     },
     {
       "symbol": "GSRAY.IS",
@@ -2128,7 +2127,7 @@
       "currency": "USD",
       "changePct": 0.49,
       "momentum1m": 12.25,
-      "pos52w": 0.329,
+      "pos52w": 0.328,
       "exp1m": null,
       "exp3m": null,
       "upside12m": null,
@@ -2155,8 +2154,7 @@
       "buyPrice": 2821.95,
       "sellPrice": 2835.44,
       "tryPerGram": 2835.44,
-      "tryPerGramSource": "altin.in",
-      "usdTry": 48.1598
+      "tryPerGramSource": "altin.in"
     },
     {
       "symbol": "HALKB.IS",
@@ -2252,10 +2250,7 @@
       "name": "Paladyum",
       "sector": "Kıymetli Maden",
       "bist": null,
-      "kind": "metal",
-      "tryPerGram": 2237.4,
-      "tryPerGramSource": "spot",
-      "usdTry": 48.1598
+      "kind": "metal"
     },
     {
       "symbol": "FENER.IS",
@@ -2323,8 +2318,7 @@
       "buyPrice": 6849.54,
       "sellPrice": 6908.26,
       "tryPerGram": 6908.26,
-      "tryPerGramSource": "altin.in",
-      "usdTry": 48.1598
+      "tryPerGramSource": "altin.in"
     },
     {
       "symbol": "ESEN.IS",
@@ -2685,7 +2679,7 @@
       "currency": "TRY",
       "changePct": -0.06,
       "momentum1m": 2.77,
-      "pos52w": 0.044,
+      "pos52w": 0.048,
       "exp1m": null,
       "exp3m": null,
       "upside12m": null,
@@ -2813,7 +2807,7 @@
       "currency": "TRY",
       "changePct": 0.42,
       "momentum1m": -3.63,
-      "pos52w": 0.094,
+      "pos52w": 0.097,
       "exp1m": null,
       "exp3m": null,
       "upside12m": null,
