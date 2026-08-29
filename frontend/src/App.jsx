@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, lazy, memo, Suspense } from 'react';
 import { API_BASE, fmtNum, norm, roundPrice } from './lib/common.js';
-import { Expected, Logo, Pct, Tutar } from './lib/ui.jsx';
+import { BackToTop, Expected, Logo, Pct, Tutar } from './lib/ui.jsx';
 import { useModalBack } from './lib/useModalBack.js';
 import {
   VB_START, vbCleanRetired, vbSave, vbTrade, vbUnitLabel, vbUnitPrice,
@@ -1176,6 +1176,7 @@ export default function App() {
           <ChartModal item={chartLive} onClose={() => setChartItem(null)} />
         </Suspense>
       )}
+      <BackToTop />
     </div>
   );
 }

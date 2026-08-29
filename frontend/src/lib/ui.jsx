@@ -1,6 +1,55 @@
 // Hem tabloda/kartta hem grafik pop-up'ında kullanılan küçük görsel parçalar.
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { fmtNum } from './common.js';
+
+// Sayfa biraz kaydırılınca sağ altta beliren "başa dön" düğmesi. Uzun
+// listelerde (100+ satır) tekrar tekrar elle kaydırmamak için.
+const BASA_DON_ESIGI = 400;
+
+// window.scrollTo({behavior:'smooth'}) bazı tarayıcı/otomasyon ortamlarında
+// güvenilmez çalışıyor; rAF ile elle yumuşatılmış kaydırma her yerde çalışır.
+// Sekme arka plandaysa rAF hiç tetiklenmeyebilir — o durumda düğme "ölü"
+// görünmesin diye kısa bir sürede ani atlamaya düşen bir güvenlik ağı var.
+function yumusakBasaDon() {
+  const baslangic = window.scrollY;
+  if (baslangic <= 0) return;
+  const sure = 400;
+  const t0 = performance.now();
+  let calisti = false;
+  const adim = (simdi) => {
+    calisti = true;
+    const ilerleme = Math.min(1, (simdi - t0) / sure);
+    const kolayla = 1 - Math.pow(1 - ilerleme, 3); // ease-out
+    window.scrollTo(0, Math.round(baslangic * (1 - kolayla)));
+    if (ilerleme < 1) requestAnimationFrame(adim);
+  };
+  requestAnimationFrame(adim);
+  setTimeout(() => { if (!calisti) window.scrollTo(0, 0); }, 500);
+}
+
+export function BackToTop() {
+  const [gorunur, setGorunur] = useState(false);
+
+  useEffect(() => {
+    const kontrolEt = () => setGorunur(window.scrollY > BASA_DON_ESIGI);
+    kontrolEt();
+    window.addEventListener('scroll', kontrolEt, { passive: true });
+    return () => window.removeEventListener('scroll', kontrolEt);
+  }, []);
+
+  if (!gorunur) return null;
+
+  return (
+    <button
+      className="back-to-top"
+      onClick={yumusakBasaDon}
+      aria-label="Başa dön"
+      title="Başa dön"
+    >
+      ↑ Başa dön
+    </button>
+  );
+}
 
 // Ticker'dan sabit bir renk üretir (aynı hisse hep aynı renk alır), logo
 // bulunamadığında baş harflerle gösterilen yedek rozet için kullanılır.

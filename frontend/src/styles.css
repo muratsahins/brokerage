@@ -617,3 +617,24 @@ th.num { text-align: right; }
   .us-quant-grid { grid-template-columns: repeat(2, 1fr); }
   .us-report-cols { grid-template-columns: 1fr; }
 }
+
+.back-to-top {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  opacity: 0.9;
+}
+.back-to-top:hover { opacity: 1; background: #1c2029; }
