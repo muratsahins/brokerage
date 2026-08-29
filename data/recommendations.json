@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-29T16:42:37.076Z",
+  "updatedAt": "2026-08-29T20:54:07.555Z",
   "source": "github-actions",
   "count": 104,
   "withAnalyst": 55,
@@ -908,15 +908,15 @@
       "changePct": 0.48,
       "momentum1m": 18.83,
       "pos52w": 0.498,
-      "exp1m": 2.2,
-      "exp3m": 6.74,
-      "upside12m": 29.83,
-      "targetMean": 95.03,
+      "exp1m": 2.23,
+      "exp3m": 6.84,
+      "upside12m": 30.32,
+      "targetMean": 95.39,
       "targetHigh": 116.6,
       "targetLow": 77,
-      "recommendationKey": "none",
-      "numAnalysts": 15,
-      "forwardPE": 3.04,
+      "recommendationKey": "buy",
+      "numAnalysts": 16,
+      "forwardPE": 3.18,
       "revenueGrowth": 42,
       "score": 78,
       "signal": "TUT",
@@ -1990,7 +1990,8 @@
       "buyPrice": 102.77,
       "sellPrice": 103.19,
       "tryPerGram": 103.19,
-      "tryPerGramSource": "altin.in"
+      "tryPerGramSource": "altin.in",
+      "usdTry": 48.1598
     },
     {
       "symbol": "GSRAY.IS",
@@ -2154,7 +2155,8 @@
       "buyPrice": 2821.95,
       "sellPrice": 2835.44,
       "tryPerGram": 2835.44,
-      "tryPerGramSource": "altin.in"
+      "tryPerGramSource": "altin.in",
+      "usdTry": 48.1598
     },
     {
       "symbol": "HALKB.IS",
@@ -2250,7 +2252,10 @@
       "name": "Paladyum",
       "sector": "Kıymetli Maden",
       "bist": null,
-      "kind": "metal"
+      "kind": "metal",
+      "tryPerGram": 2237.4,
+      "tryPerGramSource": "spot",
+      "usdTry": 48.1598
     },
     {
       "symbol": "FENER.IS",
@@ -2318,7 +2323,8 @@
       "buyPrice": 6849.54,
       "sellPrice": 6908.26,
       "tryPerGram": 6908.26,
-      "tryPerGramSource": "altin.in"
+      "tryPerGramSource": "altin.in",
+      "usdTry": 48.1598
     },
     {
       "symbol": "ESEN.IS",
