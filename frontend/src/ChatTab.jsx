@@ -1,5 +1,12 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { API_BASE } from './lib/common.js';
+import { getStoredEmail, isValidEmail, setStoredEmail } from './lib/auth.js';
+
+// Sohbet, yalnızca e-posta ile "giriş yapmış" ziyaretçilere açık — App.jsx
+// zaten sekmeyi girişsiz gizliyor, ama biri doğrudan bu sekmede kalırken çıkış
+// yaparsa (veya ileride sekme başka bir yoldan da açılabilirse) diye burada da
+// aynı kapı var. `getStoredEmail`/`setStoredEmail` Sanal Borsa (VirtualTrade)
+// ile AYNI localStorage anahtarını kullanır — tek site girişi.
 
 // Boş sohbette gösterilen hazır sorular — kullanıcıyı başlatmaya teşvik eder.
 // Sitenin kapsamından (BIST 100 / kıymetli maden / ABD büyük şirket) örnekler.
@@ -35,12 +42,27 @@ function Formatted({ text }) {
 }
 
 export default function ChatTab() {
+  const [email, setEmail] = useState(getStoredEmail);
+  const [emailInput, setEmailInput] = useState('');
+  const [loginMsg, setLoginMsg] = useState(null);
   const [messages, setMessages] = useState([]); // [{role:'user'|'assistant', content}]
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const bottomRef = useRef(null);
   const abortRef = useRef(null);
+
+  function login(e) {
+    e.preventDefault();
+    const em = emailInput.trim().toLowerCase();
+    if (!isValidEmail(em)) { setLoginMsg('Geçerli bir e-posta girin.'); return; }
+    setStoredEmail(em);
+    setEmail(em); setLoginMsg(null);
+  }
+  function logout() {
+    setStoredEmail('');
+    setEmail(''); setEmailInput('');
+  }
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -65,7 +87,7 @@ export default function ChatTab() {
       const res = await fetch(`${API_BASE}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: history }),
+        body: JSON.stringify({ messages: history, email }),
         signal: controller.signal,
       });
       if (!res.ok || !res.body) {
@@ -107,8 +129,31 @@ export default function ChatTab() {
     }
   }
 
+  if (!email) {
+    return (
+      <div className="vb-login">
+        <p className="subtitle">
+          Sohbet asistanı yalnızca e-posta ile giriş yapanlara açık — hızlı bir giriş yeterli.
+          (Sanal Borsa'da zaten giriş yaptıysan burada da otomatik açılır.)
+        </p>
+        <form onSubmit={login} className="vb-loginform">
+          <input
+            className="search-input vb-emailin"
+            type="email"
+            placeholder="e-posta adresin"
+            value={emailInput}
+            onChange={(e) => setEmailInput(e.target.value)}
+          />
+          <button className="refresh-btn" type="submit">Giriş</button>
+        </form>
+        {loginMsg && <div className="vb-msg err">{loginMsg}</div>}
+      </div>
+    );
+  }
+
   return (
     <div className="chat">
+      <div className="vb-user">{email} · <button className="vb-link" onClick={logout}>çıkış</button></div>
       <div className="chat-note">
         Bu asistan, sitede takip edilen <strong>BIST 100</strong>, <strong>kıymetli maden</strong> ve
         <strong> ABD büyük şirketleri</strong> hakkında sitenin kendi güncel verisine dayanarak

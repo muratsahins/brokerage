@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, lazy, memo, Suspense } from 'react';
 import { API_BASE, fmtNum, norm, roundPrice } from './lib/common.js';
+import { getStoredEmail, isValidEmail, onEmailChange, setStoredEmail } from './lib/auth.js';
 import { BackToTop, Expected, Logo, Pct, Tutar } from './lib/ui.jsx';
 import { useModalBack } from './lib/useModalBack.js';
 import {
@@ -403,7 +404,7 @@ function NewsList({ kind }) {
 }
 
 function VirtualTrade({ items, onSelect }) {
-  const [email, setEmail] = useState(() => { try { return localStorage.getItem('vb_email') || ''; } catch { return ''; } });
+  const [email, setEmail] = useState(getStoredEmail);
   const [emailInput, setEmailInput] = useState('');
   const [pf, setPf] = useState(null);
   const [q, setQ] = useState('');
@@ -432,11 +433,11 @@ function VirtualTrade({ items, onSelect }) {
   function login(e) {
     e.preventDefault();
     const em = emailInput.trim().toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { setMsg({ t: 'err', m: 'Geçerli bir e-posta girin.' }); return; }
-    try { localStorage.setItem('vb_email', em); } catch { /* */ }
+    if (!isValidEmail(em)) { setMsg({ t: 'err', m: 'Geçerli bir e-posta girin.' }); return; }
+    setStoredEmail(em);
     setEmail(em); setMsg(null);
   }
-  function logout() { try { localStorage.removeItem('vb_email'); } catch { /* */ } setEmail(''); setEmailInput(''); setSel(''); setQ(''); }
+  function logout() { setStoredEmail(''); setEmail(''); setEmailInput(''); setSel(''); setQ(''); }
   function reset() {
     if (!window.confirm('Portföyü sıfırlamak istediğine emin misin?')) return;
     persist({ cash: VB_START, positions: {}, history: [] });
@@ -637,6 +638,20 @@ export default function App() {
   // yükleniyor…" ekranı), geçmiş kaydı dokunur dokunmaz eklensin.
   useModalBack(chartItem != null, () => setChartItem(null));
   const [gecikti, setGecikti] = useState(false); // fiyat akışı duraklamış mı
+
+  // Sitenin e-posta girişi (Sanal Borsa'yla PAYLAŞILAN durum — bkz. lib/auth.js).
+  // Sohbet sekmesi yalnızca giriş yapılınca görünür; VirtualTrade veya ChatTab
+  // içinde giriş/çıkış yapılınca `onEmailChange` ile burası da anında haberdar
+  // olur (localStorage tek başına aynı sekme içi güncellemeyi yayınlamıyor).
+  const [siteEmail, setSiteEmail] = useState(getStoredEmail);
+  useEffect(() => onEmailChange(setSiteEmail), []);
+  // Giriş yapılmadan sohbetteyken çıkış yapılırsa (veya hiç giriş yapmadan
+  // doğrudan #chat gibi bir durumda kalınırsa) kullanıcıyı görünür bir sekmede
+  // bırak — aksi halde nav'da hiçbir sekme aktif görünmeyen "hayalet" bir
+  // sekmede kalır.
+  useEffect(() => {
+    setTab((t) => (t === 'chat' && !siteEmail ? 'bist100' : t));
+  }, [siteEmail]);
   // Görünüm: 'mobile' (kart, yatay scroll yok) | 'web' (tam tablo).
   const [view, setView] = useState(() => {
     try { return localStorage.getItem('viewMode') || (window.innerWidth <= 640 ? 'mobile' : 'web'); }
@@ -956,12 +971,14 @@ export default function App() {
             {t.label}
           </button>
         ))}
-        <button
-          className={`news-tab chat-tab ${tab === 'chat' ? 'active' : ''}`}
-          onClick={() => setTab('chat')}
-        >
-          {CHAT_TAB.label}
-        </button>
+        {siteEmail && (
+          <button
+            className={`news-tab chat-tab ${tab === 'chat' ? 'active' : ''}`}
+            onClick={() => setTab('chat')}
+          >
+            {CHAT_TAB.label}
+          </button>
+        )}
       </div>
 
       <div className="news-nav">

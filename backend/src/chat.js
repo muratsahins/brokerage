@@ -268,18 +268,32 @@ function toApiMessages(history) {
   return trimmed;
 }
 
-// --- Basit istek başına IP hız sınırlaması (public, ücretsiz uç — kontrolsüz
-// kullanım Anthropic faturasını doğrudan büyütür). Sunucu belleğinde tutulur,
-// yeniden başlayınca sıfırlanır; bu bir MVP korumasıdır, dağıtık değildir.
+// --- Erişim: yalnızca e-posta ile "giriş yapmış" kullanıcılar ------------
+// Frontend (ChatTab.jsx) bu kapıyı zaten UI'da gösteriyor, ama o tek başına
+// atlanabilir (biri doğrudan /api/chat'e istek atabilir) — bu yüzden aynı
+// kural burada da uygulanıyor. Gerçek bir kimlik doğrulama DEĞİL (e-postanın
+// sahipliği doğrulanmıyor, Sanal Borsa ile aynı "hafif kimlik" felsefesi);
+// amaç açık bir public uç yerine en azından bir e-postaya bağlı kullanım
+// olması ve hız sınırını IP yerine kullanıcı bazında uygulayabilmek.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// --- Basit, kullanıcı (e-posta) başına hız sınırlaması (public, ücretsiz uç
+// — kontrolsüz kullanım Anthropic faturasını doğrudan büyütür). Sunucu
+// belleğinde tutulur, yeniden başlayınca sıfırlanır; bu bir MVP korumasıdır,
+// dağıtık değildir.
 const RATE_LIMIT = Number(process.env.CHAT_RATE_LIMIT ?? 12);
 const RATE_WINDOW_MS = Number(process.env.CHAT_RATE_WINDOW_MINUTES ?? 5) * 60 * 1000;
 const buckets = new Map();
 export function chatRateLimit(req, res, next) {
-  const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
+  const email = String(req.body?.email || '').trim().toLowerCase();
+  if (!EMAIL_RE.test(email)) {
+    return res.status(401).json({ error: 'Sohbet asistanı yalnızca e-posta ile giriş yapan kullanıcılara açık.' });
+  }
+  req.chatEmail = email;
   const now = Date.now();
-  const b = buckets.get(ip);
+  const b = buckets.get(email);
   if (!b || now > b.resetAt) {
-    buckets.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    buckets.set(email, { count: 1, resetAt: now + RATE_WINDOW_MS });
     return next();
   }
   if (b.count >= RATE_LIMIT) {
