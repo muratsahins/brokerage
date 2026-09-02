@@ -17,3 +17,9 @@ services:
       # PORT'u Render otomatik verir; kod process.env.PORT'u kullanıyor.
       # PostgreSQL istersen: Render'da ücretsiz bir Postgres oluşturup
       # buraya DATABASE_URL ekleyebilirsin (yoksa uygulama bellek içi çalışır).
+      # Sohbet asistanı (chat.js): key'i Render panelinden elle gir (sync:false —
+      # repoya yazılmaz). Boş bırakılırsa /api/chat 503 döner, site kapalı kalmaz.
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: CHAT_MODEL
+        value: "claude-opus-5"

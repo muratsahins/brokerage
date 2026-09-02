@@ -10,6 +10,7 @@
     "refresh": "node src/refresh-cli.js"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.123.0",
     "compression": "^1.8.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

@@ -16,6 +16,12 @@ const ChartModal = lazy(() => import('./ChartModal.jsx'));
 // tıklanınca iner (ChartModal ile aynı tembel yükleme gerekçesi).
 const UsStocksTab = lazy(() => import('./UsStocksTab.jsx'));
 
+// Sohbet asistanı sekmesi: Anthropic SDK'ya bağlı backend ucu (/api/chat)
+// dışında ekstra bağımlılığı yok, ama yine de yalnızca tıklanınca inmesi için
+// (ilk açılış bundle'ını büyütmesin) tembel yükleniyor — ChartModal/UsStocksTab
+// ile aynı gerekçe.
+const ChatTab = lazy(() => import('./ChatTab.jsx'));
+
 
 // Güncel fiyatları (/api/prices) mevcut veriye işler: fiyat + günlük değişim
 // (+ metal ₺/gram), AYNI ANDA hesaplanan teknik göstergeler ve canlı fiyattan
@@ -785,10 +791,12 @@ export default function App() {
     // değil), o yüzden match yok — UsStocksTab kendi verisini kendi çeker.
     { key: 'us',      label: '🇺🇸 ABD Hisseleri' },
   ];
-  // Üst şerit: haberler.
+  // Üst şerit: haberler + sohbet asistanı (yan yana — Sohbet'in Haberler'e
+  // bitişik durması kullanıcı isteğiydi).
   const NEWS_TABS = [
     { key: 'news',  label: '📰 Haberler', news: 'news' },
   ];
+  const CHAT_TAB = { key: 'chat', label: '💬 Sohbet' };
   // Favori listesi: 4 teknik+analist koşulunu birden sağlayan hisseler
   // (BIST + ABD — aynı koşullar, ayrı veri kaynaklarından gelir).
   const FAV_TAB = {
@@ -833,7 +841,7 @@ export default function App() {
     [data.items, usTradableItems],
   );
   const TRADE_TAB = { key: 'trade', label: '💼 Sanal Borsa' };
-  const activeTab = [...TABS, FAV_TAB, TRADE_TAB, ...NEWS_TABS].find((t) => t.key === tab) ?? TABS[0];
+  const activeTab = [...TABS, FAV_TAB, TRADE_TAB, CHAT_TAB, ...NEWS_TABS].find((t) => t.key === tab) ?? TABS[0];
   const isNews = !!activeTab.news;
 
   // Önce aktif sekmeye göre, sonra sinyale göre süz. Favori sekmesinde BIST
@@ -909,6 +917,8 @@ export default function App() {
               ? 'Sanal borsa · e-posta ile giriş, sanal alım-satım (gerçek para değildir)'
               : tab === 'us'
               ? 'NASDAQ-100 + S&P 100 · temel analiz ağırlıklı puan + seçili hisselerde tam analist raporu'
+              : tab === 'chat'
+              ? 'Kıdemli analist sohbeti · BIST 100, kıymetli maden ve ABD büyük şirketleri hakkında soru sorun'
               : isNews
               ? 'Piyasa, kıymetli maden ve analist önerisi haberleri'
               : <>Analist hedef fiyatı + temel verilere dayalı beklenen getiri · {searching ? `“${query.trim()}” için ${items.length} sonuç` : `${inTab.length} kayıt`}
@@ -946,6 +956,12 @@ export default function App() {
             {t.label}
           </button>
         ))}
+        <button
+          className={`news-tab chat-tab ${tab === 'chat' ? 'active' : ''}`}
+          onClick={() => setTab('chat')}
+        >
+          {CHAT_TAB.label}
+        </button>
       </div>
 
       <div className="news-nav">
@@ -977,6 +993,10 @@ export default function App() {
 
       {isNews ? (
         <NewsList kind={activeTab.news} />
+      ) : tab === 'chat' ? (
+        <Suspense fallback={<div className="state">Yükleniyor…</div>}>
+          <ChatTab />
+        </Suspense>
       ) : tab === 'trade' ? (
         <VirtualTrade items={tradeItems} onSelect={setChartItem} />
       ) : tab === 'us' ? (
@@ -1127,7 +1147,7 @@ export default function App() {
       </>
       )}
 
-      {tab !== 'us' && (
+      {tab !== 'us' && tab !== 'chat' && (
       <footer className="disclaimer">
         <p>
           <strong>Beklenen getiri</strong> tahminleri, hisseyi izleyen analistlerin <strong>ortalama 12 aylık hedef

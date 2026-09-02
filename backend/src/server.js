@@ -11,6 +11,7 @@ import { getLivePrices, getUsLivePrices, refreshSeries, seriesStats } from './li
 import { fetchNews } from './newsSource.js';
 import { INSTRUMENTS } from './stocks.js';
 import { US_STOCKS } from './usStocks.js';
+import { chatHandler, chatRateLimit } from './chat.js';
 
 // Ticker -> Yahoo sembolü. ABD hisselerinde sembol ticker'ın kendisi (AAPL),
 // BIST'te .IS ekli. Grafik ucu ikisini de servis ediyor.
@@ -72,6 +73,11 @@ app.get('/api/chart', async (req, res) => {
     res.status(502).json({ error: err.message });
   }
 });
+
+// Sohbet asistanı: kıdemli finansal analist kimliğiyle BIST 100, kıymetli maden
+// ve ABD büyük şirketleri hakkında soru cevaplar (chat.js). Cevap düz metin
+// olarak akıtılır (streaming); IP başına hız sınırı vardır (chatRateLimit).
+app.post('/api/chat', chatRateLimit, chatHandler);
 
 // Haberler (BIST/hisse, kıymetli maden, ekonomi, analist önerileri).
 app.get('/api/news', async (req, res) => {
