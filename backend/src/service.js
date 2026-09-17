@@ -41,8 +41,6 @@ const memory = {
 
 const byTicker = new Map(INSTRUMENTS.map((s) => [s.ticker, s]));
 
-const TROY_OUNCE_G = 31.1034768; // 1 troy ons = gram
-
 // Yahoo'dan çeker, puanlar, isim/sektör/tür ile zenginleştirir. Yan etkisiz.
 export async function computeRecommendations() {
   const quotes = await fetchQuotes(INSTRUMENTS);

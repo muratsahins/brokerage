@@ -32,7 +32,6 @@ const GAP_MS = Number(process.env.SERIES_FETCH_GAP_MS ?? 350);
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const day = (t, off) => Math.floor((t + off) / 86400);
-const round = (x, d = 2) => (x == null ? null : Math.round(x * 10 ** d) / 10 ** d);
 
 // ticker -> { open[], high[], low[], close[], volume[], lastTs, gmtoffset, at }
 const cache = new Map();

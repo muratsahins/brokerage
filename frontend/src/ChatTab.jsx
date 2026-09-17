@@ -134,7 +134,7 @@ export default function ChatTab() {
       <div className="vb-login">
         <p className="subtitle">
           Sohbet asistanı yalnızca e-posta ile giriş yapanlara açık — hızlı bir giriş yeterli.
-          (Sanal Borsa'da zaten giriş yaptıysan burada da otomatik açılır.)
+          (Sanal Borsa&apos;da zaten giriş yaptıysan burada da otomatik açılır.)
         </p>
         <form onSubmit={login} className="vb-loginform">
           <input

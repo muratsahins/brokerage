@@ -627,7 +627,7 @@ async function fetchFundamentals(symbol, attempt = 0) {
   let res;
   try {
     res = await fetch(url, { headers: { ...BROWSER_HEADERS, Cookie: cookie } });
-  } catch (e) {
+  } catch {
     if (attempt < 3) { await sleep(700 * (attempt + 1)); return fetchFundamentals(symbol, attempt + 1); }
     return null;
   }
@@ -676,7 +676,7 @@ export async function fetchUsFundamentals(symbol, attempt = 0) {
   let res;
   try {
     res = await fetch(url, { headers: { ...BROWSER_HEADERS, Cookie: cookie } });
-  } catch (e) {
+  } catch {
     if (attempt < 3) { await sleep(700 * (attempt + 1)); return fetchUsFundamentals(symbol, attempt + 1); }
     return null;
   }

@@ -306,7 +306,7 @@ function ReportPanel({ item, onClose }) {
 
 // Mobil kart — BIST kartıyla aynı iskelet (card-top / card-price /
 // card-metrics), yalnızca gösterge şeridi yerine temel analiz metrikleri.
-function UsCard({ s, rank, onSelect, onChart }) {
+function UsCard({ s, onSelect, onChart }) {
   return (
     <div className="card">
       <div className="card-top">
@@ -414,15 +414,15 @@ export default function UsStocksTab({ view = 'web' }) {
     <>
       <div className="fav-note">
         <strong>ABD Büyük Şirketler</strong> — NASDAQ-100 + S&P 100 birleşimi ({items.length || '~200'} hisse;
-        endeksten çıkmış ama takipte tutulan şirketler dahil — bunlar yalnızca <strong>Tümü</strong>'de görünür),
+        endeksten çıkmış ama takipte tutulan şirketler dahil — bunlar yalnızca <strong>Tümü</strong>&apos;de görünür),
         temel analiz ağırlıklı bir <strong>puan</strong>: analist 12 aylık hedef potansiyeli (%35), yıllık
         (YoY) gelir büyümesi (%20), net kâr marjı (%15), kaldıraç/<code>Net Debt-EBITDA</code> (%15) ve
         <code> FCF</code> marjı (%15) — BIST sekmesindeki momentum ağırlıklı puanla karıştırılmamalı.
         <strong> 📄 Analiz</strong> — segment/rakip/moat/güçlü-zayıf yön anlatısı içeren tam rapor — yalnızca
-        elle hazırlanmış {reportCount || '~48'} mega-cap'te var; diğerlerinde ticker'a tıklayınca yalnızca
+        elle hazırlanmış {reportCount || '~48'} mega-cap&apos;te var; diğerlerinde ticker&apos;a tıklayınca yalnızca
         otomatik sayısal özet açılır. Temel veriler (analist hedefi, marj, kaldıraç) <strong>günde bir
         yayınlanır</strong>; fiyat, göstergeler ve puan ABD seansı boyunca ~18 saniyede bir tazelenir.
-        Fiyatlar USD'dir. <span className="muted-dash">Yatırım tavsiyesi değildir.</span>
+        Fiyatlar USD&apos;dir. <span className="muted-dash">Yatırım tavsiyesi değildir.</span>
       </div>
 
       <div className="search">
@@ -495,7 +495,7 @@ export default function UsStocksTab({ view = 'web' }) {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((s, i) => (
+              {filtered.map((s) => (
                 <tr key={s.ticker}>
                   <td><Logo ticker={s.ticker} market="US" /></td>
                   <td>
