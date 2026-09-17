@@ -4,7 +4,7 @@ import { getStoredEmail, isValidEmail, onEmailChange, setStoredEmail } from './l
 import { BackToTop, Expected, Logo, Pct, Tutar } from './lib/ui.jsx';
 import { useModalBack } from './lib/useModalBack.js';
 import {
-  VB_START, vbCleanRetired, vbSave, vbTrade, vbUnitLabel, vbUnitPrice,
+  VB_START, vbCleanRetired, vbTrade, vbUnitLabel, vbUnitPrice,
 } from './lib/vb.js';
 
 // Grafik pop-up'ı lightweight-charts'a bağlı: bundle'ın 109 KB gzip'inin
@@ -158,7 +158,7 @@ function SignalBadge({ signal }) {
 // referans karşılaştırması tutuyor ve o satır hiç yeniden render edilmiyor.
 // onSelect olarak setChartItem geçiliyor; useState kurucusunun kimliği sabit
 // olduğu için memo bozulmuyor (satır içi ok fonksiyonu geçilseydi bozulurdu).
-const StockRow = memo(function StockRow({ s, rank, showBuySell, onSelect }) {
+const StockRow = memo(function StockRow({ s, showBuySell, onSelect }) {
   return (
     <tr>
       <td><Logo ticker={s.ticker} market={s.kind === 'metal' ? 'metal' : 'BIST'} /></td>
@@ -216,7 +216,7 @@ const StockRow = memo(function StockRow({ s, rank, showBuySell, onSelect }) {
   );
 });
 
-const StockCard = memo(function StockCard({ s, rank, onSelect }) {
+const StockCard = memo(function StockCard({ s, onSelect }) {
   return (
     <div className="card">
       <div className="card-top">
@@ -638,6 +638,20 @@ export default function App() {
   // yükleniyor…" ekranı), geçmiş kaydı dokunur dokunmaz eklensin.
   useModalBack(chartItem != null, () => setChartItem(null));
   const [gecikti, setGecikti] = useState(false); // fiyat akışı duraklamış mı
+  // Bağımsız kaynakla (Google Finance) fiyat doğrulama sonucu — arka planda
+  // seyrek çalışır (priceVerify.js), burada sadece son sonucu okuruz.
+  const [priceCheck, setPriceCheck] = useState(null);
+  useEffect(() => {
+    const kontrol = () => {
+      fetch(`${API_BASE}/api/price-check`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((j) => { if (j?.checkedAt) setPriceCheck(j); })
+        .catch(() => { /* yoksay — rozet göstermemesi yeterli */ });
+    };
+    kontrol();
+    const id = setInterval(kontrol, 5 * 60 * 1000); // 5 dk'da bir yeter, backend ~20 dk'da bir tazeliyor
+    return () => clearInterval(id);
+  }, []);
 
   // Sitenin e-posta girişi (Sanal Borsa'yla PAYLAŞILAN durum — bkz. lib/auth.js).
   // Sohbet sekmesi yalnızca giriş yapılınca görünür; VirtualTrade veya ChatTab
@@ -1073,6 +1087,22 @@ export default function App() {
                 ⚠ gecikiyor
               </span>
             )}
+            {priceCheck?.mismatches?.length > 0 && (
+              <span
+                className="dogrulama-rozet uyusmazlik"
+                title={`Google Finance ile karşılaştırıldığında ${priceCheck.mismatches.length} hissede fark %${priceCheck.thresholdPct}'i aşıyor: ${priceCheck.mismatches.map((m) => `${m.ticker} (biz ${m.ours} / referans ${m.ref})`).join(', ')}. Son kontrol: ${new Date(priceCheck.checkedAt).toLocaleTimeString('tr-TR')}`}
+              >
+                ⚠ {priceCheck.mismatches.length} hissede fiyat uyuşmazlığı
+              </span>
+            )}
+            {priceCheck?.checked > 0 && priceCheck.mismatches.length === 0 && (
+              <span
+                className="dogrulama-rozet"
+                title={`Google Finance ile karşılaştırıldı, ${priceCheck.checked} hissede uyuşmazlık yok. Son kontrol: ${new Date(priceCheck.checkedAt).toLocaleTimeString('tr-TR')}`}
+              >
+                ✓ fiyat doğrulandı
+              </span>
+            )}
             {items.some((i) => i.signalsLive) ? 'Fiyat + göstergeler' : 'Fiyat'}:{' '}
             {new Date(data.priceUpdatedAt || data.updatedAt).toLocaleTimeString('tr-TR')}
           </span>
@@ -1175,7 +1205,7 @@ export default function App() {
           <strong>Puan</strong>; analist potansiyeli (%45), analist tavsiyesi (%20), 1 aylık momentum (%20) ve
           ileri F/K (%15) bileşenlerinden hesaplanır; eksik bileşen varsa kalanların ağırlığı normalize edilir.
           <strong>Analist kapsamı olmayan</strong> enstrümanlarda (kıymetli madenler ve analist izlemeyen
-          hisseler) puanın yalnızca fiyat hareketinden geldiği için <strong>tavanı 60'tır</strong> — sıralama
+          hisseler) puanın yalnızca fiyat hareketinden geldiği için <strong>tavanı 60&apos;tır</strong> — sıralama
           korunur ama analist teyitli hisselerle aynı puana çıkamaz ve <code>AL</code> rozeti almaz.
         </p>
         <p>
@@ -1185,13 +1215,13 @@ export default function App() {
           (−53/−60) yukarı kestiğinde <code>AL</code>, aşırı alım bölgesinde (+53/+60) aşağı kestiğinde
           <code>SAT</code>; ters kesişim olunca boşalır. <strong>WaveTrend</strong>: yeşil çizgi
           kırmızıyı (herhangi bölgede) yukarı kestiğinde <code>AL</code>, aşağı kestiğinde <code>SAT</code>.
-          SuperTrend'de fiyat trend çizgisinin üstünde <code>AL</code>, altında <code>SAT</code>.
+          SuperTrend&apos;de fiyat trend çizgisinin üstünde <code>AL</code>, altında <code>SAT</code>.
           Kısa vadeli, gecikmeli sinyallerdir; analist tahminlerinden bağımsızdır.
         </p>
         <p>
           <strong>Kıymetli madenler</strong> USD/ons cinsinden gösterilir; <strong>₺/gr</strong> karşılığı
           TCMB güncel USD döviz satış kuru ve 1 troy ons = 31,1035 gram üzerinden hesaplanır.
-          <strong>Alış/Satış</strong> (₺) fiyatları <strong>altin.in</strong>'den alınır (paladyum orada
+          <strong>Alış/Satış</strong> (₺) fiyatları <strong>altin.in</strong>&apos;den alınır (paladyum orada
           bulunmadığından boş görünebilir).
         </p>
         <p>

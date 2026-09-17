@@ -12,6 +12,7 @@ import { fetchNews } from './newsSource.js';
 import { INSTRUMENTS } from './stocks.js';
 import { US_STOCKS } from './usStocks.js';
 import { chatHandler, chatRateLimit } from './chat.js';
+import { verifyAllPrices, peekVerification } from './priceVerify.js';
 
 // Ticker -> Yahoo sembolü. ABD hisselerinde sembol ticker'ın kendisi (AAPL),
 // BIST'te .IS ekli. Grafik ucu ikisini de servis ediyor.
@@ -31,6 +32,13 @@ app.use(express.json());
 
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, time: new Date().toISOString(), series: seriesStats() });
+});
+
+// Yahoo'dan gelen canlı BIST fiyatlarının Google Finance ile karşılaştırma
+// sonucu — bağımsız ikinci kaynağa göre uyuşmazlık var mı (priceVerify.js).
+// Arka planda periyodik çalışır; bu uç sadece son sonucu döner (bekletmez).
+app.get('/api/price-check', (req, res) => {
+  res.json(peekVerification());
 });
 
 // Toplu güncel (intraday) fiyatlar + AYNI ANDAKİ gösterge sinyalleri ve
@@ -198,6 +206,20 @@ async function start() {
       syncUsData().catch((err) => console.warn(`[cron] ABD veri senkronizasyonu başarısız: ${err.message}`));
     }, usMinutes * 60 * 1000);
     console.log(`[start] ABD veri senkronizasyonu her ${usMinutes} dakikada bir açık.`);
+  }
+
+  // Fiyat doğrulama (priceVerify.js): ~104 sembol × 300ms ≈ 30 sn süren yavaş
+  // bir tur olduğu için 15-18 sn'lik canlı fiyat döngüsünden ayrı, seyrek
+  // çalışır. İlk tur, canlı fiyat önbelleği dolsun diye 1 dk gecikmeli başlar.
+  const verifyMinutes = Number(process.env.PRICE_VERIFY_INTERVAL_MINUTES ?? 20);
+  if (verifyMinutes > 0) {
+    setTimeout(() => {
+      verifyAllPrices().catch((err) => console.warn(`[verify] Fiyat doğrulaması başarısız: ${err.message}`));
+    }, 60 * 1000);
+    setInterval(() => {
+      verifyAllPrices().catch((err) => console.warn(`[verify] Fiyat doğrulaması başarısız: ${err.message}`));
+    }, verifyMinutes * 60 * 1000);
+    console.log(`[start] Fiyat doğrulaması (Google Finance) her ${verifyMinutes} dakikada bir açık.`);
   }
 
   app.listen(PORT, () => console.log(`[start] Backend hazır: http://localhost:${PORT}`));
