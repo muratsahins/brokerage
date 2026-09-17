@@ -72,6 +72,9 @@ function mergeLivePrices(data, live) {
       next.stSignal = s.st ?? null;
       next.wtCrossSignal = s.wt ?? null;
       next.wtSignal = s.wo ?? null;
+      next.wtSignalAt = s.woAt ?? null;
+      next.wtSignal4h = s.wo4h ?? null;
+      next.wtSignal4hAt = s.wo4hAt ?? null;
       next.signalsLive = true;
     }
     // Analist potansiyeli, momentum, puan ve AL/TUT/İZLE sinyali de canlı
@@ -158,14 +161,15 @@ function SignalBadge({ signal }) {
 // referans karşılaştırması tutuyor ve o satır hiç yeniden render edilmiyor.
 // onSelect olarak setChartItem geçiliyor; useState kurucusunun kimliği sabit
 // olduğu için memo bozulmuyor (satır içi ok fonksiyonu geçilseydi bozulurdu).
-const StockRow = memo(function StockRow({ s, showBuySell, onSelect }) {
+const StockRow = memo(function StockRow({ s, showBuySell, onSelect, overzoneField = 'wtSignal', isNew = false }) {
   return (
-    <tr>
+    <tr className={isNew ? 'satir-yeni' : ''}>
       <td><Logo ticker={s.ticker} market={s.kind === 'metal' ? 'metal' : 'BIST'} /></td>
       <td>
         {/* Madenlerde grafik yok: bar geçmişi vadeli kontrata ait, gösterilen
             fiyat ise spot. ABD hisselerinde grafik/sanal borsa açık — ₺
             karşılığı (tryPrice) üzerinden alınıp satılır. */}
+        {isNew && <span className="yeni-rozet" title="Bu ziyarette yeni yakalanan sinyal">YENİ</span>}
         {s.kind === 'metal' ? (
           <span className="ticker">{s.ticker}</span>
         ) : (
@@ -209,20 +213,21 @@ const StockRow = memo(function StockRow({ s, showBuySell, onSelect }) {
       </td>
       <td><ScoreBar score={s.score} /></td>
       <td><SignalBadge signal={s.signal} /></td>
-      <td><IndicatorBadge signal={sig(s, 'wtSignal')} /></td>
+      <td><IndicatorBadge signal={sig(s, overzoneField)} /></td>
       <td><IndicatorBadge signal={sig(s, 'wtCrossSignal')} /></td>
       <td><IndicatorBadge signal={sig(s, 'stSignal')} /></td>
     </tr>
   );
 });
 
-const StockCard = memo(function StockCard({ s, onSelect }) {
+const StockCard = memo(function StockCard({ s, onSelect, overzoneField = 'wtSignal', isNew = false }) {
   return (
-    <div className="card">
+    <div className={`card ${isNew ? 'satir-yeni' : ''}`}>
       <div className="card-top">
         <div className="card-id">
           <Logo ticker={s.ticker} market={s.kind === 'metal' ? 'metal' : 'BIST'} />
           <div>
+            {isNew && <span className="yeni-rozet" title="Bu ziyarette yeni yakalanan sinyal">YENİ</span>}
             {s.kind === 'metal' ? (
               <span className="ticker">{s.ticker}</span>
             ) : (
@@ -279,13 +284,70 @@ const StockCard = memo(function StockCard({ s, onSelect }) {
       </div>
 
       <div className="card-signals">
-        <div className="sig"><span className="metric-label">overzone</span><IndicatorBadge signal={sig(s, 'wtSignal')} /></div>
+        <div className="sig"><span className="metric-label">overzone</span><IndicatorBadge signal={sig(s, overzoneField)} /></div>
         <div className="sig"><span className="metric-label">WaveTrend</span><IndicatorBadge signal={sig(s, 'wtCrossSignal')} /></div>
         <div className="sig"><span className="metric-label">SuperTrend</span><IndicatorBadge signal={sig(s, 'stSignal')} /></div>
       </div>
     </div>
   );
 });
+
+// Tarama sekmesinin GÜNLÜK/4 SAATLİK bölümlerinden biri. Genel arama/sıralama/
+// sayfalama boru hattından bağımsız — listeler zaten küçük (overzone AL alt
+// kümesi), o yüzden doğrudan basılır. `overzoneField` hangi zaman diliminin
+// sinyalinin OVERZONE sütununda gösterileceğini belirler.
+function TaramaSection({ title, items, overzoneField, atField, keyPrefix, highlight, view, onSelect, emptyText }) {
+  return (
+    <div className="tarama-section">
+      <h3 className="tarama-section-title">{title} <span className="muted-dash">({items.length})</span></h3>
+      {items.length === 0 ? (
+        <div className="state">{emptyText}</div>
+      ) : view === 'web' ? (
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Hisse</th>
+                <th className="num">Fiyat</th>
+                <th className="num">Günlük</th>
+                <th className="num">Hedef</th>
+                <th style={{ minWidth: 110 }}>Puan</th>
+                <th>Sinyal</th>
+                <th>overzone</th>
+                <th>WaveTrend</th>
+                <th>SuperTrend</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((s) => (
+                <StockRow
+                  key={s.ticker}
+                  s={s}
+                  onSelect={onSelect}
+                  overzoneField={overzoneField}
+                  isNew={highlight.has(taramaAnahtar(keyPrefix, s, atField))}
+                />
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="cards">
+          {items.map((s) => (
+            <StockCard
+              key={s.ticker}
+              s={s}
+              onSelect={onSelect}
+              overzoneField={overzoneField}
+              isNew={highlight.has(taramaAnahtar(keyPrefix, s, atField))}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 // Kademeli render: liste ~620 kalemken hepsini birden basmak ~17.000 DOM düğümü
 // demekti ve ilk boyamayı (özellikle telefonda) uzatıyordu. Evren BIST 100 +
@@ -301,6 +363,11 @@ const SAYFA = 120;
 // Fiyat damgası bu kadar geri kalırsa 'gecikiyor' rozeti çıkar. Anket 18 sn,
 // sunucu önbelleği 15 sn: 2 dakika ≈ arka arkaya 8 başarısız tur demek.
 const GECIKME_ESIGI_MS = 2 * 60 * 1000;
+
+// Tarama: sinyal KURULDUĞU bardan (wtSignal/wtSignal4hAt, epoch saniye) bu
+// kadar eskiyse listeden düşer — "son 2 gün" penceresi.
+const TARAMA_TAZELIK_MS = 2 * 24 * 60 * 60 * 1000;
+const taramaTaze = (atSaniye) => atSaniye != null && (Date.now() - atSaniye * 1000) <= TARAMA_TAZELIK_MS;
 
 function useKademeliListe(items, sifirlaAnahtari) {
   const [n, setN] = useState(SAYFA);
@@ -327,6 +394,63 @@ function useKademeliListe(items, sifirlaAnahtari) {
   }, [n, items.length, hepsi]);
 
   return { gorunen: hepsi ? items : items.slice(0, n), nobetciRef, hepsi, dahaGoster };
+}
+
+// Tarama: bir satırın kimliği hisse + sinyalin KURULDUĞU bar zaman damgası —
+// bu tetikleyici olay değişmediği sürece aynı kalır (fiyat/puan gibi diğer
+// alanların değişmesi "yeni sinyal" saydırmaz). "d:"/"h:" öneki günlük/4
+// saatlik listelerin anahtarları çakışmasın diye.
+const taramaAnahtar = (onek, s, atAlan) => `${onek}:${s.ticker}:${s[atAlan]}`;
+
+const TARAMA_SEEN_KEY = 'taramaSeen';
+function taramaGorulduYukle() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(TARAMA_SEEN_KEY) || 'null');
+    return Array.isArray(raw) ? new Set(raw) : new Set();
+  } catch {
+    return new Set();
+  }
+}
+
+// Görülmemiş (yeni) Tarama sinyallerini izler: sekme kapalıyken/arka planda
+// gelen sinyaller "yeni" sayılır, sekmeye AÇIKÇA girilip sayfa görünür
+// olduğunda görüldü kaydedilir (bkz. commit 5db8f4d'deki UYARI deseni).
+function useTaramaYeni(dailyItems, fourHourItems, aktif) {
+  const guncelAnahtarlar = useMemo(() => [
+    ...dailyItems.map((s) => taramaAnahtar('d', s, 'wtSignalAt')),
+    ...fourHourItems.map((s) => taramaAnahtar('h', s, 'wtSignal4hAt')),
+  ], [dailyItems, fourHourItems]);
+
+  const [gorulen, setGorulen] = useState(taramaGorulduYukle);
+  const yeniAnahtarlar = useMemo(
+    () => new Set(guncelAnahtarlar.filter((k) => !gorulen.has(k))),
+    [guncelAnahtarlar, gorulen],
+  );
+
+  // "YENİ" rozetli satırlar: sekmeye girildiği ANDA görülmemiş olanlar +
+  // sekme açıkken sonradan gelenler. Ref'te tutulur, sekme kapanınca sıfırlanır.
+  const oncekiAktif = useRef(false);
+  const vurguRef = useRef(new Set());
+  if (!aktif) vurguRef.current = new Set();
+  else if (!oncekiAktif.current) vurguRef.current = new Set(yeniAnahtarlar);
+  else yeniAnahtarlar.forEach((k) => vurguRef.current.add(k));
+  oncekiAktif.current = aktif;
+
+  // Görüldü kaydı yalnızca sekme açıkken VE sayfa gerçekten görünürken
+  // yazılır — arka planda duran sekme "görüldü" sayılmaz.
+  useEffect(() => {
+    if (!aktif) return undefined;
+    const isaretle = () => {
+      if (document.visibilityState !== 'visible') return;
+      try { localStorage.setItem(TARAMA_SEEN_KEY, JSON.stringify(guncelAnahtarlar)); } catch { /* yoksay */ }
+      setGorulen(new Set(guncelAnahtarlar));
+    };
+    isaretle();
+    document.addEventListener('visibilitychange', isaretle);
+    return () => document.removeEventListener('visibilitychange', isaretle);
+  }, [aktif, guncelAnahtarlar]);
+
+  return { yeniSayisi: yeniAnahtarlar.size, vurgu: vurguRef.current };
 }
 
 function ScoreBar({ score }) {
@@ -621,6 +745,14 @@ export default function App() {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('ALL');
   const [tab, setTab] = useState('bist100'); // açılış: BIST 100
+  // Tarama'nın 2 günlük tazelik penceresi fiyat değişmeden de eskiyebilir
+  // (ör. seans kapalıyken); bu sayaç periyodik olarak taramaDailyItems/
+  // tarama4hItems'ı yeniden hesaplatıp eskiyeni düşürür.
+  const [taramaSaat, setTaramaSaat] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setTaramaSaat((n) => n + 1), 5 * 60 * 1000);
+    return () => clearInterval(id);
+  }, []);
   // Sıralama: 'ticker' (alfabetik, varsayılan) | 'score' (puan). Tercih saklanır.
   // Kaldırılan 'fresh' (tazelik) seçeneği bazı
   // tarayıcılarda kayıtlı kalmış olabilir; düğmesi artık yok, o yüzden
@@ -706,6 +838,9 @@ export default function App() {
                 }
                 if (sig) {
                   next.wtSignal = sig.wo ?? null;
+                  next.wtSignalAt = sig.woAt ?? null;
+                  next.wtSignal4h = sig.wo4h ?? null;
+                  next.wtSignal4hAt = sig.wo4hAt ?? null;
                   next.wtCrossSignal = sig.wt ?? null;
                   next.stSignal = sig.st ?? null;
                 }
@@ -835,6 +970,13 @@ export default function App() {
       && i.wtSignal === 'AL' && i.wtCrossSignal === 'AL' && i.stSignal === 'AL'
       && (i.recommendationKey === 'buy' || i.recommendationKey === 'strong_buy'),
   };
+  // Tarama: TEK koşul (WaveTrend overzone AL) — SuperTrend/analist şartı yok,
+  // Favori'den daha geniş, bilgilendirici bir liste. Sinyal aşırı satımda
+  // yukarı kesişimle kurulur, ters kesişime kadar kalıcıdır (indicators.js).
+  // Kendi (özel) render'ı var — GÜNLÜK ve 4 SAATLİK AYNI ANDA, ayrı bölümlerde
+  // gösteriliyor (bkz. taramaDailyItems/tarama4hItems) — bu yüzden diğer
+  // sekmelerin aksine `match` yok, genel tablo boru hattından geçmiyor.
+  const TARAMA_TAB = { key: 'tarama', label: '🔎 Tarama' };
   // ABD hisseleri BIST'ten ayrı bir uçtan gelir (usFav). Sanal Borsa'da (ve
   // grafik/alım-satım panelinde) TEK para biriminde kalınsın diye ₺ karşılığı
   // (tryPrice) burada hesaplanır — kıymetli madenlerle AYNI desen. Kur, BIST
@@ -864,17 +1006,39 @@ export default function App() {
       && (i.recommendationKey === 'buy' || i.recommendationKey === 'strong_buy')),
     [usTradableItems],
   );
+  // Tarama: GÜNLÜK ve 4 SAATLİK overzone AL sinyalleri AYRI listelenir (BIST +
+  // ABD birleşik, Favori ile aynı desen) — ikisi AYNI ANDA gösterilir, sekme
+  // içi bir geçiş/toggle YOK.
+  const taramaDailyItems = useMemo(
+    () => [
+      ...data.items.filter((i) => i.kind === 'stock' && i.wtSignal === 'AL' && taramaTaze(i.wtSignalAt)),
+      ...usTradableItems.filter((i) => i.wtSignal === 'AL' && taramaTaze(i.wtSignalAt)),
+    ].sort((a, b) => a.ticker.localeCompare(b.ticker, 'tr')),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- taramaSaat: yalnızca periyodik yeniden hesap tetikleyici
+    [data.items, usTradableItems, taramaSaat],
+  );
+  const tarama4hItems = useMemo(
+    () => [
+      ...data.items.filter((i) => i.kind === 'stock' && i.wtSignal4h === 'AL' && taramaTaze(i.wtSignal4hAt)),
+      ...usTradableItems.filter((i) => i.wtSignal4h === 'AL' && taramaTaze(i.wtSignal4hAt)),
+    ].sort((a, b) => a.ticker.localeCompare(b.ticker, 'tr')),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- taramaSaat: yalnızca periyodik yeniden hesap tetikleyici
+    [data.items, usTradableItems, taramaSaat],
+  );
+  // Yeni (henüz görülmemiş) Tarama sinyali varsa sekme yanıp söner; sekmeye
+  // girilip sayfa görününce söner (bkz. useTaramaYeni).
+  const { yeniSayisi: taramaYeniSayisi, vurgu: taramaVurgu } = useTaramaYeni(taramaDailyItems, tarama4hItems, tab === 'tarama');
   // Sanal Borsa'nın arama/alım-satım havuzu: BIST + ABD birlikte.
   const tradeItems = useMemo(
     () => [...data.items, ...usTradableItems],
     [data.items, usTradableItems],
   );
   const TRADE_TAB = { key: 'trade', label: '💼 Sanal Borsa' };
-  const activeTab = [...TABS, FAV_TAB, TRADE_TAB, CHAT_TAB, ...NEWS_TABS].find((t) => t.key === tab) ?? TABS[0];
+  const activeTab = [...TABS, FAV_TAB, TARAMA_TAB, TRADE_TAB, CHAT_TAB, ...NEWS_TABS].find((t) => t.key === tab) ?? TABS[0];
   const isNews = !!activeTab.news;
 
-  // Önce aktif sekmeye göre, sonra sinyale göre süz. Favori sekmesinde BIST
-  // eşleşmelerinin üstüne aynı koşulu sağlayan ABD hisseleri de eklenir.
+  // Önce aktif sekmeye göre, sonra sinyale göre süz. Favori/Tarama sekmelerinde
+  // BIST eşleşmelerinin üstüne aynı koşulu sağlayan ABD hisseleri de eklenir.
   const inTab = useMemo(() => {
     const base = activeTab.match ? data.items.filter(activeTab.match) : [];
     return tab === 'fav' ? [...base, ...usFavItems] : base;
@@ -1010,6 +1174,17 @@ export default function App() {
         </button>
       </div>
 
+      <div className="news-nav">
+        <button
+          className={`news-tab tarama-tab ${taramaYeniSayisi > 0 && tab !== 'tarama' ? 'blink' : ''} ${tab === 'tarama' ? 'active' : ''}`}
+          onClick={() => setTab('tarama')}
+          title={taramaYeniSayisi > 0 && tab !== 'tarama' ? `${taramaYeniSayisi} yeni sinyal — görmek için aç` : undefined}
+        >
+          {TARAMA_TAB.label}
+          {taramaYeniSayisi > 0 && tab !== 'tarama' && <span className="tab-badge">{taramaYeniSayisi}</span>}
+        </button>
+      </div>
+
       <div className="tabs">
         {TABS.map((t) => (
           <button
@@ -1034,6 +1209,40 @@ export default function App() {
         <Suspense fallback={<div className="state">Yükleniyor…</div>}>
           <UsStocksTab view={view} />
         </Suspense>
+      ) : tab === 'tarama' ? (
+        <>
+          <div className="fav-note">
+            <strong>Tarama kriteri:</strong> WaveTrend <strong>overzone</strong> sinyali <strong>son 2 gün</strong>{' '}
+            içinde kurulmuş (aşırı satım bölgesinde yukarı kesişim) — SuperTrend veya analist tavsiyesi şartı
+            yok. 2 günden eski sinyaller listeden düşer; Günlük ve 4 saatlik mumlardaki sinyaller AYRI
+            bölümlerde gösterilir. Yeni yakalanan sinyal Tarama sekmesini yanıp söndürür, sekmeyi
+            açıp görünce söner.
+            <span className="muted-dash"> BIST 100 + ABD (NASDAQ-100 + S&P 100) evreninde aranır.
+            {usFav.loading ? ' ABD verisi yükleniyor…' : ''}</span>
+          </div>
+          <TaramaSection
+            title="Günlük"
+            items={taramaDailyItems}
+            overzoneField="wtSignal"
+            atField="wtSignalAt"
+            keyPrefix="d"
+            highlight={taramaVurgu}
+            view={view}
+            onSelect={setChartItem}
+            emptyText="Son 2 günde günlük overzone AL sinyali veren BIST veya ABD hissesi yok."
+          />
+          <TaramaSection
+            title="4 Saatlik"
+            items={tarama4hItems}
+            overzoneField="wtSignal4h"
+            atField="wtSignal4hAt"
+            keyPrefix="h"
+            highlight={taramaVurgu}
+            view={view}
+            onSelect={setChartItem}
+            emptyText="Son 2 günde 4 saatlik overzone AL sinyali veren BIST veya ABD hissesi yok."
+          />
+        </>
       ) : (
       <>
       <div className="search">
@@ -1120,7 +1329,6 @@ export default function App() {
           bu kalemlerde de açık (₺ karşılığı üzerinden).{usFav.loading ? ' ABD verisi yükleniyor…' : ''})</span>
         </div>
       )}
-
       {!loading && !error && items.length === 0 && (
         <div className="state">
           {searching

@@ -125,9 +125,37 @@ h1 { font-size: 26px; margin: 0 0 6px; }
 .news-tab.active { background: #1f6feb; color: #fff; border-color: #1f6feb; }
 .fav-tab { border-color: #4a3d00; color: #fbbf24; }
 .fav-tab.active { background: #b45309; color: #fff; border-color: #b45309; }
+.tarama-tab { border-color: #0e3a4a; color: #38bdf8; }
+.tarama-tab.active { background: #0369a1; color: #fff; border-color: #0369a1; }
 .trade-tab { border-color: #3a2a4d; color: #c084fc; }
 .trade-tab.active { background: #7c3aed; color: #fff; border-color: #7c3aed; }
 .filter-sep { width: 1px; align-self: stretch; background: var(--border); margin: 0 4px; }
+
+/* Tarama: yeni sinyal yakalanınca sekme yanıp söner, sekmeye girilince söner. */
+@keyframes tab-blink {
+  0%, 100% { background: transparent; color: #38bdf8; border-color: #0e3a4a; box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+  50%      { background: #0369a1;     color: #fff;    border-color: #38bdf8; box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.25); }
+}
+.news-tab.tarama-tab.blink { animation: tab-blink 1.1s ease-in-out infinite; }
+.tab-badge {
+  display: inline-block; margin-left: 8px; min-width: 18px;
+  font-size: 11px; font-weight: 700; line-height: 18px; text-align: center;
+  color: #062334; background: #38bdf8; border-radius: 999px; padding: 0 6px;
+}
+/* Hareketi kısıtlayan kullanıcıda yanıp sönme yerine sabit vurgu. */
+@media (prefers-reduced-motion: reduce) {
+  .news-tab.tarama-tab.blink {
+    animation: none; background: #0369a1; color: #fff; border-color: #38bdf8;
+  }
+}
+/* Tarama satırı: bu ziyarette yeni yakalanan sinyal. */
+tr.satir-yeni { background: #052733; }
+tr.satir-yeni:hover { background: #063142; }
+.card.satir-yeni { border-color: #0e3a4a; background: #052733; }
+.yeni-rozet {
+  display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.4px;
+  color: #062334; background: #38bdf8; border-radius: 999px; padding: 1px 7px; margin-right: 6px;
+}
 
 /* Hacim dönüşü hücresi */
 
@@ -191,6 +219,11 @@ h1 { font-size: 26px; margin: 0 0 6px; }
   line-height: 1.6;
 }
 .fav-note code { background: #2a2a2a; padding: 1px 6px; border-radius: 4px; font-size: 11px; color: var(--text); }
+
+/* Tarama: günlük/4 saatlik bölümleri art arda, başlıkla ayrılmış. */
+.tarama-section { margin-top: 18px; }
+.tarama-section-title { font-size: 15px; margin: 0 0 8px; color: var(--text); }
+.tarama-section-title .muted-dash { font-size: 13px; font-weight: 400; }
 
 .tabs {
   display: flex;

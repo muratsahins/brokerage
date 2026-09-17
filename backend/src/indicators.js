@@ -227,12 +227,36 @@ export function wavetrendSignal(highs, lows, closes) {
 export function wavetrendSignals(highs, lows, closes) {
   const w = computeWaveTrend(highs, lows, closes);
   if (!w) return { cross: null, overzone: null };
-  return { cross: crossFrom(w), overzone: overzoneFrom(w) };
+  return { cross: crossFrom(w), overzone: overzoneFromWithIndex(w).signal };
+}
+
+// wavetrendSignals + overzone sinyalinin KURULDUĞU bar indeksi, TEK geçişte
+// (Tarama'nın tazelik penceresi bunu kullanır — bkz. liveSignals.js).
+export function wavetrendSignalsFull(highs, lows, closes) {
+  const w = computeWaveTrend(highs, lows, closes);
+  if (!w) return { cross: null, overzone: null, sinceIndex: null };
+  const { signal, sinceIndex } = overzoneFromWithIndex(w);
+  return { cross: crossFrom(w), overzone: signal, sinceIndex };
+}
+
+// Yalnızca overzone + kuruluş indeksi (4 saatlik seri için — cross gerekmiyor).
+export function wavetrendOverzoneSince(highs, lows, closes) {
+  const w = computeWaveTrend(highs, lows, closes);
+  if (!w) return { signal: null, sinceIndex: null };
+  return overzoneFromWithIndex(w);
 }
 
 function overzoneFrom(w) {
+  return overzoneFromWithIndex(w).signal;
+}
+
+// Ortak çekirdek: overzoneFrom'un mantığının AYNISI, ek olarak `sinceIndex`
+// (mevcut kalıcı sinyalin KURULDUĞU bar) döner. Tarama sekmesi bunu bar
+// zaman damgasına çevirip "son N gün içinde mi" diye süzüyor (liveSignals.js).
+function overzoneFromWithIndex(w) {
   const { wt1, wt2, n } = w;
   let signal = null;
+  let sinceIndex = null;
   for (let i = 1; i < n; i++) {
     const prevDiff = wt1[i - 1] - wt2[i - 1];
     const diff = wt1[i] - wt2[i];
@@ -240,12 +264,12 @@ function overzoneFrom(w) {
     const downCross = prevDiff >= 0 && diff < 0;
     const level = wt2[i]; // kesişimin gerçekleştiği bölge (kırmızı çizgi değeri)
     if (upCross) {
-      if (level <= WT_OS_LEVEL) signal = 'AL';   // aşırı satımda yukarı kesişim -> AL
-      else if (signal === 'SAT') signal = null;  // SAT'ın tersi -> boşalt
+      if (level <= WT_OS_LEVEL) { signal = 'AL'; sinceIndex = i; }        // aşırı satımda yukarı kesişim -> AL
+      else if (signal === 'SAT') { signal = null; sinceIndex = null; }   // SAT'ın tersi -> boşalt
     } else if (downCross) {
-      if (level >= WT_OB_LEVEL) signal = 'SAT';  // aşırı alımda aşağı kesişim -> SAT
-      else if (signal === 'AL') signal = null;   // AL'ın tersi -> boşalt
+      if (level >= WT_OB_LEVEL) { signal = 'SAT'; sinceIndex = i; }      // aşırı alımda aşağı kesişim -> SAT
+      else if (signal === 'AL') { signal = null; sinceIndex = null; }    // AL'ın tersi -> boşalt
     }
   }
-  return signal;
+  return { signal, sinceIndex };
 }
