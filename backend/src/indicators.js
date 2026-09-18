@@ -239,13 +239,6 @@ export function wavetrendSignalsFull(highs, lows, closes) {
   return { cross: crossFrom(w), overzone: signal, sinceIndex };
 }
 
-// Yalnızca overzone + kuruluş indeksi (4 saatlik seri için — cross gerekmiyor).
-export function wavetrendOverzoneSince(highs, lows, closes) {
-  const w = computeWaveTrend(highs, lows, closes);
-  if (!w) return { signal: null, sinceIndex: null };
-  return overzoneFromWithIndex(w);
-}
-
 function overzoneFrom(w) {
   return overzoneFromWithIndex(w).signal;
 }

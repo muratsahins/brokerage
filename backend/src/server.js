@@ -7,9 +7,7 @@ import {
   syncData, getRecommendations, getCachedItems, getUsRecommendations, syncUsData,
 } from './service.js';
 import { diagnose, fetchOhlc, peekLivePrices, peekUsLivePrices } from './dataSource.js';
-import {
-  getLivePrices, getUsLivePrices, refreshSeries, refreshSeries4h, seriesStats,
-} from './liveSignals.js';
+import { getLivePrices, getUsLivePrices, refreshSeries, seriesStats } from './liveSignals.js';
 import { fetchNews } from './newsSource.js';
 import { INSTRUMENTS } from './stocks.js';
 import { US_STOCKS } from './usStocks.js';
@@ -187,16 +185,6 @@ async function start() {
     setInterval(() => {
       refreshSeries().catch((err) => console.warn(`[live] Bar geçmişi tazelenemedi: ${err.message}`));
     }, seriesCheck * 60 * 1000);
-  }
-
-  // Tarama'nın "4 Saatlik" görünümü için ayrı, seyrek bar önbellek tazelemesi
-  // (bkz. liveSignals.js refreshSeries4h) — günlük döngüden bağımsız.
-  refreshSeries4h().catch((err) => console.warn(`[live-4h] Bar geçmişi doldurulamadı: ${err.message}`));
-  const series4hCheck = Number(process.env.SERIES4H_CHECK_MINUTES ?? 20);
-  if (series4hCheck > 0) {
-    setInterval(() => {
-      refreshSeries4h().catch((err) => console.warn(`[live-4h] Bar geçmişi tazelenemedi: ${err.message}`));
-    }, series4hCheck * 60 * 1000);
   }
 
   const minutes = Number(process.env.REFRESH_INTERVAL_MINUTES ?? 30);

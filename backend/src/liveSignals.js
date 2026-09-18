@@ -17,7 +17,7 @@ import {
   fetchUsExtendedPrices,
 } from './dataSource.js';
 import {
-  supertrendSignal, wavetrendSignalsFull, wavetrendOverzoneSince,
+  supertrendSignal, wavetrendSignalsFull,
 } from './indicators.js';
 import { priceDerived } from './recommend.js';
 import { usPriceDerived } from './recommendUs.js';
@@ -37,15 +37,6 @@ const day = (t, off) => Math.floor((t + off) / 86400);
 const cache = new Map();
 let filling = false;
 
-// 4 saatlik bar önbelleği — Tarama sekmesinin "4 Saatlik" görünümü için.
-// Ayrı Map, ayrı TTL (bar günlükten çok daha sık kapanıyor ama saatlik/1h
-// kadar da değil — 60 dk TTL eski kaldırılan sistemle aynı değer, bkz.
-// commit 28e02db). Canlı fiyatla yamalanmıyor: 60 dk'lık tazelik bir 4
-// saatlik barın süresinin çeyreği, ek karmaşıklığı hak etmiyor.
-const cache4h = new Map();
-let filling4h = false;
-const TTL4H_MS = Number(process.env.SERIES4H_TTL_MINUTES ?? 60) * 60 * 1000;
-
 // Bar geçmişi tutulan küme: BIST (madenler hariç) + ABD hisseleri.
 // ABD tarafında Yahoo sembolü ticker'ın kendisi (AAPL). Ticker çakışması yok
 // (kontrol edildi: 100 BIST hissesi / 172 ABD, kesişim boş) — önbellek düz bir Map
@@ -62,10 +53,7 @@ const SERIES_INSTRUMENTS = [
 const SERIES_TOTAL = SERIES_INSTRUMENTS.length;
 
 export function seriesStats() {
-  return {
-    cached: cache.size, total: SERIES_TOTAL, filling,
-    cached4h: cache4h.size, filling4h,
-  };
+  return { cached: cache.size, total: SERIES_TOTAL, filling };
 }
 
 // Eksik/bayat bar geçmişlerini arka planda (sırayla, nazikçe) tazeler.
@@ -116,46 +104,6 @@ export async function refreshSeries() {
   }
 }
 
-// refreshSeries()'in 4 saatlik karşılığı — Tarama'nın "4 Saatlik" görünümü
-// için. Kendi önbelleğine (cache4h) yazar, canlı fiyat döngüsünden bağımsız,
-// seyrek çalışır (bkz. server.js). fetchBars'ın interval parametresi zaten
-// '4h' kabul ediyor (Yahoo yerel destekliyor, dataGranularity ile doğrulandı
-// — bkz. dataSource.js fetchBars yorumu); agregasyon gerekmiyor.
-export async function refreshSeries4h() {
-  if (filling4h) return;
-  filling4h = true;
-  let ok = 0, fail = 0, skip = 0;
-  try {
-    for (const inst of SERIES_INSTRUMENTS) {
-      const cur = cache4h.get(inst.ticker);
-      if (cur && Date.now() - cur.at < TTL4H_MS) { skip++; continue; }
-      try {
-        const { bars } = await fetchBars(inst.symbol, '3mo', '4h');
-        if (bars.length) {
-          cache4h.set(inst.ticker, {
-            high: bars.map((b) => b.high),
-            low: bars.map((b) => b.low),
-            close: bars.map((b) => b.close),
-            time: bars.map((b) => b.ts),
-            at: Date.now(),
-          });
-          ok++;
-        } else {
-          fail++;
-        }
-      } catch {
-        fail++;
-      }
-      await sleep(GAP_MS);
-    }
-  } finally {
-    filling4h = false;
-  }
-  if (ok || fail) {
-    console.log(`[live-4h] Bar geçmişi tazelendi — ${ok} yeni, ${skip} taze, ${fail} başarısız (önbellek ${cache4h.size}/${SERIES_TOTAL}).`);
-  }
-}
-
 // Önbellekteki seriyi canlı veriyle günceller: kapanış canlı fiyattan, son barın
 // açılış/yüksek/düşük/HACİM değerleri ise canlı gün içi bardan (v7/quote) gelir —
 // böylece son bar fiyatla tamamen aynı tazelikte olur. Canlı bar yoksa (crumb
@@ -201,9 +149,8 @@ function seriesWithLive(entry, price, priceTs, bar) {
 
 // Canlı fiyatlardan gösterge sinyallerini üretir. Yanıt küçük kalsın diye kısa
 // anahtar + yalnızca dolu alanlar: st=SuperTrend, wt=WaveTrend kesişimi,
-// wo=overzone (53-60, günlük), wo4h=overzone (4 saatlik, bkz. cache4h).
-// woAt/wo4hAt: sinyalin KURULDUĞU barın epoch saniyesi — Tarama sekmesinin
-// "son N gün" tazelik penceresi (frontend) bunu kullanır.
+// wo=overzone (53-60). woAt: sinyalin KURULDUĞU barın epoch saniyesi —
+// Tarama sekmesinin "son N gün" tazelik penceresi (frontend) bunu kullanır.
 export function computeLiveSignals(prices, bars = {}) {
   const out = {};
   for (const [ticker, p] of Object.entries(prices)) {
@@ -220,16 +167,6 @@ export function computeLiveSignals(prices, bars = {}) {
     if (overzone) {
       sig.wo = overzone;
       if (sinceIndex != null && s.times?.[sinceIndex] != null) sig.woAt = s.times[sinceIndex];
-    }
-    // 4 saatlik seri canlı fiyatla yamalanmıyor (cache4h TTL'i zaten 60 dk —
-    // bkz. refreshSeries4h yorumu); doğrudan önbellekteki barlarla hesaplanır.
-    const entry4h = cache4h.get(ticker);
-    if (entry4h) {
-      const { signal: overzone4h, sinceIndex: sinceIndex4h } = wavetrendOverzoneSince(entry4h.high, entry4h.low, entry4h.close);
-      if (overzone4h) {
-        sig.wo4h = overzone4h;
-        if (sinceIndex4h != null && entry4h.time?.[sinceIndex4h] != null) sig.wo4hAt = entry4h.time[sinceIndex4h];
-      }
     }
     out[ticker] = sig; // boş nesne de anlamlı: "hesaplandı, sinyal yok"
   }

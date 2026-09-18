@@ -73,8 +73,6 @@ function mergeLivePrices(data, live) {
       next.wtCrossSignal = s.wt ?? null;
       next.wtSignal = s.wo ?? null;
       next.wtSignalAt = s.woAt ?? null;
-      next.wtSignal4h = s.wo4h ?? null;
-      next.wtSignal4hAt = s.wo4hAt ?? null;
       next.signalsLive = true;
     }
     // Analist potansiyeli, momentum, puan ve AL/TUT/İZLE sinyali de canlı
@@ -292,11 +290,10 @@ const StockCard = memo(function StockCard({ s, onSelect, overzoneField = 'wtSign
   );
 });
 
-// Tarama sekmesinin GÜNLÜK/4 SAATLİK bölümlerinden biri. Genel arama/sıralama/
-// sayfalama boru hattından bağımsız — listeler zaten küçük (overzone AL alt
-// kümesi), o yüzden doğrudan basılır. `overzoneField` hangi zaman diliminin
-// sinyalinin OVERZONE sütununda gösterileceğini belirler.
-function TaramaSection({ title, items, overzoneField, atField, keyPrefix, highlight, view, onSelect, emptyText }) {
+// Tarama sekmesinin (günlük) bölümü. Genel arama/sıralama/sayfalama boru
+// hattından bağımsız — liste zaten küçük (overzone AL alt kümesi), o yüzden
+// doğrudan basılır.
+function TaramaSection({ title, items, overzoneField, highlight, view, onSelect, emptyText }) {
   return (
     <div className="tarama-section">
       <h3 className="tarama-section-title">{title} <span className="muted-dash">({items.length})</span></h3>
@@ -326,7 +323,7 @@ function TaramaSection({ title, items, overzoneField, atField, keyPrefix, highli
                   s={s}
                   onSelect={onSelect}
                   overzoneField={overzoneField}
-                  isNew={highlight.has(taramaAnahtar(keyPrefix, s, atField))}
+                  isNew={highlight.has(taramaAnahtar(s))}
                 />
               ))}
             </tbody>
@@ -340,7 +337,7 @@ function TaramaSection({ title, items, overzoneField, atField, keyPrefix, highli
               s={s}
               onSelect={onSelect}
               overzoneField={overzoneField}
-              isNew={highlight.has(taramaAnahtar(keyPrefix, s, atField))}
+              isNew={highlight.has(taramaAnahtar(s))}
             />
           ))}
         </div>
@@ -364,9 +361,9 @@ const SAYFA = 120;
 // sunucu önbelleği 15 sn: 2 dakika ≈ arka arkaya 8 başarısız tur demek.
 const GECIKME_ESIGI_MS = 2 * 60 * 1000;
 
-// Tarama: sinyal KURULDUĞU bardan (wtSignal/wtSignal4hAt, epoch saniye) bu
-// kadar eskiyse listeden düşer — "son 2 gün" penceresi.
-const TARAMA_TAZELIK_MS = 2 * 24 * 60 * 60 * 1000;
+// Tarama: sinyal KURULDUĞU bardan (wtSignalAt, epoch saniye) bu kadar
+// eskiyse listeden düşer — "son 3 gün" penceresi.
+const TARAMA_TAZELIK_MS = 3 * 24 * 60 * 60 * 1000;
 const taramaTaze = (atSaniye) => atSaniye != null && (Date.now() - atSaniye * 1000) <= TARAMA_TAZELIK_MS;
 
 function useKademeliListe(items, sifirlaAnahtari) {
@@ -398,9 +395,8 @@ function useKademeliListe(items, sifirlaAnahtari) {
 
 // Tarama: bir satırın kimliği hisse + sinyalin KURULDUĞU bar zaman damgası —
 // bu tetikleyici olay değişmediği sürece aynı kalır (fiyat/puan gibi diğer
-// alanların değişmesi "yeni sinyal" saydırmaz). "d:"/"h:" öneki günlük/4
-// saatlik listelerin anahtarları çakışmasın diye.
-const taramaAnahtar = (onek, s, atAlan) => `${onek}:${s.ticker}:${s[atAlan]}`;
+// alanların değişmesi "yeni sinyal" saydırmaz).
+const taramaAnahtar = (s) => `${s.ticker}:${s.wtSignalAt}`;
 
 const TARAMA_SEEN_KEY = 'taramaSeen';
 function taramaGorulduYukle() {
@@ -415,11 +411,8 @@ function taramaGorulduYukle() {
 // Görülmemiş (yeni) Tarama sinyallerini izler: sekme kapalıyken/arka planda
 // gelen sinyaller "yeni" sayılır, sekmeye AÇIKÇA girilip sayfa görünür
 // olduğunda görüldü kaydedilir (bkz. commit 5db8f4d'deki UYARI deseni).
-function useTaramaYeni(dailyItems, fourHourItems, aktif) {
-  const guncelAnahtarlar = useMemo(() => [
-    ...dailyItems.map((s) => taramaAnahtar('d', s, 'wtSignalAt')),
-    ...fourHourItems.map((s) => taramaAnahtar('h', s, 'wtSignal4hAt')),
-  ], [dailyItems, fourHourItems]);
+function useTaramaYeni(dailyItems, aktif) {
+  const guncelAnahtarlar = useMemo(() => dailyItems.map(taramaAnahtar), [dailyItems]);
 
   const [gorulen, setGorulen] = useState(taramaGorulduYukle);
   const yeniAnahtarlar = useMemo(
@@ -745,9 +738,9 @@ export default function App() {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('ALL');
   const [tab, setTab] = useState('bist100'); // açılış: BIST 100
-  // Tarama'nın 2 günlük tazelik penceresi fiyat değişmeden de eskiyebilir
-  // (ör. seans kapalıyken); bu sayaç periyodik olarak taramaDailyItems/
-  // tarama4hItems'ı yeniden hesaplatıp eskiyeni düşürür.
+  // Tarama'nın 3 günlük tazelik penceresi fiyat değişmeden de eskiyebilir
+  // (ör. seans kapalıyken); bu sayaç periyodik olarak taramaDailyItems'ı
+  // yeniden hesaplatıp eskiyeni düşürür.
   const [taramaSaat, setTaramaSaat] = useState(0);
   useEffect(() => {
     const id = setInterval(() => setTaramaSaat((n) => n + 1), 5 * 60 * 1000);
@@ -839,8 +832,6 @@ export default function App() {
                 if (sig) {
                   next.wtSignal = sig.wo ?? null;
                   next.wtSignalAt = sig.woAt ?? null;
-                  next.wtSignal4h = sig.wo4h ?? null;
-                  next.wtSignal4hAt = sig.wo4hAt ?? null;
                   next.wtCrossSignal = sig.wt ?? null;
                   next.stSignal = sig.st ?? null;
                 }
@@ -970,12 +961,10 @@ export default function App() {
       && i.wtSignal === 'AL' && i.wtCrossSignal === 'AL' && i.stSignal === 'AL'
       && (i.recommendationKey === 'buy' || i.recommendationKey === 'strong_buy'),
   };
-  // Tarama: TEK koşul (WaveTrend overzone AL) — SuperTrend/analist şartı yok,
-  // Favori'den daha geniş, bilgilendirici bir liste. Sinyal aşırı satımda
-  // yukarı kesişimle kurulur, ters kesişime kadar kalıcıdır (indicators.js).
-  // Kendi (özel) render'ı var — GÜNLÜK ve 4 SAATLİK AYNI ANDA, ayrı bölümlerde
-  // gösteriliyor (bkz. taramaDailyItems/tarama4hItems) — bu yüzden diğer
-  // sekmelerin aksine `match` yok, genel tablo boru hattından geçmiyor.
+  // Tarama: TEK koşul (WaveTrend overzone AL, son 3 gün içinde kurulmuş) —
+  // SuperTrend/analist şartı yok, Favori'den daha geniş, bilgilendirici bir
+  // liste. Kendi (özel) render'ı var (bkz. taramaDailyItems) — bu yüzden
+  // diğer sekmelerin aksine `match` yok, genel tablo boru hattından geçmiyor.
   const TARAMA_TAB = { key: 'tarama', label: '🔎 Tarama' };
   // ABD hisseleri BIST'ten ayrı bir uçtan gelir (usFav). Sanal Borsa'da (ve
   // grafik/alım-satım panelinde) TEK para biriminde kalınsın diye ₺ karşılığı
@@ -1017,17 +1006,9 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- taramaSaat: yalnızca periyodik yeniden hesap tetikleyici
     [data.items, usTradableItems, taramaSaat],
   );
-  const tarama4hItems = useMemo(
-    () => [
-      ...data.items.filter((i) => i.kind === 'stock' && i.wtSignal4h === 'AL' && taramaTaze(i.wtSignal4hAt)),
-      ...usTradableItems.filter((i) => i.wtSignal4h === 'AL' && taramaTaze(i.wtSignal4hAt)),
-    ].sort((a, b) => a.ticker.localeCompare(b.ticker, 'tr')),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- taramaSaat: yalnızca periyodik yeniden hesap tetikleyici
-    [data.items, usTradableItems, taramaSaat],
-  );
   // Yeni (henüz görülmemiş) Tarama sinyali varsa sekme yanıp söner; sekmeye
   // girilip sayfa görününce söner (bkz. useTaramaYeni).
-  const { yeniSayisi: taramaYeniSayisi, vurgu: taramaVurgu } = useTaramaYeni(taramaDailyItems, tarama4hItems, tab === 'tarama');
+  const { yeniSayisi: taramaYeniSayisi, vurgu: taramaVurgu } = useTaramaYeni(taramaDailyItems, tab === 'tarama');
   // Sanal Borsa'nın arama/alım-satım havuzu: BIST + ABD birlikte.
   const tradeItems = useMemo(
     () => [...data.items, ...usTradableItems],
@@ -1212,11 +1193,10 @@ export default function App() {
       ) : tab === 'tarama' ? (
         <>
           <div className="fav-note">
-            <strong>Tarama kriteri:</strong> WaveTrend <strong>overzone</strong> sinyali <strong>son 2 gün</strong>{' '}
+            <strong>Tarama kriteri:</strong> WaveTrend <strong>overzone</strong> sinyali <strong>son 3 gün</strong>{' '}
             içinde kurulmuş (aşırı satım bölgesinde yukarı kesişim) — SuperTrend veya analist tavsiyesi şartı
-            yok. 2 günden eski sinyaller listeden düşer; Günlük ve 4 saatlik mumlardaki sinyaller AYRI
-            bölümlerde gösterilir. Yeni yakalanan sinyal Tarama sekmesini yanıp söndürür, sekmeyi
-            açıp görünce söner.
+            yok. 3 günden eski sinyaller listeden düşer. Yeni yakalanan sinyal Tarama sekmesini yanıp
+            söndürür, sekmeyi açıp görünce söner.
             <span className="muted-dash"> BIST 100 + ABD (NASDAQ-100 + S&P 100) evreninde aranır.
             {usFav.loading ? ' ABD verisi yükleniyor…' : ''}</span>
           </div>
@@ -1224,23 +1204,10 @@ export default function App() {
             title="Günlük"
             items={taramaDailyItems}
             overzoneField="wtSignal"
-            atField="wtSignalAt"
-            keyPrefix="d"
             highlight={taramaVurgu}
             view={view}
             onSelect={setChartItem}
-            emptyText="Son 2 günde günlük overzone AL sinyali veren BIST veya ABD hissesi yok."
-          />
-          <TaramaSection
-            title="4 Saatlik"
-            items={tarama4hItems}
-            overzoneField="wtSignal4h"
-            atField="wtSignal4hAt"
-            keyPrefix="h"
-            highlight={taramaVurgu}
-            view={view}
-            onSelect={setChartItem}
-            emptyText="Son 2 günde 4 saatlik overzone AL sinyali veren BIST veya ABD hissesi yok."
+            emptyText="Son 3 günde günlük overzone AL sinyali veren BIST veya ABD hissesi yok."
           />
         </>
       ) : (
