@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-19T15:52:25.128Z",
+  "updatedAt": "2026-09-19T20:37:36.980Z",
   "source": "github-actions",
   "count": 104,
   "withAnalyst": 55,
@@ -884,7 +884,7 @@
       "targetLow": 143,
       "recommendationKey": "strong_buy",
       "numAnalysts": 15,
-      "forwardPE": 2.77,
+      "forwardPE": 2.8,
       "revenueGrowth": 24.5,
       "score": 77,
       "signal": "AL",
