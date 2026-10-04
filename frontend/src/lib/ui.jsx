@@ -198,8 +198,9 @@ export function Pct({ value, strong }) {
   const up = value >= 0;
   return (
     <span style={{
-      color: up ? '#4ade80' : '#f87171',
+      color: up ? 'var(--up)' : 'var(--down)',
       fontVariantNumeric: 'tabular-nums',
+      fontFamily: 'var(--font-mono)',
       fontWeight: strong ? 700 : 400,
     }}>
       {up ? '▲' : '▼'} %{fmtNum(Math.abs(value))}
@@ -231,7 +232,7 @@ export function Tutar({ value, birim = '₺' }) {
   if (value == null) return <span className="muted-dash">—</span>;
   const up = value >= 0;
   return (
-    <span style={{ color: up ? '#4ade80' : '#f87171', fontVariantNumeric: 'tabular-nums', fontWeight: 700 }}>
+    <span style={{ color: up ? 'var(--up)' : 'var(--down)', fontVariantNumeric: 'tabular-nums', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
       {up ? '+' : '−'}{fmtNum(Math.abs(value))} {birim}
     </span>
   );

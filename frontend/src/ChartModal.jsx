@@ -134,11 +134,22 @@ function loadChartInds() {
 // alimSatim=false ile Sanal Borsa paneli ve pozisyon şeridi gizlenir. ABD
 // hisselerinde şart: fiyatları USD, portföyün nakdi ise ₺ — vbTrade ikisini
 // karıştırıp yanlış tutar hesaplardı.
+// Kapanış animasyonu CSS'teki .closing ters oynatmasıyla simetrik (bkz.
+// styles.css modal-in/.closing) — gerçek unmount (onClose) bu süre kadar
+// geciktirilir ki pop-up geldiği yoldan geri gitsin, aniden kesilmesin.
+const CLOSE_MS = 160;
+const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 export default function ChartModal({ item, onClose, alimSatim = true }) {
   const priceRef = useRef(null);
   const wtRef = useRef(null);
   const stochRef = useRef(null);
   const macdRef = useRef(null);
+  const [closing, setClosing] = useState(false);
+  const requestClose = () => {
+    setClosing(true);
+    setTimeout(onClose, prefersReducedMotion() ? 0 : CLOSE_MS);
+  };
   const [status, setStatus] = useState('loading'); // loading | ok | error
   const [tqty, setTqty] = useState('');
   const [tmsg, setTmsg] = useState(null);
@@ -181,7 +192,7 @@ export default function ChartModal({ item, onClose, alimSatim = true }) {
     : null;
 
   useEffect(() => {
-    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    const onKey = (e) => { if (e.key === 'Escape') requestClose(); };
     document.addEventListener('keydown', onKey);
     let charts = [];
     let cancelled = false;
@@ -331,7 +342,7 @@ export default function ChartModal({ item, onClose, alimSatim = true }) {
 
   const cur = item.currency || (item.kind === 'metal' ? 'USD' : 'TRY');
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className={`modal-overlay ${closing ? 'closing' : ''}`} onClick={requestClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-head">
           <div className="modal-title">
@@ -341,7 +352,7 @@ export default function ChartModal({ item, onClose, alimSatim = true }) {
             </span>
             <span className="modal-name">{item.name}{item.sector ? ` · ${item.sector}` : ''} · son 1 yıl (günlük)</span>
           </div>
-          <button className="modal-close" onClick={onClose} aria-label="Kapat">✕</button>
+          <button className="modal-close" onClick={requestClose} aria-label="Kapat">✕</button>
         </div>
 
         {/* Şerit giriş yapılmışsa HER ZAMAN görünür. Pozisyon yokken gizlemek,

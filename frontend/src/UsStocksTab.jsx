@@ -16,16 +16,16 @@ import { useModalBack } from './lib/useModalBack.js';
 const ChartModal = lazy(() => import('./ChartModal.jsx'));
 
 const SIGNAL_STYLES = {
-  AL: { label: 'AL', bg: '#0f5132', fg: '#4ade80' },
-  TUT: { label: 'TUT', bg: '#665200', fg: '#fbbf24' },
-  'İZLE': { label: 'İZLE', bg: '#3a3a3a', fg: '#cbd5e1' },
+  AL: { label: 'AL', bg: 'var(--up-soft)', fg: 'var(--up)' },
+  TUT: { label: 'TUT', bg: 'var(--warn-soft)', fg: 'var(--warn)' },
+  'İZLE': { label: 'İZLE', bg: 'var(--watch-soft)', fg: 'var(--watch)' },
 };
 function SignalBadge({ signal }) {
   const s = SIGNAL_STYLES[signal] ?? SIGNAL_STYLES['İZLE'];
   return (
     <span style={{
       background: s.bg, color: s.fg, padding: '3px 10px', borderRadius: 999,
-      fontSize: 12, fontWeight: 700, letterSpacing: 0.5,
+      fontSize: 12, fontWeight: 700, letterSpacing: 0.5, fontFamily: 'var(--font-mono)',
     }}>
       {s.label}
     </span>
@@ -33,13 +33,13 @@ function SignalBadge({ signal }) {
 }
 function ScoreBar({ score }) {
   const pct = Math.max(0, Math.min(100, score ?? 0));
-  const color = pct >= 65 ? '#4ade80' : pct >= 45 ? '#fbbf24' : '#64748b';
+  const color = pct >= 65 ? 'var(--up)' : pct >= 45 ? 'var(--warn)' : 'var(--muted-2)';
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-      <div style={{ flex: 1, height: 6, background: '#2a2a2a', borderRadius: 4, minWidth: 60 }}>
+      <div style={{ flex: 1, height: 6, background: 'var(--border)', borderRadius: 4, minWidth: 60 }}>
         <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: 4 }} />
       </div>
-      <span style={{ fontVariantNumeric: 'tabular-nums', width: 26, textAlign: 'right' }}>{score ?? '—'}</span>
+      <span style={{ fontVariantNumeric: 'tabular-nums', fontFamily: 'var(--font-mono)', width: 26, textAlign: 'right' }}>{score ?? '—'}</span>
     </div>
   );
 }
@@ -49,10 +49,10 @@ function IndicatorBadge({ signal }) {
   const buy = signal === 'AL';
   return (
     <span style={{
-      background: buy ? '#0f5132' : '#5b1a1a',
-      color: buy ? '#4ade80' : '#f87171',
+      background: buy ? 'var(--up-soft)' : 'var(--down-soft)',
+      color: buy ? 'var(--up)' : 'var(--down)',
       padding: '3px 10px', borderRadius: 999,
-      fontSize: 12, fontWeight: 700, letterSpacing: 0.5,
+      fontSize: 12, fontWeight: 700, letterSpacing: 0.5, fontFamily: 'var(--font-mono)',
     }}>
       {signal}
     </span>
@@ -211,12 +211,22 @@ function raporYasi(asOf) {
   return new Date().getFullYear() - Number(m[1]);
 }
 
+// Kapanış animasyonu CSS'teki .closing ters oynatmasıyla simetrik (bkz.
+// styles.css modal-in/.closing, ChartModal.jsx'teki aynı desen).
+const CLOSE_MS = 160;
+const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 function ReportPanel({ item, onClose }) {
   const r = item.report;
   const yas = r ? raporYasi(r.asOf) : null;
   const cokEski = yas != null && yas >= 2;
+  const [closing, setClosing] = useState(false);
+  const requestClose = () => {
+    setClosing(true);
+    setTimeout(onClose, prefersReducedMotion() ? 0 : CLOSE_MS);
+  };
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className={`modal-overlay ${closing ? 'closing' : ''}`} onClick={requestClose}>
       <div className="modal us-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-head">
           <div className="modal-title">
@@ -225,7 +235,7 @@ function ReportPanel({ item, onClose }) {
               {item.name} · {fmtNum(item.price)} {item.currency} <Pct value={item.changePct} /><ExtBadge ext={item.ext} />
             </span>
           </div>
-          <button className="modal-close" onClick={onClose}>✕</button>
+          <button className="modal-close" onClick={requestClose}>✕</button>
         </div>
         <div className="us-modal-body">
           <p className="exp-note">

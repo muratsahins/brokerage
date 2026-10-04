@@ -111,9 +111,9 @@ const GRAM_KAYNAK = {
 };
 
 const SIGNAL_STYLES = {
-  AL: { label: 'AL', bg: '#0f5132', fg: '#4ade80' },
-  TUT: { label: 'TUT', bg: '#665200', fg: '#fbbf24' },
-  'İZLE': { label: 'İZLE', bg: '#3a3a3a', fg: '#cbd5e1' },
+  AL: { label: 'AL', bg: 'var(--up-soft)', fg: 'var(--up)' },
+  TUT: { label: 'TUT', bg: 'var(--warn-soft)', fg: 'var(--warn)' },
+  'İZLE': { label: 'İZLE', bg: 'var(--watch-soft)', fg: 'var(--watch)' },
 };
 
 // Hedef fiyat notu para birimine göre: ABD hisseleri USD, BIST/maden ₺.
@@ -131,10 +131,10 @@ function IndicatorBadge({ signal }) {
   const buy = signal === 'AL';
   return (
     <span style={{
-      background: buy ? '#0f5132' : '#5b1a1a',
-      color: buy ? '#4ade80' : '#f87171',
+      background: buy ? 'var(--up-soft)' : 'var(--down-soft)',
+      color: buy ? 'var(--up)' : 'var(--down)',
       padding: '3px 10px', borderRadius: 999,
-      fontSize: 12, fontWeight: 700, letterSpacing: 0.5,
+      fontSize: 12, fontWeight: 700, letterSpacing: 0.5, fontFamily: 'var(--font-mono)',
     }}>
       {signal}
     </span>
@@ -146,7 +146,7 @@ function SignalBadge({ signal }) {
   return (
     <span style={{
       background: s.bg, color: s.fg, padding: '3px 10px', borderRadius: 999,
-      fontSize: 12, fontWeight: 700, letterSpacing: 0.5,
+      fontSize: 12, fontWeight: 700, letterSpacing: 0.5, fontFamily: 'var(--font-mono)',
     }}>
       {s.label}
     </span>
@@ -448,13 +448,13 @@ function useTaramaYeni(dailyItems, aktif) {
 
 function ScoreBar({ score }) {
   const pct = Math.max(0, Math.min(100, score ?? 0));
-  const color = pct >= 65 ? '#4ade80' : pct >= 45 ? '#fbbf24' : '#64748b';
+  const color = pct >= 65 ? 'var(--up)' : pct >= 45 ? 'var(--warn)' : 'var(--muted-2)';
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-      <div style={{ flex: 1, height: 6, background: '#2a2a2a', borderRadius: 4, minWidth: 60 }}>
+      <div style={{ flex: 1, height: 6, background: 'var(--border)', borderRadius: 4, minWidth: 60 }}>
         <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: 4 }} />
       </div>
-      <span style={{ fontVariantNumeric: 'tabular-nums', width: 26, textAlign: 'right' }}>{pct}</span>
+      <span style={{ fontVariantNumeric: 'tabular-nums', fontFamily: 'var(--font-mono)', width: 26, textAlign: 'right' }}>{pct}</span>
     </div>
   );
 }
@@ -622,7 +622,7 @@ function VirtualTrade({ items, onSelect }) {
       <div className="vb-summary">
         <div className="vb-stat"><span className="metric-label">Toplam Değer</span><span className="vb-big">{fmtNum(total)} ₺</span></div>
         <div className="vb-stat"><span className="metric-label">Nakit</span><span>{fmtNum(pf.cash)} ₺</span></div>
-        <div className="vb-stat"><span className="metric-label">Kâr / Zarar</span><span style={{ color: totalPnl >= 0 ? '#4ade80' : '#f87171' }}>{totalPnl >= 0 ? '+' : ''}{fmtNum(totalPnl)} ₺ · %{fmtNum(totalPnl / VB_START * 100)}</span></div>
+        <div className="vb-stat"><span className="metric-label">Kâr / Zarar</span><span style={{ color: totalPnl >= 0 ? 'var(--up)' : 'var(--down)', fontFamily: 'var(--font-mono)' }}>{totalPnl >= 0 ? '+' : ''}{fmtNum(totalPnl)} ₺ · %{fmtNum(totalPnl / VB_START * 100)}</span></div>
         {posList.length > 0 && (
           <div className="vb-stat">
             <span className="metric-label">Bugün</span>
@@ -700,7 +700,7 @@ function VirtualTrade({ items, onSelect }) {
               </div>
               <div className="vb-posdetail">
                 {fmtNum(p.qty)} {unitLabel(p.it)} · maliyet {fmtNum(p.avgCost)} ₺ · fiyat {fmtNum(p.price)} ₺
-                <span style={{ color: p.pnl >= 0 ? '#4ade80' : '#f87171', marginLeft: 8 }}>{p.pnl >= 0 ? '+' : ''}{fmtNum(p.pnl)} ₺ (%{fmtNum(p.pnlPct)})</span>
+                <span style={{ color: p.pnl >= 0 ? 'var(--up)' : 'var(--down)', marginLeft: 8, fontFamily: 'var(--font-mono)' }}>{p.pnl >= 0 ? '+' : ''}{fmtNum(p.pnl)} ₺ (%{fmtNum(p.pnlPct)})</span>
               </div>
             </div>
           ))}
