@@ -10,6 +10,7 @@ import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { API_BASE, fmtNum, norm } from './lib/common.js';
 import { Expected, Logo, Pct } from './lib/ui.jsx';
 import { useModalBack } from './lib/useModalBack.js';
+import { useModalClose } from './lib/useModalClose.js';
 
 // BIST ile aynı grafik bileşeni; aynı tembel parçadan gelir, ikinci bir indirme
 // olmaz. alimSatim=false — ABD fiyatları USD, sanal borsa nakdi ₺.
@@ -211,22 +212,14 @@ function raporYasi(asOf) {
   return new Date().getFullYear() - Number(m[1]);
 }
 
-// Kapanış animasyonu CSS'teki .closing ters oynatmasıyla simetrik (bkz.
-// styles.css modal-in/.closing, ChartModal.jsx'teki aynı desen).
-const CLOSE_MS = 160;
-const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-function ReportPanel({ item, onClose }) {
+// `closing`/`onClose` çağırana ait (bkz. lib/useModalClose.js) — X/overlay/
+// Escape burada, mobil GERİ tuşu useModalBack üzerinden AYNI onClose'u tetikler.
+function ReportPanel({ item, onClose, closing = false }) {
   const r = item.report;
   const yas = r ? raporYasi(r.asOf) : null;
   const cokEski = yas != null && yas >= 2;
-  const [closing, setClosing] = useState(false);
-  const requestClose = () => {
-    setClosing(true);
-    setTimeout(onClose, prefersReducedMotion() ? 0 : CLOSE_MS);
-  };
   return (
-    <div className={`modal-overlay ${closing ? 'closing' : ''}`} onClick={requestClose}>
+    <div className={`modal-overlay ${closing ? 'closing' : ''}`} onClick={onClose}>
       <div className="modal us-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-head">
           <div className="modal-title">
@@ -235,7 +228,7 @@ function ReportPanel({ item, onClose }) {
               {item.name} · {fmtNum(item.price)} {item.currency} <Pct value={item.changePct} /><ExtBadge ext={item.ext} />
             </span>
           </div>
-          <button className="modal-close" onClick={requestClose}>✕</button>
+          <button className="modal-close" onClick={onClose}>✕</button>
         </div>
         <div className="us-modal-body">
           <p className="exp-note">
@@ -398,11 +391,15 @@ export default function UsStocksTab({ view = 'web' }) {
   const [sort, setSort] = useState('score'); // score | ticker
   const [selected, setSelected] = useState(null);
   const [chartItem, setChartItem] = useState(null);
+  // Kapanış animasyonu (bkz. lib/useModalClose.js) X/overlay/Escape VE mobil
+  // GERİ tuşuyla (useModalBack) AYNI requestClose'tan geçsin.
+  const { closing: selectedClosing, requestClose: requestSelectedClose } = useModalClose(() => setSelected(null));
+  const { closing: chartClosing, requestClose: requestChartClose } = useModalClose(() => setChartItem(null));
   // Pop-up açıkken geri tuşu siteden çıkmasın, sadece pop-up'ı kapatsın.
   // İkisi ayrı ayrı kaydediliyor: rapor açıkken grafiğe de girilebiliyor,
   // o durumda geri tuşu önce grafiği, sonra raporu kapatır.
-  useModalBack(selected != null, () => setSelected(null));
-  useModalBack(chartItem != null, () => setChartItem(null));
+  useModalBack(selected != null, requestSelectedClose);
+  useModalBack(chartItem != null, requestChartClose);
 
   const filtered = useMemo(() => {
     const nq = norm(query.trim());
@@ -554,10 +551,10 @@ export default function UsStocksTab({ view = 'web' }) {
         </div>
       )}
 
-      {selected && <ReportPanel item={selected} onClose={() => setSelected(null)} />}
+      {selected && <ReportPanel item={selected} onClose={requestSelectedClose} closing={selectedClosing} />}
       {chartItem && (
-        <Suspense fallback={<div className="modal-overlay"><div className="chart-state">Grafik yükleniyor…</div></div>}>
-          <ChartModal item={chartItem} onClose={() => setChartItem(null)} alimSatim={false} />
+        <Suspense fallback={<div className={`modal-overlay ${chartClosing ? 'closing' : ''}`}><div className="chart-state">Grafik yükleniyor…</div></div>}>
+          <ChartModal item={chartItem} onClose={requestChartClose} closing={chartClosing} alimSatim={false} />
         </Suspense>
       )}
     </>

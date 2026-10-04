@@ -21,6 +21,13 @@ export function roundPrice(x) {
   return Math.round(x * f) / f;
 }
 
+// Pop-up kapanış animasyonu (bkz. styles.css .modal-overlay/.modal .closing):
+// gerçek unmount'u bu kadar geciktiriyoruz ki animasyon ortada kesilmesin —
+// ister X/overlay/Escape ister mobil GERİ tuşuyla kapansın, AYNI yoldan
+// geçsin (useModalBack.js da bu sabitle çağırır).
+export const MODAL_CLOSE_MS = 160;
+export const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 // Türkçe karakter duyarsız normalleştirme (arama için): "Şişecam" -> "sisecam".
 export function norm(s) {
   return (s || '')

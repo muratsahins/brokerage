@@ -3,6 +3,7 @@ import { API_BASE, fmtNum, norm, roundPrice } from './lib/common.js';
 import { getStoredEmail, isValidEmail, onEmailChange, setStoredEmail } from './lib/auth.js';
 import { BackToTop, Expected, Logo, Pct, Tutar } from './lib/ui.jsx';
 import { useModalBack } from './lib/useModalBack.js';
+import { useModalClose } from './lib/useModalClose.js';
 import {
   VB_START, vbCleanRetired, vbTrade, vbUnitLabel, vbUnitPrice,
 } from './lib/vb.js';
@@ -758,10 +759,14 @@ export default function App() {
   });
   const [query, setQuery] = useState('');
   const [chartItem, setChartItem] = useState(null); // grafik pop-up'ı için seçili enstrüman
+  // Kapanış animasyonu (bkz. lib/useModalClose.js) X/overlay/Escape VE mobil
+  // GERİ tuşuyla (useModalBack) AYNI requestClose'tan geçsin — hangisiyle
+  // kapanırsa kapansın pop-up aynı yoldan (animasyonlu) kapanır.
+  const { closing: chartClosing, requestClose: requestChartClose } = useModalClose(() => setChartItem(null));
   // Grafik açıkken geri tuşu siteden çıkmasın, sadece pop-up'ı kapatsın.
   // ChartModal'ın İÇİNDE değil burada: pop-up tembel yükleniyor ("Grafik
   // yükleniyor…" ekranı), geçmiş kaydı dokunur dokunmaz eklensin.
-  useModalBack(chartItem != null, () => setChartItem(null));
+  useModalBack(chartItem != null, requestChartClose);
   const [gecikti, setGecikti] = useState(false); // fiyat akışı duraklamış mı
   // Bağımsız kaynakla (Google Finance) fiyat doğrulama sonucu — arka planda
   // seyrek çalışır (priceVerify.js), burada sadece son sonucu okuruz.
@@ -1414,8 +1419,8 @@ export default function App() {
           çözümlüyoruz. Kalem listeden düşerse (süzme değişti) elimizdeki
           kopyayla devam. */}
       {chartLive && (
-        <Suspense fallback={<div className="modal-overlay"><div className="chart-state">Grafik yükleniyor…</div></div>}>
-          <ChartModal item={chartLive} onClose={() => setChartItem(null)} />
+        <Suspense fallback={<div className={`modal-overlay ${chartClosing ? 'closing' : ''}`}><div className="chart-state">Grafik yükleniyor…</div></div>}>
+          <ChartModal item={chartLive} onClose={requestChartClose} closing={chartClosing} />
         </Suspense>
       )}
       <BackToTop />
