@@ -671,6 +671,21 @@ th.num { text-align: right; }
   color: var(--muted);
   pointer-events: none;
 }
+/* Fare mum üzerine gelince O/Y/D/K değerleri — fiyat panelinin sağ üstünde. */
+.pane-legend {
+  position: absolute;
+  top: 3px;
+  right: 10px;
+  z-index: 3;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.2px;
+  color: var(--text);
+  pointer-events: none;
+  white-space: nowrap;
+}
+.pane-legend.lg-up { color: var(--up); }
+.pane-legend.lg-down { color: var(--down); }
 .chart-state {
   position: absolute;
   inset: 0;

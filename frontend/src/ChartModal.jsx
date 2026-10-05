@@ -142,6 +142,7 @@ export default function ChartModal({ item, onClose, closing = false, alimSatim =
   const wtRef = useRef(null);
   const stochRef = useRef(null);
   const macdRef = useRef(null);
+  const legendRef = useRef(null);
   const [status, setStatus] = useState('loading'); // loading | ok | error
   const [tqty, setTqty] = useState('');
   const [tmsg, setTmsg] = useState(null);
@@ -229,6 +230,19 @@ export default function ChartModal({ item, onClose, closing = false, alimSatim =
         const priceChart = createChart(priceRef.current, { ...base, timeScale: tsOpt('price') });
         const candleSeries = priceChart.addCandlestickSeries({ upColor: UP, downColor: DOWN, wickUpColor: UP, wickDownColor: DOWN, borderVisible: false });
         candleSeries.setData(candles);
+        // Sağ üstteki O/Y/D/K etiketi: imleç bir mumun üzerindeyken o mumu,
+        // değilken son mumu gösterir (bkz. aşağıdaki crosshair aboneliği).
+        const setLegend = (c) => {
+          if (!legendRef.current || !c) return;
+          legendRef.current.textContent = `A ${fmtNum(c.open)}  Y ${fmtNum(c.high)}  D ${fmtNum(c.low)}  K ${fmtNum(c.close)}`;
+          legendRef.current.classList.toggle('lg-up', c.close >= c.open);
+          legendRef.current.classList.toggle('lg-down', c.close < c.open);
+        };
+        setLegend(candles[candles.length - 1]);
+        priceChart.subscribeCrosshairMove((param) => {
+          const d = param.seriesData?.get(candleSeries);
+          setLegend(d || candles[candles.length - 1]);
+        });
         if (inds.volume) {
           const volSeries = priceChart.addHistogramSeries({ priceFormat: { type: 'volume' }, priceScaleId: '', lastValueVisible: false, priceLineVisible: false });
           volSeries.priceScale().applyOptions({ scaleMargins: { top: 0.82, bottom: 0 } });
@@ -439,6 +453,7 @@ export default function ChartModal({ item, onClose, closing = false, alimSatim =
           <div className="chart-panes">
             <div className="pane" style={{ flex: 3 }} ref={priceRef}>
               <span className="pane-label">Fiyat{inds.volume ? ' · Hacim' : ''}{inds.supertrend ? ' · SuperTrend' : ''}</span>
+              <span className="pane-legend" ref={legendRef}></span>
             </div>
             {inds.wavetrend && <div className="pane" style={{ flex: 1.5 }} ref={wtRef}><span className="pane-label">WaveTrend (LazyBear)</span></div>}
             {inds.stochrsi && <div className="pane" style={{ flex: 1.5 }} ref={stochRef}><span className="pane-label">Stoch RSI 14</span></div>}
