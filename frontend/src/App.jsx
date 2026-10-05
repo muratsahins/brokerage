@@ -762,7 +762,7 @@ export default function App() {
   // Kapanış animasyonu (bkz. lib/useModalClose.js) X/overlay/Escape VE mobil
   // GERİ tuşuyla (useModalBack) AYNI requestClose'tan geçsin — hangisiyle
   // kapanırsa kapansın pop-up aynı yoldan (animasyonlu) kapanır.
-  const { closing: chartClosing, requestClose: requestChartClose } = useModalClose(() => setChartItem(null));
+  const { closing: chartClosing, requestClose: requestChartClose } = useModalClose(() => setChartItem(null), chartItem?.ticker);
   // Grafik açıkken geri tuşu siteden çıkmasın, sadece pop-up'ı kapatsın.
   // ChartModal'ın İÇİNDE değil burada: pop-up tembel yükleniyor ("Grafik
   // yükleniyor…" ekranı), geçmiş kaydı dokunur dokunmaz eklensin.

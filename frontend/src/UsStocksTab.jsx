@@ -393,8 +393,8 @@ export default function UsStocksTab({ view = 'web' }) {
   const [chartItem, setChartItem] = useState(null);
   // Kapanış animasyonu (bkz. lib/useModalClose.js) X/overlay/Escape VE mobil
   // GERİ tuşuyla (useModalBack) AYNI requestClose'tan geçsin.
-  const { closing: selectedClosing, requestClose: requestSelectedClose } = useModalClose(() => setSelected(null));
-  const { closing: chartClosing, requestClose: requestChartClose } = useModalClose(() => setChartItem(null));
+  const { closing: selectedClosing, requestClose: requestSelectedClose } = useModalClose(() => setSelected(null), selected?.ticker);
+  const { closing: chartClosing, requestClose: requestChartClose } = useModalClose(() => setChartItem(null), chartItem?.ticker);
   // Pop-up açıkken geri tuşu siteden çıkmasın, sadece pop-up'ı kapatsın.
   // İkisi ayrı ayrı kaydediliyor: rapor açıkken grafiğe de girilebiliyor,
   // o durumda geri tuşu önce grafiği, sonra raporu kapatır.

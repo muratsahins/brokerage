@@ -25,6 +25,7 @@ import { useEffect, useRef } from 'react';
 // arkasında kalıyor); iç içe pop-up eklenirse burası gözden geçirilmeli.
 const yigin = [];
 let dinleyiciKurulu = false;
+let sayac = 0;
 
 function geriBasildi() {
   const ust = yigin[yigin.length - 1];
@@ -58,10 +59,11 @@ export function useModalBack(isAcik, onClose) {
 
   useEffect(() => {
     if (!isAcik) return undefined;
+    const id = ++sayac;
     const giris = { close: () => onCloseRef.current(), geriIleKapandi: false };
     yigin.push(giris);
     dinleyiciAyarla();
-    window.history.pushState({ modalAcik: true }, '');
+    window.history.pushState({ modalAcik: true, id }, '');
 
     return () => {
       const i = yigin.indexOf(giris);
@@ -70,7 +72,16 @@ export function useModalBack(isAcik, onClose) {
       // Geri tuşuyla kapandıysa kayıt zaten düştü; tekrar back() çağırmak
       // kullanıcıyı siteden atardı.
       if (giris.geriIleKapandi) return;
-      if (window.history.state?.modalAcik) window.history.back();
+      // React StrictMode (dev) her effect'i mount→cleanup→mount olarak art
+      // arda çalıştırır: senkron cleanup burada back() çağırırsa, hemen
+      // ardından gelen (gerçek) mount'un pushState'i üzerine binen asenkron
+      // popstate, az önce açılmış pop-up'ı anında kapatırdı. Çağrıyı bir
+      // sonraki tick'e erteleyip o an geçmişin TEPESİ hâlâ bizim kaydımız mı
+      // diye bakıyoruz — StrictMode remount'u bu arada yeni bir id push
+      // ettiyse dokunmuyoruz.
+      setTimeout(() => {
+        if (window.history.state?.id === id) window.history.back();
+      }, 0);
     };
   }, [isAcik]);
 }
