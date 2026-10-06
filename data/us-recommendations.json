@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-05T21:21:20.805Z",
+  "updatedAt": "2026-10-06T01:57:49.366Z",
   "source": "github-actions",
   "count": 200,
   "withReport": 48,
@@ -120,6 +120,41 @@
       }
     },
     {
+      "ticker": "MU",
+      "price": 1063.96,
+      "currency": "USD",
+      "changePct": -1.02,
+      "marketCap": 1201629036544,
+      "sector": "Yarı İletken",
+      "industry": "Semiconductors",
+      "pos52w": 0.822,
+      "upside12m": 44.33,
+      "targetMean": 1535.57,
+      "recommendationKey": "strong_buy",
+      "numAnalysts": 46,
+      "revenueGrowth": 379.3,
+      "revenue3yCagr": 104.65,
+      "profitMargins": 63.8,
+      "netDebtToEbitda": -0.35,
+      "fcfMargin": 21.93,
+      "dividendYield": 0.06,
+      "forwardPE": 5.15,
+      "trailingPE": 14.31,
+      "priceToBook": 11.93,
+      "score": 87,
+      "signal": "AL",
+      "wtSignal": null,
+      "wtCrossSignal": "SAT",
+      "stSignal": "AL",
+      "name": "Micron Technology",
+      "indices": [
+        "NDX",
+        "SPX"
+      ],
+      "hasReport": false,
+      "report": null
+    },
+    {
       "ticker": "WDC",
       "price": 441.64,
       "currency": "USD",
@@ -149,41 +184,6 @@
       "name": "Western Digital",
       "indices": [
         "NDX"
-      ],
-      "hasReport": false,
-      "report": null
-    },
-    {
-      "ticker": "MU",
-      "price": 1063.96,
-      "currency": "USD",
-      "changePct": -1.02,
-      "marketCap": 1201629036544,
-      "sector": "Yarı İletken",
-      "industry": "Semiconductors",
-      "pos52w": 0.822,
-      "upside12m": 43.03,
-      "targetMean": 1521.76,
-      "recommendationKey": "strong_buy",
-      "numAnalysts": 46,
-      "revenueGrowth": 379.3,
-      "revenue3yCagr": 104.65,
-      "profitMargins": 63.8,
-      "netDebtToEbitda": -0.35,
-      "fcfMargin": 21.93,
-      "dividendYield": 0.06,
-      "forwardPE": 5.17,
-      "trailingPE": 14.31,
-      "priceToBook": 11.93,
-      "score": 86,
-      "signal": "AL",
-      "wtSignal": null,
-      "wtCrossSignal": "SAT",
-      "stSignal": "AL",
-      "name": "Micron Technology",
-      "indices": [
-        "NDX",
-        "SPX"
       ],
       "hasReport": false,
       "report": null
@@ -850,7 +850,7 @@
       "pos52w": 0.734,
       "upside12m": 24.32,
       "targetMean": 1839.8,
-      "recommendationKey": "none",
+      "recommendationKey": "strong_buy",
       "numAnalysts": 15,
       "revenueGrowth": 47.6,
       "revenue3yCagr": 15.86,
@@ -916,8 +916,8 @@
       "sector": "E-ticaret",
       "industry": "Internet Retail",
       "pos52w": 0.088,
-      "upside12m": 47.13,
-      "targetMean": 114.61,
+      "upside12m": 47.35,
+      "targetMean": 114.79,
       "recommendationKey": "buy",
       "numAnalysts": 34,
       "revenueGrowth": 8.1,
@@ -1172,8 +1172,8 @@
       "sector": "Yarı İletken Ekip.",
       "industry": "Semiconductor Equipment & Materials",
       "pos52w": 0.868,
-      "upside12m": 12.42,
-      "targetMean": 2090.88,
+      "upside12m": 12.37,
+      "targetMean": 2089.95,
       "recommendationKey": "strong_buy",
       "numAnalysts": 16,
       "revenueGrowth": 21.3,
@@ -1997,7 +1997,7 @@
       "marketCap": 21251874816,
       "sector": "Veri/Analitik",
       "industry": "Consulting Services",
-      "pos52w": 0.079,
+      "pos52w": 0.08,
       "upside12m": 43.78,
       "targetMean": 234.76,
       "recommendationKey": "buy",
@@ -2818,108 +2818,6 @@
       }
     },
     {
-      "ticker": "AXON",
-      "price": 411.81,
-      "currency": "USD",
-      "changePct": -0.37,
-      "marketCap": 33454381056,
-      "sector": "Kamu Güvenliği Tekn.",
-      "industry": "Aerospace & Defense",
-      "pos52w": 0.171,
-      "upside12m": 70.98,
-      "targetMean": 704.11,
-      "recommendationKey": "buy",
-      "numAnalysts": 19,
-      "revenueGrowth": 35.3,
-      "revenue3yCagr": 32.68,
-      "profitMargins": 6.19,
-      "netDebtToEbitda": 7.01,
-      "fcfMargin": 6.9,
-      "dividendYield": 0,
-      "forwardPE": 39.06,
-      "trailingPE": 170.88,
-      "priceToBook": 9.1,
-      "score": 62,
-      "signal": "TUT",
-      "wtSignal": null,
-      "wtCrossSignal": "SAT",
-      "stSignal": "SAT",
-      "name": "Axon Enterprise",
-      "indices": [
-        "NDX"
-      ],
-      "hasReport": false,
-      "report": null
-    },
-    {
-      "ticker": "UBER",
-      "price": 69.48,
-      "currency": "USD",
-      "changePct": 2.01,
-      "marketCap": 141917077504,
-      "sector": "Ulaşım/Platform",
-      "industry": "Software - Application",
-      "pos52w": 0.113,
-      "upside12m": 45.06,
-      "targetMean": 100.79,
-      "recommendationKey": "buy",
-      "numAnalysts": 46,
-      "revenueGrowth": 12.2,
-      "revenue3yCagr": 17.73,
-      "profitMargins": 17.35,
-      "netDebtToEbitda": 1.25,
-      "fcfMargin": 13.12,
-      "dividendYield": 0,
-      "forwardPE": 15.72,
-      "trailingPE": 15.24,
-      "priceToBook": 5.19,
-      "score": 62,
-      "signal": "TUT",
-      "wtSignal": null,
-      "wtCrossSignal": "AL",
-      "stSignal": "SAT",
-      "name": "Uber Technologies",
-      "indices": [
-        "SPX"
-      ],
-      "hasReport": false,
-      "report": null
-    },
-    {
-      "ticker": "TRI",
-      "price": 97.08,
-      "currency": "USD",
-      "changePct": -0.55,
-      "marketCap": 42060046336,
-      "sector": "Bilgi Hizmetleri",
-      "industry": "Specialty Business Services",
-      "pos52w": 0.236,
-      "upside12m": 25.97,
-      "targetMean": 122.29,
-      "recommendationKey": "buy",
-      "numAnalysts": 12,
-      "revenueGrowth": 9.5,
-      "revenue3yCagr": 4.1,
-      "profitMargins": 21.22,
-      "netDebtToEbitda": 1.1,
-      "fcfMargin": 26.92,
-      "dividendYield": 2.68,
-      "forwardPE": 19.1,
-      "trailingPE": 25.48,
-      "priceToBook": 3.78,
-      "score": 62,
-      "signal": "TUT",
-      "wtSignal": null,
-      "wtCrossSignal": "AL",
-      "stSignal": "SAT",
-      "name": "Thomson Reuters",
-      "indices": [
-        "NDX"
-      ],
-      "hasReport": false,
-      "report": null
-    },
-    {
       "ticker": "AMD",
       "price": 631.75,
       "currency": "USD",
@@ -2928,8 +2826,8 @@
       "sector": "Yarı İletken",
       "industry": "Semiconductors",
       "pos52w": 0.97,
-      "upside12m": -1.54,
-      "targetMean": 622.01,
+      "upside12m": -0.4,
+      "targetMean": 629.21,
       "recommendationKey": "strong_buy",
       "numAnalysts": 50,
       "revenueGrowth": 50.1,
@@ -2938,10 +2836,10 @@
       "netDebtToEbitda": -0.92,
       "fcfMargin": 21.41,
       "dividendYield": 0,
-      "forwardPE": 40.42,
+      "forwardPE": 40.18,
       "trailingPE": 161.16,
       "priceToBook": 15.34,
-      "score": 61,
+      "score": 62,
       "signal": "TUT",
       "wtSignal": "SAT",
       "wtCrossSignal": "SAT",
@@ -3004,6 +2902,108 @@
         "balanceNote": "Net NAKİT 8.8 Mr$ (nakit 13.1 Mr$ > borç 4.3 Mr$); Net Borç/EBITDA -0.92x — bilanço riski minimal.",
         "fcfNote": "FCF 8.8 Mr$, marj %21.4; net kârın %137.4'i nakde dönüyor — güçlü nakde dönüşüm. İşletme nakit akışıyla arasındaki 1.2 Mr$ fark yatırım/capex kalemi."
       }
+    },
+    {
+      "ticker": "AXON",
+      "price": 411.81,
+      "currency": "USD",
+      "changePct": -0.37,
+      "marketCap": 33454381056,
+      "sector": "Kamu Güvenliği Tekn.",
+      "industry": "Aerospace & Defense",
+      "pos52w": 0.171,
+      "upside12m": 70.98,
+      "targetMean": 704.11,
+      "recommendationKey": "buy",
+      "numAnalysts": 19,
+      "revenueGrowth": 35.3,
+      "revenue3yCagr": 32.68,
+      "profitMargins": 6.19,
+      "netDebtToEbitda": 7.01,
+      "fcfMargin": 6.9,
+      "dividendYield": 0,
+      "forwardPE": 39.06,
+      "trailingPE": 170.88,
+      "priceToBook": 9.1,
+      "score": 62,
+      "signal": "TUT",
+      "wtSignal": null,
+      "wtCrossSignal": "SAT",
+      "stSignal": "SAT",
+      "name": "Axon Enterprise",
+      "indices": [
+        "NDX"
+      ],
+      "hasReport": false,
+      "report": null
+    },
+    {
+      "ticker": "UBER",
+      "price": 69.48,
+      "currency": "USD",
+      "changePct": 2.01,
+      "marketCap": 141917077504,
+      "sector": "Ulaşım/Platform",
+      "industry": "Software - Application",
+      "pos52w": 0.115,
+      "upside12m": 45.06,
+      "targetMean": 100.79,
+      "recommendationKey": "buy",
+      "numAnalysts": 46,
+      "revenueGrowth": 12.2,
+      "revenue3yCagr": 17.73,
+      "profitMargins": 17.35,
+      "netDebtToEbitda": 1.25,
+      "fcfMargin": 13.12,
+      "dividendYield": 0,
+      "forwardPE": 15.72,
+      "trailingPE": 15.24,
+      "priceToBook": 5.19,
+      "score": 62,
+      "signal": "TUT",
+      "wtSignal": null,
+      "wtCrossSignal": "AL",
+      "stSignal": "SAT",
+      "name": "Uber Technologies",
+      "indices": [
+        "SPX"
+      ],
+      "hasReport": false,
+      "report": null
+    },
+    {
+      "ticker": "TRI",
+      "price": 97.08,
+      "currency": "USD",
+      "changePct": -0.55,
+      "marketCap": 42060046336,
+      "sector": "Bilgi Hizmetleri",
+      "industry": "Specialty Business Services",
+      "pos52w": 0.236,
+      "upside12m": 25.97,
+      "targetMean": 122.29,
+      "recommendationKey": "buy",
+      "numAnalysts": 12,
+      "revenueGrowth": 9.5,
+      "revenue3yCagr": 4.1,
+      "profitMargins": 21.22,
+      "netDebtToEbitda": 1.1,
+      "fcfMargin": 26.92,
+      "dividendYield": 2.68,
+      "forwardPE": 19.1,
+      "trailingPE": 25.48,
+      "priceToBook": 3.78,
+      "score": 62,
+      "signal": "TUT",
+      "wtSignal": null,
+      "wtCrossSignal": "AL",
+      "stSignal": "SAT",
+      "name": "Thomson Reuters",
+      "indices": [
+        "NDX"
+      ],
+      "hasReport": false,
+      "report": null
     },
     {
       "ticker": "ARM",
@@ -3082,8 +3082,8 @@
       "sector": "Lojistik",
       "industry": "Trucking",
       "pos52w": 0.423,
-      "upside12m": 27.09,
-      "targetMean": 227.95,
+      "upside12m": 26.63,
+      "targetMean": 227.14,
       "recommendationKey": "buy",
       "numAnalysts": 22,
       "revenueGrowth": 10.4,
@@ -3092,7 +3092,7 @@
       "netDebtToEbitda": -0.15,
       "fcfMargin": 17.33,
       "dividendYield": 0.64,
-      "forwardPE": 26.81,
+      "forwardPE": 26.76,
       "trailingPE": 34.49,
       "priceToBook": 8.18,
       "score": 61,
@@ -3404,8 +3404,8 @@
       "sector": "Bankacılık",
       "industry": "Banks - Diversified",
       "pos52w": 0.347,
-      "upside12m": 22.02,
-      "targetMean": 99.37,
+      "upside12m": 21.8,
+      "targetMean": 99.2,
       "recommendationKey": "buy",
       "numAnalysts": 23,
       "revenueGrowth": 9.5,
@@ -3414,7 +3414,7 @@
       "netDebtToEbitda": null,
       "fcfMargin": null,
       "dividendYield": 2.49,
-      "forwardPE": 10.22,
+      "forwardPE": 10.2,
       "trailingPE": 11.84,
       "priceToBook": 1.5,
       "score": 60,
@@ -3720,40 +3720,6 @@
       "report": null
     },
     {
-      "ticker": "C",
-      "price": 128.55,
-      "currency": "USD",
-      "changePct": 0.04,
-      "marketCap": 215634509824,
-      "sector": "Bankacılık",
-      "industry": "Banks - Diversified",
-      "pos52w": 0.643,
-      "upside12m": 19.56,
-      "targetMean": 153.7,
-      "recommendationKey": "buy",
-      "numAnalysts": 20,
-      "revenueGrowth": 15.5,
-      "revenue3yCagr": 4.2,
-      "profitMargins": 21.83,
-      "netDebtToEbitda": null,
-      "fcfMargin": null,
-      "dividendYield": 2.09,
-      "forwardPE": 9.97,
-      "trailingPE": 13.88,
-      "priceToBook": 1.12,
-      "score": 59,
-      "signal": "TUT",
-      "wtSignal": null,
-      "wtCrossSignal": "SAT",
-      "stSignal": "SAT",
-      "name": "Citigroup",
-      "indices": [
-        "SPX"
-      ],
-      "hasReport": false,
-      "report": null
-    },
-    {
       "ticker": "AMT",
       "price": 162.26,
       "currency": "USD",
@@ -3918,7 +3884,7 @@
       "marketCap": 11207766016,
       "sector": "Emlak Verisi",
       "industry": "Real Estate Services",
-      "pos52w": 0.03,
+      "pos52w": 0.032,
       "upside12m": 34.85,
       "targetMean": 37.3,
       "recommendationKey": "buy",
@@ -3951,8 +3917,8 @@
       "sector": "Tıbbi Cihaz",
       "industry": "Medical Devices",
       "pos52w": 0.852,
-      "upside12m": 9.41,
-      "targetMean": 95.08,
+      "upside12m": 9.87,
+      "targetMean": 95.48,
       "recommendationKey": "strong_buy",
       "numAnalysts": 25,
       "revenueGrowth": 13.1,
@@ -3961,7 +3927,7 @@
       "netDebtToEbitda": -0.39,
       "fcfMargin": 20.55,
       "dividendYield": 0,
-      "forwardPE": 27.84,
+      "forwardPE": 27.88,
       "trailingPE": 34.48,
       "priceToBook": 12.51,
       "score": 58,
@@ -3972,6 +3938,40 @@
       "name": "Dexcom",
       "indices": [
         "NDX"
+      ],
+      "hasReport": false,
+      "report": null
+    },
+    {
+      "ticker": "C",
+      "price": 128.55,
+      "currency": "USD",
+      "changePct": 0.04,
+      "marketCap": 215634509824,
+      "sector": "Bankacılık",
+      "industry": "Banks - Diversified",
+      "pos52w": 0.643,
+      "upside12m": 18.83,
+      "targetMean": 152.75,
+      "recommendationKey": "buy",
+      "numAnalysts": 20,
+      "revenueGrowth": 15.5,
+      "revenue3yCagr": 4.2,
+      "profitMargins": 21.83,
+      "netDebtToEbitda": null,
+      "fcfMargin": null,
+      "dividendYield": 2.09,
+      "forwardPE": 9.93,
+      "trailingPE": 13.88,
+      "priceToBook": 1.12,
+      "score": 58,
+      "signal": "TUT",
+      "wtSignal": null,
+      "wtCrossSignal": "SAT",
+      "stSignal": "SAT",
+      "name": "Citigroup",
+      "indices": [
+        "SPX"
       ],
       "hasReport": false,
       "report": null
@@ -4213,6 +4213,92 @@
       "report": null
     },
     {
+      "ticker": "MSFT",
+      "price": 525.18,
+      "currency": "USD",
+      "changePct": 1.48,
+      "marketCap": 3899747991552,
+      "sector": "Yazılım",
+      "industry": "Software - Infrastructure",
+      "pos52w": 0.86,
+      "upside12m": 10.93,
+      "targetMean": 582.6,
+      "recommendationKey": "strong_buy",
+      "numAnalysts": 53,
+      "revenueGrowth": 17.7,
+      "revenue3yCagr": 16.12,
+      "profitMargins": 40.31,
+      "netDebtToEbitda": 0.27,
+      "fcfMargin": 4.99,
+      "dividendYield": 0.76,
+      "forwardPE": 22.18,
+      "trailingPE": 29.26,
+      "priceToBook": 8.82,
+      "score": 56,
+      "signal": "TUT",
+      "wtSignal": null,
+      "wtCrossSignal": "AL",
+      "stSignal": "AL",
+      "name": "Microsoft",
+      "indices": [
+        "NDX",
+        "SPX"
+      ],
+      "hasReport": true,
+      "report": {
+        "asOf": "FY2025 yıllık rapor verilerine dayalı, yaklaşık",
+        "segments": [
+          {
+            "name": "Akıllı Bulut (Azure, sunucu ürünleri)",
+            "sharePct": 44,
+            "note": "AI iş yükleriyle en hızlı büyüyen kol; sermaye yoğunluğu da en yüksek olan"
+          },
+          {
+            "name": "Üretkenlik ve İş Süreçleri (Microsoft 365, LinkedIn, Dynamics)",
+            "sharePct": 33,
+            "note": "Abonelik ağırlıklı, öngörülebilir; Copilot ile birim fiyat artışı deneniyor"
+          },
+          {
+            "name": "Daha Fazla Kişisel Bilgisayarlama (Windows, Xbox, arama, cihaz)",
+            "sharePct": 23,
+            "note": "Olgun; oyun tarafı Activision ile büyüdü"
+          }
+        ],
+        "competitors": [
+          "Amazon (AWS)",
+          "Alphabet (Google Cloud)",
+          "Oracle",
+          "Salesforce",
+          "OpenAI (kısmen ortak kısmen rakip)"
+        ],
+        "moat": [
+          {
+            "title": "Kurumsal dağıtım ve satın alma ilişkisi",
+            "desc": "Kurumsal müşterilerin çoğu Windows, Office ve Azure'u tek bir kurumsal sözleşmede topluyor; yeni bir ürünü aynı sözleşmeye eklemek rakipten satın almaktan idari olarak çok daha kolay — bu, Microsoft'a satış yapmadan önce kazanılmış bir avantaj sağlıyor."
+          },
+          {
+            "title": "Kurumsal veri yerçekimi",
+            "desc": "Kurumun dosyaları, kimlik yönetimi ve iş akışları Microsoft bulutunda biriktikçe taşınma maliyeti teknik bir projeye dönüşüyor; bu yapışkanlık fiyat artışlarını da taşıyabiliyor."
+          }
+        ],
+        "strengths": [
+          "Bulut ve abonelik ağırlıklı gelir yapısı yüksek marjlı ve öngörülebilir",
+          "Kurumsal kimlik ve üretkenlik katmanına sahip olmak, AI ürünlerini mevcut sözleşmelere eklemeyi kolaylaştırıyor",
+          "Net marj mega-cap grubunun üst bandında ve büyüme çift haneli sürüyor"
+        ],
+        "risks": [
+          "AI veri merkezi yatırımı serbest nakit akışını sert biçimde daraltmış durumda — %40'ı aşan net marja karşılık FCF marjı tek haneye inmiş; kâr ile nakit arasındaki bu makas tezin en somut zayıflığı",
+          "Azure büyümesi kapasite kısıtına bağlı; yatırımın gelire dönüşme takvimi kayarsa beklenti hızla bozulur",
+          "OpenAI ilişkisi hem stratejik avantaj hem bağımlılık; ortaklığın ekonomisi değişirse AI ürün hattının maliyet yapısı etkilenir"
+        ],
+        "verdict": "Kurumsal dağıtım gücü ve abonelik yapısı, mega-cap içinde en savunulabilir iş modellerinden birini oluşturuyor; ileri çarpan da bu kalite için aşırı değil. Ancak değerlemenin sınavı kârlılık değil nakit: veri merkezi yatırımı FCF marjını net marjın çok altına indirdiği sürece kâra dayalı çarpanlar gerçeğin önünde koşar. İzlenmesi gereken, capex'in Azure gelirine dönüşme hızı.",
+        "revenue3yNote": "Gelir 331.8 Mr$ (son 12 ay, 30.06.2026'da biten dönem); yıllık büyüme %17.7, 3 yıllık bileşik büyüme %16.1 (FY2023→FY2026 yıllık tabloları). Büyüme temposu 3 yıllık ortalamayla uyumlu.",
+        "marginNote": "Net kâr marjı %40.3 (≈ 133.7 Mr$ net kâr); EBITDA marjı %58.5.",
+        "balanceNote": "Net borç 52.0 Mr$ (borç 128.8 Mr$, nakit 76.8 Mr$); Net Borç/EBITDA 0.27x — rahat seviye.",
+        "fcfNote": "FCF 16.5 Mr$, marj %5.0; net kârın %12.4'i nakde dönüyor — dönüşüm ZAYIF, muhasebe kârı nakit üretiminin belirgin önünde. İşletme nakit akışıyla arasındaki 166.4 Mr$ fark yatırım/capex kalemi."
+      }
+    },
+    {
       "ticker": "ROP",
       "price": 363.38,
       "currency": "USD",
@@ -4343,92 +4429,6 @@
       "indices": [],
       "hasReport": false,
       "report": null
-    },
-    {
-      "ticker": "MSFT",
-      "price": 525.18,
-      "currency": "USD",
-      "changePct": 1.48,
-      "marketCap": 3899747991552,
-      "sector": "Yazılım",
-      "industry": "Software - Infrastructure",
-      "pos52w": 0.86,
-      "upside12m": 10.21,
-      "targetMean": 578.82,
-      "recommendationKey": "strong_buy",
-      "numAnalysts": 53,
-      "revenueGrowth": 17.7,
-      "revenue3yCagr": 16.12,
-      "profitMargins": 40.31,
-      "netDebtToEbitda": 0.27,
-      "fcfMargin": 4.99,
-      "dividendYield": 0.76,
-      "forwardPE": 22.21,
-      "trailingPE": 29.26,
-      "priceToBook": 8.82,
-      "score": 55,
-      "signal": "TUT",
-      "wtSignal": null,
-      "wtCrossSignal": "AL",
-      "stSignal": "AL",
-      "name": "Microsoft",
-      "indices": [
-        "NDX",
-        "SPX"
-      ],
-      "hasReport": true,
-      "report": {
-        "asOf": "FY2025 yıllık rapor verilerine dayalı, yaklaşık",
-        "segments": [
-          {
-            "name": "Akıllı Bulut (Azure, sunucu ürünleri)",
-            "sharePct": 44,
-            "note": "AI iş yükleriyle en hızlı büyüyen kol; sermaye yoğunluğu da en yüksek olan"
-          },
-          {
-            "name": "Üretkenlik ve İş Süreçleri (Microsoft 365, LinkedIn, Dynamics)",
-            "sharePct": 33,
-            "note": "Abonelik ağırlıklı, öngörülebilir; Copilot ile birim fiyat artışı deneniyor"
-          },
-          {
-            "name": "Daha Fazla Kişisel Bilgisayarlama (Windows, Xbox, arama, cihaz)",
-            "sharePct": 23,
-            "note": "Olgun; oyun tarafı Activision ile büyüdü"
-          }
-        ],
-        "competitors": [
-          "Amazon (AWS)",
-          "Alphabet (Google Cloud)",
-          "Oracle",
-          "Salesforce",
-          "OpenAI (kısmen ortak kısmen rakip)"
-        ],
-        "moat": [
-          {
-            "title": "Kurumsal dağıtım ve satın alma ilişkisi",
-            "desc": "Kurumsal müşterilerin çoğu Windows, Office ve Azure'u tek bir kurumsal sözleşmede topluyor; yeni bir ürünü aynı sözleşmeye eklemek rakipten satın almaktan idari olarak çok daha kolay — bu, Microsoft'a satış yapmadan önce kazanılmış bir avantaj sağlıyor."
-          },
-          {
-            "title": "Kurumsal veri yerçekimi",
-            "desc": "Kurumun dosyaları, kimlik yönetimi ve iş akışları Microsoft bulutunda biriktikçe taşınma maliyeti teknik bir projeye dönüşüyor; bu yapışkanlık fiyat artışlarını da taşıyabiliyor."
-          }
-        ],
-        "strengths": [
-          "Bulut ve abonelik ağırlıklı gelir yapısı yüksek marjlı ve öngörülebilir",
-          "Kurumsal kimlik ve üretkenlik katmanına sahip olmak, AI ürünlerini mevcut sözleşmelere eklemeyi kolaylaştırıyor",
-          "Net marj mega-cap grubunun üst bandında ve büyüme çift haneli sürüyor"
-        ],
-        "risks": [
-          "AI veri merkezi yatırımı serbest nakit akışını sert biçimde daraltmış durumda — %40'ı aşan net marja karşılık FCF marjı tek haneye inmiş; kâr ile nakit arasındaki bu makas tezin en somut zayıflığı",
-          "Azure büyümesi kapasite kısıtına bağlı; yatırımın gelire dönüşme takvimi kayarsa beklenti hızla bozulur",
-          "OpenAI ilişkisi hem stratejik avantaj hem bağımlılık; ortaklığın ekonomisi değişirse AI ürün hattının maliyet yapısı etkilenir"
-        ],
-        "verdict": "Kurumsal dağıtım gücü ve abonelik yapısı, mega-cap içinde en savunulabilir iş modellerinden birini oluşturuyor; ileri çarpan da bu kalite için aşırı değil. Ancak değerlemenin sınavı kârlılık değil nakit: veri merkezi yatırımı FCF marjını net marjın çok altına indirdiği sürece kâra dayalı çarpanlar gerçeğin önünde koşar. İzlenmesi gereken, capex'in Azure gelirine dönüşme hızı.",
-        "revenue3yNote": "Gelir 331.8 Mr$ (son 12 ay, 30.06.2026'da biten dönem); yıllık büyüme %17.7, 3 yıllık bileşik büyüme %16.1 (FY2023→FY2026 yıllık tabloları). Büyüme temposu 3 yıllık ortalamayla uyumlu.",
-        "marginNote": "Net kâr marjı %40.3 (≈ 133.7 Mr$ net kâr); EBITDA marjı %58.5.",
-        "balanceNote": "Net borç 52.0 Mr$ (borç 128.8 Mr$, nakit 76.8 Mr$); Net Borç/EBITDA 0.27x — rahat seviye.",
-        "fcfNote": "FCF 16.5 Mr$, marj %5.0; net kârın %12.4'i nakde dönüyor — dönüşüm ZAYIF, muhasebe kârı nakit üretiminin belirgin önünde. İşletme nakit akışıyla arasındaki 166.4 Mr$ fark yatırım/capex kalemi."
-      }
     },
     {
       "ticker": "AMZN",
@@ -4585,6 +4585,38 @@
       "report": null
     },
     {
+      "ticker": "TEAM",
+      "price": 196.65,
+      "currency": "USD",
+      "changePct": 4.66,
+      "marketCap": 49779744768,
+      "sector": "Yazılım",
+      "industry": "Software - Application",
+      "pos52w": 0.977,
+      "upside12m": 4.45,
+      "targetMean": 205.39,
+      "recommendationKey": "buy",
+      "numAnalysts": 31,
+      "revenueGrowth": 27.6,
+      "revenue3yCagr": 22.97,
+      "profitMargins": -0.82,
+      "netDebtToEbitda": -0.02,
+      "fcfMargin": 25.19,
+      "dividendYield": 0,
+      "forwardPE": 29.23,
+      "trailingPE": null,
+      "priceToBook": 47.08,
+      "score": 54,
+      "signal": "TUT",
+      "wtSignal": null,
+      "wtCrossSignal": "AL",
+      "stSignal": "AL",
+      "name": "Atlassian",
+      "indices": [],
+      "hasReport": false,
+      "report": null
+    },
+    {
       "ticker": "AXP",
       "price": 304.02,
       "currency": "USD",
@@ -4593,8 +4625,8 @@
       "sector": "Ödeme/Kredi Kartı",
       "industry": "Credit Services",
       "pos52w": 0.135,
-      "upside12m": 23.28,
-      "targetMean": 374.79,
+      "upside12m": 22.47,
+      "targetMean": 372.33,
       "recommendationKey": "buy",
       "numAnalysts": 24,
       "revenueGrowth": 12.8,
@@ -4606,7 +4638,7 @@
       "forwardPE": 15.08,
       "trailingPE": 18.45,
       "priceToBook": 5.99,
-      "score": 55,
+      "score": 54,
       "signal": "TUT",
       "wtSignal": "AL",
       "wtCrossSignal": "AL",
@@ -4673,38 +4705,6 @@
         "balanceNote": "Nakit 45.8 Mr$, borç 59.1 Mr$. Finansal kuruluş olduğu için Net Borç/EBITDA anlamlı bir kaldıraç ölçütü değil — borç burada bir finansman kaynağı, faaliyet dışı bir yük değil; sermaye yeterliliği oranlarıyla değerlendirilmeli.",
         "fcfNote": "Serbest nakit akışı bu iş modelinde standart biçimde hesaplanmıyor (mevduat/kredi akışları işletme kalemleridir); nakit üretimi net faiz geliri ve komisyonlar üzerinden okunmalı."
       }
-    },
-    {
-      "ticker": "TEAM",
-      "price": 196.65,
-      "currency": "USD",
-      "changePct": 4.66,
-      "marketCap": 49779744768,
-      "sector": "Yazılım",
-      "industry": "Software - Application",
-      "pos52w": 0.977,
-      "upside12m": 4.45,
-      "targetMean": 205.39,
-      "recommendationKey": "buy",
-      "numAnalysts": 31,
-      "revenueGrowth": 27.6,
-      "revenue3yCagr": 22.97,
-      "profitMargins": -0.82,
-      "netDebtToEbitda": -0.02,
-      "fcfMargin": 25.19,
-      "dividendYield": 0,
-      "forwardPE": 29.23,
-      "trailingPE": null,
-      "priceToBook": 47.08,
-      "score": 54,
-      "signal": "TUT",
-      "wtSignal": null,
-      "wtCrossSignal": "AL",
-      "stSignal": "AL",
-      "name": "Atlassian",
-      "indices": [],
-      "hasReport": false,
-      "report": null
     },
     {
       "ticker": "MCD",
@@ -4935,7 +4935,7 @@
       "netDebtToEbitda": 0.56,
       "fcfMargin": 10.48,
       "dividendYield": 3.44,
-      "forwardPE": 14.2,
+      "forwardPE": 14.16,
       "trailingPE": 19.87,
       "priceToBook": 2.13,
       "score": 53,
@@ -5623,7 +5623,7 @@
       "netDebtToEbitda": -2.55,
       "fcfMargin": 4.67,
       "dividendYield": 0,
-      "forwardPE": 176.59,
+      "forwardPE": 176.66,
       "trailingPE": 350.68,
       "priceToBook": 17.22,
       "score": 48,
@@ -5699,8 +5699,8 @@
       "sector": "Sanayi Konglomera",
       "industry": "Conglomerates",
       "pos52w": 0.523,
-      "upside12m": 14.58,
-      "targetMean": 186.98,
+      "upside12m": 14.55,
+      "targetMean": 186.93,
       "recommendationKey": "buy",
       "numAnalysts": 18,
       "revenueGrowth": 2.5,
@@ -5709,7 +5709,7 @@
       "netDebtToEbitda": 1.21,
       "fcfMargin": 25.22,
       "dividendYield": 1.93,
-      "forwardPE": 16.6,
+      "forwardPE": 16.61,
       "trailingPE": 28.99,
       "priceToBook": 28.51,
       "score": 48,
@@ -5957,7 +5957,7 @@
       "marketCap": 372213514240,
       "sector": "İçecek",
       "industry": "Beverages - Non-Alcoholic",
-      "pos52w": 0.776,
+      "pos52w": 0.775,
       "upside12m": 9.41,
       "targetMean": 94.65,
       "recommendationKey": "buy",
@@ -6032,96 +6032,6 @@
         "marginNote": "Net kâr marjı %28.6 (≈ 14.3 Mr$ net kâr); EBITDA marjı %33.9.",
         "balanceNote": "Net borç 27.9 Mr$ (borç 44.3 Mr$, nakit 16.4 Mr$); Net Borç/EBITDA 1.64x — yönetilebilir ama izlenmeli.",
         "fcfNote": "FCF 5.2 Mr$, marj %10.4; net kârın %36.5'i nakde dönüyor — dönüşüm ZAYIF, muhasebe kârı nakit üretiminin belirgin önünde. İşletme nakit akışıyla arasındaki 11.1 Mr$ fark yatırım/capex kalemi."
-      }
-    },
-    {
-      "ticker": "CAT",
-      "price": 848.14,
-      "currency": "USD",
-      "changePct": 0.32,
-      "marketCap": 389868650496,
-      "sector": "Ağır Makine",
-      "industry": "Farm & Heavy Construction Machinery",
-      "pos52w": 0.618,
-      "upside12m": 15.03,
-      "targetMean": 975.61,
-      "recommendationKey": "buy",
-      "numAnalysts": 26,
-      "revenueGrowth": 24,
-      "revenue3yCagr": 4.38,
-      "profitMargins": 14.51,
-      "netDebtToEbitda": 2.41,
-      "fcfMargin": 6.76,
-      "dividendYield": 0.77,
-      "forwardPE": 26.2,
-      "trailingPE": 36.51,
-      "priceToBook": 20.1,
-      "score": 47,
-      "signal": "TUT",
-      "wtSignal": null,
-      "wtCrossSignal": "AL",
-      "stSignal": "SAT",
-      "name": "Caterpillar",
-      "indices": [
-        "SPX"
-      ],
-      "hasReport": true,
-      "report": {
-        "asOf": "FY2025 yıllık rapor verilerine dayalı, yaklaşık",
-        "segments": [
-          {
-            "name": "İnşaat Sanayileri",
-            "sharePct": 42,
-            "note": "Altyapı harcamalarına bağlı; en büyük kol"
-          },
-          {
-            "name": "Kaynak Sanayileri (madencilik ekipmanı)",
-            "sharePct": 22,
-            "note": "Emtia fiyat döngüsüne duyarlı"
-          },
-          {
-            "name": "Enerji ve Ulaşım",
-            "sharePct": 30,
-            "note": "Veri merkezi jeneratörleri bu grupta ve hızlı büyüyor"
-          },
-          {
-            "name": "Finansal ürünler",
-            "sharePct": 6,
-            "note": "Müşteri finansmanı"
-          }
-        ],
-        "competitors": [
-          "Komatsu",
-          "Deere & Company",
-          "Volvo Construction",
-          "Hitachi Construction",
-          "CNH Industrial"
-        ],
-        "moat": [
-          {
-            "title": "Bayi ağı ve yedek parça erişimi",
-            "desc": "Küresel bayi ağı, sahada duran bir iş makinesinin en kısa sürede çalışır hale gelmesini sağlıyor; müşteri için arıza süresi maliyeti makine fiyatından önemli olduğu için bu ağ satın alma kararını belirliyor."
-          },
-          {
-            "title": "Kurulu makine tabanı üzerinden parça geliri",
-            "desc": "Sahadaki makineler on yıllarca yedek parça ve servis geliri üretiyor; bu, yeni makine siparişleri döngüsel olarak düştüğünde nakit akışını taşıyan yüksek marjlı bir taban."
-          }
-        ],
-        "strengths": [
-          "Bayi ağı ve parça geliri, döngüsel bir işte istikrarlı ve yüksek marjlı bir taban sağlıyor",
-          "Veri merkezi güç üretimi talebi Enerji ve Ulaşım kolunu doğrudan besliyor — AI yatırımına dolaylı erişim",
-          "Fiyatlama gücü kanıtlanmış; maliyet artışlarını geçirebildi"
-        ],
-        "risks": [
-          "Talep altyapı harcamaları ve emtia fiyatlarına bağlı; ikisi de makro ve politik kararlara duyarlı",
-          "Kaldıraç orta-yüksek seviyede ve nakde dönüşüm zayıf seyrediyor",
-          "İleri çarpan döngüsel bir iş için yüksek; tepe kâr üzerinden hesaplanıyor olma riski taşıyor"
-        ],
-        "verdict": "Bayi ağı ve parça geliri, döngüsel bir işte gerçek bir istikrar unsuru; veri merkezi jeneratör talebi de beklenmedik bir büyüme kolu açtı. Değerlemedeki risk zamanlama: çarpan, altyapı ve madencilik döngüsünün güçlü olduğu bir dönemin kârı üzerinden hesaplanıyor. Döngü dönerse hem kâr hem çarpan aynı yönde hareket eder.",
-        "revenue3yNote": "Gelir 74.7 Mr$ (son 12 ay, 30.06.2026'da biten dönem); yıllık büyüme %24.0, 3 yıllık bileşik büyüme %4.4 (FY2022→FY2025 yıllık tabloları). Son yıl 3 yıllık ortalamanın 19.6 puan ÜSTÜNDE — hızlanma.",
-        "marginNote": "Net kâr marjı %14.5 (≈ 10.8 Mr$ net kâr); EBITDA marjı %21.7.",
-        "balanceNote": "Net borç 39.2 Mr$ (borç 45.1 Mr$, nakit 5.9 Mr$); Net Borç/EBITDA 2.41x — yönetilebilir ama izlenmeli.",
-        "fcfNote": "FCF 5.0 Mr$, marj %6.8; net kârın %46.6'i nakde dönüyor — dönüşüm ZAYIF, muhasebe kârı nakit üretiminin belirgin önünde. İşletme nakit akışıyla arasındaki 8.5 Mr$ fark yatırım/capex kalemi."
       }
     },
     {
@@ -6310,40 +6220,6 @@
       "report": null
     },
     {
-      "ticker": "BMY",
-      "price": 58.81,
-      "currency": "USD",
-      "changePct": -3.83,
-      "marketCap": 120132050944,
-      "sector": "İlaç",
-      "industry": "Drug Manufacturers - General",
-      "pos52w": 0.624,
-      "upside12m": 13.43,
-      "targetMean": 66.71,
-      "recommendationKey": "buy",
-      "numAnalysts": 24,
-      "revenueGrowth": 5.7,
-      "revenue3yCagr": 1.45,
-      "profitMargins": 18.87,
-      "netDebtToEbitda": 1.8,
-      "fcfMargin": 16.5,
-      "dividendYield": 4.12,
-      "forwardPE": 8.96,
-      "trailingPE": 12.95,
-      "priceToBook": 5.38,
-      "score": 46,
-      "signal": "TUT",
-      "wtSignal": null,
-      "wtCrossSignal": "SAT",
-      "stSignal": "SAT",
-      "name": "Bristol-Myers Squibb",
-      "indices": [
-        "SPX"
-      ],
-      "hasReport": false,
-      "report": null
-    },
-    {
       "ticker": "PGR",
       "price": 212.62,
       "currency": "USD",
@@ -6384,17 +6260,17 @@
       "sector": "Kimya/Endüstriyel Gaz",
       "industry": "Specialty Chemicals",
       "pos52w": 0.59,
-      "upside12m": 12.48,
-      "targetMean": 542.6,
+      "upside12m": 12.73,
+      "targetMean": 543.81,
       "recommendationKey": "buy",
-      "numAnalysts": 25,
+      "numAnalysts": 26,
       "revenueGrowth": 9.3,
       "revenue3yCagr": 0.62,
       "profitMargins": 20.43,
       "netDebtToEbitda": 1.67,
       "fcfMargin": 11.74,
       "dividendYield": 1.33,
-      "forwardPE": 24.65,
+      "forwardPE": 24.64,
       "trailingPE": 31.14,
       "priceToBook": 5.69,
       "score": 46,
@@ -6409,6 +6285,96 @@
       ],
       "hasReport": false,
       "report": null
+    },
+    {
+      "ticker": "CAT",
+      "price": 848.14,
+      "currency": "USD",
+      "changePct": 0.32,
+      "marketCap": 389868650496,
+      "sector": "Ağır Makine",
+      "industry": "Farm & Heavy Construction Machinery",
+      "pos52w": 0.618,
+      "upside12m": 14.46,
+      "targetMean": 970.8,
+      "recommendationKey": "buy",
+      "numAnalysts": 26,
+      "revenueGrowth": 24,
+      "revenue3yCagr": 4.38,
+      "profitMargins": 14.51,
+      "netDebtToEbitda": 2.41,
+      "fcfMargin": 6.76,
+      "dividendYield": 0.77,
+      "forwardPE": 26.15,
+      "trailingPE": 36.51,
+      "priceToBook": 20.1,
+      "score": 46,
+      "signal": "TUT",
+      "wtSignal": null,
+      "wtCrossSignal": "AL",
+      "stSignal": "SAT",
+      "name": "Caterpillar",
+      "indices": [
+        "SPX"
+      ],
+      "hasReport": true,
+      "report": {
+        "asOf": "FY2025 yıllık rapor verilerine dayalı, yaklaşık",
+        "segments": [
+          {
+            "name": "İnşaat Sanayileri",
+            "sharePct": 42,
+            "note": "Altyapı harcamalarına bağlı; en büyük kol"
+          },
+          {
+            "name": "Kaynak Sanayileri (madencilik ekipmanı)",
+            "sharePct": 22,
+            "note": "Emtia fiyat döngüsüne duyarlı"
+          },
+          {
+            "name": "Enerji ve Ulaşım",
+            "sharePct": 30,
+            "note": "Veri merkezi jeneratörleri bu grupta ve hızlı büyüyor"
+          },
+          {
+            "name": "Finansal ürünler",
+            "sharePct": 6,
+            "note": "Müşteri finansmanı"
+          }
+        ],
+        "competitors": [
+          "Komatsu",
+          "Deere & Company",
+          "Volvo Construction",
+          "Hitachi Construction",
+          "CNH Industrial"
+        ],
+        "moat": [
+          {
+            "title": "Bayi ağı ve yedek parça erişimi",
+            "desc": "Küresel bayi ağı, sahada duran bir iş makinesinin en kısa sürede çalışır hale gelmesini sağlıyor; müşteri için arıza süresi maliyeti makine fiyatından önemli olduğu için bu ağ satın alma kararını belirliyor."
+          },
+          {
+            "title": "Kurulu makine tabanı üzerinden parça geliri",
+            "desc": "Sahadaki makineler on yıllarca yedek parça ve servis geliri üretiyor; bu, yeni makine siparişleri döngüsel olarak düştüğünde nakit akışını taşıyan yüksek marjlı bir taban."
+          }
+        ],
+        "strengths": [
+          "Bayi ağı ve parça geliri, döngüsel bir işte istikrarlı ve yüksek marjlı bir taban sağlıyor",
+          "Veri merkezi güç üretimi talebi Enerji ve Ulaşım kolunu doğrudan besliyor — AI yatırımına dolaylı erişim",
+          "Fiyatlama gücü kanıtlanmış; maliyet artışlarını geçirebildi"
+        ],
+        "risks": [
+          "Talep altyapı harcamaları ve emtia fiyatlarına bağlı; ikisi de makro ve politik kararlara duyarlı",
+          "Kaldıraç orta-yüksek seviyede ve nakde dönüşüm zayıf seyrediyor",
+          "İleri çarpan döngüsel bir iş için yüksek; tepe kâr üzerinden hesaplanıyor olma riski taşıyor"
+        ],
+        "verdict": "Bayi ağı ve parça geliri, döngüsel bir işte gerçek bir istikrar unsuru; veri merkezi jeneratör talebi de beklenmedik bir büyüme kolu açtı. Değerlemedeki risk zamanlama: çarpan, altyapı ve madencilik döngüsünün güçlü olduğu bir dönemin kârı üzerinden hesaplanıyor. Döngü dönerse hem kâr hem çarpan aynı yönde hareket eder.",
+        "revenue3yNote": "Gelir 74.7 Mr$ (son 12 ay, 30.06.2026'da biten dönem); yıllık büyüme %24.0, 3 yıllık bileşik büyüme %4.4 (FY2022→FY2025 yıllık tabloları). Son yıl 3 yıllık ortalamanın 19.6 puan ÜSTÜNDE — hızlanma.",
+        "marginNote": "Net kâr marjı %14.5 (≈ 10.8 Mr$ net kâr); EBITDA marjı %21.7.",
+        "balanceNote": "Net borç 39.2 Mr$ (borç 45.1 Mr$, nakit 5.9 Mr$); Net Borç/EBITDA 2.41x — yönetilebilir ama izlenmeli.",
+        "fcfNote": "FCF 5.0 Mr$, marj %6.8; net kârın %46.6'i nakde dönüyor — dönüşüm ZAYIF, muhasebe kârı nakit üretiminin belirgin önünde. İşletme nakit akışıyla arasındaki 8.5 Mr$ fark yatırım/capex kalemi."
+      }
     },
     {
       "ticker": "CSX",
@@ -6474,6 +6440,40 @@
       "name": "Gilead Sciences",
       "indices": [
         "NDX",
+        "SPX"
+      ],
+      "hasReport": false,
+      "report": null
+    },
+    {
+      "ticker": "BMY",
+      "price": 58.81,
+      "currency": "USD",
+      "changePct": -3.83,
+      "marketCap": 120132050944,
+      "sector": "İlaç",
+      "industry": "Drug Manufacturers - General",
+      "pos52w": 0.624,
+      "upside12m": 12.44,
+      "targetMean": 66.13,
+      "recommendationKey": "hold",
+      "numAnalysts": 24,
+      "revenueGrowth": 5.7,
+      "revenue3yCagr": 1.45,
+      "profitMargins": 18.87,
+      "netDebtToEbitda": 1.8,
+      "fcfMargin": 16.5,
+      "dividendYield": 4.12,
+      "forwardPE": 8.93,
+      "trailingPE": 12.95,
+      "priceToBook": 5.38,
+      "score": 45,
+      "signal": "TUT",
+      "wtSignal": null,
+      "wtCrossSignal": "SAT",
+      "stSignal": "SAT",
+      "name": "Bristol-Myers Squibb",
+      "indices": [
         "SPX"
       ],
       "hasReport": false,
@@ -6801,7 +6801,7 @@
       "marketCap": 65566593024,
       "sector": "Yazılım/Bitcoin Hazinesi",
       "industry": "Software - Application",
-      "pos52w": 0.292,
+      "pos52w": 0.298,
       "upside12m": 44.01,
       "targetMean": 236.8,
       "recommendationKey": "strong_buy",
@@ -7081,6 +7081,96 @@
       "report": null
     },
     {
+      "ticker": "MRK",
+      "price": 139.54,
+      "currency": "USD",
+      "changePct": -3.3,
+      "marketCap": 344269094912,
+      "sector": "İlaç",
+      "industry": "Drug Manufacturers - General",
+      "pos52w": 0.768,
+      "upside12m": 12.05,
+      "targetMean": 156.36,
+      "recommendationKey": "buy",
+      "numAnalysts": 25,
+      "revenueGrowth": 5.1,
+      "revenue3yCagr": 3.12,
+      "profitMargins": 4.77,
+      "netDebtToEbitda": 1.62,
+      "fcfMargin": 22.79,
+      "dividendYield": 2.36,
+      "forwardPE": 14.74,
+      "trailingPE": 110.75,
+      "priceToBook": 8.22,
+      "score": 42,
+      "signal": "İZLE",
+      "wtSignal": null,
+      "wtCrossSignal": "SAT",
+      "stSignal": "SAT",
+      "name": "Merck & Co",
+      "indices": [
+        "SPX"
+      ],
+      "hasReport": true,
+      "report": {
+        "asOf": "FY2025 yıllık rapor verilerine dayalı, yaklaşık",
+        "segments": [
+          {
+            "name": "Farmasötik — onkoloji (anahtar immünoterapi)",
+            "sharePct": 50,
+            "note": "Gelirin yarısına yakını tek bir ilaçtan; patent takvimi kritik"
+          },
+          {
+            "name": "Farmasötik — aşı ve diğer",
+            "sharePct": 33,
+            "note": "HPV ve pnömokok aşıları; bölgesel talep dalgalı"
+          },
+          {
+            "name": "Hayvan Sağlığı",
+            "sharePct": 12,
+            "note": "İstikrarlı, döngüden bağımsız kol"
+          },
+          {
+            "name": "Diğer",
+            "sharePct": 5,
+            "note": "Kalıntı iş kolları"
+          }
+        ],
+        "competitors": [
+          "Bristol Myers Squibb",
+          "AstraZeneca",
+          "Roche",
+          "Pfizer",
+          "Johnson & Johnson"
+        ],
+        "moat": [
+          {
+            "title": "Onkolojide klinik veri birikimi",
+            "desc": "Anahtar immünoterapinin onlarca endikasyonda biriken klinik verisi, hekim tercihini ve tedavi kılavuzlarındaki konumunu belirliyor; rakibin bu veri tabanını oluşturması yıllar süren çalışmalar gerektiriyor."
+          },
+          {
+            "title": "Aşı üretim ve dağıtım altyapısı",
+            "desc": "Küresel ölçekte aşı üretmek ve soğuk zincirle dağıtmak yüksek düzenleyici ve sermaye engeli taşıyor; bu altyapı yeni girenler için pratik bir bariyer."
+          }
+        ],
+        "strengths": [
+          "Onkoloji franchise'ı tedavi kılavuzlarında yerleşik ve endikasyon genişlemesi sürüyor",
+          "Hayvan sağlığı kolu istikrarlı ve ilaç döngüsünden bağımsız",
+          "İleri çarpan düşük; beklenti çıtası mütevazı"
+        ],
+        "risks": [
+          "Gelirin yaklaşık yarısı tek bir ilaçta ve patent ömrünün sonuna yaklaşılıyor — bu, önümüzdeki dönemin en belirleyici riski",
+          "Boru hattının patent kaybını telafi edecek ölçekte bir halef üretip üretemeyeceği henüz kanıtlanmadı",
+          "Analist potansiyeli bu listenin en düşüğü; piyasa yaklaşan patent uçurumunu fiyatlamış görünüyor"
+        ],
+        "verdict": "Düşük ileri çarpan ilk bakışta cazip ama sebebi belli: gelirin yaklaşık yarısını üreten ilacın patent ömrü sona yaklaşıyor ve analist potansiyeli bu listenin en düşüğü. Değerleme bir iskonto değil, öngörülebilir bir gelir kaybının fiyatlanması. Tezin tamamı boru hattının bu boşluğu zamanında doldurup dolduramayacağına bağlı — bu kanıtlanana kadar ucuzluk görünürde kalır.",
+        "revenue3yNote": "Gelir 66.6 Mr$ (son 12 ay, 30.06.2026'da biten dönem); yıllık büyüme %5.1, 3 yıllık bileşik büyüme %3.1 (FY2022→FY2025 yıllık tabloları). Büyüme temposu 3 yıllık ortalamayla uyumlu.",
+        "marginNote": "Net kâr marjı %4.8 (≈ 3.2 Mr$ net kâr); EBITDA marjı %43.4.",
+        "balanceNote": "Net borç 46.8 Mr$ (borç 53.9 Mr$, nakit 7.1 Mr$); Net Borç/EBITDA 1.62x — yönetilebilir ama izlenmeli.",
+        "fcfNote": "FCF 15.2 Mr$, marj %22.8; net kârın %478.2'i nakde dönüyor — güçlü nakde dönüşüm. İşletme nakit akışıyla arasındaki 4.8 Mr$ fark yatırım/capex kalemi."
+      }
+    },
+    {
       "ticker": "PYPL",
       "price": 54.41,
       "currency": "USD",
@@ -7237,8 +7327,8 @@
       "sector": "Altyapı/İnşaat",
       "industry": "Engineering & Construction",
       "pos52w": 0.024,
-      "upside12m": 40.63,
-      "targetMean": 72.9,
+      "upside12m": 40.57,
+      "targetMean": 72.87,
       "recommendationKey": "buy",
       "numAnalysts": 3,
       "revenueGrowth": 5.2,
@@ -7364,96 +7454,6 @@
       "report": null
     },
     {
-      "ticker": "MRK",
-      "price": 139.54,
-      "currency": "USD",
-      "changePct": -3.3,
-      "marketCap": 344269094912,
-      "sector": "İlaç",
-      "industry": "Drug Manufacturers - General",
-      "pos52w": 0.768,
-      "upside12m": 11.62,
-      "targetMean": 155.76,
-      "recommendationKey": "buy",
-      "numAnalysts": 25,
-      "revenueGrowth": 5.1,
-      "revenue3yCagr": 3.12,
-      "profitMargins": 4.77,
-      "netDebtToEbitda": 1.62,
-      "fcfMargin": 22.79,
-      "dividendYield": 2.36,
-      "forwardPE": 14.74,
-      "trailingPE": 110.75,
-      "priceToBook": 8.22,
-      "score": 41,
-      "signal": "İZLE",
-      "wtSignal": null,
-      "wtCrossSignal": "SAT",
-      "stSignal": "SAT",
-      "name": "Merck & Co",
-      "indices": [
-        "SPX"
-      ],
-      "hasReport": true,
-      "report": {
-        "asOf": "FY2025 yıllık rapor verilerine dayalı, yaklaşık",
-        "segments": [
-          {
-            "name": "Farmasötik — onkoloji (anahtar immünoterapi)",
-            "sharePct": 50,
-            "note": "Gelirin yarısına yakını tek bir ilaçtan; patent takvimi kritik"
-          },
-          {
-            "name": "Farmasötik — aşı ve diğer",
-            "sharePct": 33,
-            "note": "HPV ve pnömokok aşıları; bölgesel talep dalgalı"
-          },
-          {
-            "name": "Hayvan Sağlığı",
-            "sharePct": 12,
-            "note": "İstikrarlı, döngüden bağımsız kol"
-          },
-          {
-            "name": "Diğer",
-            "sharePct": 5,
-            "note": "Kalıntı iş kolları"
-          }
-        ],
-        "competitors": [
-          "Bristol Myers Squibb",
-          "AstraZeneca",
-          "Roche",
-          "Pfizer",
-          "Johnson & Johnson"
-        ],
-        "moat": [
-          {
-            "title": "Onkolojide klinik veri birikimi",
-            "desc": "Anahtar immünoterapinin onlarca endikasyonda biriken klinik verisi, hekim tercihini ve tedavi kılavuzlarındaki konumunu belirliyor; rakibin bu veri tabanını oluşturması yıllar süren çalışmalar gerektiriyor."
-          },
-          {
-            "title": "Aşı üretim ve dağıtım altyapısı",
-            "desc": "Küresel ölçekte aşı üretmek ve soğuk zincirle dağıtmak yüksek düzenleyici ve sermaye engeli taşıyor; bu altyapı yeni girenler için pratik bir bariyer."
-          }
-        ],
-        "strengths": [
-          "Onkoloji franchise'ı tedavi kılavuzlarında yerleşik ve endikasyon genişlemesi sürüyor",
-          "Hayvan sağlığı kolu istikrarlı ve ilaç döngüsünden bağımsız",
-          "İleri çarpan düşük; beklenti çıtası mütevazı"
-        ],
-        "risks": [
-          "Gelirin yaklaşık yarısı tek bir ilaçta ve patent ömrünün sonuna yaklaşılıyor — bu, önümüzdeki dönemin en belirleyici riski",
-          "Boru hattının patent kaybını telafi edecek ölçekte bir halef üretip üretemeyeceği henüz kanıtlanmadı",
-          "Analist potansiyeli bu listenin en düşüğü; piyasa yaklaşan patent uçurumunu fiyatlamış görünüyor"
-        ],
-        "verdict": "Düşük ileri çarpan ilk bakışta cazip ama sebebi belli: gelirin yaklaşık yarısını üreten ilacın patent ömrü sona yaklaşıyor ve analist potansiyeli bu listenin en düşüğü. Değerleme bir iskonto değil, öngörülebilir bir gelir kaybının fiyatlanması. Tezin tamamı boru hattının bu boşluğu zamanında doldurup dolduramayacağına bağlı — bu kanıtlanana kadar ucuzluk görünürde kalır.",
-        "revenue3yNote": "Gelir 66.6 Mr$ (son 12 ay, 30.06.2026'da biten dönem); yıllık büyüme %5.1, 3 yıllık bileşik büyüme %3.1 (FY2022→FY2025 yıllık tabloları). Büyüme temposu 3 yıllık ortalamayla uyumlu.",
-        "marginNote": "Net kâr marjı %4.8 (≈ 3.2 Mr$ net kâr); EBITDA marjı %43.4.",
-        "balanceNote": "Net borç 46.8 Mr$ (borç 53.9 Mr$, nakit 7.1 Mr$); Net Borç/EBITDA 1.62x — yönetilebilir ama izlenmeli.",
-        "fcfNote": "FCF 15.2 Mr$, marj %22.8; net kârın %478.2'i nakde dönüyor — güçlü nakde dönüşüm. İşletme nakit akışıyla arasındaki 4.8 Mr$ fark yatırım/capex kalemi."
-      }
-    },
-    {
       "ticker": "NBIS",
       "price": 232.57,
       "currency": "USD",
@@ -7520,6 +7520,97 @@
       ],
       "hasReport": false,
       "report": null
+    },
+    {
+      "ticker": "INTC",
+      "price": 116.19,
+      "currency": "USD",
+      "changePct": -2.63,
+      "marketCap": 614192578560,
+      "sector": "Yarı İletken",
+      "industry": "Semiconductors",
+      "pos52w": 0.761,
+      "upside12m": 1.16,
+      "targetMean": 117.53,
+      "recommendationKey": "buy",
+      "numAnalysts": 43,
+      "revenueGrowth": 25.4,
+      "revenue3yCagr": -5.71,
+      "profitMargins": -19.79,
+      "netDebtToEbitda": 1.24,
+      "fcfMargin": 8.53,
+      "dividendYield": 0,
+      "forwardPE": 55.79,
+      "trailingPE": null,
+      "priceToBook": 6.69,
+      "score": 39,
+      "signal": "İZLE",
+      "wtSignal": "SAT",
+      "wtCrossSignal": "SAT",
+      "stSignal": "AL",
+      "name": "Intel",
+      "indices": [
+        "NDX",
+        "SPX"
+      ],
+      "hasReport": true,
+      "report": {
+        "asOf": "FY2025 yıllık rapor verilerine dayalı, yaklaşık",
+        "segments": [
+          {
+            "name": "İstemci Bilgisayarlama (PC işlemcileri)",
+            "sharePct": 51,
+            "note": "Hâlâ en büyük kol ama pazar payı AMD ve ARM tabanlı çiplere karşı eriyor"
+          },
+          {
+            "name": "Veri Merkezi ve AI",
+            "sharePct": 32,
+            "note": "Sunucu CPU'da pay kaybı sürüyor; AI hızlandırıcıda anlamlı konum yok"
+          },
+          {
+            "name": "Foundry (dış müşterilere üretim)",
+            "sharePct": 12,
+            "note": "Stratejik dönüşümün merkezi; henüz zarar üretiyor"
+          },
+          {
+            "name": "Diğer (ağ, uç birim)",
+            "sharePct": 5,
+            "note": "Küçülen portföy"
+          }
+        ],
+        "competitors": [
+          "AMD",
+          "NVIDIA",
+          "TSMC",
+          "Samsung Foundry",
+          "Qualcomm / ARM tabanlı üreticiler"
+        ],
+        "moat": [
+          {
+            "title": "x86 kurulu tabanı",
+            "desc": "Onlarca yıllık yazılım uyumluluğu ve kurumsal doğrulama süreçleri, özellikle sunucu tarafında geçişi yavaşlatıyor — bu bir büyüme motoru değil ama erimeyi geciktiren bir tampon."
+          },
+          {
+            "title": "Ölçekli üretim varlıkları ve devlet desteği",
+            "desc": "ABD ve Avrupa'da kendi fabrikalarına sahip olması, tedarik güvenliği kaygısıyla gelen kamu teşviklerine ve savunma/kamu siparişlerine erişim sağlıyor."
+          }
+        ],
+        "strengths": [
+          "Gelir 3 yıllık negatif trendden dönmüş görünüyor — dip seviyeden toparlanma işareti",
+          "Kendi üretim varlıklarına sahip olması, tedarik zinciri güvenliği isteyen kamu ve savunma müşterileri için yapısal bir avantaj",
+          "Foundry stratejisi başarılı olursa TSMC dışında ölçekli bir alternatif olarak konumlanabilir"
+        ],
+        "risks": [
+          "Net marj NEGATİF — şirket zarar ediyor ve toparlanma henüz kârlılığa yansımadı",
+          "Foundry dönüşümü çok yüksek sermaye gerektiriyor ve geri dönüşü yıllara yayılı; bu süre boyunca nakit yakımı sürüyor",
+          "İleri çarpan çok yüksek, çünkü normalleşmiş kâr varsayımı üzerine kurulu — bu varsayım gerçekleşmezse değerlemenin dayanağı kalmıyor"
+        ],
+        "verdict": "Bu bir değerleme değil, dönüşüm hikâyesi: şirket şu an zarar ediyor ve ileri çarpan bugünkü kârdan değil, gelecekte normalleşeceği varsayılan bir kârdan hesaplanıyor. Foundry stratejisi tutarsa yeniden değerleme büyük olabilir; tutmazsa hem sermaye yakımı hem pazar payı kaybı birlikte sürer. Risk profili bu listedeki diğer kayıtlarla aynı kategoride değil.",
+        "revenue3yNote": "Gelir 57.0 Mr$ (son 12 ay, 27.06.2026'da biten dönem); yıllık büyüme %25.4, 3 yıllık bileşik büyüme %-5.7 (FY2022→FY2025 yıllık tabloları). Son yıl 3 yıllık ortalamanın 31.1 puan ÜSTÜNDE — hızlanma.",
+        "marginNote": "Net kâr marjı %-19.8 (≈ -11.3 Mr$ net kâr); EBITDA marjı %29.5.",
+        "balanceNote": "Net borç 20.8 Mr$ (borç 50.5 Mr$, nakit 29.7 Mr$); Net Borç/EBITDA 1.24x — rahat seviye.",
+        "fcfNote": "FCF 4.9 Mr$, marj %8.5; net kârın %-43.1'i nakde dönüyor — dönüşüm ZAYIF, muhasebe kârı nakit üretiminin belirgin önünde. İşletme nakit akışıyla arasındaki 10.1 Mr$ fark yatırım/capex kalemi."
+      }
     },
     {
       "ticker": "LULU",
@@ -7767,8 +7858,8 @@
       "sector": "Lojistik",
       "industry": "Integrated Freight & Logistics",
       "pos52w": 0.658,
-      "upside12m": 22.78,
-      "targetMean": 355,
+      "upside12m": 22.77,
+      "targetMean": 354.96,
       "recommendationKey": "buy",
       "numAnalysts": 26,
       "revenueGrowth": 12.5,
@@ -7791,97 +7882,6 @@
       ],
       "hasReport": false,
       "report": null
-    },
-    {
-      "ticker": "INTC",
-      "price": 116.19,
-      "currency": "USD",
-      "changePct": -2.63,
-      "marketCap": 614192578560,
-      "sector": "Yarı İletken",
-      "industry": "Semiconductors",
-      "pos52w": 0.761,
-      "upside12m": 0.16,
-      "targetMean": 116.37,
-      "recommendationKey": "buy",
-      "numAnalysts": 43,
-      "revenueGrowth": 25.4,
-      "revenue3yCagr": -5.71,
-      "profitMargins": -19.79,
-      "netDebtToEbitda": 1.24,
-      "fcfMargin": 8.53,
-      "dividendYield": 0,
-      "forwardPE": 56.33,
-      "trailingPE": null,
-      "priceToBook": 6.69,
-      "score": 38,
-      "signal": "İZLE",
-      "wtSignal": "SAT",
-      "wtCrossSignal": "SAT",
-      "stSignal": "AL",
-      "name": "Intel",
-      "indices": [
-        "NDX",
-        "SPX"
-      ],
-      "hasReport": true,
-      "report": {
-        "asOf": "FY2025 yıllık rapor verilerine dayalı, yaklaşık",
-        "segments": [
-          {
-            "name": "İstemci Bilgisayarlama (PC işlemcileri)",
-            "sharePct": 51,
-            "note": "Hâlâ en büyük kol ama pazar payı AMD ve ARM tabanlı çiplere karşı eriyor"
-          },
-          {
-            "name": "Veri Merkezi ve AI",
-            "sharePct": 32,
-            "note": "Sunucu CPU'da pay kaybı sürüyor; AI hızlandırıcıda anlamlı konum yok"
-          },
-          {
-            "name": "Foundry (dış müşterilere üretim)",
-            "sharePct": 12,
-            "note": "Stratejik dönüşümün merkezi; henüz zarar üretiyor"
-          },
-          {
-            "name": "Diğer (ağ, uç birim)",
-            "sharePct": 5,
-            "note": "Küçülen portföy"
-          }
-        ],
-        "competitors": [
-          "AMD",
-          "NVIDIA",
-          "TSMC",
-          "Samsung Foundry",
-          "Qualcomm / ARM tabanlı üreticiler"
-        ],
-        "moat": [
-          {
-            "title": "x86 kurulu tabanı",
-            "desc": "Onlarca yıllık yazılım uyumluluğu ve kurumsal doğrulama süreçleri, özellikle sunucu tarafında geçişi yavaşlatıyor — bu bir büyüme motoru değil ama erimeyi geciktiren bir tampon."
-          },
-          {
-            "title": "Ölçekli üretim varlıkları ve devlet desteği",
-            "desc": "ABD ve Avrupa'da kendi fabrikalarına sahip olması, tedarik güvenliği kaygısıyla gelen kamu teşviklerine ve savunma/kamu siparişlerine erişim sağlıyor."
-          }
-        ],
-        "strengths": [
-          "Gelir 3 yıllık negatif trendden dönmüş görünüyor — dip seviyeden toparlanma işareti",
-          "Kendi üretim varlıklarına sahip olması, tedarik zinciri güvenliği isteyen kamu ve savunma müşterileri için yapısal bir avantaj",
-          "Foundry stratejisi başarılı olursa TSMC dışında ölçekli bir alternatif olarak konumlanabilir"
-        ],
-        "risks": [
-          "Net marj NEGATİF — şirket zarar ediyor ve toparlanma henüz kârlılığa yansımadı",
-          "Foundry dönüşümü çok yüksek sermaye gerektiriyor ve geri dönüşü yıllara yayılı; bu süre boyunca nakit yakımı sürüyor",
-          "İleri çarpan çok yüksek, çünkü normalleşmiş kâr varsayımı üzerine kurulu — bu varsayım gerçekleşmezse değerlemenin dayanağı kalmıyor"
-        ],
-        "verdict": "Bu bir değerleme değil, dönüşüm hikâyesi: şirket şu an zarar ediyor ve ileri çarpan bugünkü kârdan değil, gelecekte normalleşeceği varsayılan bir kârdan hesaplanıyor. Foundry stratejisi tutarsa yeniden değerleme büyük olabilir; tutmazsa hem sermaye yakımı hem pazar payı kaybı birlikte sürer. Risk profili bu listedeki diğer kayıtlarla aynı kategoride değil.",
-        "revenue3yNote": "Gelir 57.0 Mr$ (son 12 ay, 27.06.2026'da biten dönem); yıllık büyüme %25.4, 3 yıllık bileşik büyüme %-5.7 (FY2022→FY2025 yıllık tabloları). Son yıl 3 yıllık ortalamanın 31.1 puan ÜSTÜNDE — hızlanma.",
-        "marginNote": "Net kâr marjı %-19.8 (≈ -11.3 Mr$ net kâr); EBITDA marjı %29.5.",
-        "balanceNote": "Net borç 20.8 Mr$ (borç 50.5 Mr$, nakit 29.7 Mr$); Net Borç/EBITDA 1.24x — rahat seviye.",
-        "fcfNote": "FCF 4.9 Mr$, marj %8.5; net kârın %-43.1'i nakde dönüyor — dönüşüm ZAYIF, muhasebe kârı nakit üretiminin belirgin önünde. İşletme nakit akışıyla arasındaki 10.1 Mr$ fark yatırım/capex kalemi."
-      }
     },
     {
       "ticker": "SIRI",
@@ -9031,8 +9031,8 @@
       "sector": "İçecek Şişeleme",
       "industry": "Beverages - Non-Alcoholic",
       "pos52w": 0.579,
-      "upside12m": 5.98,
-      "targetMean": 107.54,
+      "upside12m": 7.08,
+      "targetMean": 108.65,
       "recommendationKey": "buy",
       "numAnalysts": 12,
       "revenueGrowth": 4.4,
@@ -9041,7 +9041,7 @@
       "netDebtToEbitda": 2.89,
       "fcfMargin": 7.41,
       "dividendYield": 2.38,
-      "forwardPE": 20.69,
+      "forwardPE": 20.66,
       "trailingPE": 19.59,
       "priceToBook": 4.83,
       "score": 29,
@@ -9050,40 +9050,6 @@
       "wtCrossSignal": "SAT",
       "stSignal": "SAT",
       "name": "Coca-Cola Europacific Partners",
-      "indices": [
-        "NDX"
-      ],
-      "hasReport": false,
-      "report": null
-    },
-    {
-      "ticker": "KHC",
-      "price": 21.84,
-      "currency": "USD",
-      "changePct": -1.58,
-      "marketCap": 25898391552,
-      "sector": "Gıda",
-      "industry": "Packaged Foods",
-      "pos52w": 0.114,
-      "upside12m": 16.63,
-      "targetMean": 25.47,
-      "recommendationKey": "hold",
-      "numAnalysts": 18,
-      "revenueGrowth": -1.4,
-      "revenue3yCagr": -1.98,
-      "profitMargins": -13.64,
-      "netDebtToEbitda": 2.97,
-      "fcfMargin": 13.05,
-      "dividendYield": 7.21,
-      "forwardPE": 10.46,
-      "trailingPE": null,
-      "priceToBook": 0.72,
-      "score": 29,
-      "signal": "İZLE",
-      "wtSignal": null,
-      "wtCrossSignal": "SAT",
-      "stSignal": "SAT",
-      "name": "Kraft Heinz",
       "indices": [
         "NDX"
       ],
@@ -9120,6 +9086,40 @@
       "name": "Southern Company",
       "indices": [
         "SPX"
+      ],
+      "hasReport": false,
+      "report": null
+    },
+    {
+      "ticker": "KHC",
+      "price": 21.84,
+      "currency": "USD",
+      "changePct": -1.58,
+      "marketCap": 25898391552,
+      "sector": "Gıda",
+      "industry": "Packaged Foods",
+      "pos52w": 0.114,
+      "upside12m": 15.61,
+      "targetMean": 25.25,
+      "recommendationKey": "hold",
+      "numAnalysts": 18,
+      "revenueGrowth": -1.4,
+      "revenue3yCagr": -1.98,
+      "profitMargins": -13.64,
+      "netDebtToEbitda": 2.97,
+      "fcfMargin": 13.05,
+      "dividendYield": 7.21,
+      "forwardPE": 10.49,
+      "trailingPE": null,
+      "priceToBook": 0.72,
+      "score": 28,
+      "signal": "İZLE",
+      "wtSignal": null,
+      "wtCrossSignal": "SAT",
+      "stSignal": "SAT",
+      "name": "Kraft Heinz",
+      "indices": [
+        "NDX"
       ],
       "hasReport": false,
       "report": null
