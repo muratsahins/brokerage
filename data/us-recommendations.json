@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-07T13:37:22.064Z",
+  "updatedAt": "2026-11-08T13:55:26.195Z",
   "source": "github-actions",
   "count": 200,
   "withReport": 48,
@@ -15,7 +15,7 @@
       "pos52w": 0.3,
       "upside12m": 145.18,
       "targetMean": 2047.38,
-      "recommendationKey": "buy",
+      "recommendationKey": "strong_buy",
       "numAnalysts": 24,
       "revenueGrowth": 377.9,
       "revenue3yCagr": null,
@@ -47,10 +47,10 @@
       "sector": "Yarı İletken",
       "industry": "Semiconductors",
       "pos52w": 0.019,
-      "upside12m": 79.38,
-      "targetMean": 526.81,
+      "upside12m": 81.63,
+      "targetMean": 533.42,
       "recommendationKey": "strong_buy",
-      "numAnalysts": 48,
+      "numAnalysts": 47,
       "revenueGrowth": 85.5,
       "revenue3yCagr": 24.38,
       "profitMargins": 42.94,
@@ -193,7 +193,7 @@
       "price": 200.44,
       "currency": "USD",
       "changePct": 8.23,
-      "marketCap": 250835501056,
+      "marketCap": 250383826944,
       "sector": "Yarı İletken Ekip.",
       "industry": "Semiconductor Equipment & Materials",
       "pos52w": 0.214,
@@ -489,10 +489,10 @@
       "sector": "Yarı İletken",
       "industry": "Semiconductors",
       "pos52w": 0.231,
-      "upside12m": 79.94,
-      "targetMean": 343.17,
+      "upside12m": 82.04,
+      "targetMean": 347.18,
       "recommendationKey": "buy",
-      "numAnalysts": 23,
+      "numAnalysts": 22,
       "revenueGrowth": 153.7,
       "revenue3yCagr": null,
       "profitMargins": 29.64,
@@ -846,8 +846,8 @@
       "sector": "Biyoteknoloji",
       "industry": "Biotechnology",
       "pos52w": 0.005,
-      "upside12m": 93.97,
-      "targetMean": 302.48,
+      "upside12m": 94.02,
+      "targetMean": 302.56,
       "recommendationKey": "buy",
       "numAnalysts": 27,
       "revenueGrowth": 16.7,
@@ -880,10 +880,10 @@
       "sector": "Yarı İletken",
       "industry": "Semiconductors",
       "pos52w": 0.555,
-      "upside12m": 46.14,
-      "targetMean": 656.24,
+      "upside12m": 46.93,
+      "targetMean": 659.77,
       "recommendationKey": "strong_buy",
-      "numAnalysts": 48,
+      "numAnalysts": 47,
       "revenueGrowth": 44.7,
       "revenue3yCagr": 13.64,
       "profitMargins": 16.77,
@@ -1541,38 +1541,6 @@
       "report": null
     },
     {
-      "ticker": "TEAM",
-      "price": 153.68,
-      "currency": "USD",
-      "changePct": -16.15,
-      "marketCap": 38902370304,
-      "sector": "Yazılım",
-      "industry": "Software - Application",
-      "pos52w": 0.561,
-      "upside12m": 47.15,
-      "targetMean": 226.14,
-      "recommendationKey": "buy",
-      "numAnalysts": 31,
-      "revenueGrowth": 23.7,
-      "revenue3yCagr": 22.97,
-      "profitMargins": 1.28,
-      "netDebtToEbitda": 0.15,
-      "fcfMargin": 29.12,
-      "dividendYield": 0,
-      "forwardPE": 22.9,
-      "trailingPE": 465.7,
-      "priceToBook": 42.54,
-      "score": 73,
-      "signal": "AL",
-      "wtSignal": "SAT",
-      "wtCrossSignal": "SAT",
-      "stSignal": "SAT",
-      "name": "Atlassian",
-      "indices": [],
-      "hasReport": false,
-      "report": null
-    },
-    {
       "ticker": "FANG",
       "price": 178.96,
       "currency": "USD",
@@ -1603,6 +1571,38 @@
       "indices": [
         "NDX"
       ],
+      "hasReport": false,
+      "report": null
+    },
+    {
+      "ticker": "TEAM",
+      "price": 153.68,
+      "currency": "USD",
+      "changePct": -16.15,
+      "marketCap": 38902370304,
+      "sector": "Yazılım",
+      "industry": "Software - Application",
+      "pos52w": 0.561,
+      "upside12m": 45.05,
+      "targetMean": 222.91,
+      "recommendationKey": "buy",
+      "numAnalysts": 31,
+      "revenueGrowth": 23.7,
+      "revenue3yCagr": 22.97,
+      "profitMargins": 1.28,
+      "netDebtToEbitda": 0.16,
+      "fcfMargin": 28.9,
+      "dividendYield": 0,
+      "forwardPE": 22.88,
+      "trailingPE": 465.7,
+      "priceToBook": 42.55,
+      "score": 72,
+      "signal": "AL",
+      "wtSignal": "SAT",
+      "wtCrossSignal": "SAT",
+      "stSignal": "SAT",
+      "name": "Atlassian",
+      "indices": [],
       "hasReport": false,
       "report": null
     },
@@ -1797,12 +1797,12 @@
       "price": 452.8,
       "currency": "USD",
       "changePct": -3.36,
-      "marketCap": 159964299264,
+      "marketCap": 156960276480,
       "sector": "Tıbbi Cihaz",
       "industry": "Medical Instruments & Supplies",
       "pos52w": 0.451,
-      "upside12m": 6.6,
-      "targetMean": 482.67,
+      "upside12m": 7.24,
+      "targetMean": 485.57,
       "recommendationKey": "buy",
       "numAnalysts": 30,
       "revenueGrowth": 21.7,
@@ -1917,7 +1917,7 @@
       "price": 91.49,
       "currency": "USD",
       "changePct": -1.18,
-      "marketCap": 158216912896,
+      "marketCap": 157912432640,
       "sector": "Aracı Kurum",
       "industry": "Capital Markets",
       "pos52w": 0.246,
@@ -1933,7 +1933,7 @@
       "dividendYield": 1.4,
       "forwardPE": 11.72,
       "trailingPE": 15.64,
-      "priceToBook": 3.08,
+      "priceToBook": 3.49,
       "score": 70,
       "signal": "AL",
       "wtSignal": "AL",
@@ -2413,8 +2413,8 @@
       "sector": "E-ticaret Yazılımı",
       "industry": "Software - Application",
       "pos52w": 0.632,
-      "upside12m": 18.99,
-      "targetMean": 177.19,
+      "upside12m": 19.2,
+      "targetMean": 177.5,
       "recommendationKey": "buy",
       "numAnalysts": 49,
       "revenueGrowth": 31.6,
@@ -2423,7 +2423,7 @@
       "netDebtToEbitda": -1.75,
       "fcfMargin": 11.58,
       "dividendYield": 0,
-      "forwardPE": 60.71,
+      "forwardPE": 60.73,
       "trailingPE": 91.36,
       "priceToBook": 15.02,
       "score": 65,
@@ -2719,8 +2719,8 @@
       "sector": "Seyahat/Platform",
       "industry": "Travel Services",
       "pos52w": 0.193,
-      "upside12m": 34.85,
-      "targetMean": 216.66,
+      "upside12m": 34.32,
+      "targetMean": 215.8,
       "recommendationKey": "buy",
       "numAnalysts": 35,
       "revenueGrowth": -1.3,
@@ -2729,7 +2729,7 @@
       "netDebtToEbitda": 0.56,
       "fcfMargin": 27.05,
       "dividendYield": 1.05,
-      "forwardPE": 13.13,
+      "forwardPE": 13.11,
       "trailingPE": 17.43,
       "priceToBook": null,
       "score": 64,
@@ -2812,6 +2812,96 @@
       ],
       "hasReport": false,
       "report": null
+    },
+    {
+      "ticker": "V",
+      "price": 422.65,
+      "currency": "USD",
+      "changePct": 0.01,
+      "marketCap": 788580401152,
+      "sector": "Ödeme Sistemleri",
+      "industry": "Credit Services",
+      "pos52w": 0.868,
+      "upside12m": 5.6,
+      "targetMean": 446.33,
+      "recommendationKey": "strong_buy",
+      "numAnalysts": 37,
+      "revenueGrowth": 13.2,
+      "revenue3yCagr": 12.02,
+      "profitMargins": 51.2,
+      "netDebtToEbitda": 0.28,
+      "fcfMargin": 45.71,
+      "dividendYield": 0.74,
+      "forwardPE": 24.65,
+      "trailingPE": 34.31,
+      "priceToBook": 22.05,
+      "score": 64,
+      "signal": "TUT",
+      "wtSignal": "SAT",
+      "wtCrossSignal": "SAT",
+      "stSignal": "AL",
+      "name": "Visa",
+      "indices": [
+        "SPX"
+      ],
+      "hasReport": true,
+      "report": {
+        "asOf": "FY2025 yıllık rapor verilerine dayalı, yaklaşık",
+        "segments": [
+          {
+            "name": "Hizmet geliri (işlem hacmine bağlı)",
+            "sharePct": 36,
+            "note": "Ağ üzerinden geçen toplam ödeme hacmiyle doğrudan orantılı"
+          },
+          {
+            "name": "Veri işleme (yetkilendirme, takas, mutabakat)",
+            "sharePct": 35,
+            "note": "İşlem adedine bağlı, ölçek ekonomisi çok yüksek"
+          },
+          {
+            "name": "Uluslararası işlem",
+            "sharePct": 24,
+            "note": "Sınır ötesi hacim; marjı en yüksek kol, seyahat hacmine duyarlı"
+          },
+          {
+            "name": "Diğer (katma değerli hizmetler)",
+            "sharePct": 5,
+            "note": "Danışmanlık, dolandırıcılık önleme, tokenizasyon"
+          }
+        ],
+        "competitors": [
+          "Mastercard",
+          "American Express",
+          "PayPal",
+          "Block (Square)",
+          "yerel ödeme şemaları (UPI, Pix)"
+        ],
+        "moat": [
+          {
+            "title": "İki taraflı ağ etkisi",
+            "desc": "Kart sahibi kabul edildiği için kartı taşıyor, üye iş yeri kart sahibi olduğu için kabul ediyor; yeni bir ağın her iki tarafı aynı anda ikna etmesi gerektiğinden giriş engeli neredeyse aşılmaz."
+          },
+          {
+            "title": "Sabit maliyetli altyapı üzerinde ölçek",
+            "desc": "Ağ bir kez kurulduktan sonra ek işlemin marjinal maliyeti ihmal edilebilir; hacim büyüdükçe marj genişliyor ve bu, küçük rakiplerin fiyatla rekabet etmesini imkânsız kılıyor."
+          }
+        ],
+        "strengths": [
+          "Net marj ve FCF marjı birlikte çok yüksek — kârın büyük kısmı gerçekten nakde dönüyor",
+          "Nakit bazlı tüketimden karta geçiş eğilimi gelişmekte olan pazarlarda hâlâ sürüyor; yapısal bir büyüme kolu",
+          "Kredi riski taşımıyor: ağ operatörü, kredi veren taraf değil — ekonomik yavaşlamada bankalardan daha korunaklı"
+        ],
+        "risks": [
+          "Değişim ücretleri (interchange) birçok ülkede düzenleyici baskı altında; ücret tavanları doğrudan gelire vurur",
+          "Devlet destekli yerel ödeme şemaları (Hindistan'da UPI, Brezilya'da Pix) kart ağlarını atlayan hacmi büyütüyor",
+          "Sınır ötesi işlem en kârlı kol ve seyahat hacmine duyarlı; küresel bir daralmada orantısız etkilenir"
+        ],
+        "verdict": "Ağ etkisi ve nakde dönüşüm kalitesi, bu şirketi değerlemenin en kolay savunulduğu iş modellerinden biri yapıyor; prim büyük ölçüde hak edilmiş. Asıl risk rekabet değil düzenleme ve devlet eliyle kurulan alternatif raylar — bunlar yavaş hareket eder ama moat'ı doğrudan hedef alır, dolayısıyla tez uzun vadeli ve düzenleyici gündeme bağlıdır.",
+        "revenue3yNote": "Gelir 45.9 Mr$ (son 12 ay, 30.09.2026'da biten dönem); yıllık büyüme %13.2, 3 yıllık bileşik büyüme %12.0 (FY2023→FY2026 yıllık tabloları). Büyüme temposu 3 yıllık ortalamayla uyumlu.",
+        "marginNote": "Net kâr marjı %51.2 (≈ 23.5 Mr$ net kâr); EBITDA marjı %69.4.",
+        "balanceNote": "Net borç 8.9 Mr$ (borç 23.0 Mr$, nakit 14.1 Mr$); Net Borç/EBITDA 0.28x — rahat seviye.",
+        "fcfNote": "FCF 21.0 Mr$, marj %45.7; net kârın %89.3'i nakde dönüyor — güçlü nakde dönüşüm. İşletme nakit akışıyla arasındaki 2.7 Mr$ fark yatırım/capex kalemi."
+      }
     },
     {
       "ticker": "INTC",
@@ -2913,8 +3003,8 @@
       "sector": "Yarı İletken",
       "industry": "Semiconductors",
       "pos52w": 0.109,
-      "upside12m": 71.37,
-      "targetMean": 66.18,
+      "upside12m": 67.72,
+      "targetMean": 64.77,
       "recommendationKey": "buy",
       "numAnalysts": 22,
       "revenueGrowth": 12.5,
@@ -2923,7 +3013,7 @@
       "netDebtToEbitda": -0.27,
       "fcfMargin": 6.16,
       "dividendYield": 1.24,
-      "forwardPE": 14.84,
+      "forwardPE": 14.88,
       "trailingPE": 110.34,
       "priceToBook": 1.8,
       "score": 63,
@@ -2945,8 +3035,8 @@
       "sector": "Tasarım Yazılımı",
       "industry": "Software - Infrastructure",
       "pos52w": 0.497,
-      "upside12m": 30.3,
-      "targetMean": 586.95,
+      "upside12m": 30.88,
+      "targetMean": 589.55,
       "recommendationKey": "strong_buy",
       "numAnalysts": 25,
       "revenueGrowth": 42.4,
@@ -2964,130 +3054,6 @@
       "wtCrossSignal": "SAT",
       "stSignal": "AL",
       "name": "Synopsys",
-      "indices": [
-        "NDX"
-      ],
-      "hasReport": false,
-      "report": null
-    },
-    {
-      "ticker": "V",
-      "price": 422.65,
-      "currency": "USD",
-      "changePct": 0.01,
-      "marketCap": 788580401152,
-      "sector": "Ödeme Sistemleri",
-      "industry": "Credit Services",
-      "pos52w": 0.868,
-      "upside12m": 4.92,
-      "targetMean": 443.44,
-      "recommendationKey": "strong_buy",
-      "numAnalysts": 37,
-      "revenueGrowth": 13.2,
-      "revenue3yCagr": 12.02,
-      "profitMargins": 51.2,
-      "netDebtToEbitda": 0.28,
-      "fcfMargin": 45.71,
-      "dividendYield": 0.74,
-      "forwardPE": 24.68,
-      "trailingPE": 34.31,
-      "priceToBook": 22.05,
-      "score": 63,
-      "signal": "TUT",
-      "wtSignal": "SAT",
-      "wtCrossSignal": "SAT",
-      "stSignal": "AL",
-      "name": "Visa",
-      "indices": [
-        "SPX"
-      ],
-      "hasReport": true,
-      "report": {
-        "asOf": "FY2025 yıllık rapor verilerine dayalı, yaklaşık",
-        "segments": [
-          {
-            "name": "Hizmet geliri (işlem hacmine bağlı)",
-            "sharePct": 36,
-            "note": "Ağ üzerinden geçen toplam ödeme hacmiyle doğrudan orantılı"
-          },
-          {
-            "name": "Veri işleme (yetkilendirme, takas, mutabakat)",
-            "sharePct": 35,
-            "note": "İşlem adedine bağlı, ölçek ekonomisi çok yüksek"
-          },
-          {
-            "name": "Uluslararası işlem",
-            "sharePct": 24,
-            "note": "Sınır ötesi hacim; marjı en yüksek kol, seyahat hacmine duyarlı"
-          },
-          {
-            "name": "Diğer (katma değerli hizmetler)",
-            "sharePct": 5,
-            "note": "Danışmanlık, dolandırıcılık önleme, tokenizasyon"
-          }
-        ],
-        "competitors": [
-          "Mastercard",
-          "American Express",
-          "PayPal",
-          "Block (Square)",
-          "yerel ödeme şemaları (UPI, Pix)"
-        ],
-        "moat": [
-          {
-            "title": "İki taraflı ağ etkisi",
-            "desc": "Kart sahibi kabul edildiği için kartı taşıyor, üye iş yeri kart sahibi olduğu için kabul ediyor; yeni bir ağın her iki tarafı aynı anda ikna etmesi gerektiğinden giriş engeli neredeyse aşılmaz."
-          },
-          {
-            "title": "Sabit maliyetli altyapı üzerinde ölçek",
-            "desc": "Ağ bir kez kurulduktan sonra ek işlemin marjinal maliyeti ihmal edilebilir; hacim büyüdükçe marj genişliyor ve bu, küçük rakiplerin fiyatla rekabet etmesini imkânsız kılıyor."
-          }
-        ],
-        "strengths": [
-          "Net marj ve FCF marjı birlikte çok yüksek — kârın büyük kısmı gerçekten nakde dönüyor",
-          "Nakit bazlı tüketimden karta geçiş eğilimi gelişmekte olan pazarlarda hâlâ sürüyor; yapısal bir büyüme kolu",
-          "Kredi riski taşımıyor: ağ operatörü, kredi veren taraf değil — ekonomik yavaşlamada bankalardan daha korunaklı"
-        ],
-        "risks": [
-          "Değişim ücretleri (interchange) birçok ülkede düzenleyici baskı altında; ücret tavanları doğrudan gelire vurur",
-          "Devlet destekli yerel ödeme şemaları (Hindistan'da UPI, Brezilya'da Pix) kart ağlarını atlayan hacmi büyütüyor",
-          "Sınır ötesi işlem en kârlı kol ve seyahat hacmine duyarlı; küresel bir daralmada orantısız etkilenir"
-        ],
-        "verdict": "Ağ etkisi ve nakde dönüşüm kalitesi, bu şirketi değerlemenin en kolay savunulduğu iş modellerinden biri yapıyor; prim büyük ölçüde hak edilmiş. Asıl risk rekabet değil düzenleme ve devlet eliyle kurulan alternatif raylar — bunlar yavaş hareket eder ama moat'ı doğrudan hedef alır, dolayısıyla tez uzun vadeli ve düzenleyici gündeme bağlıdır.",
-        "revenue3yNote": "Gelir 45.9 Mr$ (son 12 ay, 30.09.2026'da biten dönem); yıllık büyüme %13.2, 3 yıllık bileşik büyüme %12.0 (FY2023→FY2026 yıllık tabloları). Büyüme temposu 3 yıllık ortalamayla uyumlu.",
-        "marginNote": "Net kâr marjı %51.2 (≈ 23.5 Mr$ net kâr); EBITDA marjı %69.4.",
-        "balanceNote": "Net borç 8.9 Mr$ (borç 23.0 Mr$, nakit 14.1 Mr$); Net Borç/EBITDA 0.28x — rahat seviye.",
-        "fcfNote": "FCF 21.0 Mr$, marj %45.7; net kârın %89.3'i nakde dönüyor — güçlü nakde dönüşüm. İşletme nakit akışıyla arasındaki 2.7 Mr$ fark yatırım/capex kalemi."
-      }
-    },
-    {
-      "ticker": "MNST",
-      "price": 45.72,
-      "currency": "USD",
-      "changePct": -4.41,
-      "marketCap": 89497444352,
-      "sector": "İçecek",
-      "industry": "Beverages - Non-Alcoholic",
-      "pos52w": 0.713,
-      "upside12m": 9.46,
-      "targetMean": 50.04,
-      "recommendationKey": "buy",
-      "numAnalysts": 23,
-      "revenueGrowth": 16.7,
-      "revenue3yCagr": 9.54,
-      "profitMargins": 22.66,
-      "netDebtToEbitda": -1.25,
-      "fcfMargin": null,
-      "dividendYield": 0,
-      "forwardPE": 35.19,
-      "trailingPE": 41.56,
-      "priceToBook": 9.09,
-      "score": 62,
-      "signal": "TUT",
-      "wtSignal": null,
-      "wtCrossSignal": "SAT",
-      "stSignal": "AL",
-      "name": "Monster Beverage",
       "indices": [
         "NDX"
       ],
@@ -3222,8 +3188,8 @@
       "sector": "Finansal Veri",
       "industry": "Financial Data & Stock Exchanges",
       "pos52w": 0.661,
-      "upside12m": 12.26,
-      "targetMean": 525.15,
+      "upside12m": 12.59,
+      "targetMean": 526.7,
       "recommendationKey": "strong_buy",
       "numAnalysts": 20,
       "revenueGrowth": 6.8,
@@ -3232,7 +3198,7 @@
       "netDebtToEbitda": 1.33,
       "fcfMargin": 37.06,
       "dividendYield": 0.83,
-      "forwardPE": 23.18,
+      "forwardPE": 23.19,
       "trailingPE": 27.95,
       "priceToBook": 6.88,
       "score": 60,
@@ -3242,6 +3208,40 @@
       "stSignal": "AL",
       "name": "S&P Global",
       "indices": [],
+      "hasReport": false,
+      "report": null
+    },
+    {
+      "ticker": "MNST",
+      "price": 45.72,
+      "currency": "USD",
+      "changePct": -4.41,
+      "marketCap": 89497444352,
+      "sector": "İçecek",
+      "industry": "Beverages - Non-Alcoholic",
+      "pos52w": 0.713,
+      "upside12m": 9.46,
+      "targetMean": 50.04,
+      "recommendationKey": "buy",
+      "numAnalysts": 23,
+      "revenueGrowth": 16.7,
+      "revenue3yCagr": 9.54,
+      "profitMargins": 22.66,
+      "netDebtToEbitda": -1.21,
+      "fcfMargin": 15.13,
+      "dividendYield": 0,
+      "forwardPE": 35.19,
+      "trailingPE": 41.56,
+      "priceToBook": 9.09,
+      "score": 60,
+      "signal": "TUT",
+      "wtSignal": null,
+      "wtCrossSignal": "SAT",
+      "stSignal": "AL",
+      "name": "Monster Beverage",
+      "indices": [
+        "NDX"
+      ],
       "hasReport": false,
       "report": null
     },
@@ -3295,12 +3295,12 @@
       "revenueGrowth": 27.9,
       "revenue3yCagr": 32.68,
       "profitMargins": 7.57,
-      "netDebtToEbitda": 5.98,
-      "fcfMargin": 2.8,
+      "netDebtToEbitda": 7.59,
+      "fcfMargin": 1.93,
       "dividendYield": 0,
       "forwardPE": 32.78,
       "trailingPE": 100.64,
-      "priceToBook": 6.74,
+      "priceToBook": 6.77,
       "score": 59,
       "signal": "TUT",
       "wtSignal": null,
@@ -3576,7 +3576,7 @@
       "netDebtToEbitda": 2.57,
       "fcfMargin": 17.67,
       "dividendYield": 1.92,
-      "forwardPE": 16.77,
+      "forwardPE": 16.89,
       "trailingPE": 16.45,
       "priceToBook": 2.36,
       "score": 58,
@@ -3632,8 +3632,8 @@
       "sector": "E-ticaret",
       "industry": "Internet Retail",
       "pos52w": 0.047,
-      "upside12m": 49.89,
-      "targetMean": 2263.39,
+      "upside12m": 49.64,
+      "targetMean": 2259.55,
       "recommendationKey": "strong_buy",
       "numAnalysts": 26,
       "revenueGrowth": 45.1,
@@ -3642,7 +3642,7 @@
       "netDebtToEbitda": 2.23,
       "fcfMargin": -6.68,
       "dividendYield": 0,
-      "forwardPE": 27.49,
+      "forwardPE": 27.56,
       "trailingPE": 40.5,
       "priceToBook": 9.34,
       "score": 57,
@@ -3744,7 +3744,7 @@
       "netDebtToEbitda": 0.36,
       "fcfMargin": 11.51,
       "dividendYield": 3.35,
-      "forwardPE": 12.87,
+      "forwardPE": 12.9,
       "trailingPE": 15.61,
       "priceToBook": 2.13,
       "score": 57,
@@ -4215,17 +4215,17 @@
       "sector": "Ulaşım/Platform",
       "industry": "Software - Application",
       "pos52w": 0.146,
-      "upside12m": 44.16,
-      "targetMean": 98.88,
+      "upside12m": 44.56,
+      "targetMean": 99.16,
       "recommendationKey": "buy",
-      "numAnalysts": 46,
+      "numAnalysts": 47,
       "revenueGrowth": 9.6,
       "revenue3yCagr": 17.73,
       "profitMargins": 6.13,
       "netDebtToEbitda": 0.98,
       "fcfMargin": 13.12,
       "dividendYield": 0,
-      "forwardPE": 15.64,
+      "forwardPE": 15.65,
       "trailingPE": 40.35,
       "priceToBook": 5.06,
       "score": 56,
@@ -4713,97 +4713,6 @@
       "report": null
     },
     {
-      "ticker": "QCOM",
-      "price": 165.41,
-      "currency": "USD",
-      "changePct": 5.52,
-      "marketCap": 176988700672,
-      "sector": "Yarı İletken",
-      "industry": "Semiconductors",
-      "pos52w": 0.315,
-      "upside12m": 15.54,
-      "targetMean": 191.11,
-      "recommendationKey": "hold",
-      "numAnalysts": 28,
-      "revenueGrowth": -8.4,
-      "revenue3yCagr": 6.46,
-      "profitMargins": 31.61,
-      "netDebtToEbitda": 0.78,
-      "fcfMargin": 21.12,
-      "dividendYield": 2.22,
-      "forwardPE": 13.24,
-      "trailingPE": 13.02,
-      "priceToBook": 5.83,
-      "score": 51,
-      "signal": "TUT",
-      "wtSignal": null,
-      "wtCrossSignal": "SAT",
-      "stSignal": "SAT",
-      "name": "Qualcomm",
-      "indices": [
-        "NDX",
-        "SPX"
-      ],
-      "hasReport": true,
-      "report": {
-        "asOf": "FY2025 yıllık rapor verilerine dayalı, yaklaşık",
-        "segments": [
-          {
-            "name": "QCT — El cihazları (akıllı telefon çipleri)",
-            "sharePct": 63,
-            "note": "Gelirin ana gövdesi; müşteri yoğunlaşması yüksek"
-          },
-          {
-            "name": "QCT — Otomotiv",
-            "sharePct": 12,
-            "note": "En hızlı büyüyen kol; dijital kokpit ve ADAS"
-          },
-          {
-            "name": "QCT — Nesnelerin İnterneti",
-            "sharePct": 12,
-            "note": "Endüstriyel ve tüketici uç birimleri"
-          },
-          {
-            "name": "QTL — Lisanslama",
-            "sharePct": 13,
-            "note": "Küçük ama çok yüksek marjlı; patent portföyünden gelen telif"
-          }
-        ],
-        "competitors": [
-          "MediaTek",
-          "Apple (kendi modemi)",
-          "Samsung (Exynos)",
-          "NVIDIA (otomotivde)",
-          "Broadcom"
-        ],
-        "moat": [
-          {
-            "title": "Temel patent portföyü",
-            "desc": "Hücresel bağlantı standartlarındaki temel patentler, çipi kimden alırsa alsın üreticiden telif alınmasını sağlıyor; bu gelir donanım rekabetinden bağımsız."
-          },
-          {
-            "title": "Sistem entegrasyonu derinliği",
-            "desc": "Modem, işlemci ve güç yönetimini tek pakette optimize etme yeteneği; telefon üreticisi için doğrulama süresini kısaltıyor ve alternatife geçişi maliyetli kılıyor."
-          }
-        ],
-        "strengths": [
-          "Lisans geliri donanım döngüsünden bağımsız, çok yüksek marjlı bir taban sağlıyor",
-          "Otomotiv kolu hızlı büyüyor ve telefon bağımlılığını azaltma stratejisinin somut ayağı",
-          "Nakde dönüşüm güçlü ve bilanço rahat"
-        ],
-        "risks": [
-          "Gelir son 12 ayda daralmış — telefon pazarındaki durgunluk doğrudan yansıyor",
-          "En büyük müşterisinin kendi modemine geçiş süreci gelirde yapısal bir boşluk yaratma riski taşıyor",
-          "Lisanslama modeli düzenleyici ve hukuki itirazlara açık; telif oranlarındaki bir gerileme en kârlı kolu doğrudan vurur"
-        ],
-        "verdict": "Lisans geliri ve otomotiv çeşitlendirmesi gerçek güçler, değerleme de mütevazı. Ancak tezin merkezinde tek bir soru var: en büyük müşterinin kendi çipine geçişi ne kadar hızlı ve tam olacak. Bu geçiş öngörülenden hızlı ilerlerse otomotiv büyümesi boşluğu kapatmaya yetmez; yavaş ilerlerse mevcut çarpan ucuz kalır.",
-        "revenue3yNote": "Gelir 43.1 Mr$ (son 12 ay, 27.09.2026'da biten dönem); yıllık büyüme %-8.4, 3 yıllık bileşik büyüme %6.5 (FY2023→FY2026 yıllık tabloları). Son yıl 3 yıllık ortalamanın 14.9 puan ALTINDA — yavaşlama.",
-        "marginNote": "Net kâr marjı %31.6 (≈ 13.6 Mr$ net kâr); EBITDA marjı %24.6.",
-        "balanceNote": "Net borç 8.3 Mr$ (borç 16.0 Mr$, nakit 7.7 Mr$); Net Borç/EBITDA 0.78x — rahat seviye.",
-        "fcfNote": "FCF 9.1 Mr$, marj %21.1; net kârın %66.8'i nakde dönüyor — dönüşüm makul ama tam değil. İşletme nakit akışıyla arasındaki 2.0 Mr$ fark yatırım/capex kalemi."
-      }
-    },
-    {
       "ticker": "ADP",
       "price": 303.35,
       "currency": "USD",
@@ -4904,6 +4813,97 @@
       ],
       "hasReport": false,
       "report": null
+    },
+    {
+      "ticker": "QCOM",
+      "price": 165.41,
+      "currency": "USD",
+      "changePct": 5.52,
+      "marketCap": 176988700672,
+      "sector": "Yarı İletken",
+      "industry": "Semiconductors",
+      "pos52w": 0.315,
+      "upside12m": 12.32,
+      "targetMean": 185.79,
+      "recommendationKey": "hold",
+      "numAnalysts": 28,
+      "revenueGrowth": -8.4,
+      "revenue3yCagr": 6.46,
+      "profitMargins": 31.61,
+      "netDebtToEbitda": 0.78,
+      "fcfMargin": 21.12,
+      "dividendYield": 2.22,
+      "forwardPE": 13.5,
+      "trailingPE": 13.02,
+      "priceToBook": 5.83,
+      "score": 50,
+      "signal": "TUT",
+      "wtSignal": null,
+      "wtCrossSignal": "SAT",
+      "stSignal": "SAT",
+      "name": "Qualcomm",
+      "indices": [
+        "NDX",
+        "SPX"
+      ],
+      "hasReport": true,
+      "report": {
+        "asOf": "FY2025 yıllık rapor verilerine dayalı, yaklaşık",
+        "segments": [
+          {
+            "name": "QCT — El cihazları (akıllı telefon çipleri)",
+            "sharePct": 63,
+            "note": "Gelirin ana gövdesi; müşteri yoğunlaşması yüksek"
+          },
+          {
+            "name": "QCT — Otomotiv",
+            "sharePct": 12,
+            "note": "En hızlı büyüyen kol; dijital kokpit ve ADAS"
+          },
+          {
+            "name": "QCT — Nesnelerin İnterneti",
+            "sharePct": 12,
+            "note": "Endüstriyel ve tüketici uç birimleri"
+          },
+          {
+            "name": "QTL — Lisanslama",
+            "sharePct": 13,
+            "note": "Küçük ama çok yüksek marjlı; patent portföyünden gelen telif"
+          }
+        ],
+        "competitors": [
+          "MediaTek",
+          "Apple (kendi modemi)",
+          "Samsung (Exynos)",
+          "NVIDIA (otomotivde)",
+          "Broadcom"
+        ],
+        "moat": [
+          {
+            "title": "Temel patent portföyü",
+            "desc": "Hücresel bağlantı standartlarındaki temel patentler, çipi kimden alırsa alsın üreticiden telif alınmasını sağlıyor; bu gelir donanım rekabetinden bağımsız."
+          },
+          {
+            "title": "Sistem entegrasyonu derinliği",
+            "desc": "Modem, işlemci ve güç yönetimini tek pakette optimize etme yeteneği; telefon üreticisi için doğrulama süresini kısaltıyor ve alternatife geçişi maliyetli kılıyor."
+          }
+        ],
+        "strengths": [
+          "Lisans geliri donanım döngüsünden bağımsız, çok yüksek marjlı bir taban sağlıyor",
+          "Otomotiv kolu hızlı büyüyor ve telefon bağımlılığını azaltma stratejisinin somut ayağı",
+          "Nakde dönüşüm güçlü ve bilanço rahat"
+        ],
+        "risks": [
+          "Gelir son 12 ayda daralmış — telefon pazarındaki durgunluk doğrudan yansıyor",
+          "En büyük müşterisinin kendi modemine geçiş süreci gelirde yapısal bir boşluk yaratma riski taşıyor",
+          "Lisanslama modeli düzenleyici ve hukuki itirazlara açık; telif oranlarındaki bir gerileme en kârlı kolu doğrudan vurur"
+        ],
+        "verdict": "Lisans geliri ve otomotiv çeşitlendirmesi gerçek güçler, değerleme de mütevazı. Ancak tezin merkezinde tek bir soru var: en büyük müşterinin kendi çipine geçişi ne kadar hızlı ve tam olacak. Bu geçiş öngörülenden hızlı ilerlerse otomotiv büyümesi boşluğu kapatmaya yetmez; yavaş ilerlerse mevcut çarpan ucuz kalır.",
+        "revenue3yNote": "Gelir 43.1 Mr$ (son 12 ay, 27.09.2026'da biten dönem); yıllık büyüme %-8.4, 3 yıllık bileşik büyüme %6.5 (FY2023→FY2026 yıllık tabloları). Son yıl 3 yıllık ortalamanın 14.9 puan ALTINDA — yavaşlama.",
+        "marginNote": "Net kâr marjı %31.6 (≈ 13.6 Mr$ net kâr); EBITDA marjı %24.6.",
+        "balanceNote": "Net borç 8.3 Mr$ (borç 16.0 Mr$, nakit 7.7 Mr$); Net Borç/EBITDA 0.78x — rahat seviye.",
+        "fcfNote": "FCF 9.1 Mr$, marj %21.1; net kârın %66.8'i nakde dönüyor — dönüşüm makul ama tam değil. İşletme nakit akışıyla arasındaki 2.0 Mr$ fark yatırım/capex kalemi."
+      }
     },
     {
       "ticker": "TMUS",
@@ -5070,6 +5070,74 @@
       "name": "American Tower",
       "indices": [
         "SPX"
+      ],
+      "hasReport": false,
+      "report": null
+    },
+    {
+      "ticker": "SPG",
+      "price": 228.42,
+      "currency": "USD",
+      "changePct": 0.83,
+      "marketCap": 86464774144,
+      "sector": "GYO (AVM)",
+      "industry": "REIT - Retail",
+      "pos52w": 0.834,
+      "upside12m": 0.21,
+      "targetMean": 228.89,
+      "recommendationKey": "buy",
+      "numAnalysts": 19,
+      "revenueGrowth": 13.3,
+      "revenue3yCagr": 3.34,
+      "profitMargins": 63.09,
+      "netDebtToEbitda": 5.42,
+      "fcfMargin": 39.77,
+      "dividendYield": 4.03,
+      "forwardPE": 33.72,
+      "trailingPE": 16.49,
+      "priceToBook": 18.21,
+      "score": 50,
+      "signal": "TUT",
+      "wtSignal": "AL",
+      "wtCrossSignal": "AL",
+      "stSignal": "AL",
+      "name": "Simon Property Group",
+      "indices": [
+        "SPX"
+      ],
+      "hasReport": false,
+      "report": null
+    },
+    {
+      "ticker": "TRI",
+      "price": 112.57,
+      "currency": "USD",
+      "changePct": -4.69,
+      "marketCap": 48794464256,
+      "sector": "Bilgi Hizmetleri",
+      "industry": "Specialty Business Services",
+      "pos52w": 0.552,
+      "upside12m": 14.08,
+      "targetMean": 128.42,
+      "recommendationKey": "buy",
+      "numAnalysts": 13,
+      "revenueGrowth": 10.6,
+      "revenue3yCagr": 4.1,
+      "profitMargins": 19.69,
+      "netDebtToEbitda": 1.11,
+      "fcfMargin": 14.7,
+      "dividendYield": 2.33,
+      "forwardPE": 23.92,
+      "trailingPE": 34.53,
+      "priceToBook": 4.35,
+      "score": 50,
+      "signal": "TUT",
+      "wtSignal": "SAT",
+      "wtCrossSignal": "SAT",
+      "stSignal": "SAT",
+      "name": "Thomson Reuters",
+      "indices": [
+        "NDX"
       ],
       "hasReport": false,
       "report": null
@@ -5295,38 +5363,6 @@
       "report": null
     },
     {
-      "ticker": "CHTR",
-      "price": 118.07,
-      "currency": "USD",
-      "changePct": -6.19,
-      "marketCap": 15344094208,
-      "sector": "Kablo/Telekom",
-      "industry": "Telecom Services",
-      "pos52w": 0.111,
-      "upside12m": 43.89,
-      "targetMean": 169.89,
-      "recommendationKey": "hold",
-      "numAnalysts": 18,
-      "revenueGrowth": 9.1,
-      "revenue3yCagr": 0.46,
-      "profitMargins": 2.5,
-      "netDebtToEbitda": 3.87,
-      "fcfMargin": 17.71,
-      "dividendYield": 0,
-      "forwardPE": 2.52,
-      "trailingPE": 11.1,
-      "priceToBook": 1.26,
-      "score": 48,
-      "signal": "TUT",
-      "wtSignal": null,
-      "wtCrossSignal": "AL",
-      "stSignal": "AL",
-      "name": "Charter Communications",
-      "indices": [],
-      "hasReport": false,
-      "report": null
-    },
-    {
       "ticker": "PCAR",
       "price": 101.98,
       "currency": "USD",
@@ -5379,7 +5415,7 @@
       "netDebtToEbitda": 2.86,
       "fcfMargin": 28.87,
       "dividendYield": 0.84,
-      "forwardPE": 19.35,
+      "forwardPE": 19.4,
       "trailingPE": 18.86,
       "priceToBook": 2.46,
       "score": 48,
@@ -5437,7 +5473,7 @@
       "pos52w": 0.167,
       "upside12m": 12.96,
       "targetMean": 89.69,
-      "recommendationKey": "hold",
+      "recommendationKey": "buy",
       "numAnalysts": 13,
       "revenueGrowth": -1.3,
       "revenue3yCagr": 5.42,
@@ -5553,7 +5589,7 @@
       "price": 49.12,
       "currency": "USD",
       "changePct": -3.36,
-      "marketCap": 90993565696,
+      "marketCap": 90547724288,
       "sector": "Demiryolu",
       "industry": "Railroads",
       "pos52w": 0.776,
@@ -5759,7 +5795,7 @@
       "netDebtToEbitda": 0.68,
       "fcfMargin": 8.05,
       "dividendYield": 1.8,
-      "forwardPE": 18.75,
+      "forwardPE": 18.73,
       "trailingPE": 20.84,
       "priceToBook": 3.5,
       "score": 46,
@@ -5770,40 +5806,6 @@
       "name": "General Dynamics",
       "indices": [
         "SPX"
-      ],
-      "hasReport": false,
-      "report": null
-    },
-    {
-      "ticker": "TRI",
-      "price": 112.57,
-      "currency": "USD",
-      "changePct": -4.69,
-      "marketCap": 48794464256,
-      "sector": "Bilgi Hizmetleri",
-      "industry": "Specialty Business Services",
-      "pos52w": 0.552,
-      "upside12m": 13.26,
-      "targetMean": 127.5,
-      "recommendationKey": "buy",
-      "numAnalysts": 13,
-      "revenueGrowth": 2.9,
-      "revenue3yCagr": 4.1,
-      "profitMargins": 19.69,
-      "netDebtToEbitda": 1.17,
-      "fcfMargin": 13.83,
-      "dividendYield": 2.33,
-      "forwardPE": 23.82,
-      "trailingPE": 34.53,
-      "priceToBook": 4.35,
-      "score": 46,
-      "signal": "TUT",
-      "wtSignal": "SAT",
-      "wtCrossSignal": "SAT",
-      "stSignal": "SAT",
-      "name": "Thomson Reuters",
-      "indices": [
-        "NDX"
       ],
       "hasReport": false,
       "report": null
@@ -6059,7 +6061,7 @@
       "price": 230.25,
       "currency": "USD",
       "changePct": 1.73,
-      "marketCap": 161862533120,
+      "marketCap": 161987969024,
       "sector": "Yaşam Bilimleri",
       "industry": "Diagnostics & Research",
       "pos52w": 0.847,
@@ -6366,6 +6368,86 @@
       }
     },
     {
+      "ticker": "MCD",
+      "price": 276.52,
+      "currency": "USD",
+      "changePct": -0.55,
+      "marketCap": 195163602944,
+      "sector": "Restoran",
+      "industry": "Restaurants",
+      "pos52w": 0.42,
+      "upside12m": 8.32,
+      "targetMean": 299.52,
+      "recommendationKey": "buy",
+      "numAnalysts": 29,
+      "revenueGrowth": 1.1,
+      "revenue3yCagr": 5.06,
+      "profitMargins": 32.38,
+      "netDebtToEbitda": 3.54,
+      "fcfMargin": 20.41,
+      "dividendYield": 2.79,
+      "forwardPE": 20.18,
+      "trailingPE": 21.88,
+      "priceToBook": null,
+      "score": 43,
+      "signal": "İZLE",
+      "wtSignal": "AL",
+      "wtCrossSignal": "AL",
+      "stSignal": "AL",
+      "name": "McDonald's",
+      "indices": [
+        "SPX"
+      ],
+      "hasReport": true,
+      "report": {
+        "asOf": "FY2025 yıllık rapor verilerine dayalı, yaklaşık",
+        "segments": [
+          {
+            "name": "Franchise restoranlardan kira ve telif",
+            "sharePct": 62,
+            "note": "Asıl iş modeli: gayrimenkul ve marka kiralama, restoran işletmek değil"
+          },
+          {
+            "name": "Şirket işletmeli restoran satışları",
+            "sharePct": 38,
+            "note": "Doğrudan işletilen az sayıda restoran; marjı düşük"
+          }
+        ],
+        "competitors": [
+          "Restaurant Brands (Burger King)",
+          "Yum! Brands",
+          "Wendy's",
+          "Chipotle",
+          "Starbucks"
+        ],
+        "moat": [
+          {
+            "title": "Gayrimenkul portföyü",
+            "desc": "Restoranların bulunduğu arsaların büyük kısmına sahip olması, franchise alandan hem telif hem kira almasını sağlıyor; bu, gelirin restoran kârlılığından kısmen bağımsız ve çok istikrarlı olması demek."
+          },
+          {
+            "title": "Küresel marka ve ölçekli tedarik",
+            "desc": "Marka tanınırlığı yeni pazarda müşteri edinme maliyetini düşürüyor; tedarik ölçeği ise franchise alana rakiplerinden daha iyi girdi maliyeti sunmasını sağlıyor."
+          }
+        ],
+        "strengths": [
+          "Franchise ağırlıklı model yüksek marjlı, öngörülebilir ve sermaye ihtiyacı düşük gelir üretiyor",
+          "Gayrimenkul sahipliği gelir tabanını restoran kârlılığından kısmen ayırıyor",
+          "Ekonomik yavaşlamalarda değer odaklı menü pazar payı kazandırabiliyor"
+        ],
+        "risks": [
+          "Net Borç/EBITDA yüksek seviyede — model kasıtlı kaldıraçlı ve faiz ortamına duyarlı",
+          "Gelir büyümesi düşük; büyüme fiyat artışı ve seçili pazarlara bağımlı",
+          "Tüketici tarafında fiyat direnci arttı; sürekli zam trafiği aşındırma riski taşıyor"
+        ],
+        "verdict": "Gayrimenkul temelli franchise modeli, gelir istikrarı açısından restoran sektöründe eşi az bulunan bir yapı ve marjı bu sayede çok yüksek. Değerlemedeki iki sınırlayıcı unsur kaldıraç ve büyüme: borç seviyesi kasıtlı ama faiz ortamına duyarlılık yaratıyor, büyüme ise fiyat artışına bağımlı hale gelmiş durumda. İstikrar için ödenen prim makul, ancak büyüme beklentisi düşük tutulmalı.",
+        "revenue3yNote": "Gelir 27.8 Mr$ (son 12 ay, 30.09.2026'da biten dönem); yıllık büyüme %1.1, 3 yıllık bileşik büyüme %5.1 (FY2022→FY2025 yıllık tabloları). Son yıl 3 yıllık ortalamanın 4.0 puan ALTINDA — yavaşlama.",
+        "marginNote": "Net kâr marjı %32.4 (≈ 9.0 Mr$ net kâr); EBITDA marjı %54.3.",
+        "balanceNote": "Net borç 53.3 Mr$ (borç 54.5 Mr$, nakit 1.2 Mr$); Net Borç/EBITDA 3.54x — YÜKSEK; faiz ortamına ve nakit akışı istikrarına duyarlı.",
+        "fcfNote": "FCF 5.7 Mr$, marj %20.4; net kârın %63.0'i nakde dönüyor — dönüşüm makul ama tam değil. İşletme nakit akışıyla arasındaki 5.3 Mr$ fark yatırım/capex kalemi."
+      }
+    },
+    {
       "ticker": "LIN",
       "price": 515.25,
       "currency": "USD",
@@ -6435,6 +6517,38 @@
       "report": null
     },
     {
+      "ticker": "CHTR",
+      "price": 118.07,
+      "currency": "USD",
+      "changePct": -6.19,
+      "marketCap": 21140617216,
+      "sector": "Kablo/Telekom",
+      "industry": "Telecom Services",
+      "pos52w": 0.111,
+      "upside12m": 43.89,
+      "targetMean": 169.89,
+      "recommendationKey": "hold",
+      "numAnalysts": 18,
+      "revenueGrowth": 9.1,
+      "revenue3yCagr": 0.46,
+      "profitMargins": 2.5,
+      "netDebtToEbitda": 4.92,
+      "fcfMargin": 5.81,
+      "dividendYield": 0,
+      "forwardPE": 2.52,
+      "trailingPE": 11.1,
+      "priceToBook": 1.23,
+      "score": 42,
+      "signal": "İZLE",
+      "wtSignal": null,
+      "wtCrossSignal": "AL",
+      "stSignal": "AL",
+      "name": "Charter Communications",
+      "indices": [],
+      "hasReport": false,
+      "report": null
+    },
+    {
       "ticker": "GILD",
       "price": 166.89,
       "currency": "USD",
@@ -6470,45 +6584,11 @@
       "report": null
     },
     {
-      "ticker": "SPG",
-      "price": 228.42,
-      "currency": "USD",
-      "changePct": 0.83,
-      "marketCap": 86464774144,
-      "sector": "GYO (AVM)",
-      "industry": "REIT - Retail",
-      "pos52w": 0.834,
-      "upside12m": 0.21,
-      "targetMean": 228.89,
-      "recommendationKey": "buy",
-      "numAnalysts": 19,
-      "revenueGrowth": 13.3,
-      "revenue3yCagr": 3.34,
-      "profitMargins": 63.09,
-      "netDebtToEbitda": 5.49,
-      "fcfMargin": null,
-      "dividendYield": 4.03,
-      "forwardPE": 33.72,
-      "trailingPE": 16.49,
-      "priceToBook": 19.38,
-      "score": 42,
-      "signal": "İZLE",
-      "wtSignal": "AL",
-      "wtCrossSignal": "AL",
-      "stSignal": "AL",
-      "name": "Simon Property Group",
-      "indices": [
-        "SPX"
-      ],
-      "hasReport": false,
-      "report": null
-    },
-    {
       "ticker": "ORLY",
       "price": 89.89,
       "currency": "USD",
       "changePct": -1.75,
-      "marketCap": 72326168576,
+      "marketCap": 72096153600,
       "sector": "Perakende (Oto Yedek Parça)",
       "industry": "Auto Parts",
       "pos52w": 0.367,
@@ -6519,8 +6599,8 @@
       "revenueGrowth": 8.8,
       "revenue3yCagr": 7.26,
       "profitMargins": 14.27,
-      "netDebtToEbitda": 2.35,
-      "fcfMargin": 8.49,
+      "netDebtToEbitda": 2.37,
+      "fcfMargin": 8.34,
       "dividendYield": 0,
       "forwardPE": 24.55,
       "trailingPE": 27.57,
@@ -6811,9 +6891,9 @@
       "sector": "Sigorta",
       "industry": "Insurance - Property & Casualty",
       "pos52w": 0.744,
-      "upside12m": 1.73,
-      "targetMean": 231.71,
-      "recommendationKey": "none",
+      "upside12m": 2.02,
+      "targetMean": 232.38,
+      "recommendationKey": "hold",
       "numAnalysts": 21,
       "revenueGrowth": 3,
       "revenue3yCagr": 17.65,
@@ -6821,7 +6901,7 @@
       "netDebtToEbitda": 0.4,
       "fcfMargin": 14.2,
       "dividendYield": 0.18,
-      "forwardPE": 14.03,
+      "forwardPE": 14.06,
       "trailingPE": 11.47,
       "priceToBook": 3.82,
       "score": 40,
@@ -6957,86 +7037,6 @@
       ],
       "hasReport": false,
       "report": null
-    },
-    {
-      "ticker": "MCD",
-      "price": 276.52,
-      "currency": "USD",
-      "changePct": -0.55,
-      "marketCap": 195163602944,
-      "sector": "Restoran",
-      "industry": "Restaurants",
-      "pos52w": 0.42,
-      "upside12m": 8.32,
-      "targetMean": 299.52,
-      "recommendationKey": "buy",
-      "numAnalysts": 29,
-      "revenueGrowth": 1.1,
-      "revenue3yCagr": 5.06,
-      "profitMargins": 32.38,
-      "netDebtToEbitda": 3.57,
-      "fcfMargin": null,
-      "dividendYield": 2.79,
-      "forwardPE": 20.17,
-      "trailingPE": 21.88,
-      "priceToBook": null,
-      "score": 39,
-      "signal": "İZLE",
-      "wtSignal": "AL",
-      "wtCrossSignal": "AL",
-      "stSignal": "AL",
-      "name": "McDonald's",
-      "indices": [
-        "SPX"
-      ],
-      "hasReport": true,
-      "report": {
-        "asOf": "FY2025 yıllık rapor verilerine dayalı, yaklaşık",
-        "segments": [
-          {
-            "name": "Franchise restoranlardan kira ve telif",
-            "sharePct": 62,
-            "note": "Asıl iş modeli: gayrimenkul ve marka kiralama, restoran işletmek değil"
-          },
-          {
-            "name": "Şirket işletmeli restoran satışları",
-            "sharePct": 38,
-            "note": "Doğrudan işletilen az sayıda restoran; marjı düşük"
-          }
-        ],
-        "competitors": [
-          "Restaurant Brands (Burger King)",
-          "Yum! Brands",
-          "Wendy's",
-          "Chipotle",
-          "Starbucks"
-        ],
-        "moat": [
-          {
-            "title": "Gayrimenkul portföyü",
-            "desc": "Restoranların bulunduğu arsaların büyük kısmına sahip olması, franchise alandan hem telif hem kira almasını sağlıyor; bu, gelirin restoran kârlılığından kısmen bağımsız ve çok istikrarlı olması demek."
-          },
-          {
-            "title": "Küresel marka ve ölçekli tedarik",
-            "desc": "Marka tanınırlığı yeni pazarda müşteri edinme maliyetini düşürüyor; tedarik ölçeği ise franchise alana rakiplerinden daha iyi girdi maliyeti sunmasını sağlıyor."
-          }
-        ],
-        "strengths": [
-          "Franchise ağırlıklı model yüksek marjlı, öngörülebilir ve sermaye ihtiyacı düşük gelir üretiyor",
-          "Gayrimenkul sahipliği gelir tabanını restoran kârlılığından kısmen ayırıyor",
-          "Ekonomik yavaşlamalarda değer odaklı menü pazar payı kazandırabiliyor"
-        ],
-        "risks": [
-          "Net Borç/EBITDA yüksek seviyede — model kasıtlı kaldıraçlı ve faiz ortamına duyarlı",
-          "Gelir büyümesi düşük; büyüme fiyat artışı ve seçili pazarlara bağımlı",
-          "Tüketici tarafında fiyat direnci arttı; sürekli zam trafiği aşındırma riski taşıyor"
-        ],
-        "verdict": "Gayrimenkul temelli franchise modeli, gelir istikrarı açısından restoran sektöründe eşi az bulunan bir yapı ve marjı bu sayede çok yüksek. Değerlemedeki iki sınırlayıcı unsur kaldıraç ve büyüme: borç seviyesi kasıtlı ama faiz ortamına duyarlılık yaratıyor, büyüme ise fiyat artışına bağımlı hale gelmiş durumda. İstikrar için ödenen prim makul, ancak büyüme beklentisi düşük tutulmalı.",
-        "revenue3yNote": "Gelir 27.8 Mr$ (son 12 ay, 30.09.2026'da biten dönem); yıllık büyüme %1.1, 3 yıllık bileşik büyüme %5.1 (FY2022→FY2025 yıllık tabloları). Son yıl 3 yıllık ortalamanın 4.0 puan ALTINDA — yavaşlama.",
-        "marginNote": "Net kâr marjı %32.4 (≈ 9.0 Mr$ net kâr); EBITDA marjı %54.3.",
-        "balanceNote": "Net borç 53.8 Mr$ (borç 54.6 Mr$, nakit 0.8 Mr$); Net Borç/EBITDA 3.57x — YÜKSEK; faiz ortamına ve nakit akışı istikrarına duyarlı.",
-        "fcfNote": null
-      }
     },
     {
       "ticker": "CL",
@@ -7934,8 +7934,8 @@
       "sector": "İlaç",
       "industry": "Drug Manufacturers - General",
       "pos52w": 0.738,
-      "upside12m": 2.44,
-      "targetMean": 30.11,
+      "upside12m": 2.96,
+      "targetMean": 30.26,
       "recommendationKey": "buy",
       "numAnalysts": 26,
       "revenueGrowth": -0.4,
@@ -8863,8 +8863,8 @@
       "revenueGrowth": 6.6,
       "revenue3yCagr": 3.87,
       "profitMargins": 16.16,
-      "netDebtToEbitda": 5.38,
-      "fcfMargin": -8.24,
+      "netDebtToEbitda": 5.57,
+      "fcfMargin": -18.05,
       "dividendYield": 3.4,
       "forwardPE": 17.82,
       "trailingPE": 18.74,
@@ -8990,7 +8990,7 @@
       "netDebtToEbitda": 2.89,
       "fcfMargin": 7.41,
       "dividendYield": 2.07,
-      "forwardPE": 23.53,
+      "forwardPE": 23.54,
       "trailingPE": 22.42,
       "priceToBook": 5.53,
       "score": 26,
